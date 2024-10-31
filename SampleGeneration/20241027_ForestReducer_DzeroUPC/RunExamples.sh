@@ -19,11 +19,11 @@ mkdir -p Output/
 ### MC Gen PbPb ###
 ###################
 
-#./Execute --Input Samples/HiForestMiniAOD_30_MC.root \
-#   --Output Output/output_30_MC.root \
-#   --Year 2023 \
-#   --MinDzeroPT 1.0 \
-#   --IsData false \
-#   --PFTree particleFlowAnalyser/pftree \
+./Execute --Input ../../Samples/SamplesForest23HIVertex/Run23UPC_MC_pthat0_gammaN_Partial.root \
+   --Output Output/output_30_MC.root \
+   --Year 2023 \
+   --MinDzeroPT 1.0 \
+   --IsData false \
+   --PFTree particleFlowAnalyser/pftree \
 
 
