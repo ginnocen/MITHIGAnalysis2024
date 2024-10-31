@@ -737,7 +737,6 @@ public:
    std::vector<float> *DsvpvDisErr_2D;
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
-   std::vector<int> *DnTrackInAcceptanceHP;
    int nTrackInAcceptanceHP;
 
    //MC only quantities

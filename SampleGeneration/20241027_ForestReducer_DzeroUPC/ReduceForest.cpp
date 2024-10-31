@@ -187,7 +187,6 @@ int main(int argc, char *argv[]) {
         if (MDzero.Dpt[iD] < MinDzeroPT ||
             MDzero.PassUPCDzero2023Cut(iD) == false)
           continue;
-        MDzeroUPC.DnTrackInAcceptanceHP->push_back(nTrackInAcceptanceHP);
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
         MDzeroUPC.Dmass->push_back(MDzero.Dmass[iD]);

@@ -2736,7 +2736,6 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete DsvpvDisErr_2D;
       delete Dalpha;
       delete Ddtheta;
-      delete DnTrackInAcceptanceHP;
       delete Gpt;
       delete Gy;
       delete GpdgId;
@@ -2770,7 +2769,6 @@ bool DzeroUPCTreeMessenger::Initialize()
    DsvpvDisErr_2D = nullptr;
    Dalpha = nullptr;
    Ddtheta = nullptr;
-   DnTrackInAcceptanceHP = nullptr;
    Gpt = nullptr;
    Gy = nullptr;
    GpdgId = nullptr;
@@ -2801,7 +2799,6 @@ bool DzeroUPCTreeMessenger::Initialize()
    Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
    Tree->SetBranchAddress("Dalpha", &Dalpha);
    Tree->SetBranchAddress("Ddtheta", &Ddtheta);
-   Tree->SetBranchAddress("DnTrackInAcceptanceHP", &DnTrackInAcceptanceHP);
    Tree->SetBranchAddress("nTrackInAcceptanceHP", &nTrackInAcceptanceHP);
    Tree->SetBranchAddress("Gpt", &Gpt);
    Tree->SetBranchAddress("Gy", &Gy);
@@ -2872,7 +2869,6 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    DsvpvDisErr_2D = new std::vector<float>();
    Dalpha = new std::vector<float>();
    Ddtheta = new std::vector<float>();
-   DnTrackInAcceptanceHP = new std::vector<int>();
    Gpt = new std::vector<float>();
    Gy = new std::vector<float>();
    GpdgId = new std::vector<int>();
@@ -2905,7 +2901,6 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("DsvpvDisErr_2D",        &DsvpvDisErr_2D);
    Tree->Branch("Dalpha",                &Dalpha);
    Tree->Branch("Ddtheta",               &Ddtheta);
-   Tree->Branch("DnTrackInAcceptanceHP", &DnTrackInAcceptanceHP);
    Tree->Branch("nTrackInAcceptanceHP",  &nTrackInAcceptanceHP, "nTrackInAcceptanceHP/I");
    Tree->Branch("Gpt",                   &Gpt);
    Tree->Branch("Gy",                    &Gy);
@@ -2941,7 +2936,6 @@ void DzeroUPCTreeMessenger::Clear()
    DsvpvDisErr_2D->clear();
    Dalpha->clear();
    Ddtheta->clear();
-   DnTrackInAcceptanceHP->clear();
    nTrackInAcceptanceHP = 0;
    Gpt->clear();
    Gy->clear();
@@ -2976,7 +2970,6 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(DsvpvDisErr_2D != nullptr && M.DsvpvDisErr_2D != nullptr)   *DsvpvDisErr_2D = *(M.DsvpvDisErr_2D);
    if(Dalpha != nullptr && M.Dalpha != nullptr)   *Dalpha = *(M.Dalpha);
    if(Ddtheta != nullptr && M.Ddtheta != nullptr)   *Ddtheta = *(M.Ddtheta);
-   if(DnTrackInAcceptanceHP != nullptr && M.DnTrackInAcceptanceHP != nullptr)   *DnTrackInAcceptanceHP = *(M.DnTrackInAcceptanceHP);
    nTrackInAcceptanceHP = M.nTrackInAcceptanceHP;
    if(Gpt != nullptr && M.Gpt != nullptr)   *Gpt = *(M.Gpt);
    if(Gy != nullptr && M.Gy != nullptr)   *Gy = *(M.Gy);
