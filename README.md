@@ -20,14 +20,15 @@ source SetupAnalysis.sh
 ### Run the skimming example:
 ```
 cd SampleGeneration/20241027_ForestReducer_DzeroUPC
-bash clean RunExamples.sh
+bash clean.sh
+bash RunExamples.sh
 
 ```
 
 ### Run the skimming example:
 ```
 cd MainAnalysis/20241029_DzeroUPC
-clean
+bash clean.sh
 cd workflow
 bash analysis_example.sh
 
