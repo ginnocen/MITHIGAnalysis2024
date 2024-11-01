@@ -104,6 +104,52 @@ int HiEventTreeMessenger::GetEntries()
    return Tree->GetEntries();
 }
 
+METFilterTreeMessenger::METFilterTreeMessenger(TFile &File)
+{
+   Tree = (TTree *)File.Get("l1MetFilterRecoTree/MetFilterRecoTree");
+   Initialize();
+}
+
+METFilterTreeMessenger::METFilterTreeMessenger(TFile *File)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get("l1MetFilterRecoTree/MetFilterRecoTree");
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+METFilterTreeMessenger::METFilterTreeMessenger(TTree *METFilterTree)
+{
+   Initialize(METFilterTree);
+}
+
+bool METFilterTreeMessenger::Initialize(TTree *METFilterTree)
+{
+   Tree = METFilterTree;
+   return Initialize();
+}
+
+bool METFilterTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+
+  if (Tree->GetBranch("cscTightHalo2015Filter"))
+    Tree->SetBranchAddress("cscTightHalo2015Filter", &cscTightHalo2015Filter);
+  else
+    cscTightHalo2015Filter = false;
+  return true;
+}
+bool METFilterTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
 GGTreeMessenger::GGTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());
@@ -763,6 +809,12 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.clear();
    Decision.clear();
    
+   // 2023 triggers UPCs
+   Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_v2");
+   Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_v1");
+   Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v8");
+   Name.push_back("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_v8");
+
    // 2018 triggers
    Name.push_back("HLT_HIMinimumBias_SinglePixelTrack_NpixBypass_part0_v1");
    Name.push_back("HLT_HIMinimumBias_SinglePixelTrack_NpixBypass_part1_v1");
@@ -1377,6 +1429,143 @@ bool TrackTreeMessenger::PassZHadron2022CutTight(int index)
    return true;
 }
 
+DzeroTreeMessenger::DzeroTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+DzeroTreeMessenger::DzeroTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+DzeroTreeMessenger::DzeroTreeMessenger(TTree *DzeroTree)
+{
+   Initialize(DzeroTree);
+}
+
+bool DzeroTreeMessenger::Initialize(TTree *DzeroTree)
+{
+   Tree = DzeroTree;
+   return Initialize();
+}
+
+bool DzeroTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+   Tree->SetBranchAddress("Dsize", &Dsize);
+   Tree->SetBranchAddress("Dpt", &Dpt);
+   Tree->SetBranchAddress("Dy", &Dy);
+   Tree->SetBranchAddress("Dmass", &Dmass);
+   Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
+   Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
+   Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
+   Tree->SetBranchAddress("Dtrk1highPurity", &Dtrk1highPurity);
+   Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
+   Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
+   Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
+   Tree->SetBranchAddress("Dtrk2highPurity", &Dtrk2highPurity);
+   Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
+   Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
+   Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
+   Tree->SetBranchAddress("DsvpvDistance_2D", &DsvpvDistance_2D);
+   Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
+   Tree->SetBranchAddress("Dalpha", &Dalpha);
+   Tree->SetBranchAddress("Ddtheta", &Ddtheta);
+
+   return true;
+}
+
+bool DzeroTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+
+   return true;
+}
+
+bool DzeroTreeMessenger::PassUPCDzero2023Cut(int index)
+{
+   if(index >= Dsize)
+      return false;
+  //FIXME : need to be cross-checked
+  if(Dalpha[index] > 0.4)
+      return false;
+  if(Ddtheta[index] > 0.5)
+      return false;
+  if(Dchi2cl[index] < 0.1)
+      return false;
+  if(fabs(Dtrk1PtErr[index] / Dtrk1Pt[index]) > 0.1)
+      return false;
+  if(fabs(Dtrk2PtErr[index] / Dtrk2Pt[index]) > 0.1)
+      return false;
+  if (Dtrk1highPurity[index] == 0 || Dtrk2highPurity[index] == 0)
+      return false;
+  if (DsvpvDistance[index]/DsvpvDisErr[index] < 2.)
+      return false;
+   return true;
+}
+
+DzeroGenTreeMessenger::DzeroGenTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+DzeroGenTreeMessenger::DzeroGenTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+DzeroGenTreeMessenger::DzeroGenTreeMessenger(TTree *DzeroGenTree)
+{
+   Initialize(DzeroGenTree);
+}
+
+bool DzeroGenTreeMessenger::Initialize(TTree *DzeroGenTree)
+{
+   Tree = DzeroGenTree;
+   return Initialize();
+}
+
+bool DzeroGenTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->SetBranchAddress("Gsize", &Gsize);
+   Tree->SetBranchAddress("Gpt", &Gpt);
+   Tree->SetBranchAddress("Gy", &Gy);
+   Tree->SetBranchAddress("GpdgId", &GpdgId);
+   Tree->SetBranchAddress("GisSignal", &GisSignal);
+   Tree->SetBranchAddress("GcollisionId", &GcollisionId);
+   Tree->SetBranchAddress("GSignalType", &GSignalType);
+
+   return true;
+}
+
+bool DzeroGenTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+
+   return true;
+}
+
 MuTreeMessenger::MuTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());
@@ -1813,6 +2002,123 @@ bool PbPbTrackTreeMessenger::PassZHadron2022CutTight(int index)
    if(fabs(TrackEta->at(index)) > 2.4)
       return false;
 
+   return true;
+}
+
+PbPbUPCTrackTreeMessenger::PbPbUPCTrackTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+PbPbUPCTrackTreeMessenger::PbPbUPCTrackTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+PbPbUPCTrackTreeMessenger::PbPbUPCTrackTreeMessenger(TTree *PbPbUPCTrackTree)
+{
+   Initialize(PbPbUPCTrackTree);
+}
+
+bool PbPbUPCTrackTreeMessenger::Initialize(TTree *PbPbUPCTrackTree)
+{
+   Tree = PbPbUPCTrackTree;
+   return Initialize();
+}
+
+bool PbPbUPCTrackTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+
+   nVtx = 0;
+   nTrk = 0;
+
+   ptSumVtx = nullptr;
+   xVtx = nullptr;
+   yVtx = nullptr;
+   zVtx = nullptr;
+   xErrVtx = nullptr;
+   yErrVtx = nullptr;
+   zErrVtx = nullptr;
+   trkPt = nullptr;
+   trkEta = nullptr;
+   highPurity = nullptr;
+
+   Tree->SetBranchAddress("nVtx", &nVtx);
+   Tree->SetBranchAddress("nTrk", &nTrk);
+   Tree->SetBranchAddress("ptSumVtx", &ptSumVtx);
+   Tree->SetBranchAddress("xVtx", &xVtx);
+   Tree->SetBranchAddress("yVtx", &yVtx);
+   Tree->SetBranchAddress("zVtx", &zVtx);
+   Tree->SetBranchAddress("xErrVtx", &xErrVtx);
+   Tree->SetBranchAddress("yErrVtx", &yErrVtx);
+   Tree->SetBranchAddress("zErrVtx", &zErrVtx);
+   Tree->SetBranchAddress("trkPt", &trkPt);
+   Tree->SetBranchAddress("trkEta", &trkEta);
+   Tree->SetBranchAddress("highPurity", &highPurity);
+   return true;
+}
+
+bool PbPbUPCTrackTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
+ZDCTreeMessenger::ZDCTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+ZDCTreeMessenger::ZDCTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+ZDCTreeMessenger::ZDCTreeMessenger(TTree *ZDCTree)
+{
+   Initialize(ZDCTree);
+}
+
+bool ZDCTreeMessenger::Initialize(TTree *ZDCTree)
+{
+   Tree = ZDCTree;
+   return Initialize();
+}
+
+bool ZDCTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+   sumPlus = 0.0;
+   sumMinus = 0.0;
+
+   Tree->SetBranchAddress("sumPlus", &sumPlus);
+   Tree->SetBranchAddress("sumMinus", &sumMinus);
+
+   return true;
+}
+
+bool ZDCTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
    return true;
 }
 
@@ -2370,6 +2676,310 @@ void ZHadronMessenger::CopyNonTrack(ZHadronMessenger &M)
 }
 
 bool ZHadronMessenger::FillEntry()
+{
+   if(Initialized == false)
+      return false;
+   if(WriteMode == false)
+      return false;
+
+   if(Tree == nullptr)
+      return false;
+
+   Tree->Fill();
+   Clear();
+
+   return true;
+}
+
+DzeroUPCTreeMessenger::DzeroUPCTreeMessenger(TFile &File, std::string TreeName)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+DzeroUPCTreeMessenger::DzeroUPCTreeMessenger(TFile *File, std::string TreeName)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+DzeroUPCTreeMessenger::DzeroUPCTreeMessenger(TTree *DzeroUPCTree)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Initialize(DzeroUPCTree);
+}
+
+DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
+{
+   if(Initialized == true && WriteMode == true)
+   {
+      delete Dpt;
+      delete Dy;
+      delete Dmass;
+      delete Dtrk1Pt;
+      delete Dtrk2Pt;
+      delete Dchi2cl;
+      delete DsvpvDistance;
+      delete DsvpvDisErr;
+      delete DsvpvDistance_2D;
+      delete DsvpvDisErr_2D;
+      delete Dalpha;
+      delete Ddtheta;
+      delete Gpt;
+      delete Gy;
+      delete GpdgId;
+      delete GisSignal;
+      delete GcollisionId;
+      delete GSignalType;
+   }
+}
+
+bool DzeroUPCTreeMessenger::Initialize(TTree *DzeroUPCTree)
+{
+   Tree = DzeroUPCTree;
+   return Initialize();
+}
+
+bool DzeroUPCTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+
+   Initialized = true;
+   Dpt = nullptr;
+   Dy = nullptr;
+   Dmass = nullptr;
+   Dtrk1Pt = nullptr;
+   Dtrk2Pt = nullptr;
+   Dchi2cl = nullptr;
+   DsvpvDistance = nullptr;
+   DsvpvDisErr = nullptr;
+   DsvpvDistance_2D = nullptr;
+   DsvpvDisErr_2D = nullptr;
+   Dalpha = nullptr;
+   Ddtheta = nullptr;
+   Gpt = nullptr;
+   Gy = nullptr;
+   GpdgId = nullptr;
+   GisSignal = nullptr;
+   GcollisionId = nullptr;
+   GSignalType = nullptr;
+
+   Tree->SetBranchAddress("Run", &Run);
+   Tree->SetBranchAddress("Event", &Event);
+   Tree->SetBranchAddress("Lumi", &Lumi);
+   Tree->SetBranchAddress("VX", &VX);
+   Tree->SetBranchAddress("VY", &VY);
+   Tree->SetBranchAddress("VZ", &VZ);
+   Tree->SetBranchAddress("VXError", &VXError);
+   Tree->SetBranchAddress("VYError", &VYError);
+   Tree->SetBranchAddress("VZError", &VZError);
+   Tree->SetBranchAddress("gammaN", &gammaN);
+   Tree->SetBranchAddress("Ngamma", &Ngamma);
+   Tree->SetBranchAddress("Dpt", &Dpt);
+   Tree->SetBranchAddress("Dy", &Dy);
+   Tree->SetBranchAddress("Dmass", &Dmass);
+   Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
+   Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
+   Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
+   Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
+   Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
+   Tree->SetBranchAddress("DsvpvDistance_2D", &DsvpvDistance_2D);
+   Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
+   Tree->SetBranchAddress("Dalpha", &Dalpha);
+   Tree->SetBranchAddress("Ddtheta", &Ddtheta);
+   Tree->SetBranchAddress("nTrackInAcceptanceHP", &nTrackInAcceptanceHP);
+   Tree->SetBranchAddress("Gpt", &Gpt);
+   Tree->SetBranchAddress("Gy", &Gy);
+   Tree->SetBranchAddress("GpdgId", &GpdgId);
+   Tree->SetBranchAddress("GisSignal", &GisSignal);
+   Tree->SetBranchAddress("GcollisionId", &GcollisionId);
+   Tree->SetBranchAddress("GSignalType", &GSignalType);
+   return true;
+}
+
+int DzeroUPCTreeMessenger::GetEntries()
+{
+   if(Tree == nullptr)
+      return 0;
+   return Tree->GetEntries();
+}
+
+bool DzeroUPCTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   //GoodPhotonuclear = true;
+   // fill derived quantities
+   /*
+   GoodGenZ = true;
+   if(genZY == nullptr)
+      GoodGenZ = false;
+   else if(genZY->size() == 0)
+      GoodGenZ = false;
+   else
+   {
+      if(genZMass->at(0) > 120 || genZMass->at(0) < 60)   GoodGenZ = false;
+      if(genZY->at(0) < -2.4 || genZY->at(0) > 2.4)       GoodGenZ = false;
+   }
+   GoodRecoZ = true;
+   if(zY == nullptr)
+      GoodRecoZ = false;
+   else if(zY->size() == 0)
+      GoodRecoZ = false;
+   else
+   {
+      if(zMass->at(0) > 120 || zMass->at(0) < 60)   GoodRecoZ = false;
+      if(zY->at(0) < -2.4 || zY->at(0) > 2.4)       GoodRecoZ = false;
+   }
+   */
+   return true;
+}
+
+bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
+{
+   if(T == nullptr)
+      return false;
+
+   Initialized = true;
+   WriteMode = true;
+
+   Dpt = new std::vector<float>();
+   Dy = new std::vector<float>();
+   Dmass = new std::vector<float>();
+   Dtrk1Pt = new std::vector<float>();
+   Dtrk2Pt = new std::vector<float>();
+   Dchi2cl = new std::vector<float>();
+   DsvpvDistance = new std::vector<float>();
+   DsvpvDisErr = new std::vector<float>();
+   DsvpvDistance_2D = new std::vector<float>();
+   DsvpvDisErr_2D = new std::vector<float>();
+   Dalpha = new std::vector<float>();
+   Ddtheta = new std::vector<float>();
+   Gpt = new std::vector<float>();
+   Gy = new std::vector<float>();
+   GpdgId = new std::vector<int>();
+   GisSignal = new std::vector<int>();
+   GcollisionId = new std::vector<int>();
+   GSignalType = new std::vector<int>();
+
+   Tree = T;
+
+   Tree->Branch("Run",                   &Run, "Run/I");
+   Tree->Branch("Event",                 &Event, "Event/L");
+   Tree->Branch("Lumi",                  &Lumi, "Lumi/I");
+   Tree->Branch("VX",                    &VX, "VX/F");
+   Tree->Branch("VY",                    &VY, "VY/F");
+   Tree->Branch("VZ",                    &VZ, "VZ/F");
+   Tree->Branch("VXError",               &VXError, "VXError/F");
+   Tree->Branch("VYError",               &VYError, "VYError/F");
+   Tree->Branch("VZError",               &VZError, "VZError/F");
+   Tree->Branch("gammaN",                &gammaN, "gammaN/I");
+   Tree->Branch("Ngamma",                &Ngamma, "Ngamma/I");
+   Tree->Branch("Dpt",                   &Dpt);
+   Tree->Branch("Dy",                    &Dy);
+   Tree->Branch("Dmass",                 &Dmass);
+   Tree->Branch("Dtrk1Pt",               &Dtrk1Pt);
+   Tree->Branch("Dtrk2Pt",               &Dtrk2Pt);
+   Tree->Branch("Dchi2cl",               &Dchi2cl);
+   Tree->Branch("DsvpvDistance",         &DsvpvDistance);
+   Tree->Branch("DsvpvDisErr",           &DsvpvDisErr);
+   Tree->Branch("DsvpvDistance_2D",      &DsvpvDistance_2D);
+   Tree->Branch("DsvpvDisErr_2D",        &DsvpvDisErr_2D);
+   Tree->Branch("Dalpha",                &Dalpha);
+   Tree->Branch("Ddtheta",               &Ddtheta);
+   Tree->Branch("nTrackInAcceptanceHP",  &nTrackInAcceptanceHP, "nTrackInAcceptanceHP/I");
+   Tree->Branch("Gpt",                   &Gpt);
+   Tree->Branch("Gy",                    &Gy);
+   Tree->Branch("GpdgId",                &GpdgId);
+   Tree->Branch("GisSignal",             &GisSignal);
+   Tree->Branch("GcollisionId",          &GcollisionId);
+   Tree->Branch("GSignalType",           &GSignalType);
+   return true;
+}
+
+void DzeroUPCTreeMessenger::Clear()
+{
+   if(Initialized == false)
+      return;
+
+   VX = 0;
+   VY = 0;
+   VZ = 0;
+   VXError = 0;
+   VYError = 0;
+   VZError = 0;
+   gammaN = -1;
+   Ngamma = -1;
+   Dpt->clear();
+   Dy->clear();
+   Dmass->clear();
+   Dtrk1Pt->clear();
+   Dtrk2Pt->clear();
+   Dchi2cl->clear();
+   DsvpvDistance->clear();
+   DsvpvDisErr->clear();
+   DsvpvDistance_2D->clear();
+   DsvpvDisErr_2D->clear();
+   Dalpha->clear();
+   Ddtheta->clear();
+   nTrackInAcceptanceHP = 0;
+   Gpt->clear();
+   Gy->clear();
+   GpdgId->clear();
+   GisSignal->clear();
+   GcollisionId->clear();
+   GSignalType->clear();
+}
+
+void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
+{
+   Run          = M.Run;
+   Event        = M.Event;
+   Lumi         = M.Lumi;
+   VX           = M.VX;
+   VY           = M.VY;
+   VZ           = M.VZ;
+   VXError      = M.VXError;
+   VYError      = M.VYError;
+   VZError      = M.VZError;
+   gammaN       = M.gammaN;
+   Ngamma       = M.Ngamma;
+   if(Dpt != nullptr && M.Dpt != nullptr)   *Dpt = *(M.Dpt);
+   if(Dy != nullptr && M.Dy != nullptr)   *Dy = *(M.Dy);
+   if(Dmass != nullptr && M.Dmass != nullptr)   *Dmass = *(M.Dmass);
+   if(Dtrk1Pt != nullptr && M.Dtrk1Pt != nullptr)   *Dtrk1Pt = *(M.Dtrk1Pt);
+   if(Dtrk2Pt != nullptr && M.Dtrk2Pt != nullptr)   *Dtrk2Pt = *(M.Dtrk2Pt);
+   if(Dchi2cl != nullptr && M.Dchi2cl != nullptr)   *Dchi2cl = *(M.Dchi2cl);
+   if(DsvpvDistance != nullptr && M.DsvpvDistance != nullptr)   *DsvpvDistance = *(M.DsvpvDistance);
+   if(DsvpvDisErr != nullptr && M.DsvpvDisErr != nullptr)   *DsvpvDisErr = *(M.DsvpvDisErr);
+   if(DsvpvDistance_2D != nullptr && M.DsvpvDistance_2D != nullptr)   *DsvpvDistance_2D = *(M.DsvpvDistance_2D);
+   if(DsvpvDisErr_2D != nullptr && M.DsvpvDisErr_2D != nullptr)   *DsvpvDisErr_2D = *(M.DsvpvDisErr_2D);
+   if(Dalpha != nullptr && M.Dalpha != nullptr)   *Dalpha = *(M.Dalpha);
+   if(Ddtheta != nullptr && M.Ddtheta != nullptr)   *Ddtheta = *(M.Ddtheta);
+   nTrackInAcceptanceHP = M.nTrackInAcceptanceHP;
+   if(Gpt != nullptr && M.Gpt != nullptr)   *Gpt = *(M.Gpt);
+   if(Gy != nullptr && M.Gy != nullptr)   *Gy = *(M.Gy);
+   if(GpdgId != nullptr && M.GpdgId != nullptr)   *GpdgId = *(M.GpdgId);
+   if(GisSignal != nullptr && M.GisSignal != nullptr)   *GisSignal = *(M.GisSignal);
+   if(GcollisionId != nullptr && M.GcollisionId != nullptr)   *GcollisionId = *(M.GcollisionId);
+   if(GSignalType != nullptr && M.GSignalType != nullptr)   *GSignalType = *(M.GSignalType);
+}
+
+bool DzeroUPCTreeMessenger::FillEntry()
 {
    if(Initialized == false)
       return false;
