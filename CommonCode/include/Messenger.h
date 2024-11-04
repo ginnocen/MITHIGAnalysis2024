@@ -724,10 +724,19 @@ public:
    long long Event;
    int Lumi;
    //FIXME: these refer to best vertex positions calculated from the track tree
-   float VX, VY, VZ, VXError, VYError, VZError;
-   int isL1ZDCOr;
-   int isL1ZDCXORJet8;
-   int gammaN, Ngamma;
+   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
+   bool isL1ZDCOr, isL1ZDCXORJet8;
+   bool selectedBkgFilter, selectedVtxFilter;
+   bool ZDCgammaN, ZDCNgamma;
+   bool gapgammaN, gapNgamma;
+   bool gammaN, Ngamma;
+   float ZDCsumPlus;
+   float ZDCsumMinus;
+   float HFEMaxPlus;
+   float HFEMaxMinus;
+   int nTrackInAcceptanceHP;
+
+   int Dsize;
    std::vector<float> *Dpt;
    std::vector<float> *Dphi;
    std::vector<float> *Dy;
@@ -742,8 +751,6 @@ public:
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
    std::vector<int> *Dgen;
-   int nTrackInAcceptanceHP;
-
    //MC only quantities
    int Gsize;
    std::vector<float> *Gpt;

@@ -2788,12 +2788,24 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VXError", &VXError);
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
-   Tree->SetBranchAddress("gammaN", &gammaN);
-   Tree->SetBranchAddress("Ngamma", &Ngamma);
+
    Tree->SetBranchAddress("isL1ZDCOr", &isL1ZDCOr);
    Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
+   Tree->SetBranchAddress("selectedBkgFilter", &selectedBkgFilter);
+   Tree->SetBranchAddress("selectedVtxFilter", &selectedVtxFilter);
+   Tree->SetBranchAddress("ZDCgammaN", &ZDCgammaN);
+   Tree->SetBranchAddress("ZDCNgamma", &ZDCNgamma);
+   Tree->SetBranchAddress("gapgammaN", &gapgammaN);
+   Tree->SetBranchAddress("gapNgamma", &gapNgamma);
+   Tree->SetBranchAddress("gammaN", &gammaN);
+   Tree->SetBranchAddress("Ngamma", &Ngamma);
+   Tree->SetBranchAddress("ZDCsumPlus", &ZDCsumPlus);
+   Tree->SetBranchAddress("ZDCsumMinus", &ZDCsumMinus);
+   Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
+   Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
    Tree->SetBranchAddress("nTrackInAcceptanceHP", &nTrackInAcceptanceHP);
 
+   Tree->SetBranchAddress("Dsize", &Dsize);
    Tree->SetBranchAddress("Dpt", &Dpt);
    Tree->SetBranchAddress("Dy", &Dy);
    Tree->SetBranchAddress("Dmass", &Dmass);
@@ -2807,6 +2819,8 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Dalpha", &Dalpha);
    Tree->SetBranchAddress("Ddtheta", &Ddtheta);
    Tree->SetBranchAddress("Dgen", &Dgen);
+
+   Tree->SetBranchAddress("Gsize", &Gsize);
    Tree->SetBranchAddress("Gpt", &Gpt);
    Tree->SetBranchAddress("Gy", &Gy);
    Tree->SetBranchAddress("GpdgId", &GpdgId);
@@ -2895,12 +2909,23 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("VXError",               &VXError, "VXError/F");
    Tree->Branch("VYError",               &VYError, "VYError/F");
    Tree->Branch("VZError",               &VZError, "VZError/F");
-   Tree->Branch("gammaN",                &gammaN, "gammaN/I");
-   Tree->Branch("Ngamma",                &Ngamma, "Ngamma/I");
-   Tree->Branch("isL1ZDCOr",             &isL1ZDCOr, "isL1ZDCOr/I");
-   Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/I");
+   Tree->Branch("isL1ZDCOr",             &isL1ZDCOr, "isL1ZDCOr/O");
+   Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/O");
+   Tree->Branch("selectedBkgFilter",     &selectedBkgFilter, "selectedBkgFilter/O");
+   Tree->Branch("selectedVtxFilter",     &selectedVtxFilter, "selectedVtxFilter/O");
+   Tree->Branch("ZDCgammaN",             &ZDCgammaN, "ZDCgammaN/O");
+   Tree->Branch("ZDCNgamma",             &ZDCNgamma, "ZDCNgamma/O");
+   Tree->Branch("gapgammaN",             &gapgammaN, "gapgammaN/O");
+   Tree->Branch("gapNgamma",             &gapNgamma, "gapNgamma/O");
+   Tree->Branch("gammaN",                &gammaN, "gammaN/O");
+   Tree->Branch("Ngamma",                &Ngamma, "Ngamma/O");
+   Tree->Branch("ZDCsumPlus",            &ZDCsumPlus, "ZDCsumPlus/F");
+   Tree->Branch("ZDCsumMinus",           &ZDCsumMinus, "ZDCsumMinus/F");
+   Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
+   Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
    Tree->Branch("nTrackInAcceptanceHP",  &nTrackInAcceptanceHP, "nTrackInAcceptanceHP/I");
 
+   Tree->Branch("Dsize",                 &Dsize);
    Tree->Branch("Dpt",                   &Dpt);
    Tree->Branch("Dy",                    &Dy);
    Tree->Branch("Dmass",                 &Dmass);
@@ -2914,6 +2939,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dalpha",                &Dalpha);
    Tree->Branch("Ddtheta",               &Ddtheta);
    Tree->Branch("Dgen",                  &Dgen);
+
+   Tree->Branch("Gsize",                 &Gsize);
    Tree->Branch("Gpt",                   &Gpt);
    Tree->Branch("Gy",                    &Gy);
    Tree->Branch("GpdgId",                &GpdgId);
@@ -2928,18 +2955,32 @@ void DzeroUPCTreeMessenger::Clear()
    if(Initialized == false)
       return;
 
-   VX = 0;
-   VY = 0;
-   VZ = 0;
-   VXError = 0;
-   VYError = 0;
-   VZError = 0;
-   gammaN = 0;
-   Ngamma = 0;
-   isL1ZDCOr = 0;
-   isL1ZDCXORJet8 = 0;
+   Run = -999;
+   Event = -999;
+   Lumi = -999;
+   VX = 0.;
+   VY = 0.;
+   VZ = 0.;
+   VXError = 0.;
+   VYError = 0.;
+   VZError = 0.;
+   isL1ZDCOr = false;
+   isL1ZDCXORJet8 = false;
+   selectedBkgFilter = false;
+   selectedVtxFilter = false;
+   ZDCgammaN = false;
+   ZDCNgamma = false;
+   gapgammaN = false;
+   gapNgamma = false;
+   gammaN = false;
+   Ngamma = false;
+   ZDCsumPlus = -9999.;
+   ZDCsumMinus = -9999.;
+   HFEMaxPlus = 9999.;
+   HFEMaxMinus = 9999.;
    nTrackInAcceptanceHP = 0;
 
+   Dsize = 0;
    Dpt->clear();
    Dy->clear();
    Dmass->clear();
@@ -2953,6 +2994,8 @@ void DzeroUPCTreeMessenger::Clear()
    Dalpha->clear();
    Ddtheta->clear();
    Dgen->clear();
+
+   Gsize = 0;
    Gpt->clear();
    Gy->clear();
    GpdgId->clear();
@@ -2963,21 +3006,32 @@ void DzeroUPCTreeMessenger::Clear()
 
 void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
 {
-   Run            = M.Run;
-   Event          = M.Event;
-   Lumi           = M.Lumi;
-   VX             = M.VX;
-   VY             = M.VY;
-   VZ             = M.VZ;
-   VXError        = M.VXError;
-   VYError        = M.VYError;
-   VZError        = M.VZError;
-   gammaN         = M.gammaN;
-   Ngamma         = M.Ngamma;
-   isL1ZDCOr      = M.isL1ZDCOr;
-   isL1ZDCXORJet8 = M.isL1ZDCXORJet8;
+   Run                  = M.Run;
+   Event                = M.Event;
+   Lumi                 = M.Lumi;
+   VX                   = M.VX;
+   VY                   = M.VY;
+   VZ                   = M.VZ;
+   VXError              = M.VXError;
+   VYError              = M.VYError;
+   VZError              = M.VZError;
+   isL1ZDCOr            = M.isL1ZDCOr;
+   isL1ZDCXORJet8       = M.isL1ZDCXORJet8;
+   selectedBkgFilter    = M.selectedBkgFilter;
+   selectedVtxFilter    = M.selectedVtxFilter;
+   ZDCgammaN            = M.ZDCgammaN;
+   ZDCNgamma            = M.ZDCNgamma;
+   gapgammaN            = M.gapgammaN;
+   gapNgamma            = M.gapNgamma;
+   gammaN               = M.gammaN;
+   Ngamma               = M.Ngamma;
+   ZDCsumPlus           = M.ZDCsumPlus;
+   ZDCsumMinus          = M.ZDCsumMinus;
+   HFEMaxPlus           = M.HFEMaxPlus;
+   HFEMaxMinus          = M.HFEMaxMinus;
    nTrackInAcceptanceHP = M.nTrackInAcceptanceHP;
 
+   Dsize          = M.Dsize;
    if(Dpt != nullptr && M.Dpt != nullptr)   *Dpt = *(M.Dpt);
    if(Dy != nullptr && M.Dy != nullptr)   *Dy = *(M.Dy);
    if(Dmass != nullptr && M.Dmass != nullptr)   *Dmass = *(M.Dmass);
@@ -2991,6 +3045,8 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(Dalpha != nullptr && M.Dalpha != nullptr)   *Dalpha = *(M.Dalpha);
    if(Ddtheta != nullptr && M.Ddtheta != nullptr)   *Ddtheta = *(M.Ddtheta);
    if(Dgen != nullptr && M.Dgen != nullptr)   *Dgen = *(M.Dgen);
+
+   Gsize          = M.Gsize;
    if(Gpt != nullptr && M.Gpt != nullptr)   *Gpt = *(M.Gpt);
    if(Gy != nullptr && M.Gy != nullptr)   *Gy = *(M.Gy);
    if(GpdgId != nullptr && M.GpdgId != nullptr)   *GpdgId = *(M.GpdgId);
