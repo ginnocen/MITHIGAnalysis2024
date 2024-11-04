@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     DzeroTreeMessenger MDzero(InputFile);
     DzeroGenTreeMessenger MDzeroGen(InputFile, DGenTreeName);
     ZDCTreeMessenger MZDC(InputFile);
-    METFilterTreeMessenger MFilter(InputFile);
+    METFilterTreeMessenger MMETFilter(InputFile);
 
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);
@@ -91,7 +91,7 @@ int main(int argc, char *argv[]) {
 	MDzeroGen.GetEntry(iE);
       MZDC.GetEntry(iE);
       MDzeroUPC.Clear();
-      MFilter.GetEntry(iE);
+      MMETFilter.GetEntry(iE);
 
       ////////////////////////////////////////
       ////////// Global event stuff //////////
@@ -124,6 +124,7 @@ int main(int argc, char *argv[]) {
       ////////// Event selection //////////
       /////////////////////////////////////
       if (IsData == false){
+        MDzeroUPC.Gsize = MDzeroGen.Gsize;
         for (int iDGen = 0; iDGen < MDzeroGen.Gsize; iDGen++){
           MDzeroUPC.Gpt->push_back(MDzeroGen.Gpt[iDGen]);
           MDzeroUPC.Gy->push_back(MDzeroGen.Gy[iDGen]);
@@ -134,17 +135,13 @@ int main(int argc, char *argv[]) {
         }
       }
       if (IsData == true) {
-        int pprimaryVertexFilter = MSkim.PVFilter;
-        int pclusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
-        int cscTightHalo2015Filter = MFilter.cscTightHalo2015Filter;
-        if (pprimaryVertexFilter == 0 || pclusterCompatibilityFilter == 0 ||
-            cscTightHalo2015Filter == false) {
-          continue;
-        }
-        if (fabs(MTrackPbPbUPC.zVtx->at(0)) > 15) {
-          continue;
-        }
-        //  FIXME: need to be replaced with the actual PbPb triggers
+        MDzeroUPC.ZDCsumPlus = MZDC.sumPlus;
+        MDzeroUPC.ZDCsumMinus = MZDC.sumMinus;
+        bool selectedBkgFilter = MSkim.ClusterCompatibilityFilter == 1 && MMETFilter.cscTightHalo2015Filter;
+        bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
+        MDzeroUPC.selectedBkgFilter = selectedBkgFilter;
+        MDzeroUPC.selectedVtxFilter = selectedVtxFilter;
+
         int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 =
 	    MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000");
         int HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 =
@@ -153,28 +150,36 @@ int main(int argc, char *argv[]) {
             MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400");
         int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023 =
             MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
-        int isL1ZDCOr = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_2023 ||
-                        HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023;
-        int isL1ZDCXORJet8 = HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 ||
-			     HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023;
-        if (isL1ZDCOr == 0 && isL1ZDCXORJet8 == 0)
-          continue;
+        bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_2023 == 1 ||
+                         HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023 == 1;
+        bool isL1ZDCXORJet8 = HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 == 1 ||
+			      HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 == 1;
+        //if (isL1ZDCOr == false && isL1ZDCXORJet8 == false)
+        //  continue;
 
         MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
         MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
         bool ZDCgammaN = (MZDC.sumMinus > 1100. && MZDC.sumPlus < 1100.);
         bool ZDCNgamma = (MZDC.sumMinus < 1100. && MZDC.sumPlus > 1100.);
+        MDzeroUPC.ZDCgammaN = ZDCgammaN;
+        MDzeroUPC.ZDCNgamma = ZDCNgamma;
 
-        bool gapgammaN = GetMaxEnergyHF(&MPF, 3., 5.2) < 9.2;
-        bool gapNgamma = GetMaxEnergyHF(&MPF, -5.2, -3.) < 8.6;
-        bool gammaN_ = ZDCgammaN && gapgammaN;
-        bool Ngamma_ = ZDCNgamma && gapNgamma;
+        float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3., 5.2);
+        float EMaxHFMinus = GetMaxEnergyHF(&MPF, -5.2, -3.);
+        MDzeroUPC.HFEMaxPlus = EMaxHFPlus;
+        MDzeroUPC.HFEMaxMinus = EMaxHFMinus;
+        bool gapgammaN = EMaxHFPlus < 9.2;
+        bool gapNgamma = EMaxHFMinus < 8.6;
+        MDzeroUPC.gapgammaN = gapgammaN;
+        MDzeroUPC.gapNgamma = gapNgamma;
 
-        if (gammaN_ == false && Ngamma_ == false) {
-          continue;
-        }
-        MDzeroUPC.gammaN = gammaN_;
-        MDzeroUPC.Ngamma = Ngamma_;
+        bool gammaN = ZDCgammaN && gapgammaN;
+        bool Ngamma = ZDCNgamma && gapNgamma;
+        //if (gammaN_ == false && Ngamma_ == false) {
+        //  continue;
+        //}
+        MDzeroUPC.gammaN = gammaN;
+        MDzeroUPC.Ngamma = Ngamma;
       } // end of if (IsData == true)
 
       int nTrackInAcceptanceHP = 0;
@@ -186,6 +191,7 @@ int main(int argc, char *argv[]) {
         }
       }
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
+      MDzeroUPC.Dsize = MDzero.Dsize;
 
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
         if (MDzero.Dpt[iD] < MinDzeroPT ||
