@@ -22,6 +22,8 @@ using namespace std;
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
 
+#include "include/DmesonSelection.h"
+
 int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
 
@@ -189,6 +191,7 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DsvpvDisErr_2D->push_back(MDzero.DsvpvDisErr_2D[iD]);
         MDzeroUPC.Dalpha->push_back(MDzero.Dalpha[iD]);
         MDzeroUPC.Ddtheta->push_back(MDzero.Ddtheta[iD]);
+	MDzeroUPC.DpassCut->push_back(DmesonSelection(MDzero,iD));
         if (IsData == false) MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
       }
 
