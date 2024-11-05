@@ -2725,6 +2725,8 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
 {
    if(Initialized == true && WriteMode == true)
    {
+      delete gammaN;
+      delete Ngamma;
       delete Dpt;
       delete Dy;
       delete Dmass;
@@ -2759,6 +2761,8 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
       return false;
 
    Initialized = true;
+   Ngamma = nullptr;
+   gammaN = nullptr;
    Dpt = nullptr;
    Dy = nullptr;
    Dmass = nullptr;
@@ -2864,6 +2868,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Initialized = true;
    WriteMode = true;
 
+   gammaN = new std::vector<bool>();
+   Ngamma = new std::vector<bool>();
    Dpt = new std::vector<float>();
    Dy = new std::vector<float>();
    Dmass = new std::vector<float>();
@@ -2895,8 +2901,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("VXError",               &VXError, "VXError/F");
    Tree->Branch("VYError",               &VYError, "VYError/F");
    Tree->Branch("VZError",               &VZError, "VZError/F");
-   Tree->Branch("gammaN",                &gammaN, "gammaN/I");
-   Tree->Branch("Ngamma",                &Ngamma, "Ngamma/I");
+   Tree->Branch("gammaN",                &gammaN);
+   Tree->Branch("Ngamma",                &Ngamma);
    Tree->Branch("isL1ZDCOr",             &isL1ZDCOr, "isL1ZDCOr/I");
    Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/I");
    Tree->Branch("nTrackInAcceptanceHP",  &nTrackInAcceptanceHP, "nTrackInAcceptanceHP/I");
@@ -2934,12 +2940,12 @@ void DzeroUPCTreeMessenger::Clear()
    VXError = 0;
    VYError = 0;
    VZError = 0;
-   gammaN = 0;
-   Ngamma = 0;
    isL1ZDCOr = 0;
    isL1ZDCXORJet8 = 0;
    nTrackInAcceptanceHP = 0;
 
+   gammaN->clear();
+   Ngamma->clear();
    Dpt->clear();
    Dy->clear();
    Dmass->clear();
@@ -2972,12 +2978,12 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    VXError        = M.VXError;
    VYError        = M.VYError;
    VZError        = M.VZError;
-   gammaN         = M.gammaN;
-   Ngamma         = M.Ngamma;
    isL1ZDCOr      = M.isL1ZDCOr;
    isL1ZDCXORJet8 = M.isL1ZDCXORJet8;
    nTrackInAcceptanceHP = M.nTrackInAcceptanceHP;
 
+   if (gammaN != nullptr && M.gammaN != nullptr) *gammaN = *(M.gammaN);
+   if (Ngamma != nullptr && M.Ngamma != nullptr) *Ngamma = *(M.Ngamma);
    if(Dpt != nullptr && M.Dpt != nullptr)   *Dpt = *(M.Dpt);
    if(Dy != nullptr && M.Dy != nullptr)   *Dy = *(M.Dy);
    if(Dmass != nullptr && M.Dmass != nullptr)   *Dmass = *(M.Dmass);

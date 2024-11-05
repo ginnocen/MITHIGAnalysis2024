@@ -727,7 +727,9 @@ public:
    float VX, VY, VZ, VXError, VYError, VZError;
    int isL1ZDCOr;
    int isL1ZDCXORJet8;
-   int gammaN, Ngamma;
+   //int gammaN, Ngamma;
+   std::vector<bool>  *gammaN;
+   std::vector<bool>  *Ngamma;
    std::vector<float> *Dpt;
    std::vector<float> *Dphi;
    std::vector<float> *Dy;
@@ -741,7 +743,7 @@ public:
    std::vector<float> *DsvpvDisErr_2D;
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
-   std::vector<int> *Dgen;
+   std::vector<int>   *Dgen;
    int nTrackInAcceptanceHP;
 
    //MC only quantities
