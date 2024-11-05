@@ -1479,6 +1479,8 @@ bool DzeroTreeMessenger::Initialize()
    Tree->SetBranchAddress("Dalpha", &Dalpha);
    Tree->SetBranchAddress("Ddtheta", &Ddtheta);
    Tree->SetBranchAddress("Dgen", &Dgen);
+   Tree->SetBranchAddress("Dgenpt", &Dgenpt);
+   Tree->SetBranchAddress("DgenBAncestorpdgId", &DgenBAncestorpdgId);
 
    return true;
 }
@@ -1553,6 +1555,7 @@ bool DzeroGenTreeMessenger::Initialize()
    Tree->SetBranchAddress("GisSignal", &GisSignal);
    Tree->SetBranchAddress("GcollisionId", &GcollisionId);
    Tree->SetBranchAddress("GSignalType", &GSignalType);
+   Tree->SetBranchAddress("GBAncestorpdgId", &GBAncestorpdgId);
 
    return true;
 }
@@ -2740,10 +2743,9 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dgen;
       delete Gpt;
       delete Gy;
-      delete GpdgId;
-      delete GisSignal;
-      delete GcollisionId;
-      delete GSignalType;
+      delete GisSignalCalc;
+      delete GisSignalCalcPrompt;
+      delete GisSignalCalcFeeddown;
    }
 }
 
@@ -2772,12 +2774,15 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dalpha = nullptr;
    Ddtheta = nullptr;
    Dgen = nullptr;
+   DisSignalCalc = nullptr;
+   DisSignalCalcPrompt = nullptr;
+   DisSignalCalcFeeddown = nullptr;
+
    Gpt = nullptr;
    Gy = nullptr;
-   GpdgId = nullptr;
-   GisSignal = nullptr;
-   GcollisionId = nullptr;
-   GSignalType = nullptr;
+   GisSignalCalc = nullptr;
+   GisSignalCalcPrompt = nullptr;
+   GisSignalCalcFeeddown = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -2819,14 +2824,16 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Dalpha", &Dalpha);
    Tree->SetBranchAddress("Ddtheta", &Ddtheta);
    Tree->SetBranchAddress("Dgen", &Dgen);
+   Tree->SetBranchAddress("DisSignalCalc", &DisSignalCalc);
+   Tree->SetBranchAddress("DisSignalCalcPrompt", &DisSignalCalcPrompt);
+   Tree->SetBranchAddress("DisSignalCalcFeeddown", &DisSignalCalcFeeddown);
 
    Tree->SetBranchAddress("Gsize", &Gsize);
    Tree->SetBranchAddress("Gpt", &Gpt);
    Tree->SetBranchAddress("Gy", &Gy);
-   Tree->SetBranchAddress("GpdgId", &GpdgId);
-   Tree->SetBranchAddress("GisSignal", &GisSignal);
-   Tree->SetBranchAddress("GcollisionId", &GcollisionId);
-   Tree->SetBranchAddress("GSignalType", &GSignalType);
+   Tree->SetBranchAddress("GisSignalCalc", &GisSignalCalc);
+   Tree->SetBranchAddress("GisSignalCalcPrompt", &GisSignalCalcPrompt);
+   Tree->SetBranchAddress("GisSignalCalcFeeddown", &GisSignalCalcFeeddown);
    return true;
 }
 
@@ -2843,30 +2850,6 @@ bool DzeroUPCTreeMessenger::GetEntry(int iEntry)
       return false;
 
    Tree->GetEntry(iEntry);
-   //GoodPhotonuclear = true;
-   // fill derived quantities
-   /*
-   GoodGenZ = true;
-   if(genZY == nullptr)
-      GoodGenZ = false;
-   else if(genZY->size() == 0)
-      GoodGenZ = false;
-   else
-   {
-      if(genZMass->at(0) > 120 || genZMass->at(0) < 60)   GoodGenZ = false;
-      if(genZY->at(0) < -2.4 || genZY->at(0) > 2.4)       GoodGenZ = false;
-   }
-   GoodRecoZ = true;
-   if(zY == nullptr)
-      GoodRecoZ = false;
-   else if(zY->size() == 0)
-      GoodRecoZ = false;
-   else
-   {
-      if(zMass->at(0) > 120 || zMass->at(0) < 60)   GoodRecoZ = false;
-      if(zY->at(0) < -2.4 || zY->at(0) > 2.4)       GoodRecoZ = false;
-   }
-   */
    return true;
 }
 
@@ -2891,14 +2874,17 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Dalpha = new std::vector<float>();
    Ddtheta = new std::vector<float>();
    Dgen = new std::vector<int>();
+   DisSignalCalc = new std::vector<bool>();
+   DisSignalCalcPrompt = new std::vector<bool>();
+   DisSignalCalcFeeddown = new std::vector<bool>();
+
    Gpt = new std::vector<float>();
    Gy = new std::vector<float>();
-   GpdgId = new std::vector<int>();
-   GisSignal = new std::vector<int>();
-   GcollisionId = new std::vector<int>();
-   GSignalType = new std::vector<int>();
+   GisSignalCalc = new std::vector<bool>();
+   GisSignalCalcPrompt = new std::vector<bool>();
+   GisSignalCalcFeeddown = new std::vector<bool>();
 
-   Tree = T;
+  Tree = T;
 
    Tree->Branch("Run",                   &Run, "Run/I");
    Tree->Branch("Event",                 &Event, "Event/L");
@@ -2939,14 +2925,16 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dalpha",                &Dalpha);
    Tree->Branch("Ddtheta",               &Ddtheta);
    Tree->Branch("Dgen",                  &Dgen);
+   Tree->Branch("DisSignalCalc",         &DisSignalCalc);
+   Tree->Branch("DisSignalCalcPrompt",   &DisSignalCalcPrompt);
+   Tree->Branch("DisSignalCalcFeeddown", &DisSignalCalcFeeddown);
 
    Tree->Branch("Gsize",                 &Gsize);
    Tree->Branch("Gpt",                   &Gpt);
    Tree->Branch("Gy",                    &Gy);
-   Tree->Branch("GpdgId",                &GpdgId);
-   Tree->Branch("GisSignal",             &GisSignal);
-   Tree->Branch("GcollisionId",          &GcollisionId);
-   Tree->Branch("GSignalType",           &GSignalType);
+   Tree->Branch("GisSignalCalc",         &GisSignalCalc);
+   Tree->Branch("GisSignalCalcPrompt",   &GisSignalCalcPrompt);
+   Tree->Branch("GisSignalCalcFeeddown", &GisSignalCalcFeeddown);
    return true;
 }
 
@@ -2994,14 +2982,16 @@ void DzeroUPCTreeMessenger::Clear()
    Dalpha->clear();
    Ddtheta->clear();
    Dgen->clear();
+   DisSignalCalc->clear();
+   DisSignalCalcPrompt->clear();
+   DisSignalCalcFeeddown->clear();
 
    Gsize = 0;
    Gpt->clear();
    Gy->clear();
-   GpdgId->clear();
-   GisSignal->clear();
-   GcollisionId->clear();
-   GSignalType->clear();
+   GisSignalCalc->clear();
+   GisSignalCalcPrompt->clear();
+   GisSignalCalcFeeddown->clear();
 }
 
 void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
@@ -3045,14 +3035,16 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(Dalpha != nullptr && M.Dalpha != nullptr)   *Dalpha = *(M.Dalpha);
    if(Ddtheta != nullptr && M.Ddtheta != nullptr)   *Ddtheta = *(M.Ddtheta);
    if(Dgen != nullptr && M.Dgen != nullptr)   *Dgen = *(M.Dgen);
+   if(DisSignalCalc != nullptr && M.DisSignalCalc != nullptr)   *DisSignalCalc = *(M.DisSignalCalc);
+   if(DisSignalCalcPrompt != nullptr && M.DisSignalCalcPrompt != nullptr)   *DisSignalCalcPrompt = *(M.DisSignalCalcPrompt);
+   if(DisSignalCalcFeeddown != nullptr && M.DisSignalCalcFeeddown != nullptr)   *DisSignalCalcFeeddown = *(M.DisSignalCalcFeeddown);
 
    Gsize          = M.Gsize;
    if(Gpt != nullptr && M.Gpt != nullptr)   *Gpt = *(M.Gpt);
    if(Gy != nullptr && M.Gy != nullptr)   *Gy = *(M.Gy);
-   if(GpdgId != nullptr && M.GpdgId != nullptr)   *GpdgId = *(M.GpdgId);
-   if(GisSignal != nullptr && M.GisSignal != nullptr)   *GisSignal = *(M.GisSignal);
-   if(GcollisionId != nullptr && M.GcollisionId != nullptr)   *GcollisionId = *(M.GcollisionId);
-   if(GSignalType != nullptr && M.GSignalType != nullptr)   *GSignalType = *(M.GSignalType);
+   if(GisSignalCalc != nullptr && M.GisSignalCalc != nullptr)   *GisSignalCalc = *(M.GisSignalCalc);
+   if(GisSignalCalcPrompt != nullptr && M.GisSignalCalcPrompt != nullptr)   *GisSignalCalcPrompt = *(M.GisSignalCalcPrompt);
+   if(GisSignalCalcFeeddown != nullptr && M.GisSignalCalcFeeddown != nullptr)   *GisSignalCalcFeeddown = *(M.GisSignalCalcFeeddown);
 }
 
 bool DzeroUPCTreeMessenger::FillEntry()
