@@ -2728,7 +2728,10 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
 {
    if(Initialized == true && WriteMode == true)
    {
+      delete gammaN;
+      delete Ngamma;
       delete Dpt;
+      delete DpassCut;
       delete Dy;
       delete Dmass;
       delete Dtrk1Pt;
@@ -2761,7 +2764,10 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
       return false;
 
    Initialized = true;
+   Ngamma = nullptr;
+   gammaN = nullptr;
    Dpt = nullptr;
+   DpassCut = nullptr;
    Dy = nullptr;
    Dmass = nullptr;
    Dtrk1Pt = nullptr;
@@ -2812,6 +2818,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
 
    Tree->SetBranchAddress("Dsize", &Dsize);
    Tree->SetBranchAddress("Dpt", &Dpt);
+   Tree->SetBranchAddress("DpassCut", &DpassCut);
    Tree->SetBranchAddress("Dy", &Dy);
    Tree->SetBranchAddress("Dmass", &Dmass);
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
@@ -2861,7 +2868,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Initialized = true;
    WriteMode = true;
 
+   gammaN = new std::vector<bool>();
+   Ngamma = new std::vector<bool>();
    Dpt = new std::vector<float>();
+   DpassCut = new std::vector<bool>();
    Dy = new std::vector<float>();
    Dmass = new std::vector<float>();
    Dtrk1Pt = new std::vector<float>();
@@ -2903,8 +2913,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("ZDCNgamma",             &ZDCNgamma, "ZDCNgamma/O");
    Tree->Branch("gapgammaN",             &gapgammaN, "gapgammaN/O");
    Tree->Branch("gapNgamma",             &gapNgamma, "gapNgamma/O");
-   Tree->Branch("gammaN",                &gammaN, "gammaN/O");
-   Tree->Branch("Ngamma",                &Ngamma, "Ngamma/O");
+   Tree->Branch("gammaN",                &gammaN);
+   Tree->Branch("Ngamma",                &Ngamma);
    Tree->Branch("ZDCsumPlus",            &ZDCsumPlus, "ZDCsumPlus/F");
    Tree->Branch("ZDCsumMinus",           &ZDCsumMinus, "ZDCsumMinus/F");
    Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
@@ -2913,6 +2923,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
 
    Tree->Branch("Dsize",                 &Dsize);
    Tree->Branch("Dpt",                   &Dpt);
+   Tree->Branch("DpassCut",              &DpassCut);
    Tree->Branch("Dy",                    &Dy);
    Tree->Branch("Dmass",                 &Dmass);
    Tree->Branch("Dtrk1Pt",               &Dtrk1Pt);
@@ -2960,16 +2971,16 @@ void DzeroUPCTreeMessenger::Clear()
    ZDCNgamma = false;
    gapgammaN = false;
    gapNgamma = false;
-   gammaN = false;
-   Ngamma = false;
+   gammaN->clear();
+   Ngamma->clear();
    ZDCsumPlus = -9999.;
    ZDCsumMinus = -9999.;
    HFEMaxPlus = 9999.;
    HFEMaxMinus = 9999.;
    nTrackInAcceptanceHP = 0;
-
    Dsize = 0;
    Dpt->clear();
+   DpassCut->clear();
    Dy->clear();
    Dmass->clear();
    Dtrk1Pt->clear();
@@ -2985,7 +2996,6 @@ void DzeroUPCTreeMessenger::Clear()
    DisSignalCalc->clear();
    DisSignalCalcPrompt->clear();
    DisSignalCalcFeeddown->clear();
-
    Gsize = 0;
    Gpt->clear();
    Gy->clear();
@@ -3013,16 +3023,16 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    ZDCNgamma            = M.ZDCNgamma;
    gapgammaN            = M.gapgammaN;
    gapNgamma            = M.gapNgamma;
-   gammaN               = M.gammaN;
-   Ngamma               = M.Ngamma;
+   if (gammaN != nullptr && M.gammaN != nullptr) *gammaN = *(M.gammaN);
+   if (Ngamma != nullptr && M.Ngamma != nullptr) *Ngamma = *(M.Ngamma);
    ZDCsumPlus           = M.ZDCsumPlus;
    ZDCsumMinus          = M.ZDCsumMinus;
    HFEMaxPlus           = M.HFEMaxPlus;
    HFEMaxMinus          = M.HFEMaxMinus;
    nTrackInAcceptanceHP = M.nTrackInAcceptanceHP;
-
    Dsize          = M.Dsize;
    if(Dpt != nullptr && M.Dpt != nullptr)   *Dpt = *(M.Dpt);
+   if(DpassCut != nullptr && M.DpassCut != nullptr)   *DpassCut = *(M.DpassCut);
    if(Dy != nullptr && M.Dy != nullptr)   *Dy = *(M.Dy);
    if(Dmass != nullptr && M.Dmass != nullptr)   *Dmass = *(M.Dmass);
    if(Dtrk1Pt != nullptr && M.Dtrk1Pt != nullptr)   *Dtrk1Pt = *(M.Dtrk1Pt);
@@ -3038,7 +3048,6 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(DisSignalCalc != nullptr && M.DisSignalCalc != nullptr)   *DisSignalCalc = *(M.DisSignalCalc);
    if(DisSignalCalcPrompt != nullptr && M.DisSignalCalcPrompt != nullptr)   *DisSignalCalcPrompt = *(M.DisSignalCalcPrompt);
    if(DisSignalCalcFeeddown != nullptr && M.DisSignalCalcFeeddown != nullptr)   *DisSignalCalcFeeddown = *(M.DisSignalCalcFeeddown);
-
    Gsize          = M.Gsize;
    if(Gpt != nullptr && M.Gpt != nullptr)   *Gpt = *(M.Gpt);
    if(Gy != nullptr && M.Gy != nullptr)   *Gy = *(M.Gy);

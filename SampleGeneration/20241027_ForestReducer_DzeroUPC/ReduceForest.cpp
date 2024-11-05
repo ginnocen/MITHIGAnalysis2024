@@ -22,6 +22,8 @@ using namespace std;
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
 
+#include "include/DmesonSelection.h"
+
 int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
 
@@ -34,19 +36,16 @@ int main(int argc, char *argv[]) {
   string OutputFileName = CL.Get("Output");
 
   // bool DoGenLevel                    = CL.GetBool("DoGenLevel", true);
-  int Year = CL.GetInt("Year", 2023);
-  double MinDzeroPT = CL.GetDouble("MinDzeroPT", 0.);
-  double MinTrackPT = CL.GetDouble("MinTrackPT", 1);
-  double Fraction = CL.GetDouble("Fraction", 1.00);
-  bool IsData = CL.GetBool("IsData", false);
-  string PFTreeName = "particleFlowAnalyser/pftree";
-  PFTreeName = CL.Get("PFTree", PFTreeName);
-  string DGenTreeName = "Dfinder/ntGen";
-  DGenTreeName = CL.Get("DGenTree", DGenTreeName);
+  bool   IsData        = CL.GetBool  ("IsData",     false); 
+  int    Year          = CL.GetInt   ("Year",       2023);
+  double MinDzeroPT    = CL.GetDouble("MinDzeroPT", 0.); 
+  double MinTrackPT    = CL.GetDouble("MinTrackPT", 1);
+  double Fraction      = CL.GetDouble("Fraction",   1.00);
+  string PFTreeName    = CL.Get      ("PFTree",     "particleFlowAnalyser/pftree");
+  string DGenTreeName  = CL.Get      ("DGenTree",   "Dfinder/ntGen");
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
-  TTree Tree("Tree",
-             Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
+  TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
 
   DzeroUPCTreeMessenger MDzeroUPC;
@@ -87,8 +86,7 @@ int main(int argc, char *argv[]) {
       MSkim.GetEntry(iE);
       MTrigger.GetEntry(iE);
       MDzero.GetEntry(iE);
-      if (IsData == false)
-	MDzeroGen.GetEntry(iE);
+      if (IsData == false) MDzeroGen.GetEntry(iE);
       MZDC.GetEntry(iE);
       MDzeroUPC.Clear();
       MMETFilter.GetEntry(iE);
@@ -108,9 +106,7 @@ int main(int argc, char *argv[]) {
       int BestVertex = -1;
 
       for (int i = 0; i < MTrackPbPbUPC.nVtx; i++) {
-        if (BestVertex < 0 || MTrackPbPbUPC.ptSumVtx->at(i) >
-                                  MTrackPbPbUPC.ptSumVtx->at(BestVertex))
-          BestVertex = i;
+        if (BestVertex < 0 || MTrackPbPbUPC.ptSumVtx->at(i) > MTrackPbPbUPC.ptSumVtx->at(BestVertex)) BestVertex = i;
       }
       if (BestVertex >= 0) {
         MDzeroUPC.VX = MTrackPbPbUPC.xVtx->at(BestVertex);
@@ -143,9 +139,8 @@ int main(int argc, char *argv[]) {
         bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
         MDzeroUPC.selectedBkgFilter = selectedBkgFilter;
         MDzeroUPC.selectedVtxFilter = selectedVtxFilter;
-
         int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 =
-	    MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000");
+	        MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000");
         int HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 =
             MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000");
         int HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_2023 =
@@ -158,14 +153,14 @@ int main(int argc, char *argv[]) {
 			      HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 == 1;
         //if (isL1ZDCOr == false && isL1ZDCXORJet8 == false)
         //  continue;
-
         MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
         MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
         bool ZDCgammaN = (MZDC.sumMinus > 1100. && MZDC.sumPlus < 1100.);
         bool ZDCNgamma = (MZDC.sumMinus < 1100. && MZDC.sumPlus > 1100.);
         MDzeroUPC.ZDCgammaN = ZDCgammaN;
         MDzeroUPC.ZDCNgamma = ZDCNgamma;
-
+      	// Loop through the specified ranges for gapgammaN and gapNgamma
+	      // gammaN[4] and Ngamma[4] are nominal selection criteria
         float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3., 5.2);
         float EMaxHFMinus = GetMaxEnergyHF(&MPF, -5.2, -3.);
         MDzeroUPC.HFEMaxPlus = EMaxHFPlus;
@@ -174,31 +169,29 @@ int main(int argc, char *argv[]) {
         bool gapNgamma = EMaxHFMinus < 8.6;
         MDzeroUPC.gapgammaN = gapgammaN;
         MDzeroUPC.gapNgamma = gapNgamma;
-
-        bool gammaN = ZDCgammaN && gapgammaN;
-        bool Ngamma = ZDCNgamma && gapNgamma;
-        //if (gammaN_ == false && Ngamma_ == false) {
-        //  continue;
-        //}
-        MDzeroUPC.gammaN = gammaN;
-        MDzeroUPC.Ngamma = Ngamma;
+	      for (double gapgammaN_threshold = 5.2; gapgammaN_threshold <= 13.2; gapgammaN_threshold += 1.0) {
+          bool gapgammaN = GetMaxEnergyHF(&MPF, 3.0, 5.2) < gapgammaN_threshold;
+          bool gammaN_ = ZDCgammaN && gapgammaN;
+          MDzeroUPC.gammaN->push_back(gammaN_);
+        }
+        for (double gapNgamma_threshold = 4.6; gapNgamma_threshold <= 12.6; gapNgamma_threshold += 1.0) {
+          bool gapNgamma = GetMaxEnergyHF(&MPF, -5.2, -3.0) < gapNgamma_threshold;
+          bool Ngamma_ = ZDCNgamma && gapNgamma;
+          MDzeroUPC.Ngamma->push_back(Ngamma_);
+        }
       } // end of if (IsData == true)
-
       int nTrackInAcceptanceHP = 0;
       for (int iTrack = 0; iTrack < MTrackPbPbUPC.nTrk; iTrack++) {
-        if (MTrackPbPbUPC.trkPt->at(iTrack) > 0.5 &&
-            fabs(MTrackPbPbUPC.trkEta->at(iTrack)) < 2.4 &&
-            MTrackPbPbUPC.highPurity->at(iTrack) == true) {
-          nTrackInAcceptanceHP++;
-        }
+        if (MTrackPbPbUPC.trkPt->at(iTrack) <= 0.5) continue; 
+	      if (fabs(MTrackPbPbUPC.trkEta->at(iTrack)) >= 2.4) continue;
+        if (MTrackPbPbUPC.highPurity->at(iTrack) == false) continue;
+        nTrackInAcceptanceHP++;
       }
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
       MDzeroUPC.Dsize = MDzero.Dsize;
 
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        if (MDzero.Dpt[iD] < MinDzeroPT ||
-            MDzero.PassUPCDzero2023Cut(iD) == false)
-          continue;
+        if (MDzero.Dpt[iD] < MinDzeroPT || MDzero.PassUPCDzero2023Cut(iD) == false) continue;
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
         MDzeroUPC.Dmass->push_back(MDzero.Dmass[iD]);
@@ -212,14 +205,14 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.Dalpha->push_back(MDzero.Dalpha[iD]);
         MDzeroUPC.Ddtheta->push_back(MDzero.Ddtheta[iD]);
         if (IsData == false) {
-	  MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
+	        MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
           bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;
           bool isPromptGenMatched = MDzero.DgenBAncestorpdgId[iD] == 0;
           bool isFeeddownGenMatched = (MDzero.DgenBAncestorpdgId[iD] >= 500 && MDzero.DgenBAncestorpdgId[iD] < 600) || (MDzero.DgenBAncestorpdgId[iD] > -600 && MDzero.DgenBAncestorpdgId[iD] <= -500);
           MDzeroUPC.DisSignalCalc->push_back(isSignalGenMatched);
           MDzeroUPC.DisSignalCalcPrompt->push_back(isSignalGenMatched && isPromptGenMatched);
           MDzeroUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
-	}
+	      }
       }
 
       MDzeroUPC.FillEntry();
@@ -241,19 +234,17 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3.,
-                      double etaMax = 5.) {
-  if (M == nullptr)
-    return -1;
-  if (M->Tree == nullptr)
-    return -1;
+// ============================================================================ //
+// Function to Retrieve Maximum Energy in HF Region within Specified Eta Range
+// ============================================================================ //
+double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.) {
+  if (M == nullptr)        return -1;
+  if (M->Tree == nullptr)  return -1;
 
   double EMax = 0;
   for (int iPF = 0; iPF < M->ID->size(); iPF++) {
-    if ((M->ID->at(iPF) == 6 || M->ID->at(iPF) == 7) &&
-        M->Eta->at(iPF) > etaMin && M->Eta->at(iPF) < etaMax) {
-      if (M->E->at(iPF) > EMax)
-        EMax = M->E->at(iPF);
+    if ((M->ID->at(iPF) == 6 || M->ID->at(iPF) == 7) && M->Eta->at(iPF) > etaMin && M->Eta->at(iPF) < etaMax) {
+      if (M->E->at(iPF) > EMax) EMax = M->E->at(iPF);
     }
   }
   return EMax;
