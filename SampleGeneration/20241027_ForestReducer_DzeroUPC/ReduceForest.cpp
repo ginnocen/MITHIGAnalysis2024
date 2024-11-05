@@ -128,10 +128,12 @@ int main(int argc, char *argv[]) {
         for (int iDGen = 0; iDGen < MDzeroGen.Gsize; iDGen++){
           MDzeroUPC.Gpt->push_back(MDzeroGen.Gpt[iDGen]);
           MDzeroUPC.Gy->push_back(MDzeroGen.Gy[iDGen]);
-          MDzeroUPC.GpdgId->push_back(MDzeroGen.GpdgId[iDGen]);
-          MDzeroUPC.GisSignal->push_back(MDzeroGen.GisSignal[iDGen]);
-          MDzeroUPC.GcollisionId->push_back(MDzeroGen.GcollisionId[iDGen]);
-          MDzeroUPC.GSignalType->push_back(MDzeroGen.GSignalType[iDGen]);
+          bool isSignalGen = (MDzeroGen.GisSignal[iDGen] == 1 || MDzeroGen.GisSignal[iDGen] == 2) && MDzeroGen.Gpt[iDGen] > 0.;
+          bool isPromptGen = MDzeroGen.GBAncestorpdgId[iDGen] == 0;
+          bool isFeeddownGen = (MDzeroGen.GBAncestorpdgId[iDGen] >= 500 && MDzeroGen.GBAncestorpdgId[iDGen] < 600) || (MDzeroGen.GBAncestorpdgId[iDGen] > -600 && MDzeroGen.GBAncestorpdgId[iDGen] <= -500);
+          MDzeroUPC.GisSignalCalc->push_back(isSignalGen);
+          MDzeroUPC.GisSignalCalcPrompt->push_back(isSignalGen && isPromptGen);
+          MDzeroUPC.GisSignalCalcFeeddown->push_back(isSignalGen && isFeeddownGen);
         }
       }
       if (IsData == true) {
@@ -211,6 +213,12 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.Ddtheta->push_back(MDzero.Ddtheta[iD]);
         if (IsData == false) {
 	  MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
+          bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;
+          bool isPromptGenMatched = MDzero.DgenBAncestorpdgId[iD] == 0;
+          bool isFeeddownGenMatched = (MDzero.DgenBAncestorpdgId[iD] >= 500 && MDzero.DgenBAncestorpdgId[iD] < 600) || (MDzero.DgenBAncestorpdgId[iD] > -600 && MDzero.DgenBAncestorpdgId[iD] <= -500);
+          MDzeroUPC.DisSignalCalc->push_back(isSignalGenMatched);
+          MDzeroUPC.DisSignalCalcPrompt->push_back(isSignalGenMatched && isPromptGenMatched);
+          MDzeroUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
 	}
       }
 
