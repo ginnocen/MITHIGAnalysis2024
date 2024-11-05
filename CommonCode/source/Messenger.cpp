@@ -2744,6 +2744,9 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dalpha;
       delete Ddtheta;
       delete Dgen;
+      delete DisSignalCalc;
+      delete DisSignalCalcPrompt;
+      delete DisSignalCalcFeeddown;
       delete Gpt;
       delete Gy;
       delete GisSignalCalc;
@@ -2783,7 +2786,6 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    DisSignalCalc = nullptr;
    DisSignalCalcPrompt = nullptr;
    DisSignalCalcFeeddown = nullptr;
-
    Gpt = nullptr;
    Gy = nullptr;
    GisSignalCalc = nullptr;
@@ -2799,26 +2801,23 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VXError", &VXError);
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
-
    Tree->SetBranchAddress("isL1ZDCOr", &isL1ZDCOr);
    Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
    Tree->SetBranchAddress("selectedBkgFilter", &selectedBkgFilter);
    Tree->SetBranchAddress("selectedVtxFilter", &selectedVtxFilter);
+   Tree->SetBranchAddress("ZDCsumPlus", &ZDCsumPlus);
+   Tree->SetBranchAddress("ZDCsumMinus", &ZDCsumMinus);
+   Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
+   Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
    Tree->SetBranchAddress("ZDCgammaN", &ZDCgammaN);
    Tree->SetBranchAddress("ZDCNgamma", &ZDCNgamma);
    Tree->SetBranchAddress("gapgammaN", &gapgammaN);
    Tree->SetBranchAddress("gapNgamma", &gapNgamma);
    Tree->SetBranchAddress("gammaN", &gammaN);
    Tree->SetBranchAddress("Ngamma", &Ngamma);
-   Tree->SetBranchAddress("ZDCsumPlus", &ZDCsumPlus);
-   Tree->SetBranchAddress("ZDCsumMinus", &ZDCsumMinus);
-   Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
-   Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
    Tree->SetBranchAddress("nTrackInAcceptanceHP", &nTrackInAcceptanceHP);
-
    Tree->SetBranchAddress("Dsize", &Dsize);
    Tree->SetBranchAddress("Dpt", &Dpt);
-   Tree->SetBranchAddress("DpassCut", &DpassCut);
    Tree->SetBranchAddress("Dy", &Dy);
    Tree->SetBranchAddress("Dmass", &Dmass);
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
@@ -2830,11 +2829,11 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
    Tree->SetBranchAddress("Dalpha", &Dalpha);
    Tree->SetBranchAddress("Ddtheta", &Ddtheta);
+   Tree->SetBranchAddress("DpassCut", &DpassCut);
    Tree->SetBranchAddress("Dgen", &Dgen);
    Tree->SetBranchAddress("DisSignalCalc", &DisSignalCalc);
    Tree->SetBranchAddress("DisSignalCalcPrompt", &DisSignalCalcPrompt);
    Tree->SetBranchAddress("DisSignalCalcFeeddown", &DisSignalCalcFeeddown);
-
    Tree->SetBranchAddress("Gsize", &Gsize);
    Tree->SetBranchAddress("Gpt", &Gpt);
    Tree->SetBranchAddress("Gy", &Gy);
@@ -2883,6 +2882,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    DsvpvDisErr_2D = new std::vector<float>();
    Dalpha = new std::vector<float>();
    Ddtheta = new std::vector<float>();
+   DpassCut = new std::vector<bool>();
    Dgen = new std::vector<int>();
    DisSignalCalc = new std::vector<bool>();
    DisSignalCalcPrompt = new std::vector<bool>();
@@ -2923,7 +2923,6 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
 
    Tree->Branch("Dsize",                 &Dsize);
    Tree->Branch("Dpt",                   &Dpt);
-   Tree->Branch("DpassCut",              &DpassCut);
    Tree->Branch("Dy",                    &Dy);
    Tree->Branch("Dmass",                 &Dmass);
    Tree->Branch("Dtrk1Pt",               &Dtrk1Pt);
@@ -2935,6 +2934,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("DsvpvDisErr_2D",        &DsvpvDisErr_2D);
    Tree->Branch("Dalpha",                &Dalpha);
    Tree->Branch("Ddtheta",               &Ddtheta);
+   Tree->Branch("DpassCut",              &DpassCut);
    Tree->Branch("Dgen",                  &Dgen);
    Tree->Branch("DisSignalCalc",         &DisSignalCalc);
    Tree->Branch("DisSignalCalcPrompt",   &DisSignalCalcPrompt);
@@ -2980,7 +2980,6 @@ void DzeroUPCTreeMessenger::Clear()
    nTrackInAcceptanceHP = 0;
    Dsize = 0;
    Dpt->clear();
-   DpassCut->clear();
    Dy->clear();
    Dmass->clear();
    Dtrk1Pt->clear();
@@ -2992,6 +2991,7 @@ void DzeroUPCTreeMessenger::Clear()
    DsvpvDisErr_2D->clear();
    Dalpha->clear();
    Ddtheta->clear();
+   DpassCut->clear();
    Dgen->clear();
    DisSignalCalc->clear();
    DisSignalCalcPrompt->clear();
@@ -3019,20 +3019,19 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    isL1ZDCXORJet8       = M.isL1ZDCXORJet8;
    selectedBkgFilter    = M.selectedBkgFilter;
    selectedVtxFilter    = M.selectedVtxFilter;
+   ZDCsumPlus           = M.ZDCsumPlus;
+   ZDCsumMinus          = M.ZDCsumMinus;
+   HFEMaxPlus           = M.HFEMaxPlus;
+   HFEMaxMinus          = M.HFEMaxMinus;
    ZDCgammaN            = M.ZDCgammaN;
    ZDCNgamma            = M.ZDCNgamma;
    gapgammaN            = M.gapgammaN;
    gapNgamma            = M.gapNgamma;
    if (gammaN != nullptr && M.gammaN != nullptr) *gammaN = *(M.gammaN);
    if (Ngamma != nullptr && M.Ngamma != nullptr) *Ngamma = *(M.Ngamma);
-   ZDCsumPlus           = M.ZDCsumPlus;
-   ZDCsumMinus          = M.ZDCsumMinus;
-   HFEMaxPlus           = M.HFEMaxPlus;
-   HFEMaxMinus          = M.HFEMaxMinus;
    nTrackInAcceptanceHP = M.nTrackInAcceptanceHP;
    Dsize          = M.Dsize;
    if(Dpt != nullptr && M.Dpt != nullptr)   *Dpt = *(M.Dpt);
-   if(DpassCut != nullptr && M.DpassCut != nullptr)   *DpassCut = *(M.DpassCut);
    if(Dy != nullptr && M.Dy != nullptr)   *Dy = *(M.Dy);
    if(Dmass != nullptr && M.Dmass != nullptr)   *Dmass = *(M.Dmass);
    if(Dtrk1Pt != nullptr && M.Dtrk1Pt != nullptr)   *Dtrk1Pt = *(M.Dtrk1Pt);
@@ -3044,6 +3043,7 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(DsvpvDisErr_2D != nullptr && M.DsvpvDisErr_2D != nullptr)   *DsvpvDisErr_2D = *(M.DsvpvDisErr_2D);
    if(Dalpha != nullptr && M.Dalpha != nullptr)   *Dalpha = *(M.Dalpha);
    if(Ddtheta != nullptr && M.Ddtheta != nullptr)   *Ddtheta = *(M.Ddtheta);
+   if(DpassCut != nullptr && M.DpassCut != nullptr)   *DpassCut = *(M.DpassCut);
    if(Dgen != nullptr && M.Dgen != nullptr)   *Dgen = *(M.Dgen);
    if(DisSignalCalc != nullptr && M.DisSignalCalc != nullptr)   *DisSignalCalc = *(M.DisSignalCalc);
    if(DisSignalCalcPrompt != nullptr && M.DisSignalCalcPrompt != nullptr)   *DisSignalCalcPrompt = *(M.DisSignalCalcPrompt);

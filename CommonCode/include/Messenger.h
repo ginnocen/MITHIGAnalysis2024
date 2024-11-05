@@ -731,16 +731,17 @@ public:
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    bool isL1ZDCOr, isL1ZDCXORJet8;
    bool selectedBkgFilter, selectedVtxFilter;
-   bool ZDCgammaN, ZDCNgamma;
-   bool gapgammaN, gapNgamma;
-   bool gammaN, Ngamma;
    float ZDCsumPlus;
    float ZDCsumMinus;
    float HFEMaxPlus;
    float HFEMaxMinus;
+   //booleans
+   bool ZDCgammaN, ZDCNgamma;
+   bool gapgammaN, gapNgamma;
    std::vector<bool>  *gammaN;
    std::vector<bool>  *Ngamma;
    int nTrackInAcceptanceHP;
+   //D reco quantities
    int Dsize;
    std::vector<float> *Dpt;
    std::vector<float> *Dphi;
