@@ -147,14 +147,23 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
         bool ZDCgammaN = (MZDC.sumMinus > 1100. && MZDC.sumPlus < 1100.);
         bool ZDCNgamma = (MZDC.sumMinus < 1100. && MZDC.sumPlus > 1100.);
-        bool gapgammaN = GetMaxEnergyHF(&MPF, 3., 5.2) < 9.2;
-        bool gapNgamma = GetMaxEnergyHF(&MPF, -5.2, -3.) < 8.6;
-        bool gammaN_ = ZDCgammaN && gapgammaN;
-        bool Ngamma_ = ZDCNgamma && gapNgamma;
-
-        if (gammaN_ == false && Ngamma_ == false) continue;
-        MDzeroUPC.gammaN = gammaN_;
-        MDzeroUPC.Ngamma = Ngamma_;
+	
+	// Loop through the specified ranges for gapgammaN and gapNgamma
+	// gammaN[4] and Ngamma[4] are nominal selection criteria
+	bool globalDecision=false;
+	for (double gapgammaN_threshold = 5.2; gapgammaN_threshold <= 13.2; gapgammaN_threshold += 1.0) {
+            bool gapgammaN = GetMaxEnergyHF(&MPF, 3.0, 5.2) < gapgammaN_threshold;
+            bool gammaN_ = ZDCgammaN && gapgammaN;
+            MDzeroUPC.gammaN->push_back(gammaN_);
+	    if (gammaN_) globalDecision = true;
+        }
+        for (double gapNgamma_threshold = 4.6; gapNgamma_threshold <= 12.6; gapNgamma_threshold += 1.0) {
+            bool gapNgamma = GetMaxEnergyHF(&MPF, -5.2, -3.0) < gapNgamma_threshold;
+            bool Ngamma_ = ZDCNgamma && gapNgamma;
+            MDzeroUPC.Ngamma->push_back(Ngamma_);
+            if (Ngamma_) globalDecision = true;
+        }
+	if (globalDecision==false) continue;
       } // end of if (IsData == true)
 
       int nTrackInAcceptanceHP = 0;
