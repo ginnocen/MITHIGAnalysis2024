@@ -755,7 +755,6 @@ public:
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
    std::vector<int> *Dgen;
-   std::vector<float> *Dgenpt;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;
    std::vector<bool> *DisSignalCalcFeeddown;
