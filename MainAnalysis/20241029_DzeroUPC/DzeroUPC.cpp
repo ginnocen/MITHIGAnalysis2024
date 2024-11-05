@@ -23,20 +23,6 @@ using namespace std;
 //============================================================//
 bool checkError(const Parameters &par) {
   return false;
-  /*
-  if (par.isSelfMixing && par.input != par.mixFile) {
-      std::cout << "Error! Self-mixing mode but assigned different input and mix
-  files. Please check the macro." << std::endl; return true;  // Return true
-  indicates an error was found
-  }
-
-  if (par.isHiBinUp && par.isHiBinDown) {
-      std::cout << "Error! Cannot do hiBinUp and hiBinDown simultaneously!" <<
-  std::endl; return true;  // Return true indicates an error was found
-  }
-  // No errors found
-  return false;
-  */
 }
 
 //======= trackSelection =====================================//
@@ -48,23 +34,9 @@ bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) {
 }
 
 //======= eventSelection =====================================//
-// Check if the event mass eventSelection criteria
-// MinZPT < zPt < MaxZPT
-// MinHiBin , hiBin < MaxHiBin
+// Check if the event pass eventSelection criteria
 //============================================================//
 bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
-  /*
-  if (par.isPUReject && par.isPP && b->NVertex!=1) return 0;    // Only apply PU
-  par.MinHiBin) return 0; if (effectiveHiBin>=par.MaxHiBin) return 0; if
-  ((par.isGenZ ? b->genZMass->size() : b->zMass->size())==0) return 0; if
-  ((par.isGenZ ? (*b->genZMass)[0] : (*b->zMass)[0])<60) return 0; if
-  ((par.isGenZ ? (*b->genZMass)[0] : (*b->zMass)[0])>120) return 0; if
-  (fabs((par.isGenZ ? (*b->genZY)[0] : (*b->zY)[0]))<=par.MinZY) return 0; if
-  (fabs((par.isGenZ ? (*b->genZY)[0] : (*b->zY)[0]))>=par.MaxZY) return 0; if
-  ((par.isGenZ ? (*b->genZPt)[0] : (*b->zPt)[0])<par.MinZPT) return 0; if
-  ((par.isGenZ ? (*b->genZPt)[0] : (*b->zPt)[0])>par.MaxZPT) return 0;
-  */
-
   return 1;
 }
 
@@ -86,8 +58,10 @@ bool getCorrectedYields(DzeroUPCTreeMessenger *MDzeroUPC, TH1D *hDmass,
   iStart = 0; iEnd = MDzeroUPC->GetEntries();
   for (unsigned long i = iStart; i < iEnd; i++) {
     MDzeroUPC->GetEntry(i);
-      //Bar.Update(i - iStart);
-      //Bar.Print();
+    if (i%1000==0) {
+      Bar.Update(i - iStart);
+      Bar.Print();
+    }
     // Check if the event passes the selection criteria
     if (eventSelection(MDzeroUPC, par)) {
       for (unsigned long j = 0; j < MDzeroUPC->Dalpha->size(); j++) {
@@ -96,7 +70,9 @@ bool getCorrectedYields(DzeroUPCTreeMessenger *MDzeroUPC, TH1D *hDmass,
          if (MDzeroUPC->Dy->at(j) < par.MinDzeroY) continue;
          if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY) continue;
          if (MDzeroUPC->Dalpha->at(j) < par.MaxDalpha) continue;
+	 if (!MDzeroUPC->DpassCut) continue;
          hDmass->Fill((*MDzeroUPC->Dmass)[j]);
+	 nt->Fill((*MDzeroUPC->Dmass)[j]);
       }
     }
   }
@@ -108,6 +84,7 @@ public:
   TFile *inf, *outf;
   TH1D *hDmass;
   DzeroUPCTreeMessenger *MDzeroUPC;
+  TNtuple *nt;
   string title;
 
   DataAnalyzer(const char *filename, const char *outFilename,
@@ -116,10 +93,12 @@ public:
         MDzeroUPC(new DzeroUPCTreeMessenger(*inf, string("Tree"))),
         title(mytitle), outf(new TFile(outFilename, "recreate")) {
     outf->cd();
+    nt = new TNtuple("nt", "D0 mass tree","Dmass");
   }
 
   ~DataAnalyzer() {
     deleteHistograms();
+    delete nt;
     inf->Close();
     outf->Close();
     delete MDzeroUPC;
@@ -128,12 +107,13 @@ public:
   void analyze(Parameters &par) {
     outf->cd();
     hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", 60, 1.7, 2.0);
-    getCorrectedYields(MDzeroUPC, hDmass, par);
+    getCorrectedYields(MDzeroUPC, hDmass, par, nt);
   }
 
   void writeHistograms(TFile *outf) {
     outf->cd();
     smartWrite(hDmass);
+    smartWrite(nt);
   }
 
 private:
