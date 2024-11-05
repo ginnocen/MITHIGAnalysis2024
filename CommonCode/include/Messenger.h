@@ -730,6 +730,7 @@ public:
    //int gammaN, Ngamma;
    std::vector<bool>  *gammaN;
    std::vector<bool>  *Ngamma;
+   std::vector<bool>  *DpassCut;
    std::vector<float> *Dpt;
    std::vector<float> *Dphi;
    std::vector<float> *Dy;

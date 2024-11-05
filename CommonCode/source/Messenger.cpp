@@ -2728,6 +2728,7 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete gammaN;
       delete Ngamma;
       delete Dpt;
+      delete DpassCut;
       delete Dy;
       delete Dmass;
       delete Dtrk1Pt;
@@ -2764,6 +2765,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Ngamma = nullptr;
    gammaN = nullptr;
    Dpt = nullptr;
+   DpassCut = nullptr;
    Dy = nullptr;
    Dmass = nullptr;
    Dtrk1Pt = nullptr;
@@ -2799,6 +2801,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("nTrackInAcceptanceHP", &nTrackInAcceptanceHP);
 
    Tree->SetBranchAddress("Dpt", &Dpt);
+   Tree->SetBranchAddress("DpassCut", &DpassCut);
    Tree->SetBranchAddress("Dy", &Dy);
    Tree->SetBranchAddress("Dmass", &Dmass);
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
@@ -2871,6 +2874,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    gammaN = new std::vector<bool>();
    Ngamma = new std::vector<bool>();
    Dpt = new std::vector<float>();
+   DpassCut = new std::vector<bool>();
    Dy = new std::vector<float>();
    Dmass = new std::vector<float>();
    Dtrk1Pt = new std::vector<float>();
@@ -2908,6 +2912,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("nTrackInAcceptanceHP",  &nTrackInAcceptanceHP, "nTrackInAcceptanceHP/I");
 
    Tree->Branch("Dpt",                   &Dpt);
+   Tree->Branch("DpassCut",              &DpassCut);
    Tree->Branch("Dy",                    &Dy);
    Tree->Branch("Dmass",                 &Dmass);
    Tree->Branch("Dtrk1Pt",               &Dtrk1Pt);
@@ -2947,6 +2952,7 @@ void DzeroUPCTreeMessenger::Clear()
    gammaN->clear();
    Ngamma->clear();
    Dpt->clear();
+   DpassCut->clear();
    Dy->clear();
    Dmass->clear();
    Dtrk1Pt->clear();
@@ -2985,6 +2991,7 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if (gammaN != nullptr && M.gammaN != nullptr) *gammaN = *(M.gammaN);
    if (Ngamma != nullptr && M.Ngamma != nullptr) *Ngamma = *(M.Ngamma);
    if(Dpt != nullptr && M.Dpt != nullptr)   *Dpt = *(M.Dpt);
+   if(DpassCut != nullptr && M.DpassCut != nullptr)   *DpassCut = *(M.DpassCut);
    if(Dy != nullptr && M.Dy != nullptr)   *Dy = *(M.Dy);
    if(Dmass != nullptr && M.Dmass != nullptr)   *Dmass = *(M.Dmass);
    if(Dtrk1Pt != nullptr && M.Dtrk1Pt != nullptr)   *Dtrk1Pt = *(M.Dtrk1Pt);
