@@ -38,12 +38,10 @@ int main(int argc, char *argv[]) {
   // bool DoGenLevel                    = CL.GetBool("DoGenLevel", true);
   bool IsData = CL.GetBool("IsData", false);
   int Year = CL.GetInt("Year", 2023);
-  double MinDzeroPT = CL.GetDouble("MinDzeroPT", 0.);
-  double MinTrackPT = CL.GetDouble("MinTrackPT", 1);
   double Fraction = CL.GetDouble("Fraction", 1.00);
+  bool ApplyDPreselection = CL.GetBool("ApplyDPreselection", true);
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string DGenTreeName = CL.Get("DGenTree", "Dfinder/ntGen");
-
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
@@ -195,11 +193,10 @@ int main(int argc, char *argv[]) {
         nTrackInAcceptanceHP++;
       }
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
-      MDzeroUPC.Dsize = MDzero.Dsize;
-
+      int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        if (MDzero.Dpt[iD] < MinDzeroPT || MDzero.PassUPCDzero2023Cut(iD) == false)
-          continue;
+        if (ApplyDPreselection && DmesonSelectionSkimPrelim23(MDzero, iD) == false) continue;
+        countSelDzero++;
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
         MDzeroUPC.Dmass->push_back(MDzero.Dmass[iD]);
@@ -212,7 +209,7 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DsvpvDisErr_2D->push_back(MDzero.DsvpvDisErr_2D[iD]);
         MDzeroUPC.Dalpha->push_back(MDzero.Dalpha[iD]);
         MDzeroUPC.Ddtheta->push_back(MDzero.Ddtheta[iD]);
-        MDzeroUPC.DpassCut->push_back(DmesonSelection(MDzero,iD));
+        MDzeroUPC.DpassCut->push_back(DmesonSelectionPrelim23(MDzero,iD));
         if (IsData == false) {
           MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
           bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;
@@ -224,7 +221,7 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
         }
       }
-
+      MDzeroUPC.Dsize = countSelDzero;
       MDzeroUPC.FillEntry();
     }
 

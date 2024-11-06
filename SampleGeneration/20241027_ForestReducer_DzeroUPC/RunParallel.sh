@@ -22,8 +22,8 @@ while IFS= read -r file; do
             ./Execute --Input "$file" \
             --Output "$OUTPUT/output_$counter.root" \
             --Year 2023 \
+            --ApplyDPreselection true \
             --IsData true \
-            --MinDzeroPT 1.0 \
             --PFTree particleFlowAnalyser/pftree &
  #           --DGenTree Dfinder/ntGen &
     ((counter++))
@@ -60,7 +60,7 @@ while IFS= read -r file; do
             --Output "$OUTPUTMC/output_$counterMC.root" \
             --Year 2023 \
             --IsData false \
-            --MinDzeroPT 1.0 \
+            --ApplyDPreselection true \
             --PFTree particleFlowAnalyser/pftree &
             --DGenTree Dfinder/ntGen &
     ((counterMC++))
