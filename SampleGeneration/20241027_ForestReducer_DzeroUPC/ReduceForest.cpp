@@ -212,6 +212,7 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DsvpvDisErr_2D->push_back(MDzero.DsvpvDisErr_2D[iD]);
         MDzeroUPC.Dalpha->push_back(MDzero.Dalpha[iD]);
         MDzeroUPC.Ddtheta->push_back(MDzero.Ddtheta[iD]);
+        MDzeroUPC.DpassCut->push_back(DmesonSelection(MDzero,iD));
         if (IsData == false) {
           MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
           bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;
