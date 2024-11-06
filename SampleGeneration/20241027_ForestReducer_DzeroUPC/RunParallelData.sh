@@ -1,10 +1,10 @@
 #!/bin/bash
 MAXCORES=100
 
-NAME="20241106_SkimOldReco23sample_DataShort"
+NAME="20241106_SkimOldReco23sample_DataAll"
 OUTPUT="output"
 counter=0
-filelist="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_DataShort.txt"
+filelist="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_DataAll.txt"
 MERGEDOUTPUT="/data/NewSkims23_24/$NAME.root"
 rm $MERGEDOUTPUT
 
