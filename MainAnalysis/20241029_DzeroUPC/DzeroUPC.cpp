@@ -50,12 +50,8 @@ bool getCorrectedYields(DzeroUPCTreeMessenger *MDzeroUPC, TH1D *hDmass,
   unsigned long nEntry = MDzeroUPC->GetEntries() * par.scaleFactor;
   unsigned long iStart = nEntry * (par.nChunk - 1) / par.nThread;
   unsigned long iEnd = nEntry * par.nChunk / par.nThread;
-
   ProgressBar Bar(cout, iEnd - iStart);
   Bar.SetStyle(1);
-  unsigned long mix_i = iStart;
-  unsigned long mixstart_i = mix_i;
-  iStart = 0; iEnd = MDzeroUPC->GetEntries();
   for (unsigned long i = iStart; i < iEnd; i++) {
     MDzeroUPC->GetEntry(i);
     if (i%1000==0) {
