@@ -71,6 +71,34 @@ bool binsMaxCheck(std::string binStr, int nBins, int nMaxBins)
   return true;
 }
 
+void bookHist1D(std::string nameStr, std::string titleStr, std::vector<double> histBins, std::vector<double> axisBins, TH1D* hist[])
+{
+  for(unsigned int bI = 0; bI < histBins.size()-1; ++bI){
+    std::string localName = nameStr + std::to_string(bI) + "_h";
+    std::string localTitle = Form(titleStr.c_str(), histBins[bI], histBins[bI+1]);
+
+    hist[bI] = new TH1D(localName.c_str(), localTitle.c_str(), axisBins.size()-1, axisBins.data());
+  }
+  std::string localName = nameStr + "All_h";
+  std::string localTitle = Form(titleStr.c_str(), histBins[0], histBins[histBins.size()-1]);
+  hist[histBins.size()-1] = new TH1D(localName.c_str(), localTitle.c_str(), axisBins.size()-1, axisBins.data());
+
+  return;
+}
+
+std::vector<double> getLinBins(int nbins, double low, double high)
+{
+  std::vector<double> vect;
+  double binWidth = (high - low)/(double)nbins;
+  vect.push_back(low);
+  for(int bI = 1; bI < nbins; ++bI){
+    vect.push_back(low+binWidth*(double)bI);
+  }
+  vect.push_back(high);
+  
+  return vect;
+}
+
 int DataMCComp(std::string inConfigName)
 {
   //config handler - 
@@ -89,7 +117,7 @@ int DataMCComp(std::string inConfigName)
     }
     inFile.close();
   }
-
+  
   //grab dPtBins
   std::vector<double> dPtBins = commaSepStrToDVect(config_p->GetValue("DPTBINS", ""));
   if(dPtBins.size() == 0) return 1;
@@ -97,6 +125,12 @@ int DataMCComp(std::string inConfigName)
   //grab dYBins
   std::vector<double> dYBins = commaSepStrToDVect(config_p->GetValue("DYBINS", ""));
   if(dYBins.size() == 0) return 1;
+
+  //Grab dMBins
+  Int_t nDMBins = config_p->GetValue("NDMBINS", -1);//nonsense defaults for auto-failure
+  Double_t dMBinsLow = config_p->GetValue("DMBINSLOW", -1.0);
+  Double_t dMBinsHigh = config_p->GetValue("DMBINSHIGH", -9999.0);
+  std::vector<double> dMBins = getLinBins(nDMBins, dMBinsLow, dMBinsHigh);
   
   //Grab the outputfile name, if it exist; else default name
   std::string outFileName = config_p->GetValue("OUTFILENAME", "out.root");
@@ -108,46 +142,52 @@ int DataMCComp(std::string inConfigName)
 
   if(!binsMaxCheck("DPt", nDPtBins, nMaxBins)) return 1;
   if(!binsMaxCheck("DY", nDYBins, nMaxBins)) return 1;
-
   
   TH1D* rawDPt_h[nMaxBins];
   TH1D* rawDY_h[nMaxBins];
   TH1D* rawDM_h[nMaxBins][nMaxBins];
 
-  //Pt histograms in y bins
-  for(unsigned int yI = 0; yI < nDYBins; ++yI){
-    std::string histName = Form("rawDPt_YBin%d_h", yI);
-    std::string histTitle = Form(";D^{0} cand. p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins[yI], dYBins[yI+1]);
-    
-    rawDPt_h[yI] = new TH1D(histName.c_str(), histTitle.c_str(), dPtBins.size()-1, dPtBins.data());  
-  }
-  std::string histName = "rawDPt_YBinAll_h";
-  std::string histTitle = Form(";D^{0} cand. p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins[0], dYBins[nDYBins]);
-  rawDPt_h[nDYBins] = new TH1D(histName.c_str(), histTitle.c_str(), dPtBins.size()-1, dPtBins.data());  
+  bookHist1D("rawDPt_YBin", ";D^{0} cand. p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins, dPtBins, rawDPt_h); 
+  bookHist1D("rawDY_PtBin", ";D^{0} cand. y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins, dYBins, rawDY_h);   
 
-  //Y histograms in pt bins
-  for(unsigned int pI = 0; pI < nDPtBins; ++pI){
-    histName = Form("rawDY_PtBin%d_h", pI);
-    histTitle = Form(";D^{0} cand. y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins[pI], dPtBins[pI+1]);
-    
-    rawDY_h[pI] = new TH1D(histName.c_str(), histTitle.c_str(), dYBins.size()-1, dYBins.data());  
-  }
-  histName = "rawDY_PtBinAll_h";
-  histTitle = Form(";D^{0} cand. y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins[0], dPtBins[nDPtBins]);
-  rawDY_h[nDPtBins] = new TH1D(histName.c_str(), histTitle.c_str(), dYBins.size()-1, dYBins.data());  
+  //For mass, double binned, so iterate over Pt, then Y
+  for(Int_t pI = 0; pI < nDPtBins+1; ++pI){
+    std::string histName = "rawDM_PtBinAll";
+    std::string histTitle = Form(";D^{0} cand. Mass (GeV), %.1f < p_{T} < %.1f (GeV),", dPtBins[0], dPtBins[dPtBins.size()-1]);
+    if(pI < nDPtBins){
+      histName = "rawDM_PtBin" + std::to_string(pI);
+      histTitle = Form(";D^{0} cand. Mass (GeV), %.1f < p_{T} < %.1f (GeV),", dPtBins[pI], dPtBins[pI+1]);
+    }
 
+    histName = histName + "_Y";
+    histTitle = histTitle + " %.1f < y < %.1f;Counts";
+    bookHist1D(histName, histTitle, dYBins, dMBins, rawDM_h[pI]);
+  }
+
+  const ULong64_t nEntriesToPrint = TMath::Max(1, config_p->GetValue("NENTRIESTOPRINT", 10000));
   
   //Done handling config input
 
+  ULong64_t totalNEntries = 0;
+  
+  std::cout << "Pre-processing " << skimFileNames.size() << " skim files...." << std::endl;
+  for(unsigned int fI = 0; fI < skimFileNames.size(); ++fI){
+    TFile* inFile_p = new TFile(skimFileNames[fI].c_str(), "READ");
+    DzeroUPCTreeMessenger *MDzeroUPC = new DzeroUPCTreeMessenger(inFile_p, "Tree");
+    totalNEntries += MDzeroUPC->GetEntries();
+    delete MDzeroUPC;
+    inFile_p->Close();
+    delete inFile_p;
+  }  
+  
   //Process inputs
   std::cout << "Processing " << skimFileNames.size() << " skim files...." << std::endl;
-  for(unsigned int fI = 0; fI < skimFileNames.size(); ++fI){
-    std::cout << " File " << fI << "/" << skimFileNames.size() << " (" << ((Double_t)fI)/(Double_t)skimFileNames.size() << "): " << skimFileNames[fI] << std::endl;
+  std::cout << "Total entries: " << totalNEntries << "..." << std::endl; 
 
-    //Define the variables to be used w/ skim tree
-    std::vector<float>* Dpt_p=nullptr;
-    std::vector<float>* Dy_p=nullptr;
-    
+  ULong64_t nCurrEntries = 0;
+  
+  
+  for(unsigned int fI = 0; fI < skimFileNames.size(); ++fI){
     //Grab the input file and Tree
     TFile* inFile_p = new TFile(skimFileNames[fI].c_str(), "READ");
     //Use UPC DZeroTree
@@ -156,6 +196,9 @@ int DataMCComp(std::string inConfigName)
     //Loop over entries
     ULong64_t nEntries = MDzeroUPC->GetEntries();
     for(ULong64_t entry = 0; entry < nEntries; ++entry){   
+      if(nCurrEntries%nEntriesToPrint == 0) std::cout << " Entry " << nCurrEntries << "/" << totalNEntries << " = " << Form("%.1f", ((Double_t)100*nCurrEntries)/((Double_t)totalNEntries)) << "%, File " << fI << "/" << skimFileNames.size() << std::endl;
+      ++nCurrEntries;
+      
       MDzeroUPC->GetEntry(entry);
 
       for(unsigned int dI = 0; dI < MDzeroUPC->Dpt->size(); ++dI){
@@ -170,6 +213,13 @@ int DataMCComp(std::string inConfigName)
 	if(ptPos >= 0){
 	  rawDY_h[ptPos]->Fill(MDzeroUPC->Dy->at(dI));
 	  rawDY_h[nDPtBins]->Fill(MDzeroUPC->Dy->at(dI));
+	}
+
+	if(ptPos >= 0 && yPos >= 0){
+	  rawDM_h[ptPos][yPos]->Fill(MDzeroUPC->Dmass->at(dI));
+	  rawDM_h[nDPtBins][yPos]->Fill(MDzeroUPC->Dmass->at(dI));
+	  rawDM_h[ptPos][nDYBins]->Fill(MDzeroUPC->Dmass->at(dI));
+	  rawDM_h[nDPtBins][nDYBins]->Fill(MDzeroUPC->Dmass->at(dI));
 	}
       }
     }
@@ -192,7 +242,14 @@ int DataMCComp(std::string inConfigName)
     rawDY_h[pI]->Write("", TObject::kOverwrite);
     delete rawDY_h[pI];    
   }
-  
+
+  for(Int_t pI = 0; pI < nDPtBins+1; ++pI){
+    for(unsigned int yI = 0; yI < nDYBins+1; ++yI){
+      rawDM_h[pI][yI]->Write("", TObject::kOverwrite);
+      delete rawDM_h[pI][yI];    
+    }
+  }
+    
   //Write out the config so there is a record of production
   config_p->Write("config", TObject::kOverwrite);
   delete config_p;
