@@ -13,6 +13,9 @@
 #include "TH1D.h"
 #include "TTree.h"
 
+//Local CommonCode
+#include "Messenger.h"
+
 std::vector<double> commaSepStrToDVect(std::string inStr)
 {
    std::vector<double> vectD = {};
@@ -38,6 +41,34 @@ std::vector<double> commaSepStrToDVect(std::string inStr)
   }
   
   return vectD;
+}
+
+int getPosFromBins(double val, std::vector<double> bins)
+{
+  int retPos = -1;
+  if(bins.size() <= 1){
+    std::cout << __PRETTY_FUNCTION__ << " WARNING: Given bins.size() = " << bins.size() << ", return -1" << std::endl;
+    return retPos;
+  }
+  
+  for(unsigned int bI = 0; bI < bins.size()-1; ++bI){
+    if(val >= bins[bI] && val < bins[bI+1]){
+      retPos = bI;
+      break;
+    }
+  }
+
+  return retPos;
+}
+
+bool binsMaxCheck(std::string binStr, int nBins, int nMaxBins)
+{
+  if(nBins > nMaxBins){
+    std::cout << __PRETTY_FUNCTION__ << " WARNING: Given nBins=" << nBins << " for '' exceeds max. return false" << std::endl;
+    return false;
+  }
+
+  return true;
 }
 
 int DataMCComp(std::string inConfigName)
@@ -72,33 +103,39 @@ int DataMCComp(std::string inConfigName)
   TFile* outFile_p = new TFile(outFileName.c_str(), "RECREATE");
 
   const Int_t nMaxBins = 20;
-  
   const Int_t nDPtBins = dPtBins.size()-1;
   const Int_t nDYBins = dYBins.size()-1;
+
+  if(!binsMaxCheck("DPt", nDPtBins, nMaxBins)) return 1;
+  if(!binsMaxCheck("DY", nDYBins, nMaxBins)) return 1;
+
   
-  TH1D* dPt_h[nMaxBins];
-  TH1D* dY_h[nMaxBins];
+  TH1D* rawDPt_h[nMaxBins];
+  TH1D* rawDY_h[nMaxBins];
+  TH1D* rawDM_h[nMaxBins][nMaxBins];
+
   //Pt histograms in y bins
   for(unsigned int yI = 0; yI < nDYBins; ++yI){
-    std::string histName = Form("dPt_YBin%d_h", yI);
-    std::string histTitle = Form(";D^{0} p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins[yI], dYBins[yI+1]);
+    std::string histName = Form("rawDPt_YBin%d_h", yI);
+    std::string histTitle = Form(";D^{0} cand. p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins[yI], dYBins[yI+1]);
     
-    dPt_h[yI] = new TH1D(histName.c_str(), histTitle.c_str(), dPtBins.size()-1, dPtBins.data());  
+    rawDPt_h[yI] = new TH1D(histName.c_str(), histTitle.c_str(), dPtBins.size()-1, dPtBins.data());  
   }
-  std::string histName = "dPt_YBinAll_h";
-  std::string histTitle = Form(";D^{0} p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins[0], dYBins[nDYBins]);
-  dPt_h[nDYBins] = new TH1D(histName.c_str(), histTitle.c_str(), dPtBins.size()-1, dPtBins.data());  
+  std::string histName = "rawDPt_YBinAll_h";
+  std::string histTitle = Form(";D^{0} cand. p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins[0], dYBins[nDYBins]);
+  rawDPt_h[nDYBins] = new TH1D(histName.c_str(), histTitle.c_str(), dPtBins.size()-1, dPtBins.data());  
 
   //Y histograms in pt bins
   for(unsigned int pI = 0; pI < nDPtBins; ++pI){
-    histName = Form("dY_PtBin%d_h", pI);
-    histTitle = Form(";D^{0} y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins[pI], dPtBins[pI+1]);
+    histName = Form("rawDY_PtBin%d_h", pI);
+    histTitle = Form(";D^{0} cand. y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins[pI], dPtBins[pI+1]);
     
-    dY_h[pI] = new TH1D(histName.c_str(), histTitle.c_str(), dYBins.size()-1, dYBins.data());  
+    rawDY_h[pI] = new TH1D(histName.c_str(), histTitle.c_str(), dYBins.size()-1, dYBins.data());  
   }
-  histName = "dY_PtBinAll_h";
-  histTitle = Form(";D^{0} y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins[0], dPtBins[nDPtBins]);
-  dY_h[nDPtBins] = new TH1D(histName.c_str(), histTitle.c_str(), dYBins.size()-1, dYBins.data());  
+  histName = "rawDY_PtBinAll_h";
+  histTitle = Form(";D^{0} cand. y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins[0], dPtBins[nDPtBins]);
+  rawDY_h[nDPtBins] = new TH1D(histName.c_str(), histTitle.c_str(), dYBins.size()-1, dYBins.data());  
+
   
   //Done handling config input
 
@@ -113,36 +150,31 @@ int DataMCComp(std::string inConfigName)
     
     //Grab the input file and Tree
     TFile* inFile_p = new TFile(skimFileNames[fI].c_str(), "READ");
-    TTree* Tree = (TTree*)inFile_p->Get("Tree");
-
-    //Tree branch handling
-    Tree->SetBranchStatus("*", 0);
-    Tree->SetBranchStatus("Dpt", 1);
-    Tree->SetBranchStatus("Dy", 1);
-
-    Tree->SetBranchAddress("Dpt", &Dpt_p);
-    Tree->SetBranchAddress("Dy", &Dy_p);
+    //Use UPC DZeroTree
+    DzeroUPCTreeMessenger *MDzeroUPC = new DzeroUPCTreeMessenger(inFile_p, "Tree");
 
     //Loop over entries
-    ULong64_t nEntries = Tree->GetEntries();
+    ULong64_t nEntries = MDzeroUPC->GetEntries();
     for(ULong64_t entry = 0; entry < nEntries; ++entry){   
-      Tree->GetEntry(entry);
-      for(unsigned int dI = 0; dI < Dpt_p->size(); ++dI){
+      MDzeroUPC->GetEntry(entry);
 
-	int yPos = -1;
-	for(Int_t yI = 0; yI < nDYBins; ++yI){
-	  if(Dy_p->at(dI) >= dYBins[yI] && Dy_p->at(dI) <= dYBins[yI+1]){
-	    yPos = yI;
-	    break;
-	  }
+      for(unsigned int dI = 0; dI < MDzeroUPC->Dpt->size(); ++dI){
+	int yPos = getPosFromBins(MDzeroUPC->Dy->at(dI), dYBins);
+	int ptPos = getPosFromBins(MDzeroUPC->Dpt->at(dI), dPtBins);
+	
+	if(yPos >= 0){
+	  rawDPt_h[yPos]->Fill(MDzeroUPC->Dpt->at(dI));
+	  rawDPt_h[nDYBins]->Fill(MDzeroUPC->Dpt->at(dI));
 	}
 
-	if(yPos >= 0){
-	  dPt_h[yPos]->Fill(Dpt_p->at(dI));
-	  dPt_h[nDYBins]->Fill(Dpt_p->at(dI));
+	if(ptPos >= 0){
+	  rawDY_h[ptPos]->Fill(MDzeroUPC->Dy->at(dI));
+	  rawDY_h[nDPtBins]->Fill(MDzeroUPC->Dy->at(dI));
 	}
       }
     }
+
+    delete MDzeroUPC;
     
     inFile_p->Close();
     delete inFile_p;
@@ -152,13 +184,13 @@ int DataMCComp(std::string inConfigName)
   outFile_p->cd();
 
   for(unsigned int yI = 0; yI < nDYBins+1; ++yI){
-    dPt_h[yI]->Write("", TObject::kOverwrite);
-    delete dPt_h[yI];
+    rawDPt_h[yI]->Write("", TObject::kOverwrite);
+    delete rawDPt_h[yI];
   }
 
-  for(unsigned int pI = 0; pI < nDPtBins; ++pI){
-    dY_h[pI]->Write("", TObject::kOverwrite);
-    delete dY_h[pI];    
+  for(unsigned int pI = 0; pI < nDPtBins+1; ++pI){
+    rawDY_h[pI]->Write("", TObject::kOverwrite);
+    delete rawDY_h[pI];    
   }
   
   //Write out the config so there is a record of production
