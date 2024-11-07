@@ -10,8 +10,8 @@ mkdir -p Output/
 ./Execute --Input /data/NewSkims23_24/20241102_ForestOldReco23sample_Dataexample/HiForestMiniAOD_UPCPbPb23_HiVertex_279.root \
    --Output Output/example.root \
    --Year 2023 \
-   --MinDzeroPT 1.0 \
    --IsData true \
+   --ApplyDPreselection false \
    --PFTree particleFlowAnalyser/pftree \
 
 ###################
@@ -21,7 +21,7 @@ mkdir -p Output/
 ./Execute --Input /home/data/public/hannah/mc_productions/OfficialMC_pTHat2/UnmergedForests/ForcedD0Decay100M_BeamA/HiForestMiniAOD_44.root \
    --Output Output/output_44.root \
    --Year 2023 \
-   --MinDzeroPT 1.0 \
    --IsData false \
+   --ApplyDPreselection false \
    --PFTree particleFlowAnalyser/pftree \
    --DGenTree Dfinder/ntGen

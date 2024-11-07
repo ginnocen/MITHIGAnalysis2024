@@ -1,4 +1,4 @@
-bool DmesonSelection(DzeroTreeMessenger& MDzero, int iD) {
+bool DmesonSelectionPrelim23(DzeroTreeMessenger& MDzero, int iD) {
   const int nPtBinsOpt = 3;
   const int nYBinsOpt = 4;
 
@@ -37,9 +37,9 @@ bool DmesonSelection(DzeroTreeMessenger& MDzero, int iD) {
 
   // Check if the pt and y bins were found
   if (ptBin == -1 || yBin == -1) {
-    cerr << "Error! No pt bin and/or y bin found for D meson selection. "
-     << "pt = " << pt << ", y = " << y 
-     << ". Please check if the pt or y values fall within the defined bin ranges." << endl;
+    //cerr << "Error! No pt bin and/or y bin found for D meson selection. "
+    // << "pt = " << pt << ", y = " << y
+    // << ". Please check if the pt or y values fall within the defined bin ranges." << endl;
     return 0;
   }
 
@@ -50,4 +50,10 @@ bool DmesonSelection(DzeroTreeMessenger& MDzero, int iD) {
               (MDzero.DsvpvDistance[iD] / MDzero.DsvpvDisErr[iD] >= DsvpvSigCutValue[ptBin][yBin]);
 
   return pass;
+}
+
+bool DmesonSelectionSkimPrelim23(DzeroTreeMessenger& MDzero, int iD) {
+  float pt = MDzero.Dpt[iD];
+  if (pt < 2.) return false;
+  return true;
 }
