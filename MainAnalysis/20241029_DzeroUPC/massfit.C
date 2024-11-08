@@ -17,9 +17,10 @@
 using namespace std;
 using namespace RooFit;
 
-void main_fit(TTree *datatree) {
+void main_fit(TTree *datatree, string outputstring) {
+    TCanvas* canvas = new TCanvas("canvas", "Fit Plot", 800, 600);
     // Define the mass range and variables
-    RooRealVar m("Dmass", "Mass [GeV]", 1.76, 1.96);
+    RooRealVar m("Dmass", "Mass [GeV]", 1.68, 2.05);
 
     // Define the signal model: double Gaussian
     RooRealVar mean("mean", "mean", 1.86484, 1.85, 1.88);
@@ -47,14 +48,13 @@ void main_fit(TTree *datatree) {
     RooFitResult* result = model.fitTo(data, Save());
 
     // Plot the data and the fit result
-    TCanvas* canvas = new TCanvas("canvas", "Fit Plot", 800, 600);
     RooPlot* frame = m.frame();
     data.plotOn(frame);
     model.plotOn(frame);
     model.plotOn(frame, Components(background), LineStyle(kDashed), LineColor(kRed));
     frame->Draw();
+    canvas->SaveAs(Form("fit_result%s.pdf", outputstring.c_str()));
     
-    canvas->SaveAs("fit_result.pdf");
 }
 
 
@@ -63,11 +63,10 @@ int main(int argc, char *argv[]) {
   CommandLine CL(argc, argv);
   string input         = CL.Get      ("Input",   "output.root"); // Input file
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
-  
+  string outputstring  = CL.Get      ("Label",   "label");       // Label for output file
   TFile *inf  = new TFile(input.c_str());
   TFile *outf = new TFile(output.c_str());
-  
   TTree *t = (TTree*) inf->Get("nt");
-  main_fit(t);
-}
+  main_fit(t, outputstring);
 
+}

@@ -29,7 +29,6 @@ bool checkError(const Parameters &par) {
 // Check if the track pass selection criteria
 //============================================================//
 bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) {
-  if ((*b->Dalpha)[j]>par.MaxDalpha) return false;
   return true;
 }
 
@@ -37,7 +36,14 @@ bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) {
 // Check if the event pass eventSelection criteria
 //============================================================//
 bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
-  return 1;
+  if (par.IsData == false) return true;
+  if (b->selectedBkgFilter == false || b->selectedBkgFilter == false) return false;
+  if (par.IsGammaN && (b->ZDCgammaN && b->gapgammaN) == false) return false;
+  if (!par.IsGammaN && (b->ZDCNgamma && b->gapNgamma) == false) return false;
+  if (par.TriggerChoice == 1 && b->isL1ZDCOr == false) return false;
+  if (par.TriggerChoice == 2 && b->isL1ZDCXORJet8 == false) return false;
+  //if (b->nVtx >= 3) return false; //FIXME: this is to be removed once we move to HiVertexReco
+  return true;
 }
 
 //============================================================//
@@ -59,16 +65,16 @@ bool getCorrectedYields(DzeroUPCTreeMessenger *MDzeroUPC, TH1D *hDmass,
       Bar.Print();
     }
     // Check if the event passes the selection criteria
+    //if (1) {
     if (eventSelection(MDzeroUPC, par)) {
       for (unsigned long j = 0; j < MDzeroUPC->Dalpha->size(); j++) {
-         if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT) continue;
-         if (MDzeroUPC->Dpt->at(j) > par.MaxDzeroPT) continue;
-         if (MDzeroUPC->Dy->at(j) < par.MinDzeroY) continue;
-         if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY) continue;
-         if (MDzeroUPC->Dalpha->at(j) < par.MaxDalpha) continue;
-	 if (!MDzeroUPC->DpassCut) continue;
-         hDmass->Fill((*MDzeroUPC->Dmass)[j]);
-	 nt->Fill((*MDzeroUPC->Dmass)[j]);
+        if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT) continue;
+        if (MDzeroUPC->Dpt->at(j) > par.MaxDzeroPT) continue;
+        if (MDzeroUPC->Dy->at(j) < par.MinDzeroY) continue;
+        if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY) continue;
+        if (!MDzeroUPC->DpassCut) continue;
+        hDmass->Fill((*MDzeroUPC->Dmass)[j]);
+        nt->Fill((*MDzeroUPC->Dmass)[j]);
       }
     }
   }
@@ -122,26 +128,27 @@ private:
 int main(int argc, char *argv[]) {
   if (printHelpMessage(argc, argv))
     return 0;
-  std::cout << "Starting DzeroUPC analysis" << std::endl;
   CommandLine CL(argc, argv);
   float MinDzeroPT = CL.GetDouble("MinDzeroPT", 1); // Minimum Dzero transverse momentum threshold for Dzero selection.
   float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 2); // Maximum Dzero transverse momentum threshold for Dzero selection.
   float MinDzeroY = CL.GetDouble("MinDzeroY", -2); // Minimum Dzero rapidity threshold for Dzero selection.
   float MaxDzeroY = CL.GetDouble("MaxDzeroY", +2); // Maximum Dzero rapidity threshold for Dzero selection.
-  float MaxDalpha = CL.GetDouble("MaxDalpha", 0.3); // Minimum Dalpha threshold for Dzero selection.
-
-   Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, MaxDalpha);
-   par.input         = CL.Get      ("Input",   "mergedSample/HISingleMuon-v5.root");            // Input file
+   bool IsGammaN = CL.GetBool("IsGammaN", true); // GammaN analysis (or NGamma)
+   int TriggerChoice = CL.GetInt("TriggerChoice", 2); // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
+   float scaleFactor = CL.GetDouble("scaleFactor", 1); // Scale factor for the number of events to be processed.
+   bool IsData = CL.GetBool("IsData", 0); // Data or MC
+   Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, IsData, scaleFactor);
+   par.input         = CL.Get      ("Input",   "mergedSample.root");            // Input file
    par.output        = CL.Get      ("Output",  "output.root");                             	// Output file
-   par.nThread       = CL.GetInt   ("nThread", 1);         // The number of threads to be used for parallel processing.
+   par.nThread       = CL.GetInt   ("nThread", 20);         // The number of threads to be used for parallel processing.
    par.nChunk        = CL.GetInt   ("nChunk", 1);          // Specifies which chunk (segment) of the data to process, used in parallel processing.
    if (checkError(par)) return -1;
-   std::cout << "Parameters are set" << std::endl; 
+   std::cout << "Parameters are set" << std::endl;
    // Analyze Data
    DataAnalyzer analyzer(par.input.c_str(), par.output.c_str(), "Data");
    analyzer.analyze(par);
    analyzer.writeHistograms(analyzer.outf);
    cout <<endl<<endl<<"Good good"<<endl;
-   saveParametersToHistograms(par, analyzer.outf);   
+   saveParametersToHistograms(par, analyzer.outf);
    cout << "done!" << analyzer.outf->GetName() << endl;
 }

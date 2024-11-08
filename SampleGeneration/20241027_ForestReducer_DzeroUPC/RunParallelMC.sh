@@ -1,7 +1,7 @@
 #!/bin/bash
 MAXCORES=100
 
-NAMEMC="20241106_filelist_SkimOldReco23sample_MCPthat2"
+NAMEMC="20241107_filelist_SkimOldReco23sample_MCPthat2"
 OUTPUTMC="outputMC"
 counterMC=0
 filelistMC="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_MCPthat2.txt"
