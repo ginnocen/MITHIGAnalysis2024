@@ -28,7 +28,7 @@ std::vector<double> commaSepStrToDVect(std::string inStr)
   if(inStr.substr(inStr.size()-1, 1).find(",") == std::string::npos){
     inStr = inStr + ",";
   }
-  
+
   if(inStr.find(",") == std::string::npos){
     std::cout << __PRETTY_FUNCTION__ << " WARNING: Not a comma separated list, returning empty vector. check input" << std::endl;
     return vectD;
@@ -39,7 +39,7 @@ std::vector<double> commaSepStrToDVect(std::string inStr)
     vectD.push_back(value);
     inStr.replace(0, inStr.find(",")+1, "");
   }
-  
+
   return vectD;
 }
 
@@ -50,7 +50,7 @@ int getPosFromBins(double val, std::vector<double> bins)
     std::cout << __PRETTY_FUNCTION__ << " WARNING: Given bins.size() = " << bins.size() << ", return -1" << std::endl;
     return retPos;
   }
-  
+
   for(unsigned int bI = 0; bI < bins.size()-1; ++bI){
     if(val >= bins[bI] && val < bins[bI+1]){
       retPos = bI;
@@ -95,13 +95,13 @@ std::vector<double> getLinBins(int nbins, double low, double high)
     vect.push_back(low+binWidth*(double)bI);
   }
   vect.push_back(high);
-  
+
   return vect;
 }
 
 int DataMCComp(std::string inConfigName)
 {
-  //config handler - 
+  //config handler -
   TEnv* config_p = new TEnv(inConfigName.c_str());
   //Grab the input skim file
   std::string skimFileName = config_p->GetValue("SKIMFILENAME", "");
@@ -117,7 +117,7 @@ int DataMCComp(std::string inConfigName)
     }
     inFile.close();
   }
-  
+
   //grab dPtBins
   std::vector<double> dPtBins = commaSepStrToDVect(config_p->GetValue("DPTBINS", ""));
   if(dPtBins.size() == 0) return 1;
@@ -131,45 +131,84 @@ int DataMCComp(std::string inConfigName)
   Double_t dMBinsLow = config_p->GetValue("DMBINSLOW", -1.0);
   Double_t dMBinsHigh = config_p->GetValue("DMBINSHIGH", -9999.0);
   std::vector<double> dMBins = getLinBins(nDMBins, dMBinsLow, dMBinsHigh);
-  
+
   //Grab the outputfile name, if it exist; else default name
   std::string outFileName = config_p->GetValue("OUTFILENAME", "out.root");
   TFile* outFile_p = new TFile(outFileName.c_str(), "RECREATE");
 
+  //Bin handling
   const Int_t nMaxBins = 20;
+  const Int_t nGammaBins = 2;
   const Int_t nDPtBins = dPtBins.size()-1;
   const Int_t nDYBins = dYBins.size()-1;
 
+  //bin check, return if failed
   if(!binsMaxCheck("DPt", nDPtBins, nMaxBins)) return 1;
   if(!binsMaxCheck("DY", nDYBins, nMaxBins)) return 1;
-  
-  TH1D* rawDPt_h[nMaxBins];
-  TH1D* rawDY_h[nMaxBins];
-  TH1D* rawDM_h[nMaxBins][nMaxBins];
 
-  bookHist1D("rawDPt_YBin", ";D^{0} cand. p_{T} (GeV), %.1f < y < %.1f; Counts", dYBins, dPtBins, rawDPt_h); 
-  bookHist1D("rawDY_PtBin", ";D^{0} cand. y, %.1f < p_{T} < %.1f (GeV); Counts", dPtBins, dYBins, rawDY_h);   
+  //Define gamma n and n gamma bins
+  std::map<std::string, int> nGammaBinsStrMap;
+  nGammaBinsStrMap["NGamma"] = 0;
+  nGammaBinsStrMap["GammaN"] = 1;
 
-  //For mass, double binned, so iterate over Pt, then Y
-  for(Int_t pI = 0; pI < nDPtBins+1; ++pI){
-    std::string histName = "rawDM_PtBinAll";
-    std::string histTitle = Form(";D^{0} cand. Mass (GeV), %.1f < p_{T} < %.1f (GeV),", dPtBins[0], dPtBins[dPtBins.size()-1]);
-    if(pI < nDPtBins){
-      histName = "rawDM_PtBin" + std::to_string(pI);
-      histTitle = Form(";D^{0} cand. Mass (GeV), %.1f < p_{T} < %.1f (GeV),", dPtBins[pI], dPtBins[pI+1]);
+  std::map<std::string, std::string> nGammaBinsLabelMap;
+  nGammaBinsLabelMap["NGamma"] = "N+#gamma";
+  nGammaBinsLabelMap["GammaN"] = "#gamma+N";
+
+  //Add info to config file
+  config_p->SetValue("NGAMMABINS", nGammaBins);
+  for(auto const& nGammaBinStr : nGammaBinsStrMap){
+    std::string keyStr = "GAMMABIN." + std::to_string(nGammaBinStr.second);
+    std::string valStr = nGammaBinStr.first;
+    config_p->SetValue(keyStr.c_str(), valStr.c_str());
+
+    keyStr = "GAMMALABEL." + std::to_string(nGammaBinStr.second);
+    valStr = nGammaBinsLabelMap[nGammaBinStr.first];
+    config_p->SetValue(keyStr.c_str(), valStr.c_str());
+  }
+
+  //CutPass handler
+  TH1D* cutPass_h = new TH1D("cutPass_h", ";Cuts;Events", 3, -0.5, 2.5);
+  cutPass_h->GetXaxis()->SetBinLabel(1, "No Cut");
+  cutPass_h->GetXaxis()->SetBinLabel(2, "ZDC XOR");
+  cutPass_h->GetXaxis()->SetBinLabel(3, "Gap Requirement");
+
+  //D kinematics
+  TH1D* rawDPt_h[nGammaBins][nMaxBins];
+  TH1D* rawDY_h[nGammaBins][nMaxBins];
+  TH1D* rawDM_h[nGammaBins][nMaxBins][nMaxBins];
+
+  for(auto const& nGammaStr: nGammaBinsStrMap){
+    std::string histName = "rawDPt_" + nGammaStr.first + "_YBin";
+    std::string histTitle = ";D^{0} cand. p_{T} (GeV), %.1f < y < %.1f; Counts (" + nGammaBinsLabelMap[nGammaStr.first] + ")";
+    bookHist1D(histName.c_str(), histTitle.c_str(), dYBins, dPtBins, rawDPt_h[nGammaStr.second]);
+
+    histName = "rawDY_" + nGammaStr.first + "_PtBin";
+    histTitle = ";D^{0} cand. y, %.1f < p_{T} < %.1f (GeV); Counts (" + nGammaBinsLabelMap[nGammaStr.first] + ")";
+    bookHist1D(histName.c_str(), histTitle.c_str(), dPtBins, dYBins, rawDY_h[nGammaStr.second]);
+
+    //For mass, double binned, so iterate over Pt, then Y
+    for(Int_t pI = 0; pI < nDPtBins+1; ++pI){
+      histName = "rawDM_" + nGammaStr.first + "_PtBinAll";
+      histTitle = Form(";D^{0} cand. Mass (GeV), %.1f < p_{T} < %.1f (GeV),", dPtBins[0], dPtBins[dPtBins.size()-1]);
+      if(pI < nDPtBins){
+	histName = "rawDM_" + nGammaStr.first + "_PtBin" + std::to_string(pI);
+	histTitle = Form(";D^{0} cand. Mass (GeV), %.1f < p_{T} < %.1f (GeV),", dPtBins[pI], dPtBins[pI+1]);
+      }
+
+      histName = histName + "_Y";
+      histTitle = histTitle + " %.1f < y < %.1f;Counts (" + nGammaBinsLabelMap[nGammaStr.first] + ")";
+      bookHist1D(histName, histTitle, dYBins, dMBins, rawDM_h[nGammaStr.second][pI]);
     }
-
-    histName = histName + "_Y";
-    histTitle = histTitle + " %.1f < y < %.1f;Counts";
-    bookHist1D(histName, histTitle, dYBins, dMBins, rawDM_h[pI]);
   }
 
   const ULong64_t nEntriesToPrint = TMath::Max(1, config_p->GetValue("NENTRIESTOPRINT", 10000));
-  
+  const ULong64_t nEntriesToProcess = config_p->GetValue("NENTRIESTOPROCESS", -1);
+
   //Done handling config input
 
   ULong64_t totalNEntries = 0;
-  
+
   std::cout << "Pre-processing " << skimFileNames.size() << " skim files...." << std::endl;
   for(unsigned int fI = 0; fI < skimFileNames.size(); ++fI){
     TFile* inFile_p = new TFile(skimFileNames[fI].c_str(), "READ");
@@ -178,15 +217,21 @@ int DataMCComp(std::string inConfigName)
     delete MDzeroUPC;
     inFile_p->Close();
     delete inFile_p;
-  }  
-  
+  }
+
+  //Check if the nentries override is in place
+  if(nEntriesToProcess >= 0){
+    if(nEntriesToProcess >= totalNEntries){
+      std::cout << "Requested nEntriesToProcess=" << nEntriesToProcess << " exceeds total number, " << totalNEntries << ". Will process total instead." << std::endl;
+    }
+    else totalNEntries = nEntriesToProcess;
+  }
+
   //Process inputs
   std::cout << "Processing " << skimFileNames.size() << " skim files...." << std::endl;
-  std::cout << "Total entries: " << totalNEntries << "..." << std::endl; 
+  std::cout << "Total entries to be processed: " << totalNEntries << "..." << std::endl;
 
   ULong64_t nCurrEntries = 0;
-  
-  
   for(unsigned int fI = 0; fI < skimFileNames.size(); ++fI){
     //Grab the input file and Tree
     TFile* inFile_p = new TFile(skimFileNames[fI].c_str(), "READ");
@@ -195,68 +240,99 @@ int DataMCComp(std::string inConfigName)
 
     //Loop over entries
     ULong64_t nEntries = MDzeroUPC->GetEntries();
-    for(ULong64_t entry = 0; entry < nEntries; ++entry){   
+    for(ULong64_t entry = 0; entry < nEntries; ++entry){
       if(nCurrEntries%nEntriesToPrint == 0) std::cout << " Entry " << nCurrEntries << "/" << totalNEntries << " = " << Form("%.1f", ((Double_t)100*nCurrEntries)/((Double_t)totalNEntries)) << "%, File " << fI << "/" << skimFileNames.size() << std::endl;
       ++nCurrEntries;
-      
+
+      if(nCurrEntries > totalNEntries) break;
+
       MDzeroUPC->GetEntry(entry);
 
+      cutPass_h->Fill(0);
+
+      //event selection handling
+      bool zdcGammaN = MDzeroUPC->ZDCgammaN;
+      bool zdcNGamma = MDzeroUPC->ZDCNgamma;
+
+      //Impose XOR
+      if(zdcGammaN && zdcNGamma) continue;
+      if(!zdcGammaN && !zdcNGamma) continue;
+
+      cutPass_h->Fill(1);
+
+      //Impose gap requirement
+      if(zdcGammaN && !MDzeroUPC->gapgammaN) continue;
+      if(zdcNGamma && !MDzeroUPC->gapNgamma) continue;
+
+      cutPass_h->Fill(2);
+
+      std::string gammaNStr = zdcGammaN ? "GammaN" : "NGamma";
+      int gammaNPos = nGammaBinsStrMap[gammaNStr];
+
+      //D handling
       for(unsigned int dI = 0; dI < MDzeroUPC->Dpt->size(); ++dI){
 	int yPos = getPosFromBins(MDzeroUPC->Dy->at(dI), dYBins);
 	int ptPos = getPosFromBins(MDzeroUPC->Dpt->at(dI), dPtBins);
-	
+
 	if(yPos >= 0){
-	  rawDPt_h[yPos]->Fill(MDzeroUPC->Dpt->at(dI));
-	  rawDPt_h[nDYBins]->Fill(MDzeroUPC->Dpt->at(dI));
+	  rawDPt_h[gammaNPos][yPos]->Fill(MDzeroUPC->Dpt->at(dI));
+	  rawDPt_h[gammaNPos][nDYBins]->Fill(MDzeroUPC->Dpt->at(dI));
 	}
 
 	if(ptPos >= 0){
-	  rawDY_h[ptPos]->Fill(MDzeroUPC->Dy->at(dI));
-	  rawDY_h[nDPtBins]->Fill(MDzeroUPC->Dy->at(dI));
+	  rawDY_h[gammaNPos][ptPos]->Fill(MDzeroUPC->Dy->at(dI));
+	  rawDY_h[gammaNPos][nDPtBins]->Fill(MDzeroUPC->Dy->at(dI));
 	}
 
 	if(ptPos >= 0 && yPos >= 0){
-	  rawDM_h[ptPos][yPos]->Fill(MDzeroUPC->Dmass->at(dI));
-	  rawDM_h[nDPtBins][yPos]->Fill(MDzeroUPC->Dmass->at(dI));
-	  rawDM_h[ptPos][nDYBins]->Fill(MDzeroUPC->Dmass->at(dI));
-	  rawDM_h[nDPtBins][nDYBins]->Fill(MDzeroUPC->Dmass->at(dI));
+	  rawDM_h[gammaNPos][ptPos][yPos]->Fill(MDzeroUPC->Dmass->at(dI));
+	  rawDM_h[gammaNPos][nDPtBins][yPos]->Fill(MDzeroUPC->Dmass->at(dI));
+	  rawDM_h[gammaNPos][ptPos][nDYBins]->Fill(MDzeroUPC->Dmass->at(dI));
+	  rawDM_h[gammaNPos][nDPtBins][nDYBins]->Fill(MDzeroUPC->Dmass->at(dI));
 	}
       }
     }
 
     delete MDzeroUPC;
-    
+
     inFile_p->Close();
     delete inFile_p;
+
+
+    if(nCurrEntries > totalNEntries) break;
   }//complete file loop
 
   //outfile handling
   outFile_p->cd();
+  cutPass_h->Write("", TObject::kOverwrite);
+  delete cutPass_h;
 
-  for(unsigned int yI = 0; yI < nDYBins+1; ++yI){
-    rawDPt_h[yI]->Write("", TObject::kOverwrite);
-    delete rawDPt_h[yI];
-  }
-
-  for(unsigned int pI = 0; pI < nDPtBins+1; ++pI){
-    rawDY_h[pI]->Write("", TObject::kOverwrite);
-    delete rawDY_h[pI];    
-  }
-
-  for(Int_t pI = 0; pI < nDPtBins+1; ++pI){
+  for(auto const& gammaNVal : nGammaBinsStrMap){
     for(unsigned int yI = 0; yI < nDYBins+1; ++yI){
-      rawDM_h[pI][yI]->Write("", TObject::kOverwrite);
-      delete rawDM_h[pI][yI];    
+      rawDPt_h[gammaNVal.second][yI]->Write("", TObject::kOverwrite);
+      delete rawDPt_h[gammaNVal.second][yI];
+    }
+
+    for(unsigned int pI = 0; pI < nDPtBins+1; ++pI){
+      rawDY_h[gammaNVal.second][pI]->Write("", TObject::kOverwrite);
+      delete rawDY_h[gammaNVal.second][pI];
+    }
+
+    for(Int_t pI = 0; pI < nDPtBins+1; ++pI){
+      for(unsigned int yI = 0; yI < nDYBins+1; ++yI){
+	rawDM_h[gammaNVal.second][pI][yI]->Write("", TObject::kOverwrite);
+	delete rawDM_h[gammaNVal.second][pI][yI];
+      }
     }
   }
-    
+
   //Write out the config so there is a record of production
   config_p->Write("config", TObject::kOverwrite);
   delete config_p;
-  
+
   outFile_p->Close();
   delete outFile_p;
-  
+
   std::cout << "DataMCComp complete! return 0" << std::endl;
   return 0;
 }
