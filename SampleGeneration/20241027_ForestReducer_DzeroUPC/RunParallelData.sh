@@ -37,7 +37,10 @@ while IFS= read -r file; do
             --PFTree particleFlowAnalyser/pftree &
  #           --DGenTree Dfinder/ntGen &
     ((counter++))
-    wait_for_slot
+    #wait_for_slot
+    if (( counter % $MAXCORES == 0 )); then
+        wait
+    fi
     #if (( counter % $MAXCORES == 0 )); then
     #    wait
     #fi
