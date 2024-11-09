@@ -177,6 +177,10 @@ int main(int argc, char *argv[]) {
         bool gapNgamma = EMaxHFMinus < 8.6;
         MDzeroUPC.gapgammaN = gapgammaN;
         MDzeroUPC.gapNgamma = gapNgamma;
+        bool gammaN_default = ZDCgammaN && gapgammaN;
+        bool Ngamma_default = ZDCNgamma && gapNgamma;
+        if (gammaN_default == false && Ngamma_default == false) continue;
+
         for (double gapgammaN_threshold = 5.2; gapgammaN_threshold <= 13.2; gapgammaN_threshold += 1.0) {
           bool gapgammaN = GetMaxEnergyHF(&MPF, 3.0, 5.2) < gapgammaN_threshold;
           bool gammaN_ = ZDCgammaN && gapgammaN;
@@ -203,7 +207,7 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
       int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        //if (ApplyDRejection && DmesonSelectionPrelim23(MDzero, iD) == false) continue;
+        if (DmesonSelectionPrelim23(MDzero, iD) == false) continue;
         countSelDzero++;
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
