@@ -58,7 +58,7 @@ bool getCorrectedYields(DzeroUPCTreeMessenger *MDzeroUPC, TH1D *hDmass,
   unsigned long iEnd = nEntry * par.nChunk / par.nThread;
   ProgressBar Bar(cout, iEnd - iStart);
   Bar.SetStyle(1);
-  for (unsigned long i = iStart; i < iEnd; i++) {
+  for (unsigned long i = 0; i <MDzeroUPC->GetEntries() ; i++) {
     MDzeroUPC->GetEntry(i);
     if (i%1000==0) {
       Bar.Update(i - iStart);
@@ -139,7 +139,7 @@ int main(int argc, char *argv[]) {
    Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, IsData, scaleFactor);
    par.input         = CL.Get      ("Input",   "mergedSample.root");            // Input file
    par.output        = CL.Get      ("Output",  "output.root");                             	// Output file
-   par.nThread       = CL.GetInt   ("nThread", 20);         // The number of threads to be used for parallel processing.
+   par.nThread       = CL.GetInt   ("nThread", 1);         // The number of threads to be used for parallel processing.
    par.nChunk        = CL.GetInt   ("nChunk", 1);          // Specifies which chunk (segment) of the data to process, used in parallel processing.
    if (checkError(par)) return -1;
    std::cout << "Parameters are set" << std::endl;
