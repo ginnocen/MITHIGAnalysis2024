@@ -1,7 +1,7 @@
 #!/bin/bash
 MAXCORES=120
 
-NAME="20241107bis_SkimOldReco23sample_DataAll_RejectMode"
+NAME="20241110_SkimOldReco23sample_DataAll_RejectMode"
 OUTPUT="output"
 counter=0
 filelist="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_DataAll.txt"
@@ -37,10 +37,10 @@ while IFS= read -r file; do
             --PFTree particleFlowAnalyser/pftree &
  #           --DGenTree Dfinder/ntGen &
     ((counter++))
-    #wait_for_slot
-    if (( counter % $MAXCORES == 0 )); then
-        wait
-    fi
+    wait_for_slot
+    #if (( counter % $MAXCORES == 0 )); then
+    #    wait
+    #fi
     #if (( counter % $MAXCORES == 0 )); then
     #    wait
     #fi
