@@ -37,7 +37,7 @@ bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) {
 //============================================================//
 bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
   if (par.IsData == false) return true;
-  if (b->selectedBkgFilter == false || b->selectedBkgFilter == false) return false;
+  if (b->selectedBkgFilter == false || b->selectedVtxFilter == false) return false;
   if (par.IsGammaN && (b->ZDCgammaN && b->gapgammaN) == false) return false;
   if (!par.IsGammaN && (b->ZDCNgamma && b->gapNgamma) == false) return false;
   if (par.TriggerChoice == 1 && b->isL1ZDCOr == false) return false;
@@ -65,14 +65,13 @@ bool getCorrectedYields(DzeroUPCTreeMessenger *MDzeroUPC, TH1D *hDmass,
       Bar.Print();
     }
     // Check if the event passes the selection criteria
-    //if (1) {
     if (eventSelection(MDzeroUPC, par)) {
       for (unsigned long j = 0; j < MDzeroUPC->Dalpha->size(); j++) {
         if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT) continue;
         if (MDzeroUPC->Dpt->at(j) > par.MaxDzeroPT) continue;
         if (MDzeroUPC->Dy->at(j) < par.MinDzeroY) continue;
         if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY) continue;
-        if (!MDzeroUPC->DpassCut) continue;
+        if (MDzeroUPC->DpassCut->at(j) == false) continue;
         hDmass->Fill((*MDzeroUPC->Dmass)[j]);
         nt->Fill((*MDzeroUPC->Dmass)[j]);
       }
