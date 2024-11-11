@@ -1,7 +1,7 @@
 #!/bin/bash
 MAXCORES=120
 
-NAME="20241110_SkimOldReco23sample_DataAll_RejectMode"
+NAME="XYZData_SkimOldReco23sample_DataAll_RejectMode"
 OUTPUT="output"
 counter=0
 filelist="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_DataAll.txt"
