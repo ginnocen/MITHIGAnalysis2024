@@ -12,8 +12,8 @@ do
     outputFileName="$1-$2_${chunk}.root"
     outputFileNames+=($outputFileName)
     echo "Starting analysis of chunk $chunk"
-    echo ./ExecuteGtoMuMu $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15} ${16} ${17} ${18} ${19} ${20} ${21} ${22} ${23} ${24} ${25} ${26} ${27} ${28} ${29} ${30} --nThread $nThread --nChunk $chunk --Output $outputFileName &
-    ./ExecuteGtoMuMu $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15} ${16} ${17} ${18} ${19} ${20} ${21} ${22} ${23} ${24} ${25} ${26} ${27} ${28} ${29} ${30} --nThread $nThread --nChunk $chunk --Output $outputFileName &
+    echo ./ExecuteMuMuJet $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15} ${16} ${17} ${18} ${19} ${20} ${21} ${22} ${23} ${24} ${25} ${26} ${27} ${28} ${29} ${30} --nThread $nThread --nChunk $chunk --Output $outputFileName &
+    ./ExecuteMuMuJet $3 $4 $5 $6 $7 $8 $9 ${10} ${11} ${12} ${13} ${14} ${15} ${16} ${17} ${18} ${19} ${20} ${21} ${22} ${23} ${24} ${25} ${26} ${27} ${28} ${29} ${30} --nThread $nThread --nChunk $chunk --Output $outputFileName &
 done
 
 # Wait for all background processes to finish
