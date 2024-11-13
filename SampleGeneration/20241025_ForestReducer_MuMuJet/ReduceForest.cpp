@@ -34,7 +34,6 @@ int main(int argc, char *argv[])
    int Year                           = CL.GetInt("Year", 2018);
    double Fraction                    = CL.GetDouble("Fraction", 1.00);
    double MinJetPT                    = CL.GetDouble("MinJetPT", 40);
-   bool DoSumET                       = CL.GetBool("DoSumET", false);
 
    string PFTreeName                  = IsPP ? "pfcandAnalyzer/pfTree" : "particleFlowAnalyser/pftree";
    PFTreeName                         = CL.Get("PFTree", PFTreeName);
