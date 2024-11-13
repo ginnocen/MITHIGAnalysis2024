@@ -3071,3 +3071,273 @@ bool DzeroUPCTreeMessenger::FillEntry()
 
    return true;
 }
+
+MuMuJetMessenger::MuMuJetMessenger(TFile &File, std::string TreeName)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+MuMuJetMessenger::MuMuJetMessenger(TFile *File, std::string TreeName)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+MuMuJetMessenger::MuMuJetMessenger(TTree *MuMuJetTree)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Initialize(MuMuJetTree);
+}
+
+MuMuJetMessenger::~MuMuJetMessenger()
+{
+   if(Initialized == true && WriteMode == true)
+   {
+      delete MuMuMass;
+      delete MuMuEta;
+      delete MuMuY;
+      delete MuMuPhi;
+      delete MuMuPt;
+      delete muEta1;
+      delete muEta2;
+      delete muPhi1;
+      delete muPhi2;
+      delete muPt1;
+      delete muPt2;
+      delete muDeta;
+      delete muDphi;
+      delete muDR;
+      delete muDphiS;
+   }
+}
+
+bool MuMuJetMessenger::Initialize(TTree *MuMuJetTree)
+{
+   Tree = MuMuJetTree;
+   return Initialize();
+}
+
+bool MuMuJetMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+
+   Initialized = true;
+   MuMuMass = nullptr;
+   MuMuEta = nullptr;
+   MuMuY = nullptr;
+   MuMuPhi = nullptr;
+   MuMuPt = nullptr;
+   muEta1 = nullptr;
+   muEta2 = nullptr;
+   muPhi1 = nullptr;
+   muPhi2 = nullptr;
+   muPt1 = nullptr;
+   muPt2 = nullptr;
+   muDeta = nullptr;
+   muDphi = nullptr;
+   muDR = nullptr;
+   muDphiS = nullptr;
+
+   Tree->SetBranchAddress("Run", &Run);
+   Tree->SetBranchAddress("Event", &Event);
+   Tree->SetBranchAddress("Lumi", &Lumi);
+   Tree->SetBranchAddress("hiBin", &hiBin);
+   Tree->SetBranchAddress("hiHF", &hiHF);
+   Tree->SetBranchAddress("NVertex", &NVertex);
+   Tree->SetBranchAddress("VX", &VX);
+   Tree->SetBranchAddress("VY", &VY);
+   Tree->SetBranchAddress("VZ", &VZ);
+   Tree->SetBranchAddress("VXError", &VXError);
+   Tree->SetBranchAddress("VYError", &VYError);
+   Tree->SetBranchAddress("VZError", &VZError);
+   Tree->SetBranchAddress("NPU", &NPU);
+   Tree->SetBranchAddress("MuMuMass", &MuMuMass);
+   Tree->SetBranchAddress("MuMuEta", &MuMuEta);
+   Tree->SetBranchAddress("MuMuY", &MuMuY);
+   Tree->SetBranchAddress("MuMuPhi", &MuMuPhi);
+   Tree->SetBranchAddress("MuMuPt", &MuMuPt);
+   Tree->SetBranchAddress("muEta1", &muEta1);
+   Tree->SetBranchAddress("muEta2", &muEta2);
+   Tree->SetBranchAddress("muPhi1", &muPhi1);
+   Tree->SetBranchAddress("muPhi2", &muPhi2);
+   Tree->SetBranchAddress("muPt1", &muPt1);
+   Tree->SetBranchAddress("muPt2", &muPt2);
+   Tree->SetBranchAddress("muDeta", &muDeta);
+   Tree->SetBranchAddress("muDphi", &muDphi);
+   Tree->SetBranchAddress("muDR", &muDR);
+   Tree->SetBranchAddress("muDphiS", &muDphiS);
+
+   return true;
+}
+
+int MuMuJetMessenger::GetEntries()
+{
+   if(Tree == nullptr)
+      return 0;
+   return Tree->GetEntries();
+}
+
+bool MuMuJetMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
+bool MuMuJetMessenger::SetBranch(TTree *T)
+{
+   if(T == nullptr)
+      return false;
+
+   Initialized = true;
+   WriteMode = true;
+
+   MuMuMass = new std::vector<float>();
+   MuMuEta = new std::vector<float>();
+   MuMuY = new std::vector<float>();
+   MuMuPhi = new std::vector<float>();
+   MuMuPt = new std::vector<float>();
+   muEta1 = new std::vector<float>();
+   muEta2 = new std::vector<float>();
+   muPhi1 = new std::vector<float>();
+   muPhi2 = new std::vector<float>();
+   muPt1 = new std::vector<float>();
+   muPt2 = new std::vector<float>();
+   muDeta = new std::vector<float>();
+   muDphi = new std::vector<float>();
+   muDR = new std::vector<float>();
+   muDphiS = new std::vector<float>();
+
+   Tree = T;
+
+   Tree->Branch("Run", &Run, "Run/I");
+   Tree->Branch("Event", &Event, "Event/L");
+   Tree->Branch("Lumi", &Lumi, "Lumi/I");
+   Tree->Branch("hiBin", &hiBin, "hiBin/I");
+   Tree->Branch("hiHF", &hiHF, "hiHF/F");
+   Tree->Branch("NVertex", &NVertex, "NVertex/I");
+   Tree->Branch("VX", &VX, "VX/F");
+   Tree->Branch("VY", &VY, "VY/F");
+   Tree->Branch("VZ", &VZ, "VZ/F");
+   Tree->Branch("VXError", &VXError, "VXError/F");
+   Tree->Branch("VYError", &VYError, "VYError/F");
+   Tree->Branch("VZError", &VZError, "VZError/F");
+   Tree->Branch("NPU", &NPU, "NPU/I");
+   Tree->Branch("MuMuMass", &MuMuMass);
+   Tree->Branch("MuMuEta", &MuMuEta);
+   Tree->Branch("MuMuY", &MuMuY);
+   Tree->Branch("MuMuPhi", &MuMuPhi);
+   Tree->Branch("MuMuPt", &MuMuPt);
+   Tree->Branch("muEta1", &muEta1);
+   Tree->Branch("muEta2", &muEta2);
+   Tree->Branch("muPhi1", &muPhi1);
+   Tree->Branch("muPhi2", &muPhi2);
+   Tree->Branch("muPt1", &muPt1);
+   Tree->Branch("muPt2", &muPt2);
+   Tree->Branch("muDeta", &muDeta);
+   Tree->Branch("muDphi", &muDphi);
+   Tree->Branch("muDR", &muDR);
+   Tree->Branch("muDphiS", &muDphiS);
+
+   return true;
+}
+
+void MuMuJetMessenger::Clear()
+{
+   if(Initialized == false)
+      return;
+
+   Run = -999;
+   Event = -999;
+   Lumi = -999;
+   hiBin = -999;
+   hiHF = -999;
+   NVertex = 0;
+   VX = 0;
+   VY = 0;
+   VZ = 0;
+   VXError = 0;
+   VYError = 0;
+   VZError = 0;
+   NPU = 0;
+
+   MuMuMass->clear();
+   MuMuEta->clear();
+   MuMuY->clear();
+   MuMuPhi->clear();
+   MuMuPt->clear();
+   muEta1->clear();
+   muEta2->clear();
+   muPhi1->clear();
+   muPhi2->clear();
+   muPt1->clear();
+   muPt2->clear();
+   muDeta->clear();
+   muDphi->clear();
+   muDR->clear();
+   muDphiS->clear();
+}
+
+void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
+{
+   Run          = M.Run;
+   Event        = M.Event;
+   Lumi         = M.Lumi;
+   hiBin        = M.hiBin;
+   hiHF         = M.hiHF;
+   NVertex      = M.NVertex;
+   VX           = M.VX;
+   VY           = M.VY;
+   VZ           = M.VZ;
+   VXError      = M.VXError;
+   VYError      = M.VYError;
+   VZError      = M.VZError;
+   NPU          = M.NPU;
+ 
+   if(MuMuMass != nullptr && M.MuMuMass != nullptr)   *MuMuMass = *(M.MuMuMass);
+   if(MuMuEta != nullptr && M.MuMuEta != nullptr)   *MuMuEta = *(M.MuMuEta);
+   if(MuMuY != nullptr && M.MuMuY != nullptr)   *MuMuY = *(M.MuMuY);
+   if(MuMuPhi != nullptr && M.MuMuPhi != nullptr)   *MuMuPhi = *(M.MuMuPhi);
+   if(MuMuPt != nullptr && M.MuMuPt != nullptr)   *MuMuPt = *(M.MuMuPt);
+   if(muEta1 != nullptr && M.muEta1 != nullptr)   *muEta1 = *(M.muEta1);
+   if(muEta2 != nullptr && M.muEta2 != nullptr)   *muEta2 = *(M.muEta2);
+   if(muPhi1 != nullptr && M.muPhi1 != nullptr)   *muPhi1 = *(M.muPhi1);
+   if(muPhi2 != nullptr && M.muPhi2 != nullptr)   *muPhi2 = *(M.muPhi2);
+   if(muPt1 != nullptr && M.muPt1 != nullptr)   *muPt1 = *(M.muPt1);
+   if(muPt2 != nullptr && M.muPt2 != nullptr)   *muPt2 = *(M.muPt2);
+   if(muDeta != nullptr && M.muDeta != nullptr)   *muDeta = *(M.muDeta);
+   if(muDphi != nullptr && M.muDphi != nullptr)   *muDphi = *(M.muDphi);
+   if(muDR != nullptr && M.muDR != nullptr)   *muDR = *(M.muDR);
+   if(muDphiS != nullptr && M.muDphiS != nullptr)   *muDphiS = *(M.muDphiS);
+}
+
+bool MuMuJetMessenger::FillEntry()
+{
+   if(Initialized == false)
+      return false;
+   if(WriteMode == false)
+      return false;
+
+   if(Tree == nullptr)
+      return false;
+
+   Tree->Fill();
+   Clear();
+
+   return true;
+}

@@ -791,4 +791,50 @@ public:
    bool FillEntry();
 };
 
+class MuMuJetMessenger
+{
+public:
+   TTree *Tree;
+   int Run;
+   long long Event;
+   int Lumi;
+   int hiBin;
+   float hiHF;
+   int NVertex;
+   float VX, VY, VZ, VXError, VYError, VZError;
+   int NPU;
+   //std::vectors
+   std::vector<float> *MuMuMass;
+   std::vector<float> *MuMuEta;
+   std::vector<float> *MuMuY;
+   std::vector<float> *MuMuPhi;
+   std::vector<float> *MuMuPt;
+   std::vector<float> *muEta1;
+   std::vector<float> *muEta2;
+   std::vector<float> *muPhi1;
+   std::vector<float> *muPhi2;
+   std::vector<float> *muPt1;
+   std::vector<float> *muPt2;
+   std::vector<float> *muDeta;
+   std::vector<float> *muDphi;
+   std::vector<float> *muDR;
+   std::vector<float> *muDphiS;
+private:
+   bool WriteMode;
+   bool Initialized;
+public:
+   MuMuJetMessenger(TFile &File, std::string TreeName = "tree");
+   MuMuJetMessenger(TFile *File, std::string TreeName = "tree");
+   MuMuJetMessenger(TTree *MuMuJetTree = nullptr);
+   ~MuMuJetMessenger();
+   bool Initialize(TTree *MuMuJetTree);
+   bool Initialize();
+   int GetEntries();
+   bool GetEntry(int iEntry);
+   bool SetBranch(TTree *T);
+   void Clear();
+   void CopyNonTrack(MuMuJetMessenger &M);
+   bool FillEntry();
+};
+
 #endif
