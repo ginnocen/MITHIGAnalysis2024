@@ -43,10 +43,13 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   int Year = CL.GetInt("Year", 2023);
   double Fraction = CL.GetDouble("Fraction", 1.00);
-  bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", true);
-  bool ApplyDRejection = CL.GetBool("ApplyDRejection", true);
+  bool ApplyTriggerRejection = CL.GetBool("ApplyTriggerRejection", false);
+  bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
+  bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
+  bool ApplyDRejection = CL.GetBool("ApplyDRejection", false);
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string DGenTreeName = CL.Get("DGenTree", "Dfinder/ntGen");
+  string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcdigi");
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
@@ -65,7 +68,7 @@ int main(int argc, char *argv[]) {
     TriggerTreeMessenger MTrigger(InputFile);
     DzeroTreeMessenger MDzero(InputFile);
     DzeroGenTreeMessenger MDzeroGen(InputFile, DGenTreeName);
-    ZDCTreeMessenger MZDC(InputFile);
+    ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);
     METFilterTreeMessenger MMETFilter(InputFile);
 
     int EntryCount = MEvent.GetEntries() * Fraction;
@@ -146,7 +149,7 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.ZDCsumMinus = MZDC.sumMinus;
         bool selectedBkgFilter = MSkim.ClusterCompatibilityFilter == 1 && MMETFilter.cscTightHalo2015Filter;
         bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
-        if (selectedBkgFilter == false || selectedVtxFilter == false) continue;
+        if (ApplyEventRejection && IsData && (selectedBkgFilter == false || selectedVtxFilter == false)) continue;
         MDzeroUPC.selectedBkgFilter = selectedBkgFilter;
         MDzeroUPC.selectedVtxFilter = selectedVtxFilter;
         int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 =
@@ -161,7 +164,7 @@ int main(int argc, char *argv[]) {
                          HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023 == 1;
         bool isL1ZDCXORJet8 = HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 == 1 ||
                               HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 == 1;
-        if (isL1ZDCOr == false && isL1ZDCXORJet8 == false)
+        if (ApplyTriggerRejection && IsData && (isL1ZDCOr == false && isL1ZDCXORJet8 == false))
            continue;
         MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
         MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
@@ -181,8 +184,7 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.gapNgamma = gapNgamma;
         bool gammaN_default = ZDCgammaN && gapgammaN;
         bool Ngamma_default = ZDCNgamma && gapNgamma;
-        if (gammaN_default == false && Ngamma_default == false) continue;
-
+        if (ApplyZDCGapRejection && IsData && gammaN_default == false && Ngamma_default == false) continue;
         for (double gapgammaN_threshold = 5.2; gapgammaN_threshold <= 13.2; gapgammaN_threshold += 1.0) {
           bool gapgammaN = GetMaxEnergyHF(&MPF, 3.0, 5.2) < gapgammaN_threshold;
           bool gammaN_ = ZDCgammaN && gapgammaN;
@@ -209,7 +211,7 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
       int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        if (DmesonSelectionPrelim23(MDzero, iD) == false) continue;
+        if (ApplyDRejection == true && IsData && DmesonSelectionPrelim23(MDzero, iD) == false) continue;
         countSelDzero++;
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);

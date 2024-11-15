@@ -138,7 +138,7 @@ bool METFilterTreeMessenger::Initialize()
   if (Tree->GetBranch("cscTightHalo2015Filter"))
     Tree->SetBranchAddress("cscTightHalo2015Filter", &cscTightHalo2015Filter);
   else
-    cscTightHalo2015Filter = false;
+    cscTightHalo2015Filter = true;
   return true;
 }
 bool METFilterTreeMessenger::GetEntry(int iEntry)
