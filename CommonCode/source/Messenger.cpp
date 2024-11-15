@@ -2801,6 +2801,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VXError", &VXError);
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
+   Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("isL1ZDCOr", &isL1ZDCOr);
    Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
    Tree->SetBranchAddress("selectedBkgFilter", &selectedBkgFilter);
@@ -2905,6 +2906,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("VXError",               &VXError, "VXError/F");
    Tree->Branch("VYError",               &VYError, "VYError/F");
    Tree->Branch("VZError",               &VZError, "VZError/F");
+   Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
    Tree->Branch("isL1ZDCOr",             &isL1ZDCOr, "isL1ZDCOr/O");
    Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/O");
    Tree->Branch("selectedBkgFilter",     &selectedBkgFilter, "selectedBkgFilter/O");
@@ -2963,6 +2965,7 @@ void DzeroUPCTreeMessenger::Clear()
    VXError = 0.;
    VYError = 0.;
    VZError = 0.;
+   nVtx = 0;
    isL1ZDCOr = false;
    isL1ZDCXORJet8 = false;
    selectedBkgFilter = false;
@@ -3015,6 +3018,7 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    VXError              = M.VXError;
    VYError              = M.VYError;
    VZError              = M.VZError;
+   nVtx                 = M.nVtx;
    isL1ZDCOr            = M.isL1ZDCOr;
    isL1ZDCXORJet8       = M.isL1ZDCXORJet8;
    selectedBkgFilter    = M.selectedBkgFilter;

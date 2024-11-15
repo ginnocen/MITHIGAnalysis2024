@@ -121,6 +121,8 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.VYError = MTrackPbPbUPC.yErrVtx->at(BestVertex);
         MDzeroUPC.VZError = MTrackPbPbUPC.zErrVtx->at(BestVertex);
       }
+      MDzeroUPC.nVtx = MTrackPbPbUPC.nVtx;
+
       /////////////////////////////////////
       ////////// Event selection //////////
       /////////////////////////////////////

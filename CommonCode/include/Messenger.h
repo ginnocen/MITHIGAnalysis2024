@@ -729,6 +729,7 @@ public:
    int Lumi;
    //FIXME: these refer to best vertex positions calculated from the track tree
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
+   int nVtx;
    bool isL1ZDCOr, isL1ZDCXORJet8;
    bool selectedBkgFilter, selectedVtxFilter;
    float ZDCsumPlus;
