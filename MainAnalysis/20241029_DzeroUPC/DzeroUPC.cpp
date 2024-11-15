@@ -44,7 +44,7 @@ bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
     return false;
   if (par.TriggerChoice == 2 && b->isL1ZDCXORJet8 == false)
     return false;
-  // if (b->nVtx >= 3) return false; //FIXME: this is to be removed once we move to HiVertexReco
+  if (b->nVtx >= 3) return false;
   return true;
 }
 

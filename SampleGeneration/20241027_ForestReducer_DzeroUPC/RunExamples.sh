@@ -8,7 +8,7 @@ mkdir -p Output/
 #################
 
 ./Execute --Input /data/NewSkims23_24/20241102_ForestOldReco23sample_Dataexample/HiForestMiniAOD_UPCPbPb23_HiVertex_279.root \
-   --Output Output/example.root \
+   --Output Output/SkimmedHiForestMiniAOD_UPCPbPb23_HiVertex_279.root \
    --Year 2023 \
    --IsData true \
    --ApplyDPreselection false \
