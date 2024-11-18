@@ -19,6 +19,7 @@ using namespace std;
 int main(int argc, char *argv[]);
 double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
+double deltaR(double eta1, double phi1, double eta2, double phi2);
 
 int main(int argc, char *argv[])
 {
@@ -33,8 +34,8 @@ int main(int argc, char *argv[])
    bool IsPP                          = CL.GetBool("IsPP", false);
    int Year                           = CL.GetInt("Year", 2018);
    double Fraction                    = CL.GetDouble("Fraction", 1.00);
-   double MinJetPT                    = CL.GetDouble("MinJetPT", 40);
-
+   double MinJetPT                    = CL.GetDouble("MinJetPT", 80);
+   string PFJetCollection             = CL.Get("PFJetCollection", "akCs3PFJetAnalyzer/t");
    string PFTreeName                  = IsPP ? "pfcandAnalyzer/pfTree" : "particleFlowAnalyser/pftree";
    PFTreeName                         = CL.Get("PFTree", PFTreeName);
 
@@ -57,7 +58,8 @@ int main(int argc, char *argv[])
       MuTreeMessenger          MMu(InputFile);
       SkimTreeMessenger        MSkim(InputFile);
       TriggerTreeMessenger     MTrigger(InputFile);
-      
+      JetTreeMessenger         MJet(InputFile, PFJetCollection);
+
       int EntryCount = MEvent.GetEntries() * Fraction;
       ProgressBar Bar(cout, EntryCount);
       Bar.SetStyle(-1);
@@ -82,7 +84,7 @@ int main(int argc, char *argv[])
          MMu.GetEntry(iE);
          MSkim.GetEntry(iE);
          MTrigger.GetEntry(iE);
-
+         MJet.GetEntry(iE);
          MMuMuJet.Clear();
 
          ////////////////////////////////////////
@@ -132,28 +134,9 @@ int main(int argc, char *argv[])
          ////////// Event selection //////////
          /////////////////////////////////////
 
-         if(IsPP == true)
-         {
-            if(IsData == true)
-            {
-               int pprimaryVertexFilter = MSkim.PVFilter;
-               int beamScrapingFilter = MSkim.BeamScrapingFilter;
-
-               // Event selection criteria
-               //    see https://twiki.cern.ch/twiki/bin/viewauth/CMS/HIPhotonJe5TeVpp2017PbPb2018
-               if(pprimaryVertexFilter == 0 || beamScrapingFilter == 0)
-                  continue;
-
-               //HLT trigger to select dimuon events, see Kaya's note: AN2019_143_v12, p.5
-               // FIXME: need to be replaced with the actual pp triggers
-               /*
-               int HLT_HIL1DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL1DoubleMu");
-               int HLT_HIL2DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL2DoubleMu");
-               int HLT_HIL3DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL3DoubleMu");
-               if(HLT_HIL1DoubleMuOpen_2018 == 0 && HLT_HIL2DoubleMuOpen_2018 == 0 && HLT_HIL3DoubleMuOpen_2018 == 0)
-                  continue;
-               */
-            }  
+         if(IsPP == true){
+           std::cout<<"pp analysis is not yet implemented"<<std::endl;
+           return 0;
          }
          else
          {
@@ -176,56 +159,107 @@ int main(int argc, char *argv[])
                if(HLT_HIL1DoubleMuOpen_2018 == 0 && HLT_HIL2DoubleMuOpen_2018 == 0 && HLT_HIL3DoubleMuOpen_2018 == 0)
                   continue;
             }
-         }
+         } 
+         
+         for(int ijet = 0; ijet < MJet.JetCount; ijet++){
+           if(MJet.JetPT[ijet] < MinJetPT) continue;
+           if(fabs(MJet.JetEta[ijet]) > 2) continue;
+           bool passPurity = MJet.JetPFNHF[ijet] < 0.90 && MJet.JetPFNEF[ijet] < 0.90 &&
+			     MJet.JetPFMUF[ijet] < 0.80 && MJet.JetPFCHF[ijet] > 0. &&
+			     MJet.JetPFCHM[ijet] > 0. && MJet.JetPFCEF[ijet] < 0.80;
+           if(!passPurity) continue;
 
-         for(int ipair = 0; ipair < MMu.NDi; ipair++)
-         {
-            // We want opposite-charge muons with some basic kinematic cuts
-            if(MMu.DiCharge1[ipair] == MMu.DiCharge2[ipair])        continue;
-            if(fabs(MMu.DiEta1[ipair]) > 2.4)                       continue;
-            if(fabs(MMu.DiEta2[ipair]) > 2.4)                       continue;
-            if(fabs(MMu.DiPT1[ipair]) < 5)                          continue;
-            if(fabs(MMu.DiPT2[ipair]) < 5)                          continue;
-            //FIXME: this is meant at removing dimuons from Z0 decays
-            if(MMu.DiMass[ipair] > 50)                              continue;
+           MMuMuJet.JetPT->push_back(MJet.JetPT[ijet]);
+           MMuMuJet.JetEta->push_back(MJet.JetEta[ijet]);
+           MMuMuJet.JetPhi->push_back(MJet.JetPhi[ijet]);
+           bool isJetTagged = false; 
+           float muPt1 = -999.;
+           float muPt2 = -999.;
+           float muEta1 = -999.;
+           float muEta2 = -999.;
+           float muPhi1 = -999.;
+           float muPhi2 = -999.;
+           float mumuMass = -999.;
+           float mumuEta = -999.;
+           float mumuY = -999.;
+           float mumuPhi = -999.;
+           float mumuPt = -999.;
+           float DRJetmu1 = -999.;
+           float DRJetmu2 = -999.;
+           float muDeta = -999.;
+           float muDphi = -999.;
+           float muDR = -999.;
+           // variable to identify the highest pt dimuon pair
+           float maxmumuPt = 0.;
+           int maxMuMuIndex = -1;
 
-            TLorentzVector Mu1, Mu2;
-            Mu1.SetPtEtaPhiM(MMu.DiPT1[ipair], MMu.DiEta1[ipair], MMu.DiPhi1[ipair], M_MU);
-            Mu2.SetPtEtaPhiM(MMu.DiPT2[ipair], MMu.DiEta2[ipair], MMu.DiPhi2[ipair], M_MU);
-            TLorentzVector MuMu = Mu1 + Mu2;
-            if(fabs(MuMu.Rapidity()) > 2.4)
-               continue;
-
-            MMuMuJet.MuMuMass->push_back(MMu.DiMass[ipair]);
-            MMuMuJet.MuMuEta->push_back(MMu.DiEta[ipair]);
-            MMuMuJet.MuMuY->push_back(MuMu.Rapidity());
-            MMuMuJet.MuMuPhi->push_back(MMu.DiPhi[ipair]);
-            MMuMuJet.MuMuPt->push_back(MMu.DiPT[ipair]);
-            MMuMuJet.muEta1->push_back(MMu.DiEta1[ipair]);
-            MMuMuJet.muEta2->push_back(MMu.DiEta2[ipair]);
-            MMuMuJet.muPhi1->push_back(MMu.DiPhi1[ipair]);
-            MMuMuJet.muPhi2->push_back(MMu.DiPhi2[ipair]);
-            MMuMuJet.muPt1->push_back(MMu.DiPT1[ipair]);
-            MMuMuJet.muPt2->push_back(MMu.DiPT2[ipair]);
-
-            double deltaMuEta = MMu.DiEta1[ipair] - MMu.DiEta2[ipair];
-            double deltaMuPhi = PhiRangePositive(DeltaPhi(MMu.DiPhi1[ipair], MMu.DiPhi2[ipair]));
-            // dimuon properties
-            MMuMuJet.muDeta->push_back(deltaMuEta);
-            MMuMuJet.muDphi->push_back(deltaMuPhi);
-            MMuMuJet.muDR->push_back(sqrt(deltaMuEta * deltaMuEta + deltaMuPhi * deltaMuPhi));
-            double deltaPhiStar = tan((M_PI - deltaMuPhi) / 2) * sqrt(1 - tanh(deltaMuEta / 2) * tanh(deltaMuEta / 2));
-            MMuMuJet.muDphiS->push_back(deltaPhiStar);
-         }
-         MMuMuJet.FillEntry();
-      }
+           for(int ipair = 0; ipair < MMu.NDi; ipair++){
+             if(MMu.DiCharge1[ipair] == MMu.DiCharge2[ipair]) continue;
+	     if(fabs(MMu.DiEta1[ipair]) > 2.3) continue;
+	     if(fabs(MMu.DiEta2[ipair]) > 2.3) continue;
+	     if(fabs(MMu.DiPT1[ipair]) < 5) continue;
+	     if(fabs(MMu.DiPT2[ipair]) < 5) continue;
+	     if(MMu.DiMass[ipair] > 130) continue;
+             if(deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta1[ipair], MMu.DiPhi1[ipair]) > 0.3) continue;
+             if(deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta2[ipair], MMu.DiPhi2[ipair]) > 0.3) continue;
+             // build dimuon TLorentzVector
+	     TLorentzVector Mu1, Mu2;
+	     Mu1.SetPtEtaPhiM(MMu.DiPT1[ipair], MMu.DiEta1[ipair], MMu.DiPhi1[ipair], M_MU);
+	     Mu2.SetPtEtaPhiM(MMu.DiPT2[ipair], MMu.DiEta2[ipair], MMu.DiPhi2[ipair], M_MU);
+	     TLorentzVector MuMu = Mu1 + Mu2;
+             if (MuMu.Pt() > maxmumuPt){
+	       maxmumuPt = MuMu.Pt();
+	       maxMuMuIndex = ipair;
+	     } // end if dimuon pT larger than current max
+	   } // end loop over dimuon pairs
+           if (maxmumuPt > 0. && maxMuMuIndex >= 0){
+             isJetTagged = true;
+             muPt1 = MMu.DiPT1[maxMuMuIndex];
+             muPt2 = MMu.DiPT2[maxMuMuIndex];
+             muEta1 = MMu.DiEta1[maxMuMuIndex];
+             muEta2 = MMu.DiEta2[maxMuMuIndex];
+             muPhi1 = MMu.DiPhi1[maxMuMuIndex];
+             muPhi2 = MMu.DiPhi2[maxMuMuIndex];
+             mumuMass = MMu.DiMass[maxMuMuIndex];
+             mumuEta = MMu.DiEta[maxMuMuIndex];
+             mumuY = MMu.DiRapidity[maxMuMuIndex];
+             mumuPhi = MMu.DiPhi[maxMuMuIndex];
+             mumuPt = MMu.DiPT[maxMuMuIndex];
+             DRJetmu1 = deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet],
+                                   MMu.DiEta1[maxMuMuIndex], MMu.DiPhi1[maxMuMuIndex]);
+             DRJetmu2 = deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet],
+                                   MMu.DiEta2[maxMuMuIndex], MMu.DiPhi2[maxMuMuIndex]);
+             muDeta = MMu.DiEta1[maxMuMuIndex] - MMu.DiEta2[maxMuMuIndex]; 
+             muDphi = PhiRangePositive(DeltaPhi(MMu.DiPhi1[maxMuMuIndex], MMu.DiPhi2[maxMuMuIndex]));
+             muDR = sqrt(muDeta*muDeta + muDphi*muDphi);
+           } // end if dimuon pair found 
+           MMuMuJet.IsMuMuTagged->push_back(isJetTagged);
+           MMuMuJet.muPt1->push_back(muPt1);
+           MMuMuJet.muPt2->push_back(muPt2);
+           MMuMuJet.muEta1->push_back(muEta1);
+           MMuMuJet.muEta2->push_back(muEta2);
+           MMuMuJet.muPhi1->push_back(muPhi1);
+           MMuMuJet.muPhi2->push_back(muPhi2);
+           MMuMuJet.mumuMass->push_back(mumuMass);
+           MMuMuJet.mumuEta->push_back(mumuEta);
+           MMuMuJet.mumuY->push_back(mumuY);
+           MMuMuJet.mumuPhi->push_back(mumuPhi);
+           MMuMuJet.mumuPt->push_back(mumuPt);
+           MMuMuJet.DRJetmu1->push_back(DRJetmu1);
+           MMuMuJet.DRJetmu2->push_back(DRJetmu2);
+           MMuMuJet.muDeta->push_back(muDeta);
+           MMuMuJet.muDphi->push_back(muDphi);
+           MMuMuJet.muDR->push_back(muDR);
+         } // end loop over jets
+       MMuMuJet.FillEntry();
+      } // end loop over events
    
       Bar.Update(EntryCount);
       Bar.Print();
       Bar.PrintLine();
    
       InputFile.Close();
-   }
+   } // end loop over input files
 
    OutputFile.cd();
    Tree.Write();
@@ -289,3 +323,12 @@ double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent)
    return Sum;
 }
 
+double deltaR(double eta1, double phi1, double eta2, double phi2) {
+  double dEta = eta1 - eta2;
+  double dPhi = std::fabs(phi1 - phi2);
+  // Correct for the periodicity of the azimuthal angle
+  if (dPhi > M_PI) {
+    dPhi = 2 * M_PI - dPhi;
+  }
+  return std::sqrt(dEta * dEta + dPhi * dPhi);
+}

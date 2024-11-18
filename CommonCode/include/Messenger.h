@@ -805,21 +805,26 @@ public:
    float VX, VY, VZ, VXError, VYError, VZError;
    int NPU;
    //std::vectors
-   std::vector<float> *MuMuMass;
-   std::vector<float> *MuMuEta;
-   std::vector<float> *MuMuY;
-   std::vector<float> *MuMuPhi;
-   std::vector<float> *MuMuPt;
+   std::vector<float> *JetPT;
+   std::vector<float> *JetEta;
+   std::vector<float> *JetPhi;
+   std::vector<bool> *IsMuMuTagged;
+   std::vector<float> *muPt1;
+   std::vector<float> *muPt2;
    std::vector<float> *muEta1;
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
    std::vector<float> *muPhi2;
-   std::vector<float> *muPt1;
-   std::vector<float> *muPt2;
+   std::vector<float> *mumuMass;
+   std::vector<float> *mumuEta;
+   std::vector<float> *mumuY;
+   std::vector<float> *mumuPhi;
+   std::vector<float> *mumuPt;
+   std::vector<float> *DRJetmu1;
+   std::vector<float> *DRJetmu2;
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
-   std::vector<float> *muDphiS;
 private:
    bool WriteMode;
    bool Initialized;
