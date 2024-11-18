@@ -808,7 +808,11 @@ void TriggerTreeMessenger::FillTriggerNames()
 {
    Name.clear();
    Decision.clear();
-   
+   // 2024 triggers UPCs
+   Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
+   Name.push_back("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
+   Name.push_back("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000_v1");
+
    // 2023 triggers UPCs
    Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_v2");
    Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_v1");
