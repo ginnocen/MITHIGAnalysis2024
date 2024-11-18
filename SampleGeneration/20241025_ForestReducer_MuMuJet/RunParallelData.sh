@@ -30,8 +30,10 @@ mkdir $OUTPUT
 while IFS= read -r file; do
             echo "Processing $file"
             ./Execute --Input "$file" \
+            --IsData true \
+            --IsPP false \
             --Output "$OUTPUT/output_$counter.root" \
-            --MinJetPT 40 --Fraction 1.0 & 
+            --MinJetPT 60 --Fraction 1.0 & 
     ((counter++))
     wait_for_slot
 done < "$filelist"
