@@ -43,6 +43,8 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   int Year = CL.GetInt("Year", 2023);
   double Fraction = CL.GetDouble("Fraction", 1.00);
+  double ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
+  double ZDCPlus1nThreshold = CL.GetDouble("ZDCPlus1nThreshold", 1100.);
   bool ApplyTriggerRejection = CL.GetBool("ApplyTriggerRejection", false);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
@@ -168,8 +170,8 @@ int main(int argc, char *argv[]) {
            continue;
         MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
         MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
-        bool ZDCgammaN = (MZDC.sumMinus > 1100. && MZDC.sumPlus < 1100.);
-        bool ZDCNgamma = (MZDC.sumMinus < 1100. && MZDC.sumPlus > 1100.);
+        bool ZDCgammaN = (MZDC.sumMinus > ZDCMinus1nThreshold && MZDC.sumPlus < ZDCPlus1nThreshold);
+        bool ZDCNgamma = (MZDC.sumMinus < ZDCMinus1nThreshold && MZDC.sumPlus > ZDCPlus1nThreshold);
         MDzeroUPC.ZDCgammaN = ZDCgammaN;
         MDzeroUPC.ZDCNgamma = ZDCNgamma;
         // Loop through the specified ranges for gapgammaN and gapNgamma
