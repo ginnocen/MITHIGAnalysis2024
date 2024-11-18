@@ -36,7 +36,7 @@ while IFS= read -r file; do
             --ApplyTriggerRejection false \
             --ApplyEventRejection true \
             --ApplyZDCGapRejection true \
-            --ApplyDRejection true \
+            --ApplyDRejection false \
             --ZDCMinus1nThreshold 900 \
             --ZDCPlus1nThreshold 900 \
             --IsData true \

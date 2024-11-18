@@ -811,6 +811,8 @@ void TriggerTreeMessenger::FillTriggerNames()
    // 2024 triggers UPCs
    Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
    Name.push_back("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
+   Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000_v1");
+   Name.push_back("HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000_v1");
    Name.push_back("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000_v1");
 
    // 2023 triggers UPCs
@@ -2808,6 +2810,8 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("isL1ZDCOr", &isL1ZDCOr);
    Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
+   Tree->SetBranchAddress("isL1ZDCXORJet12", &isL1ZDCXORJet12);
+   Tree->SetBranchAddress("isL1ZDCXORJet16", &isL1ZDCXORJet16);
    Tree->SetBranchAddress("selectedBkgFilter", &selectedBkgFilter);
    Tree->SetBranchAddress("selectedVtxFilter", &selectedVtxFilter);
    Tree->SetBranchAddress("ZDCsumPlus", &ZDCsumPlus);
@@ -2913,6 +2917,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
    Tree->Branch("isL1ZDCOr",             &isL1ZDCOr, "isL1ZDCOr/O");
    Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/O");
+   Tree->Branch("isL1ZDCXORJet12",       &isL1ZDCXORJet12, "isL1ZDCXORJet12/O");
+   Tree->Branch("isL1ZDCXORJet16",       &isL1ZDCXORJet16, "isL1ZDCXORJet16/O");
    Tree->Branch("selectedBkgFilter",     &selectedBkgFilter, "selectedBkgFilter/O");
    Tree->Branch("selectedVtxFilter",     &selectedVtxFilter, "selectedVtxFilter/O");
    Tree->Branch("ZDCgammaN",             &ZDCgammaN, "ZDCgammaN/O");
@@ -2972,6 +2978,8 @@ void DzeroUPCTreeMessenger::Clear()
    nVtx = 0;
    isL1ZDCOr = false;
    isL1ZDCXORJet8 = false;
+   isL1ZDCXORJet12 = false;
+   isL1ZDCXORJet16 = false;
    selectedBkgFilter = false;
    selectedVtxFilter = false;
    ZDCgammaN = false;
@@ -3025,6 +3033,8 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    nVtx                 = M.nVtx;
    isL1ZDCOr            = M.isL1ZDCOr;
    isL1ZDCXORJet8       = M.isL1ZDCXORJet8;
+   isL1ZDCXORJet12      = M.isL1ZDCXORJet12;
+   isL1ZDCXORJet16      = M.isL1ZDCXORJet16;
    selectedBkgFilter    = M.selectedBkgFilter;
    selectedVtxFilter    = M.selectedVtxFilter;
    ZDCsumPlus           = M.ZDCsumPlus;

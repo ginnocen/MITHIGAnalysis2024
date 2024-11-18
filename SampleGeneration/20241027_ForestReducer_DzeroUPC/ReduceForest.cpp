@@ -43,8 +43,8 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   int Year = CL.GetInt("Year", 2023);
   double Fraction = CL.GetDouble("Fraction", 1.00);
-  double ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
-  double ZDCPlus1nThreshold = CL.GetDouble("ZDCPlus1nThreshold", 1100.);
+  float ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
+  float ZDCPlus1nThreshold = CL.GetDouble("ZDCPlus1nThreshold", 1100.);
   bool ApplyTriggerRejection = CL.GetBool("ApplyTriggerRejection", false);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
@@ -162,15 +162,21 @@ int main(int argc, char *argv[]) {
                                 HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 == 1;
           MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
           MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
+          MDzeroUPC.isL1ZDCXORJet12 = false;
+          MDzeroUPC.isL1ZDCXORJet16 = false;
           if (ApplyTriggerRejection && IsData && (isL1ZDCOr == false && isL1ZDCXORJet8 == false))
              continue;
         }
         else if (Year == 2024){
           int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
           int HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
+          int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000");
           bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 == 1 || HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 == 1;
+          bool isL1ZDCXORJet8 = HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000 == 1;
           MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
-          MDzeroUPC.isL1ZDCXORJet8 = false;
+          MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
+          MDzeroUPC.isL1ZDCXORJet12 = false;
+          MDzeroUPC.isL1ZDCXORJet16 = false;
           if (ApplyTriggerRejection && IsData && isL1ZDCOr == false) continue;
         }
      }
