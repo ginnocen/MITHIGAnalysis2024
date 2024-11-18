@@ -172,9 +172,8 @@ int main(int argc, char *argv[]) {
           int HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
           int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000");
           bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 == 1 || HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 == 1;
-          bool isL1ZDCXORJet8 = HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000 == 1;
           MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
-          MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
+          MDzeroUPC.isL1ZDCXORJet8 = false;
           MDzeroUPC.isL1ZDCXORJet12 = false;
           MDzeroUPC.isL1ZDCXORJet16 = false;
           if (ApplyTriggerRejection && IsData && isL1ZDCOr == false) continue;
