@@ -1,10 +1,10 @@
 #!/bin/bash
 MAXCORES=120
 
-NAME="XYZData_SkimOldReco23sample_DataAll_RejectMode"
+NAME="2024117_ForestDfinderData"
 OUTPUT="output"
 counter=0
-filelist="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_DataAll.txt"
+filelist="/data/NewSkims23_24/InputLists/2024117_ForestDfinder.txt"
 MERGEDOUTPUT="/data/NewSkims23_24/$NAME.root"
 rm $MERGEDOUTPUT
 
@@ -31,8 +31,14 @@ while IFS= read -r file; do
             echo "Processing $file"
             ./Execute --Input "$file" \
             --Output "$OUTPUT/output_$counter.root" \
-            --Year 2023 \
-            --ApplyDPreselection true \
+            --Year 2024 \
+            --ZDCTree zdcanalyzer/zdcrechit \
+            --ApplyTriggerRejection false \
+            --ApplyEventRejection true \
+            --ApplyZDCGapRejection true \
+            --ApplyDRejection true \
+            --ZDCMinus1nThreshold 900 \
+            --ZDCPlus1nThreshold 900 \
             --IsData true \
             --PFTree particleFlowAnalyser/pftree &
  #           --DGenTree Dfinder/ntGen &
