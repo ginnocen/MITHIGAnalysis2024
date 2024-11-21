@@ -146,10 +146,8 @@ int main(int argc, char *argv[]) {
 
           // HLT trigger to select dimuon events, see Kaya's note: AN2019_143_v12, p.5
           //  FIXME: need to be replaced with the actual PbPb triggers
-          int HLT_HIL1DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL1DoubleMu");
-          int HLT_HIL2DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL2DoubleMu");
           int HLT_HIL3DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL3DoubleMu");
-          if (HLT_HIL1DoubleMuOpen_2018 == 0 && HLT_HIL2DoubleMuOpen_2018 == 0 && HLT_HIL3DoubleMuOpen_2018 == 0)
+          if (HLT_HIL3DoubleMuOpen_2018 == 0)
             continue;
         }
       }

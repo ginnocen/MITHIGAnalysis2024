@@ -1,10 +1,10 @@
 #!/bin/bash
 MAXCORES=120
 
-NAME="SkimData2018PbPb_Version20241121_v3_ForestVersion_20241023_v220241023_v2"
+NAME="SkimMC2018PbPb_Version20241121_v2_ForestVersion20241023_DiJetpThat15PbPb2018gtoccbar_v1"
 OUTPUT="output"
 counter=0
-filelist="/data/NewSkims_gtoccbar/InputList/20241023_DataPbPb2018gtoccbar_v2.txt"
+filelist="/data/NewSkims_gtoccbar/InputList/20241023_DiJetpThat15PbPb2018gtoccbar_v1.txt"
 MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT
 
@@ -30,7 +30,7 @@ mkdir $OUTPUT
 while IFS= read -r file; do
             echo "Processing $file"
             ./Execute --Input "$file" \
-            --IsData true \
+            --IsData false \
             --IsPP false \
             --Output "$OUTPUT/output_$counter.root" \
             --MinJetPT 40 --Fraction 1.0 & 
