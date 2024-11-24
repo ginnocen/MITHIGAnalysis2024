@@ -132,8 +132,16 @@ int main(int argc, char *argv[]) {
 
       if (IsPP == true) {
         std::cout << "pp analysis is not yet implemented" << std::endl;
-        return 0;
-      } else {
+        if (IsData == true) {
+          int pprimaryVertexFilter = MSkim.PVFilter;
+          int beamScrapingFilter = MSkim.BeamScrapingFilter;
+          if(pprimaryVertexFilter == 0 || beamScrapingFilter == 0)
+            continue;
+          int HLT_HIL3DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL3DoubleMu");
+          if (HLT_HIL3DoubleMuOpen_2018 == 0)
+            continue;
+         } // end if pp data
+      } else { // if PbPb
         if (IsData == true) {
           int pprimaryVertexFilter = MSkim.PVFilter;
           int phfCoincFilter2Th4 = MSkim.HFCoincidenceFilter2Th4;
