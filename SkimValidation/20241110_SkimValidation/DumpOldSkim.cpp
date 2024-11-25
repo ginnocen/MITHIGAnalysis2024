@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   bool ApplyEventSelection = CL.GetBool("ApplyEventSelection", true);
+  bool SkimDzeroPresence = CL.GetBool("SkimDzeroPresence", false);
   double SkimDzeroPresenceAbovePTMin = CL.GetDouble("SkimDzeroPresenceAbovePTMin", 2.);
   bool ApplyDSelection = CL.GetBool("ApplyDSelection", false);
   double MinDzeroPT = CL.GetDouble("MinDzeroPT", 2.);
@@ -139,11 +140,16 @@ int main(int argc, char *argv[]) {
     bool gammaN = ZDCgammaN && gapgammaN;
     bool Ngamma = ZDCNgamma && gapNgamma;
 
-    bool DRequirement = false;
-    for (int iD = 0; iD < MDzero.Dsize; ++iD) {
-      if (MDzero.Dpt[iD] > SkimDzeroPresenceAbovePTMin) {
-        DRequirement = true;
-        break;
+    bool DRequirement;
+    if (!SkimDzeroPresence) {
+      DRequirement = true;
+    } else {
+      DRequirement = false;
+      for (int iD = 0; iD < MDzero.Dsize; ++iD) {
+        if (MDzero.Dpt[iD] > SkimDzeroPresenceAbovePTMin) {
+          DRequirement = true;
+          break;
+        }
       }
     }
 
