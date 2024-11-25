@@ -35,15 +35,17 @@ bool eventSelection(MuMuJetMessenger *b, const Parameters &par) {
 class DataAnalyzer {
 public:
   TFile *inf, *outf;
-  TH1D *hmumuMass;
-  TH1D *hjetPT;
-  TH1D *hjetEta;
-  TH1D *hmuPt1;
-  TH1D *hmuPt2;
-  TH2D *hmuPt2muPt1;
-  TH1D *hDRJetmu1;
-  TH1D *hDRJetmu2;
-  TH1D *hmuDR;
+  TH1D *hTaggedmumuMass;
+  TH1D *hInclusivejetPT;
+  TH1D *hTaggedjetPT;
+  TH1D *hTaggedjetEta;
+  TH1D *hTaggedmuPt1;
+  TH1D *hTaggedmuPt2;
+  TH2D *hTaggedmuPt2muPt1;
+  TH1D *hTaggedDRJetmu1;
+  TH1D *hTaggedDRJetmu2;
+  TH1D *hTaggedmuDR;
+  TH1D *hTaggemuPtAsymm;
   MuMuJetMessenger *MMuMuJet;
   TNtuple *nt;
   string title;
@@ -67,15 +69,17 @@ public:
 
   void analyze(Parameters &par) {
     outf->cd();
-    hmumuMass = new TH1D(Form("hmumuMass%s", title.c_str()), "", 500, 0, 50);
-    hjetPT = new TH1D(Form("hjetPT%s", title.c_str()), "", 500, 0, 500);
-    hjetEta = new TH1D(Form("hjetEta%s", title.c_str()), "", 50, -5, 5);
-    hmuPt1 = new TH1D(Form("hmuPt1%s", title.c_str()), "", 500, 0, 500);
-    hmuPt2 = new TH1D(Form("hmuPt2%s", title.c_str()), "", 500, 0, 500);
-    hmuPt2muPt1 = new TH2D(Form("hmuPt2muPt1%s", title.c_str()), "", 50, 0, 50, 50, 0, 50);
-    hDRJetmu1 = new TH1D(Form("hDRJetmu1%s", title.c_str()), "", 50, 0, 0.5);
-    hDRJetmu2 = new TH1D(Form("hDRJetmu2%s", title.c_str()), "", 50, 0, 0.5);
-    hmuDR = new TH1D(Form("hmuDR%s", title.c_str()), "", 50, 0, 5);
+    hInclusivejetPT = new TH1D(Form("hInclusivejetPT%s", title.c_str()), "", 500, 0, 500);
+    hTaggedmumuMass = new TH1D(Form("hTaggedmumuMass%s", title.c_str()), "", 500, 0, 50);
+    hTaggedjetPT = new TH1D(Form("hTaggedjetPT%s", title.c_str()), "", 500, 0, 500);
+    hTaggedjetEta = new TH1D(Form("hTaggedjetEta%s", title.c_str()), "", 50, -5, 5);
+    hTaggedmuPt1 = new TH1D(Form("hTaggedmuPt1%s", title.c_str()), "", 500, 0, 500);
+    hTaggedmuPt2 = new TH1D(Form("hTaggedmuPt2%s", title.c_str()), "", 500, 0, 500);
+    hTaggedmuPt2muPt1 = new TH2D(Form("hTaggedmuPt2muPt1%s", title.c_str()), "", 50, 0, 50, 50, 0, 50);
+    hTaggemuPtAsymm = new TH1D(Form("hTaggemuPtAsymm%s", title.c_str()), "", 40, -0.5, 1.5);
+    hTaggedDRJetmu1 = new TH1D(Form("hTaggedDRJetmu1%s", title.c_str()), "", 50, 0, 0.5);
+    hTaggedDRJetmu2 = new TH1D(Form("hTaggedDRJetmu2%s", title.c_str()), "", 50, 0, 0.5);
+    hTaggedmuDR = new TH1D(Form("hTaggedmuDR%s", title.c_str()), "", 50, 0, 5);
     unsigned long nentries = MMuMuJet->GetEntries();
     ProgressBar Bar(cout, nentries);
     std::cout<<"par.MinJetPT = "<<par.MinJetPT<< ", par.MaxJetPT = "<<par.MaxJetPT<<std::endl;
@@ -89,18 +93,20 @@ public:
       if (!eventSelection(MMuMuJet, par))
 	continue;
       for (int j = 0; j < MMuMuJet->mumuMass->size(); j++){
-        if (MMuMuJet->IsMuMuTagged->at(j) == false) continue;
         if (MMuMuJet->JetPT->at(j) < par.MinJetPT || MMuMuJet->JetPT->at(j) > par.MaxJetPT)
 	  continue;
-        hjetPT->Fill(MMuMuJet->JetPT->at(j));
-        hjetEta->Fill(MMuMuJet->JetEta->at(j));
-        hmumuMass->Fill(MMuMuJet->mumuMass->at(j));
-        hmuPt1->Fill(MMuMuJet->muPt1->at(j));
-        hmuPt2->Fill(MMuMuJet->muPt2->at(j));
-        hmuPt2muPt1->Fill(MMuMuJet->muPt1->at(j), MMuMuJet->muPt2->at(j));
-        hDRJetmu1->Fill(MMuMuJet->DRJetmu1->at(j));
-        hDRJetmu2->Fill(MMuMuJet->DRJetmu2->at(j));
-        hmuDR->Fill(MMuMuJet->muDR->at(j));
+        hInclusivejetPT->Fill(MMuMuJet->JetPT->at(j));
+        if (MMuMuJet->IsMuMuTagged->at(j) == false) continue;
+        hTaggedjetPT->Fill(MMuMuJet->JetPT->at(j));
+        hTaggedjetEta->Fill(MMuMuJet->JetEta->at(j));
+        hTaggedmumuMass->Fill(MMuMuJet->mumuMass->at(j));
+        hTaggedmuPt1->Fill(MMuMuJet->muPt1->at(j));
+        hTaggedmuPt2->Fill(MMuMuJet->muPt2->at(j));
+        hTaggedmuPt2muPt1->Fill(MMuMuJet->muPt1->at(j), MMuMuJet->muPt2->at(j));
+        hTaggedDRJetmu1->Fill(MMuMuJet->DRJetmu1->at(j));
+        hTaggedDRJetmu2->Fill(MMuMuJet->DRJetmu2->at(j));
+        hTaggedmuDR->Fill(MMuMuJet->muDR->at(j));
+        hTaggemuPtAsymm->Fill((MMuMuJet->muPt1->at(j) - MMuMuJet->muPt2->at(j)) / (MMuMuJet->muPt1->at(j) + MMuMuJet->muPt2->at(j)));
         nt->Fill(MMuMuJet->mumuMass->at(j));
       }
     }
@@ -108,20 +114,34 @@ public:
 
   void writeHistograms(TFile *outf) {
     outf->cd();
-    smartWrite(hmumuMass);
-    smartWrite(hjetPT);
-    smartWrite(hjetEta);
-    smartWrite(hmuPt1);
-    smartWrite(hmuPt2);
-    smartWrite(hmuPt2muPt1);
-    smartWrite(hDRJetmu1);
-    smartWrite(hDRJetmu2);
-    smartWrite(hmuDR);
+    smartWrite(hInclusivejetPT);
+    smartWrite(hTaggedmumuMass);
+    smartWrite(hTaggedjetPT);
+    smartWrite(hTaggedjetEta);
+    smartWrite(hTaggedmuPt1);
+    smartWrite(hTaggedmuPt2);
+    smartWrite(hTaggedmuPt2muPt1);
+    smartWrite(hTaggedDRJetmu1);
+    smartWrite(hTaggedDRJetmu2);
+    smartWrite(hTaggedmuDR);
+    smartWrite(hTaggemuPtAsymm);
     smartWrite(nt);
   }
 
 private:
-  void deleteHistograms() { delete hmumuMass; }
+  void deleteHistograms() {
+    delete hTaggedmumuMass; 
+    delete hInclusivejetPT;
+    delete hTaggedjetPT;
+    delete hTaggedjetEta;
+    delete hTaggedmuPt1;
+    delete hTaggedmuPt2;
+    delete hTaggedmuPt2muPt1;
+    delete hTaggedDRJetmu1;
+    delete hTaggedDRJetmu2;
+    delete hTaggedmuDR;
+    delete hTaggemuPtAsymm;
+  }
 };
 
 //============================================================//
@@ -144,7 +164,7 @@ int main(int argc, char *argv[]) {
   if (checkError(par)) return -1;
   std::cout << "Parameters are set" << std::endl;
   // Analyze Data
-  DataAnalyzer analyzer(par.input.c_str(), par.output.c_str(), "Data");
+  DataAnalyzer analyzer(par.input.c_str(), par.output.c_str(), "");
   analyzer.analyze(par);
   analyzer.writeHistograms(analyzer.outf);
   saveParametersToHistograms(par, analyzer.outf);

@@ -1,4 +1,4 @@
-rm Execute*
+rm ExecuteMuMuJet MassFit
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
 rm -rf Output
