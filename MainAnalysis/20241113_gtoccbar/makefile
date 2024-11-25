@@ -1,13 +1,8 @@
-default: ExecuteMuMuJet MassFit
+default: ExecuteMuMuJet
 
 ExecuteMuMuJet: MuMuJet.cpp
 	g++ MuMuJet.cpp -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \
 		-o ExecuteMuMuJet `root-config --cflags --glibs` \
-		$(ProjectBase)/CommonCode/library/Messenger.o
-
-MassFit: MuMuJet.cpp
-	g++ massfit.C -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \
-		-o MassFit `root-config --cflags --glibs` -lRooFit -lRooFitCore \
 		$(ProjectBase)/CommonCode/library/Messenger.o
 
 TestRun: ExecuteMuMuJet

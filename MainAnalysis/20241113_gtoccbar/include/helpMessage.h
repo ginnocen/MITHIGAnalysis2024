@@ -13,7 +13,6 @@ int printHelpMessage(int argc, char *argv[]) {
            std::cout << "Usage: " << argv[0] << " [OPTIONS]\n"
               << "Options:\n"
               << "  --MinJetPT <value>     Minimum jet transverse momentum.\n"
-              << "  --MaxJetPT <value>     Maximum jet transverse momentum.\n"
               << "  --Input <path>         Path to the input ROOT file.\n"
               << "  --Output <path>        Path to the output ROOT file.\n"
               << "  --Fraction <value>     Fraction of event to be processed.\n"

@@ -3,13 +3,12 @@
 //============================================================//
 class Parameters {
 public:
-    Parameters( float MinJetPT, float MaxJetPT, int TriggerChoice, bool IsData, float scaleFactor = 1.0)
-	: MinJetPT(MinJetPT), MaxJetPT(MaxJetPT), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor) {}
+    Parameters( float MinJetPT, int TriggerChoice, bool IsData, float scaleFactor = 1.0)
+	: MinJetPT(MinJetPT), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor) {}
     Parameters() {}
    string input;          // Input file name
    string output;         // Output file name
    float MinJetPT;        // Lower limit of jet pt
-   float MaxJetPT;        // Upper limit of jet pt
    int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
    bool IsData;           // Data or MC
    float scaleFactor;     // Scale factor
@@ -19,7 +18,6 @@ public:
        cout << "Input file: " << input << endl;
        cout << "Output file: " << output << endl;
        cout << "MinJetPT: " << MinJetPT << endl;
-       cout << "MaxJetPT: " << MaxJetPT << endl;
        cout << "TriggerChoice: " << TriggerChoice << endl;
        cout << "IsData: " << IsData << endl;
        cout << "scaleFactor: " << scaleFactor << endl;
@@ -36,8 +34,6 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     // Create and fill histograms for each parameter
     TH1D* hMinJetPT = new TH1D("parMinJetPT", "parMinJetPT", 1, 0, 1);
     hMinJetPT->SetBinContent(1, par.MinJetPT);
-    TH1D* hMaxJetPT = new TH1D("parMaxJetPT", "parMaxJetPT", 1, 0, 1);
-    hMaxJetPT->SetBinContent(1, par.MaxJetPT);
     TH1D* hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
     hTriggerChoice->SetBinContent(1, par.TriggerChoice);
     TH1D* hIsData = new TH1D("parIsData", "parIsData", 1, 0, 1);
@@ -51,7 +47,6 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     
     // Write histograms to the output file
     hMinJetPT->Write();
-    hMaxJetPT->Write();
     hTriggerChoice->Write();
     hIsData->Write();
     hScaleFactor->Write();
