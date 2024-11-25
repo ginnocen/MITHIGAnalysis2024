@@ -1,7 +1,7 @@
-OutputBase ='/store/group/phys_heavyions/ginnocen/PbPb2018_gtoccbar/20241023_DataPbPb2018gtoccbar_v2'
+OutputBase='/store/group/phys_heavyions/ginnocen/PbPb2018_gtoccbar/20241125_DataPbPb2018gtoccbar_v3'
 # DatasetName = '/DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8/HINPbPbSpring21MiniAOD-FixL1CaloGT_112X_upgrade2018_realistic_HI_v9-v1/MINIAODSIM'
-DatasetName = '/HISingleMuon/HIRun2018A-PbPb18_MiniAODv1-v1/MINIAOD'
-Tag = '20241023_DataPbPb2018gtoccbar_v2'
+DatasetName = '/HIDoubleMuon/HIRun2018A-PbPb18_MiniAODv1-v1/MINIAOD'
+Tag = '20241125_DataPbPb2018gtoccbar_v3'
 
 from WMCore.Configuration import Configuration
 config = Configuration()

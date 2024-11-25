@@ -134,9 +134,9 @@ process.Trigger = cms.EDFilter( "TriggerResultsFilter",
       triggerConditions = cms.vstring(
          #'HLT_HIEle*',
          #'HLT_HIDoubleEle*',
-         'HLT_HIL3Mu12_*',
-         'HLT_HIL3Mu15_*',
-         'HLT_HIL3Mu20_*',
+         #'HLT_HIL3Mu12_*',
+         #'HLT_HIL3Mu15_*',
+         #'HLT_HIL3Mu20_*',
          'HLT_HIL3DoubleMu*',
          'HLT_HIL2DoubleMu*',
          'HLT_HIL1DoubleMu*'
