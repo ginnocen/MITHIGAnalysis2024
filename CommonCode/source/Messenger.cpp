@@ -3146,6 +3146,7 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete muDeta;
       delete muDphi;
       delete muDR;
+      delete mjtHadronFlavor;
    }
 }
 
@@ -3181,6 +3182,7 @@ bool MuMuJetMessenger::Initialize()
    muDeta = nullptr;
    muDphi = nullptr;
    muDR = nullptr;
+   mjtHadronFlavor = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -3215,6 +3217,7 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("muDeta", &muDeta);
    Tree->SetBranchAddress("muDphi", &muDphi);
    Tree->SetBranchAddress("muDR", &muDR);
+   Tree->SetBranchAddress("mjtHadronFlavor", &mjtHadronFlavor);
    return true;
 }
 
@@ -3263,6 +3266,7 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    muDeta = new std::vector<float>();
    muDphi = new std::vector<float>();
    muDR = new std::vector<float>();
+   mjtHadronFlavor = new std::vector<int>();
 
    Tree = T;
 
@@ -3299,6 +3303,7 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("muDeta", &muDeta);
    Tree->Branch("muDphi", &muDphi);
    Tree->Branch("muDR", &muDR);
+   Tree->Branch("mjtHadronFlavor", &mjtHadronFlavor);
 
    return true;
 }
@@ -3341,6 +3346,7 @@ void MuMuJetMessenger::Clear()
    muDeta->clear();
    muDphi->clear();
    muDR->clear();
+   mjtHadronFlavor->clear();
 }
 
 void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
@@ -3380,6 +3386,7 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(muDeta != nullptr && M.muDeta != nullptr)   *muDeta = *(M.muDeta);
    if(muDphi != nullptr && M.muDphi != nullptr)   *muDphi = *(M.muDphi);
    if(muDR != nullptr && M.muDR != nullptr)   *muDR = *(M.muDR);
+   if(mjtHadronFlavor != nullptr && M.mjtHadronFlavor != nullptr)   *mjtHadronFlavor = *(M.mjtHadronFlavor);
 }
 
 bool MuMuJetMessenger::FillEntry()

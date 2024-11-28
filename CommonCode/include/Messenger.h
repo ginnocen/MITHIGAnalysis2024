@@ -825,6 +825,7 @@ public:
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
+   std::vector<int> *mjtHadronFlavor;
 private:
    bool WriteMode;
    bool Initialized;
