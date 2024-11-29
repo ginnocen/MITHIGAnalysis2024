@@ -45,17 +45,16 @@ int main(int argc, char *argv[]) {
   double Fraction = CL.GetDouble("Fraction", 1.00);
   float ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
   float ZDCPlus1nThreshold = CL.GetDouble("ZDCPlus1nThreshold", 1100.);
-  bool ApplyTriggerRejection = CL.GetBool("ApplyTriggerRejection", false);
+  int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
-  bool ApplyDRejection = CL.GetBool("ApplyDRejection", false);
+  int ApplyDRejection = CL.GetInteger("ApplyDRejection", 0);
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string DGenTreeName = CL.Get("DGenTree", "Dfinder/ntGen");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcdigi");
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
-
   DzeroUPCTreeMessenger MDzeroUPC;
   MDzeroUPC.SetBranch(&Tree);
 
@@ -164,8 +163,8 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
           MDzeroUPC.isL1ZDCXORJet12 = false;
           MDzeroUPC.isL1ZDCXORJet16 = false;
-          if (ApplyTriggerRejection && IsData && (isL1ZDCOr == false && isL1ZDCXORJet8 == false))
-             continue;
+          if (ApplyTriggerRejection == 1 && IsData && (isL1ZDCOr == false && isL1ZDCXORJet8 == false)) continue;
+          if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
         }
         else if (Year == 2024){
           int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
@@ -176,7 +175,8 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.isL1ZDCXORJet8 = false;
           MDzeroUPC.isL1ZDCXORJet12 = false;
           MDzeroUPC.isL1ZDCXORJet16 = false;
-          if (ApplyTriggerRejection && IsData && isL1ZDCOr == false) continue;
+          if (ApplyTriggerRejection == 1 && IsData) std::cout << "Trigger rejection ZDCOR || ZDCXORJet8 not implemented for 2024" << std::endl;
+          if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
         }
      }
      if (IsData == true) {
@@ -230,7 +230,8 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
       int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        if (ApplyDRejection == true && IsData && DmesonSelectionPrelim23(MDzero, iD) == false) continue;
+        if (ApplyDRejection == 1 && IsData && DmesonSelectionPrelim23(MDzero, iD) == false) continue;
+        if (ApplyDRejection == 2 && IsData && DmesonSelectionSkimLowPt23(MDzero, iD) == false) continue;
         countSelDzero++;
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
