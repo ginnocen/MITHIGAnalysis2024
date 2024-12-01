@@ -1,10 +1,10 @@
 #!/bin/bash
 MAXCORES=120
 
-NAME="SkimMC2018PbPb_Version20241121_v2_ForestVersion20241023_DiJetpThat15PbPb2018gtoccbar_v1"
+NAME="SkimMC2018PbPb_Version20241201_InputForest_20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL"
 OUTPUT="output"
 counter=0
-filelist="/data/NewSkims_gtoccbar/InputList/20241023_DiJetpThat15PbPb2018gtoccbar_v1.txt"
+filelist="/data/NewSkims_gtoccbar/InputList/20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL.txt"
 MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT
 

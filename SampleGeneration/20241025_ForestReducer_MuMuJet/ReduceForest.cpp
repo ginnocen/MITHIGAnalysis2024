@@ -169,7 +169,9 @@ int main(int argc, char *argv[]) {
                           MJet.JetPFCHF[ijet] > 0. && MJet.JetPFCHM[ijet] > 0. && MJet.JetPFCEF[ijet] < 0.80;
         if (!passPurity)
           continue;
-
+        MMuMuJet.MJTHadronFlavor->push_back(MJet.MJTHadronFlavor[ijet]);
+        MMuMuJet.MJTNcHad->push_back(MJet.MJTNcHad[ijet]);
+        MMuMuJet.MJTNbHad->push_back(MJet.MJTNbHad[ijet]);
         MMuMuJet.JetPT->push_back(MJet.JetPT[ijet]);
         MMuMuJet.JetEta->push_back(MJet.JetEta[ijet]);
         MMuMuJet.JetPhi->push_back(MJet.JetPhi[ijet]);

@@ -189,6 +189,9 @@ public:
    float RefPartonPT[JETCOUNTMAX];
    int RefPartonFlavor[JETCOUNTMAX];
    int RefPartonFlavorForB[JETCOUNTMAX];
+   int MJTHadronFlavor[JETCOUNTMAX];
+   int MJTNcHad[JETCOUNTMAX];
+   int MJTNbHad[JETCOUNTMAX];
    std::vector<std::vector<float> > *RefGSubJetPT;
    std::vector<std::vector<float> > *RefGSubJetEta;
    std::vector<std::vector<float> > *RefGSubJetPhi;
@@ -825,7 +828,9 @@ public:
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
-   std::vector<int> *mjtHadronFlavor;
+   std::vector<int> *MJTHadronFlavor;
+   std::vector<int> *MJTNcHad;
+   std::vector<int> *MJTNbHad;
 private:
    bool WriteMode;
    bool Initialized;
