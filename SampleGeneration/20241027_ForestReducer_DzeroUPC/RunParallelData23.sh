@@ -4,8 +4,8 @@ MAXCORES=120
 NAME="2024129_ForestDfinderData23LowPtSkim"
 OUTPUT="output"
 counter=0
-filelist="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_Data.txt"
-MERGEDOUTPUT="/data/NewSkims23_24/$NAME.root"
+filelist="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample_DataAll.txt"
+MERGEDOUTPUT="$NAME.root"
 #MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT
 
