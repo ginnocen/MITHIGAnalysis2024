@@ -818,6 +818,8 @@ public:
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
    std::vector<float> *muPhi2;
+   std::vector<float> *muDiDxy1;
+   std::vector<float> *muDiDxy2;
    std::vector<float> *mumuMass;
    std::vector<float> *mumuEta;
    std::vector<float> *mumuY;

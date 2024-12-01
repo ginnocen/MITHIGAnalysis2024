@@ -182,6 +182,8 @@ int main(int argc, char *argv[]) {
         float muEta2 = -999.;
         float muPhi1 = -999.;
         float muPhi2 = -999.;
+        float muDiDxy1 = -999.;
+        float muDiDxy2 = -999.;
         float mumuMass = -999.;
         float mumuEta = -999.;
         float mumuY = -999.;
@@ -235,6 +237,8 @@ int main(int argc, char *argv[]) {
           muEta2 = MMu.DiEta2[maxMuMuIndex];
           muPhi1 = MMu.DiPhi1[maxMuMuIndex];
           muPhi2 = MMu.DiPhi2[maxMuMuIndex];
+          muDiDxy1 = MMu.DiDxy1[maxMuMuIndex];
+          muDiDxy2 = MMu.DiDxy2[maxMuMuIndex];
           mumuMass = MMu.DiMass[maxMuMuIndex];
           mumuEta = MMu.DiEta[maxMuMuIndex];
           mumuY = MMu.DiRapidity[maxMuMuIndex];
@@ -253,6 +257,8 @@ int main(int argc, char *argv[]) {
         MMuMuJet.muEta2->push_back(muEta2);
         MMuMuJet.muPhi1->push_back(muPhi1);
         MMuMuJet.muPhi2->push_back(muPhi2);
+        MMuMuJet.muDiDxy1->push_back(muDiDxy1);
+        MMuMuJet.muDiDxy2->push_back(muDiDxy2);
         MMuMuJet.mumuMass->push_back(mumuMass);
         MMuMuJet.mumuEta->push_back(mumuEta);
         MMuMuJet.mumuY->push_back(mumuY);
