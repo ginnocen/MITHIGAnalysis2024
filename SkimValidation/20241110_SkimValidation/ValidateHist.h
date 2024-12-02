@@ -65,11 +65,15 @@ public:
   };
 
   void FillRecoDGenMatchedInfo(float _Dgen, float _DisSignalCalc, float _DisSignalCalcPrompt,
-                               float _DisSignalCalcFeeddown) {
+                               float _DisSignalCalcFeeddown, float _DisSwapCalc, float _DisD0CalcLeftSideBand,
+                               float _DisD0CalcRightSideBand) {
     h_Dgen->Fill(_Dgen);
     h_DisSignalCalc->Fill(_DisSignalCalc);
     h_DisSignalCalcPrompt->Fill(_DisSignalCalcPrompt);
     h_DisSignalCalcFeeddown->Fill(_DisSignalCalcFeeddown);
+    h_DisSwapCalc->Fill(_DisSwapCalc);
+    h_DisD0CalcLeftSideBand->Fill(_DisD0CalcLeftSideBand);
+    h_DisD0CalcRightSideBand->Fill(_DisD0CalcRightSideBand);
   };
 
   void FillGenDInfo(float _Gpt, float _Gy, float _GisSignalCalc, float _GisSignalCalcPrompt,
@@ -127,6 +131,9 @@ private:
   TH1D *h_DisSignalCalc;
   TH1D *h_DisSignalCalcPrompt;
   TH1D *h_DisSignalCalcFeeddown;
+  TH1D *h_DisSwapCalc;
+  TH1D *h_DisD0CalcLeftSideBand;
+  TH1D *h_DisD0CalcRightSideBand;
 
   TH1D *h_Gsize;
   TH1D *h_Gpt;
@@ -212,6 +219,12 @@ ValidateHist::ValidateHist(string filename,
     histDict["DisSignalCalcPrompt"] = h_DisSignalCalcPrompt;
     h_DisSignalCalcFeeddown = (TH1D *)output->Get("h_DisSignalCalcFeeddown");
     histDict["DisSignalCalcFeeddown"] = h_DisSignalCalcFeeddown;
+    h_DisSwapCalc = (TH1D *)output->Get("h_DisSwapCalc");
+    histDict["DisSwapCalc"] = h_DisSwapCalc;
+    h_DisD0CalcLeftSideBand = (TH1D *)output->Get("h_DisD0CalcLeftSideBand");
+    histDict["DisD0CalcLeftSideBand"] = h_DisD0CalcLeftSideBand;
+    h_DisD0CalcRightSideBand = (TH1D *)output->Get("h_DisD0CalcRightSideBand");
+    histDict["DisD0CalcRightSideBand"] = h_DisD0CalcRightSideBand;
 
     h_Gsize = (TH1D *)output->Get("h_Gsize");
     histDict["Gsize"] = h_Gsize;
@@ -295,6 +308,12 @@ ValidateHist::ValidateHist(string filename,
     histDict["DisSignalCalcPrompt"] = h_DisSignalCalcPrompt;
     h_DisSignalCalcFeeddown = new TH1D("h_DisSignalCalcFeeddown", "; DisSignalCalcFeeddown; Count", 2, 0, 2);
     histDict["DisSignalCalcFeeddown"] = h_DisSignalCalcFeeddown;
+    h_DisSwapCalc = new TH1D("h_DisSwapCalc", "; DisSwapCalc; Count", 2, 0, 2);
+    histDict["DisSwapCalc"] = h_DisSwapCalc;
+    h_DisD0CalcLeftSideBand = new TH1D("h_DisD0CalcLeftSideBand", "; DisD0CalcLeftSideBand; Count", 2, 0, 2);
+    histDict["DisD0CalcLeftSideBand"] = h_DisD0CalcLeftSideBand;
+    h_DisD0CalcRightSideBand = new TH1D("h_DisD0CalcRightSideBand", "; DisD0CalcRightSideBand; Count", 2, 0, 2);
+    histDict["DisD0CalcRightSideBand"] = h_DisD0CalcRightSideBand;
 
     h_Gsize = new TH1D("h_Gsize", "; Gsize; Count", 10, 0, 10);
     histDict["Gsize"] = h_Gsize;

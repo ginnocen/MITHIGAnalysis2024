@@ -24,12 +24,15 @@ using namespace std;
 
 #include "include/DmesonSelection.h"
 
+#define D0_MASS 1.8648
+
 bool logical_or_vectBool(std::vector<bool>* vec) {
     return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
 }
 
 int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
+bool GisSignalwFSR(int GpdgId, int Gdau1pdgId, int Gdau2pdgId, int Gdau3pdgId, int Gdau4pdgId, int GnDa, int GisSignal);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
@@ -137,7 +140,10 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.Gpt->push_back(MDzeroGen.Gpt[iDGen]);
           MDzeroUPC.Gy->push_back(MDzeroGen.Gy[iDGen]);
           bool isSignalGen =
-              (MDzeroGen.GisSignal[iDGen] == 1 || MDzeroGen.GisSignal[iDGen] == 2) && MDzeroGen.Gpt[iDGen] > 0.;
+              MDzeroGen.Gpt[iDGen] > 0. && \
+              GisSignalwFSR(MDzeroGen.GpdgId[iDGen], MDzeroGen.Gdau1pdgId[iDGen], MDzeroGen.Gdau2pdgId[iDGen],
+                            MDzeroGen.Gdau3pdgId[iDGen], MDzeroGen.Gdau4pdgId[iDGen], MDzeroGen.GnDa[iDGen],
+                            MDzeroGen.GisSignal[iDGen]);
           bool isPromptGen = MDzeroGen.GBAncestorpdgId[iDGen] == 0;
           bool isFeeddownGen = (MDzeroGen.GBAncestorpdgId[iDGen] >= 500 && MDzeroGen.GBAncestorpdgId[iDGen] < 600) ||
                                (MDzeroGen.GBAncestorpdgId[iDGen] > -600 && MDzeroGen.GBAncestorpdgId[iDGen] <= -500);
@@ -247,13 +253,24 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DpassCut->push_back(DmesonSelectionPrelim23(MDzero,iD));
         if (IsData == false) {
           MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
-          bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;
+          bool isSignalGenMatched = MDzero.Dgenpt[iD] > 0. && \
+                                   (MDzero.Dgen[iD] == 23333 || MDzero.Dgen[iD] == 41022 || MDzero.Dgen[iD] == 41044);
           bool isPromptGenMatched = MDzero.DgenBAncestorpdgId[iD] == 0;
           bool isFeeddownGenMatched = (MDzero.DgenBAncestorpdgId[iD] >= 500 && MDzero.DgenBAncestorpdgId[iD] < 600) ||
                                       (MDzero.DgenBAncestorpdgId[iD] > -600 && MDzero.DgenBAncestorpdgId[iD] <= -500);
+          bool isSwapGenMatched = MDzero.Dgenpt[iD] > 0. && \
+                                   (MDzero.Dgen[iD] == 23344 || MDzero.Dgen[iD] == 41122 || MDzero.Dgen[iD] == 41144);
+          bool isD0DecayLeftSideBand = MDzero.Dgenpt[iD] > 0. && \
+                                   (MDzero.Dgen[iD] == 333 && MDzero.Dmass[iD] < D0_MASS);
+          bool isD0DecayRightSideBand = MDzero.Dgenpt[iD] > 0. && \
+                                   (MDzero.Dgen[iD] == 333 && MDzero.Dmass[iD] > D0_MASS);
+
           MDzeroUPC.DisSignalCalc->push_back(isSignalGenMatched);
           MDzeroUPC.DisSignalCalcPrompt->push_back(isSignalGenMatched && isPromptGenMatched);
           MDzeroUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
+          MDzeroUPC.DisSwapCalc->push_back(isSwapGenMatched);
+          MDzeroUPC.DisD0CalcLeftSideBand->push_back(isD0DecayLeftSideBand);
+          MDzeroUPC.DisD0CalcRightSideBand->push_back(isD0DecayRightSideBand);
         }
       }
       MDzeroUPC.Dsize = countSelDzero;
@@ -293,4 +310,57 @@ double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.
     }
   }
   return EMax;
+}
+
+// ============================================================================ //
+// Function to Get a Tag for Signal D Decay process with FSR at the Gen Level
+// ============================================================================ //
+bool GisSignalwFSR(int GpdgId, int Gdau1pdgId, int Gdau2pdgId, int Gdau3pdgId, int Gdau4pdgId, int GnDa, int GisSignal)
+{
+  const int PION_PDGID =    211;
+  const int KAON_PDGID =    321;
+  const int DZERO_PDGID =   421;
+  const int GAMMA_PDGID =   22;
+  constexpr bool match_all_sign = true;
+
+  // 421 -> -321, 211
+  bool isKplusPiminusDecay = (GpdgId == DZERO_PDGID) &&
+    (Gdau1pdgId == (-KAON_PDGID) && Gdau2pdgId == PION_PDGID ||
+     Gdau2pdgId == (-KAON_PDGID) && Gdau1pdgId == PION_PDGID);
+  // -421 -> 321, -211
+  bool isKminusPiplusDecay = (GpdgId == (-DZERO_PDGID)) &&
+    (Gdau1pdgId == KAON_PDGID && Gdau2pdgId == (-PION_PDGID) ||
+     Gdau2pdgId == KAON_PDGID && Gdau1pdgId == (-PION_PDGID));
+  if (match_all_sign) {
+    // 421 -> 321, 211
+    isKplusPiminusDecay = (TMath::Abs(GpdgId) == DZERO_PDGID) &&
+      (TMath::Abs(Gdau1pdgId) == KAON_PDGID && TMath::Abs(Gdau2pdgId) == PION_PDGID ||
+       TMath::Abs(Gdau2pdgId) == KAON_PDGID && TMath::Abs(Gdau1pdgId) == PION_PDGID);
+    isKminusPiplusDecay = isKplusPiminusDecay;
+  }
+  bool isOneGamma = (Gdau3pdgId == GAMMA_PDGID);
+  bool isTwoGamma = (Gdau4pdgId == GAMMA_PDGID);
+
+  switch (GnDa) {
+  case 2: {
+    if ((GisSignal==1 || GisSignal==2) !=
+        (isKplusPiminusDecay || isKminusPiplusDecay)) {
+      std::cout << "Warning! " << __PRETTY_FUNCTION__ <<
+        "doesn't match previous definition" << "\n";
+    }
+    return isKplusPiminusDecay || isKminusPiplusDecay;
+    break;
+  }
+  case 3: {
+    return (isKplusPiminusDecay || isKminusPiplusDecay) && isOneGamma;
+    break;
+  }
+  case 4: {
+    return (isKplusPiminusDecay || isKminusPiplusDecay) && isOneGamma && isTwoGamma;
+    break;
+  }
+  default:
+    return false;
+    break;
+  }
 }
