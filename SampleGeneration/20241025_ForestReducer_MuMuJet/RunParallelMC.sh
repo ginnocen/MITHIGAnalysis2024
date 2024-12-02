@@ -5,7 +5,7 @@ NAME="SkimMC2018PbPb_Version20241201_InputForest_20241201_DiJet_pThat-15_TuneCP5
 OUTPUT="output"
 counter=0
 filelist="/data/NewSkims_gtoccbar/InputList/20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL.txt"
-MERGEDOUTPUT="$NAME.root"
+MERGEDOUTPUT="/data/NewSkims_gtoccbar/$NAME.root"
 rm $MERGEDOUTPUT
 
 # Function to monitor active processes

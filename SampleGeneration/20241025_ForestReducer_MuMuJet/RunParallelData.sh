@@ -1,11 +1,11 @@
 #!/bin/bash
 MAXCORES=120
 
-NAME="SkimData2018PbPb_Version20241121_v3_ForestVersion_20241023_v220241023_v2"
+NAME="SkimData2018PbPb_Version20241201_v4_ForestVersion_20241023_v220241023_v2"
 OUTPUT="output"
 counter=0
 filelist="/data/NewSkims_gtoccbar/InputList/20241023_DataPbPb2018gtoccbar_v2.txt"
-MERGEDOUTPUT="$NAME.root"
+MERGEDOUTPUT="/data/NewSkims_gtoccbar/$NAME.root"
 rm $MERGEDOUTPUT
 
 # Function to monitor active processes

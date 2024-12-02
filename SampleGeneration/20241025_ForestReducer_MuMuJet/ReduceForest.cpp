@@ -215,10 +215,10 @@ int main(int argc, char *argv[]) {
             continue;
           if (deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta2[ipair], MMu.DiPhi2[ipair]) > 0.3)
             continue;
-          if (fabs(MMu.DiDxy1[ipair]) < 0.01)
-            continue;
-          if (fabs(MMu.DiDxy2[ipair]) < 0.01)
-            continue;
+          //if (fabs(MMu.DiDxy1[ipair]) < 0.01)
+          //  continue;
+          //if (fabs(MMu.DiDxy2[ipair]) < 0.01)
+          //  continue;
           // build dimuon TLorentzVector
           TLorentzVector Mu1, Mu2;
           Mu1.SetPtEtaPhiM(MMu.DiPT1[ipair], MMu.DiEta1[ipair], MMu.DiPhi1[ipair], M_MU);
