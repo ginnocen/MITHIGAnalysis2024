@@ -1,5 +1,6 @@
 # Run the C++ Condor Demo
 
+## Setup
 First, make sure your VOMS proxy is valid and in your user directory. You can 
 add the following lines to `~/.bashrc` to do this automatically:
 ```bash
@@ -22,3 +23,28 @@ bash runcpptest.sh
 ```
 
 Note that this shell script automatically makes the condor config based on your user settings.
+
+## Tips
+Helpful condor commands:
+```bash
+# Check job status
+condor_q
+
+# Check status of all users in job queue
+condor_q --all-users
+
+# Kill or remove a failed job
+condor_rm <job_id>
+```
+
+Note that logs are named by the job id:
+```bash
+# General status updates
+logs/<job_id>.log
+
+# Text output of scripts, print statements, etc.
+logs/<job_id>.out
+
+# Errors and warnings
+logs/<job_id>.err
+```
