@@ -11,10 +11,10 @@ mkdir -p Output/
 #   --Output skim_UPCPbPb23_HiVertex_279.root \
 #   --Year 2023 \
 #   --IsData true \
-#   --ApplyTriggerRejection false \
+#   --ApplyTriggerRejection 0 \
 #   --ApplyEventRejection false \
 #   --ApplyZDCGapRejection false \
-#   --ApplyDRejection false \
+#   --ApplyDRejection 0 \
 #   --ZDCMinus1nThreshold 1000 \
 #   --ZDCPlus1nThreshold 1100 \
 #   --PFTree particleFlowAnalyser/pftree
@@ -28,10 +28,10 @@ mkdir -p Output/
    --Year 2024 \
    --IsData true \
    --ZDCTree zdcanalyzer/zdcrechit \
-   --ApplyTriggerRejection false \
+   --ApplyTriggerRejection 0 \
    --ApplyEventRejection true \
    --ApplyZDCGapRejection true \
-   --ApplyDRejection true \
+   --ApplyDRejection 1 \
    --ZDCMinus1nThreshold 900 \
    --ZDCPlus1nThreshold 900 \
    --PFTree particleFlowAnalyser/pftree \
@@ -44,9 +44,9 @@ mkdir -p Output/
 #   --Output Output/output_44.root \
 #   --Year 2023 \
 #   --IsData false \
-#   --ApplyTriggerRejection false \
+#   --ApplyTriggerRejection 0 \
 #   --ApplyEventRejection false \
 #   --ApplyZDCGapRejection false \
-#   --ApplyDRejection false \
+#   --ApplyDRejection 0 \
 #   --PFTree particleFlowAnalyser/pftree \
 #   --DGenTree Dfinder/ntGen
