@@ -1,3 +1,12 @@
+CMSFOLDER=/home/$USER/CMSSW_13_2_4/src
+
+if [ ! -d $CMSFOLDER ]; then
+    echo "You need to define the folder where the CMSSW environment is located"
+    exit 1
+else
+    echo "CMSSW environment is located at $CMSFOLDER"
+fi
+
 rm Execute
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
@@ -10,7 +19,7 @@ rm *.txt*
 rm SkimReco.root
 rm .DS_Store
 
-cd /home/ginnocen/CMSSW_13_2_4/src
+cd $CMSFOLDER
 cmsenv
 
 cd -
