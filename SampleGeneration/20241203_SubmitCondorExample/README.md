@@ -24,6 +24,7 @@ bash runcpptest.sh
 
 Note that this shell script automatically makes the condor config based on your user settings.
 
+
 ## Tips
 Helpful condor commands:
 ```bash
