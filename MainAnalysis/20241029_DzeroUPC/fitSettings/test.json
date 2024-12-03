@@ -1,0 +1,13 @@
+{
+  "FitDir": "MassFit",
+  "MicroTrees": [
+    {
+      "dataInput": "test/pt5-8_y-1-0/MC.root",
+      "mcInput": "test/pt5-8_y-1-0/MC.root"
+    },
+    {
+      "dataInput": "test/pt2-5_y-1-0/MC.root",
+      "mcInput": "test/pt2-5_y-1-0/MC.root"
+    }
+  ]
+}

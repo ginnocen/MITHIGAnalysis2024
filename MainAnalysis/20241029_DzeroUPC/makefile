@@ -5,7 +5,7 @@ ExecuteDzeroUPC: DzeroUPC.cpp
 		-o ExecuteDzeroUPC `root-config --cflags --glibs` \
 		$(ProjectBase)/CommonCode/library/Messenger.o
 
-MassFit: DzeroUPC.cpp
+MassFit: massfit.C
 	g++ massfit.C -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \
 		-o MassFit `root-config --cflags --glibs` -lRooFit -lRooFitCore \
 		$(ProjectBase)/CommonCode/library/Messenger.o
