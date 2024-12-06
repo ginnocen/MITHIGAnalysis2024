@@ -1,0 +1,65 @@
+{
+  "FitDir": "MassFit_comb_syst",
+  "MicroTrees": [
+    {
+      "dataInput": "test/pt2-5_y-2--1/MC.root",
+      "mcInput": "test/pt2-5_y-2--1/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt2-5_y-1-0/MC.root",
+      "mcInput": "test/pt2-5_y-1-0/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt2-5_y0-1/MC.root",
+      "mcInput": "test/pt2-5_y0-1/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt2-5_y1-2/MC.root",
+      "mcInput": "test/pt2-5_y1-2/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt5-8_y-2--1/MC.root",
+      "mcInput": "test/pt5-8_y-2--1/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt5-8_y-1-0/MC.root",
+      "mcInput": "test/pt5-8_y-1-0/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt5-8_y0-1/MC.root",
+      "mcInput": "test/pt5-8_y0-1/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt5-8_y1-2/MC.root",
+      "mcInput": "test/pt5-8_y1-2/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt8-12_y-2--1/MC.root",
+      "mcInput": "test/pt8-12_y-2--1/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt8-12_y-1-0/MC.root",
+      "mcInput": "test/pt8-12_y-1-0/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt8-12_y0-1/MC.root",
+      "mcInput": "test/pt8-12_y0-1/MC.root",
+      "doSyst_comb": true
+    },
+    {
+      "dataInput": "test/pt8-12_y1-2/MC.root",
+      "mcInput": "test/pt8-12_y1-2/MC.root",
+      "doSyst_comb": true
+    }
+  ]
+}

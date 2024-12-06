@@ -1,0 +1,269 @@
+{
+  "MicroTreeDir": "test",
+  "MicroTrees": [
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 1,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/NewSkims23_24/20241127_100Million_Inclusive_v1_Pthat5_Official.root",
+      "MinDzeroPT": 8,
+      "MaxDzeroPT": 12,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    }
+  ]
+}
