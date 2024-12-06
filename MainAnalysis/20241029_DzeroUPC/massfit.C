@@ -18,7 +18,10 @@
 
 using namespace std;
 using namespace RooFit;
+#include <RooArgSet.h>
 #include <RooRealVar.h>
+#include <RooConstVar.h>
+#include <RooFormulaVar.h>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
@@ -61,8 +64,6 @@ struct ParamsBase {
                 << ", Error = " << var->getError() << "\n";
     }
   }
-
-
 
   // Write parameters to .dat file
   void writeToDat(const std::string& filename) const {
@@ -239,12 +240,131 @@ struct PeakingPiPiParams : public ParamsBase {
 };
 
 struct EventParams {
-    RooRealVar nsig;
-    RooRealVar nbkg;
+  RooRealVar nsig;
+  RooRealVar nbkg;
 
-    EventParams()
-        : nsig("nsig", "number of signal events", 500, 0, 10000),
-          nbkg("nbkg", "number of combinatorics background events", 500, 0, 10000) {}
+  RooRealVar fswp;
+  RooRealVar fpkkk;
+  RooRealVar fpkpp;
+
+  // A set of pointers and references are declared for the RooFormulaVar objects
+  // since the class doesn't support the operator=
+  std::unique_ptr<RooFormulaVar> nswpPtr;
+  std::unique_ptr<RooFormulaVar> npkkkPtr;
+  std::unique_ptr<RooFormulaVar> npkppPtr;
+
+  RooFormulaVar& nswp;  // Reference for convenience
+  RooFormulaVar& npkkk;
+  RooFormulaVar& npkpp;
+
+  // Print method
+  void print() const {
+    std::cout << "nsig: Value = " << nsig.getVal() << ", Error = " << nsig.getError() << "\n";
+    std::cout << "nbkg: Value = " << nbkg.getVal() << ", Error = " << nbkg.getError() << "\n";
+    std::cout << "fswp: Value = " << fswp.getVal() << "\n";
+    std::cout << "fpkkk: Value = " << fpkkk.getVal() << "\n";
+    std::cout << "fpkpp: Value = " << fpkpp.getVal() << "\n";
+    std::cout << "nswp: Formula = " << nswp.GetName() << ", Value = " << nswp.getVal() << "\n";
+    std::cout << "npkkk: Formula = " << npkkk.GetName() << ", Value = " << npkkk.getVal() << "\n";
+    std::cout << "npkpp: Formula = " << npkpp.GetName() << ", Value = " << npkpp.getVal() << "\n";
+  }
+
+  // Write to file
+  static void writeFracToDat(const std::string& filename, double _fswp, double _fpkkk, double _fpkpp) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+      std::cerr << "Error: Could not open file " << filename << " for writing.\n";
+      return;
+    }
+
+    file << "name,value\n";
+    file << "fswp," << _fswp << "\n";
+    file << "fpkkk," << _fpkkk << "\n";
+    file << "fpkpp," << _fpkpp << "\n";
+    file.close();
+    std::cout << "Parameters written to " << filename << "\n";
+  }
+
+  // Read from file
+  void readFracFromDat(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+      std::cerr << "Error: Could not open file " << filename << " for reading.\n";
+      return;
+    }
+
+    std::string line;
+    bool isHeader = true;
+
+    while (std::getline(file, line)) {
+      if (isHeader) {
+        isHeader = false;
+        continue;
+      }
+
+      std::istringstream stream(line);
+      std::string name, valueStr;
+
+      if (std::getline(stream, name, ',') &&
+          std::getline(stream, valueStr, ',')) {
+        double value = std::stod(valueStr);
+
+        if (name == "fswp")
+        {
+          fswp.setVal(value);
+        }
+        else if (name == "fpkkk")
+        {
+          fpkkk.setVal(value);
+        }
+        else if (name == "fpkpp")
+        {
+          fpkpp.setVal(value);
+        }
+        else {
+          std::cerr << "Warning: Parameter " << name << " not found. Skipping.\n";
+        }
+      } else {
+        std::cerr << "Error: Malformed line in " << filename << ": " << line << "\n";
+      }
+    }
+
+    file.close();
+  }
+
+  // Constructor
+  EventParams(double _nsig = 500, double _nbkg = 500,
+              double _fswp = 0.5, double _fpkkk = 0.5, double _fpkpp = 0.5)
+      : nsig("nsig", "number of signal events", _nsig, 0, _nsig * 3),
+        nbkg("nbkg", "number of background events", _nbkg, 0, _nbkg * 3),
+        fswp("fswp", "fswp", _fswp),
+        fpkkk("fpkkk", "fpkkk", _fpkkk),
+        fpkpp("fpkpp", "fpkpp", _fpkpp),
+        nswpPtr(std::make_unique<RooFormulaVar>("nswp", "nswp", "@0*@1", RooArgList(nsig, fswp))),
+        npkkkPtr(std::make_unique<RooFormulaVar>("npkkk", "npkkk", "@0*@1", RooArgList(nsig, fpkkk))),
+        npkppPtr(std::make_unique<RooFormulaVar>("npkpp", "npkpp", "@0*@1", RooArgList(nsig, fpkpp))),
+        nswp(*nswpPtr),  // Initialize references
+        npkkk(*npkkkPtr),
+        npkpp(*npkppPtr) {}
+
+  // Constructor
+  EventParams(string dat, double _nsig = 500, double _nbkg = 500)
+      : EventParams(_nsig, _nbkg) { readFracFromDat(dat); }
+
+  // Copy assignment operator
+  EventParams& operator=(const EventParams& other) {
+    if (this != &other) {
+      // Copy RooRealVars
+      nsig = other.nsig;
+      nbkg = other.nbkg;
+      fswp = other.fswp;
+      fpkkk = other.fpkkk;
+      fpkpp = other.fpkpp;
+
+      // No reassignment of pointers and references is needed, since they're bounded as how they should be
+    }
+    return *this;
+  }
 };
 
 struct TotFitParams {
@@ -272,8 +392,7 @@ struct TotFitParams {
     pkpp.print();
 
     std::cout << "Event Parameters:\n";
-    // printVar(events.nsig);
-    // printVar(events.nbkg);
+    events.print();
   }
 };
 
@@ -474,7 +593,8 @@ void pipimc_fit(TTree *mctree, string rstDir,
 
 void main_fit(TTree *datatree, string rstDir,
               string sigldat, string swapdat,
-              string pkkkdat, string pkppdat)
+              string pkkkdat, string pkppdat,
+              string eventsdat)
 {
   std::cout << "=======================================================" << std::endl;
   std::cout << "=    Doing main fit ......" << std::endl;
@@ -484,12 +604,21 @@ void main_fit(TTree *datatree, string rstDir,
   // Define the mass range and variables
   RooRealVar m("Dmass", "Mass [GeV]", 1.68, 2.05);
 
-  TotFitParams p;
-  p.sigl = SignalParams(sigldat.c_str());
-  p.swap = SwapParams(swapdat.c_str());
-  p.pkkk = PeakingKKParams(pkkkdat.c_str());
-  p.pkpp = PeakingPiPiParams(pkppdat.c_str());
+  // Import data
+  RooDataSet data("data", "dataset", RooArgSet(m), Import(*datatree));
+  // p.events.nsig.setRange(0, data.sumEntries()*0.8);
+  // p.events.nbkg.setRange(0, data.sumEntries()*1.4);
 
+  std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
+
+  TotFitParams p;
+  p.sigl = SignalParams(sigldat);
+  p.swap = SwapParams(swapdat);
+  p.pkkk = PeakingKKParams(pkkkdat);
+  p.pkpp = PeakingPiPiParams(pkppdat);
+  p.events = EventParams(eventsdat, data.sumEntries()*0.3, data.sumEntries()*0.7);
+
+  p.print();
   // Define the signal model: double Gaussian
   RooGaussian gauss1("gauss1", "first Gaussian", m, p.sigl.mean, p.sigl.sigma1);
   RooGaussian gauss2("gauss2", "second Gaussian", m, p.sigl.mean, p.sigl.sigma2);
@@ -508,19 +637,9 @@ void main_fit(TTree *datatree, string rstDir,
   RooCBShape pkppPDF("peaking_pipi", "peaking background pipi state", m, p.pkpp.mean, p.pkpp.sigma, p.pkpp.alpha, p.pkpp.n );
 
   // Define the combined model
-  RooRealVar nsig("nsig", "number of signal events", 500, 0, 10000);
-  RooRealVar nswp("nswp", "number of swap events", 500, 0, 10000);
-  RooRealVar nbkg("nbkg", "number of background events", 500, 0, 10000);
-  RooRealVar npkkk("npkkk", "number of KK events", 500, 0, 10000);
-  RooRealVar npkpp("npkpp", "number of pipi events", 500, 0, 10000);
   RooAddPdf model("model", "signal + background", 
                   RooArgList(siglPDF, swapPDF, pkkkPDF, pkppPDF, combPDF), 
-                  RooArgList(nsig, nswp, npkkk, npkpp, nbkg));
-
-  // Import data
-  RooDataSet data("data", "dataset", RooArgSet(m), Import(*datatree));
-
-  std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
+                  RooArgList(p.events.nsig, p.events.nswp, p.events.npkkk, p.events.npkpp, p.events.nbkg));
 
   // Fit the model to data
   RooFitResult* result = model.fitTo(data, Save());
@@ -545,11 +664,14 @@ void main_fit(TTree *datatree, string rstDir,
 
   latex.DrawLatex(xpos, ypos - 0 * ypos_step, Form("a_{0} = %.3f #pm %.3f", p.comb.a0.getVal(), p.comb.a0.getError()));
   latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("a_{1} = %.3f #pm %.3f", p.comb.a1.getVal(), p.comb.a1.getError()));
-  latex.DrawLatex(xpos, ypos - 2 * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", nsig.getVal(), nsig.getError()));
-  latex.DrawLatex(xpos, ypos - 3 * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", nswp.getVal(), nswp.getError()));
-  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("N_{KK} = %.3f #pm %.3f", npkkk.getVal(), npkkk.getError()));
-  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("N_{#pi#pi} = %.3f #pm %.3f", npkpp.getVal(), npkpp.getError()));
-  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("N_{Comb} = %.3f #pm %.3f", nbkg.getVal(), nbkg.getError()));
+  latex.DrawLatex(xpos, ypos - 2 * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", p.events.nsig.getVal(), p.events.nsig.getError()));
+  latex.DrawLatex(xpos, ypos - 3 * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", p.events.nswp.getVal(), 
+                                                    p.events.nswp.getPropagatedError(*result)));
+  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("N_{KK} = %.3f #pm %.3f", p.events.npkkk.getVal(), 
+                                                    p.events.npkkk.getPropagatedError(*result)));
+  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("N_{#pi#pi} = %.3f #pm %.3f", p.events.npkpp.getVal(), 
+                                                    p.events.npkpp.getPropagatedError(*result)));
+  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("N_{Comb} = %.3f #pm %.3f", p.events.nbkg.getVal(), p.events.nbkg.getError()));
 
   canvas->SaveAs(Form("%s/fit_result.pdf", rstDir.c_str()));
 
@@ -564,9 +686,10 @@ int main(int argc, char *argv[]) {
   
   ///// for the component modeling (optional: default is taking the MC sample to do the modeling)
   ///// if the user specify the prefitted shape parameters (.dat), then the main_fit will take those parameters without a prefit procedure directly
-  string sigswpInput    = CL.Get     ("sigswpInput",   mcInput.c_str()); // Input mc file for signal and swap component
+  string sigswpInput   = CL.Get     ("sigswpInput",   mcInput.c_str()); // Input mc file for signal and swap component
   string KKmcInput     = CL.Get      ("KKmcInput",    mcInput.c_str()); // Input mc file for D0 > K K component
   string pipimcInput   = CL.Get      ("pipimcInput",  mcInput.c_str()); // Input mc file for D0 > pi pi component
+  string neventsInput  = CL.Get      ("neventsInput",  ""); // for EventParams that contains the normalization info
   
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
   string rstDir  = CL.Get      ("RstDir","./");       // Label for output file
@@ -578,6 +701,21 @@ int main(int argc, char *argv[]) {
   // TFile *outf = new TFile(output.c_str());
 
   string sigldat, swapdat, pkkkdat, pkppdat;
+  string nevtdat;
+  if (neventsInput=="")
+  {
+    double nsig = mctree->GetEntries("(Dgen == 23333 || Dgen == 41022 || Dgen == 41044) && Dmass>1.68 && Dmass<2.05");
+    double nswp = mctree->GetEntries("(Dgen == 23344 || Dgen == 41122 || Dgen == 41144) && Dmass>1.68 && Dmass<2.05");
+    double npkkk = mctree->GetEntries("Dgen == 333 && Dmass < 1.8648 && Dmass>1.68 && Dmass<2.05");
+    double npkpp = mctree->GetEntries("Dgen == 333 && Dmass > 1.8648 && Dmass>1.68 && Dmass<2.05");
+    double nall = mctree->GetEntries("Dmass>1.68 && Dmass<2.05");
+    nevtdat = Form("%s/events.dat", rstDir.c_str());
+    EventParams::writeFracToDat(nevtdat, nswp / nsig,
+                                         npkkk / nsig,
+                                         npkpp / nsig);
+  } else {
+    nevtdat = neventsInput;
+  }
 
   if (sigswpInput.find(".dat")==string::npos) {
     TFile *in_sigswp_f  = new TFile(sigswpInput.c_str());
@@ -595,7 +733,8 @@ int main(int argc, char *argv[]) {
     pipimc_fit(mctree, rstDir, pkppdat);
   }
 
-  main_fit(datatree, rstDir, sigldat, swapdat, pkkkdat, pkppdat);
+  main_fit(datatree, rstDir, sigldat, swapdat, pkkkdat, pkppdat,
+           nevtdat);
 
   return 0;
 }
