@@ -2,8 +2,10 @@
 #include <TFile.h>
 
 #include <RooAddPdf.h>
+#include <RooAbsPdf.h>
 #include <RooGaussian.h>
 #include <RooCBShape.h>
+#include <RooExponential.h>
 #include <RooChebychev.h>
 #include <RooRealVar.h>
 #include <RooDataSet.h>
@@ -61,7 +63,8 @@ struct ParamsBase {
     for (const auto& [name, var] : params) {
       std::cout << name << " (" << var->GetTitle() << "): "
                 << "Value = " << var->getVal()
-                << ", Error = " << var->getError() << "\n";
+                << ", Error = " << var->getError()
+                << ", is constant = " << var->isConstant() << "\n";
     }
   }
 
@@ -168,18 +171,35 @@ struct SignalParams : public ParamsBase {
 };
 
 struct CombinatoricsBkgParams : public ParamsBase {
+  bool doSyst; // nominal configuration is an exponential
+
+  // exponential
+  RooRealVar lambda;
+
+  // 2nd order chebyshev polynomial
   RooRealVar a0;
   RooRealVar a1;
 
-  CombinatoricsBkgParams() :
+  CombinatoricsBkgParams(bool _doSyst=false) :
+    doSyst(_doSyst),
+    lambda("lambda", "lambda", -4.0, -10.0, 10.0),
     a0("a0", "constant", 0.5, -1.0, 1.0),
     a1("a1", "slope", -0.2, -1.0, 1.0)
   {
-    params[a0.GetName()] = &a0;
-    params[a1.GetName()] = &a1;
+    // switch to allow the using the functionalities in the base class:
+    // print, write and read
+    if (doSyst)
+    {
+      params[a0.GetName()] = &a0;
+      params[a1.GetName()] = &a1;
+    }
+    else
+    {
+      params[lambda.GetName()] = &lambda;
+    }
   }
 
-  CombinatoricsBkgParams(string dat) : CombinatoricsBkgParams() { readFromDat(dat); }
+  CombinatoricsBkgParams(string dat, bool _doSyst=false) : CombinatoricsBkgParams(_doSyst) { readFromDat(dat); }
 };
 
 struct SwapParams : public ParamsBase {
@@ -257,13 +277,14 @@ struct EventParams {
   RooFormulaVar& npkkk;
   RooFormulaVar& npkpp;
 
+
   // Print method
   void print() const {
-    std::cout << "nsig: Value = " << nsig.getVal() << ", Error = " << nsig.getError() << "\n";
-    std::cout << "nbkg: Value = " << nbkg.getVal() << ", Error = " << nbkg.getError() << "\n";
-    std::cout << "fswp: Value = " << fswp.getVal() << "\n";
-    std::cout << "fpkkk: Value = " << fpkkk.getVal() << "\n";
-    std::cout << "fpkpp: Value = " << fpkpp.getVal() << "\n";
+    std::cout << "nsig: Value = " << nsig.getVal() << ", Error = " << nsig.getError() << ", is constant = " << nsig.isConstant() << "\n";
+    std::cout << "nbkg: Value = " << nbkg.getVal() << ", Error = " << nbkg.getError() << ", is constant = " << nbkg.isConstant() << "\n";
+    std::cout << "fswp: Value = " << fswp.getVal() << ", is constant = " << fswp.isConstant() << "\n";
+    std::cout << "fpkkk: Value = " << fpkkk.getVal() << ", is constant = " << fpkkk.isConstant() << "\n";
+    std::cout << "fpkpp: Value = " << fpkpp.getVal() << ", is constant = " << fpkpp.isConstant() << "\n";
     std::cout << "nswp: Formula = " << nswp.GetName() << ", Value = " << nswp.getVal() << "\n";
     std::cout << "npkkk: Formula = " << npkkk.GetName() << ", Value = " << npkkk.getVal() << "\n";
     std::cout << "npkpp: Formula = " << npkpp.GetName() << ", Value = " << npkpp.getVal() << "\n";
@@ -364,35 +385,6 @@ struct EventParams {
       // No reassignment of pointers and references is needed, since they're bounded as how they should be
     }
     return *this;
-  }
-};
-
-struct TotFitParams {
-  SignalParams sigl;
-  CombinatoricsBkgParams comb;
-  SwapParams swap;
-  PeakingKKParams pkkk;
-  PeakingPiPiParams pkpp;
-  EventParams events;
-
-  void print() const {
-    std::cout << "Signal Parameters:\n";
-    sigl.print();
-
-    std::cout << "Combinatorics Background Parameters:\n";
-    comb.print();
-
-    std::cout << "Swap Parameters:\n";
-    swap.print();
-
-    std::cout << "KK Parameters:\n";
-    pkkk.print();
-
-    std::cout << "pipi Parameters:\n";
-    pkpp.print();
-
-    std::cout << "Event Parameters:\n";
-    events.print();
   }
 };
 
@@ -594,7 +586,8 @@ void pipimc_fit(TTree *mctree, string rstDir,
 void main_fit(TTree *datatree, string rstDir,
               string sigldat, string swapdat,
               string pkkkdat, string pkppdat,
-              string eventsdat)
+              string eventsdat,
+              bool doSyst_comb)
 {
   std::cout << "=======================================================" << std::endl;
   std::cout << "=    Doing main fit ......" << std::endl;
@@ -606,40 +599,57 @@ void main_fit(TTree *datatree, string rstDir,
 
   // Import data
   RooDataSet data("data", "dataset", RooArgSet(m), Import(*datatree));
-  // p.events.nsig.setRange(0, data.sumEntries()*0.8);
-  // p.events.nbkg.setRange(0, data.sumEntries()*1.4);
 
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
 
-  TotFitParams p;
-  p.sigl = SignalParams(sigldat);
-  p.swap = SwapParams(swapdat);
-  p.pkkk = PeakingKKParams(pkkkdat);
-  p.pkpp = PeakingPiPiParams(pkppdat);
-  p.events = EventParams(eventsdat, data.sumEntries()*0.3, data.sumEntries()*0.7);
+  SignalParams sigl = SignalParams(sigldat);
+  SwapParams swap = SwapParams(swapdat);
+  PeakingKKParams pkkk = PeakingKKParams(pkkkdat);
+  PeakingPiPiParams pkpp = PeakingPiPiParams(pkppdat);
+  CombinatoricsBkgParams comb = CombinatoricsBkgParams(doSyst_comb);
+  EventParams events = EventParams(eventsdat, data.sumEntries()*0.3, data.sumEntries()*0.7);
 
-  p.print();
+  std::cout << "Signal Parameters:\n";
+  sigl.print();
+
+  std::cout << "Combinatorics Background Parameters:\n";
+  comb.print();
+
+  std::cout << "Swap Parameters:\n";
+  swap.print();
+
+  std::cout << "KK Parameters:\n";
+  pkkk.print();
+
+  std::cout << "pipi Parameters:\n";
+  pkpp.print();
+
+  std::cout << "Event Parameters:\n";
+  events.print();
+
   // Define the signal model: double Gaussian
-  RooGaussian gauss1("gauss1", "first Gaussian", m, p.sigl.mean, p.sigl.sigma1);
-  RooGaussian gauss2("gauss2", "second Gaussian", m, p.sigl.mean, p.sigl.sigma2);
-  RooAddPdf siglPDF("signal", "signal model", RooArgList(gauss1, gauss2), p.sigl.frac1);
+  RooGaussian gauss1("gauss1", "first Gaussian", m, sigl.mean, sigl.sigma1);
+  RooGaussian gauss2("gauss2", "second Gaussian", m, sigl.mean, sigl.sigma2);
+  RooAddPdf siglPDF("signal", "signal model", RooArgList(gauss1, gauss2), sigl.frac1);
 
-  // Define the background model: Chebychev polynomial
-  RooChebychev combPDF("combinatorics", "combinatorics model", m, RooArgList(p.comb.a0, p.comb.a1));
+  // Define the background model: (Nominal) Exponential (Systematics) Chebychev polynomial
+  RooExponential combPDF_exp("combinatorics_exp", "combinatorics model", m, comb.lambda);
+  RooChebychev combPDF_cheb("combinatorics_cheb", "combinatorics model", m, RooArgList(comb.a0, comb.a1));
+  RooAbsPdf& combPDF = (comb.doSyst)? (RooAbsPdf&) combPDF_cheb : (RooAbsPdf&) combPDF_exp;
 
   // Define the swap model: single Gaussian
-  RooGaussian swapPDF("swap", "swap model", m, p.swap.mean, p.swap.sigma);
+  RooGaussian swapPDF("swap", "swap model", m, swap.mean, swap.sigma);
 
   // Define the KK model: Crystal Ball
-  RooCBShape pkkkPDF("peaking_kk", "peaking background KK state", m, p.pkkk.mean, p.pkkk.sigma, p.pkkk.alpha, p.pkkk.n );
+  RooCBShape pkkkPDF("peaking_kk", "peaking background KK state", m, pkkk.mean, pkkk.sigma, pkkk.alpha, pkkk.n );
 
   // Define the pipi model: Crystal Ball
-  RooCBShape pkppPDF("peaking_pipi", "peaking background pipi state", m, p.pkpp.mean, p.pkpp.sigma, p.pkpp.alpha, p.pkpp.n );
+  RooCBShape pkppPDF("peaking_pipi", "peaking background pipi state", m, pkpp.mean, pkpp.sigma, pkpp.alpha, pkpp.n );
 
   // Define the combined model
   RooAddPdf model("model", "signal + background", 
                   RooArgList(siglPDF, swapPDF, pkkkPDF, pkppPDF, combPDF), 
-                  RooArgList(p.events.nsig, p.events.nswp, p.events.npkkk, p.events.npkpp, p.events.nbkg));
+                  RooArgList(events.nsig, events.nswp, events.npkkk, events.npkpp, events.nbkg));
 
   // Fit the model to data
   RooFitResult* result = model.fitTo(data, Save());
@@ -662,16 +672,21 @@ void main_fit(TTree *datatree, string rstDir,
   latex.SetTextSize(0.03);
   latex.SetNDC();
 
-  latex.DrawLatex(xpos, ypos - 0 * ypos_step, Form("a_{0} = %.3f #pm %.3f", p.comb.a0.getVal(), p.comb.a0.getError()));
-  latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("a_{1} = %.3f #pm %.3f", p.comb.a1.getVal(), p.comb.a1.getError()));
-  latex.DrawLatex(xpos, ypos - 2 * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", p.events.nsig.getVal(), p.events.nsig.getError()));
-  latex.DrawLatex(xpos, ypos - 3 * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", p.events.nswp.getVal(), 
-                                                    p.events.nswp.getPropagatedError(*result)));
-  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("N_{KK} = %.3f #pm %.3f", p.events.npkkk.getVal(), 
-                                                    p.events.npkkk.getPropagatedError(*result)));
-  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("N_{#pi#pi} = %.3f #pm %.3f", p.events.npkpp.getVal(), 
-                                                    p.events.npkpp.getPropagatedError(*result)));
-  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("N_{Comb} = %.3f #pm %.3f", p.events.nbkg.getVal(), p.events.nbkg.getError()));
+  if (comb.doSyst)
+  {
+    latex.DrawLatex(xpos, ypos - 0 * ypos_step, Form("a_{0} = %.3f #pm %.3f", comb.a0.getVal(), comb.a0.getError()));
+    latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("a_{1} = %.3f #pm %.3f", comb.a1.getVal(), comb.a1.getError()));
+  } else {
+    latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("#lambda = %.3f #pm %.3f", comb.lambda.getVal(), comb.lambda.getError()));
+  }
+  latex.DrawLatex(xpos, ypos - 2 * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", events.nsig.getVal(), events.nsig.getError()));
+  latex.DrawLatex(xpos, ypos - 3 * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", events.nswp.getVal(),
+                                                    events.nswp.getPropagatedError(*result)));
+  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("N_{KK} = %.3f #pm %.3f", events.npkkk.getVal(),
+                                                    events.npkkk.getPropagatedError(*result)));
+  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("N_{#pi#pi} = %.3f #pm %.3f", events.npkpp.getVal(),
+                                                    events.npkpp.getPropagatedError(*result)));
+  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("N_{Comb} = %.3f #pm %.3f", events.nbkg.getVal(), events.nbkg.getError()));
 
   canvas->SaveAs(Form("%s/fit_result.pdf", rstDir.c_str()));
 
@@ -690,6 +705,9 @@ int main(int argc, char *argv[]) {
   string KKmcInput     = CL.Get      ("KKmcInput",    mcInput.c_str()); // Input mc file for D0 > K K component
   string pipimcInput   = CL.Get      ("pipimcInput",  mcInput.c_str()); // Input mc file for D0 > pi pi component
   string neventsInput  = CL.Get      ("neventsInput",  ""); // for EventParams that contains the normalization info
+
+  ///// for fitting systematics study
+  bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
   
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
   string rstDir  = CL.Get      ("RstDir","./");       // Label for output file
@@ -708,7 +726,6 @@ int main(int argc, char *argv[]) {
     double nswp = mctree->GetEntries("(Dgen == 23344 || Dgen == 41122 || Dgen == 41144) && Dmass>1.68 && Dmass<2.05");
     double npkkk = mctree->GetEntries("Dgen == 333 && Dmass < 1.8648 && Dmass>1.68 && Dmass<2.05");
     double npkpp = mctree->GetEntries("Dgen == 333 && Dmass > 1.8648 && Dmass>1.68 && Dmass<2.05");
-    double nall = mctree->GetEntries("Dmass>1.68 && Dmass<2.05");
     nevtdat = Form("%s/events.dat", rstDir.c_str());
     EventParams::writeFracToDat(nevtdat, nswp / nsig,
                                          npkkk / nsig,
@@ -733,8 +750,10 @@ int main(int argc, char *argv[]) {
     pipimc_fit(mctree, rstDir, pkppdat);
   }
 
-  main_fit(datatree, rstDir, sigldat, swapdat, pkkkdat, pkppdat,
-           nevtdat);
+  main_fit(datatree, rstDir,
+           sigldat, swapdat, pkkkdat, pkppdat,
+           nevtdat,
+           doSyst_comb);
 
   return 0;
 }
