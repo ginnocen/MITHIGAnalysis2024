@@ -21,8 +21,8 @@
 		<MicroTreeDir>/
 		 ├── sampleConfig.json: the config card in the `sampleSettings` folder, which controls the execution of `DzeroUPC.cpp` 
 		 ├── <pt_xxx_y_xxx>/
-    		 │	├── Data.root
-    		 │	├── MC.root
+		 │	├── Data.root
+		 │	├── MC.root
   		 │	├── <FitDir1>/
 		 │	│ 	├── fitConfig.json:  the config card in the `fitSettings` folder, which controls the execution of `massfit.C`
 		 │	│ 	├── from massfit.C:  sigl.dat, swap.dat, pkkk.dat (peaking KK), pkpp.dat (peaking pipi) shape parameters from MC pre-fit
