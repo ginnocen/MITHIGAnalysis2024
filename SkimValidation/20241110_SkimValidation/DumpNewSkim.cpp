@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   bool ApplyEventSelection = CL.GetBool("ApplyEventSelection", true);
+  bool SkimDzeroPresence = CL.GetBool("SkimDzeroPresence", false);
   double SkimDzeroPresenceAbovePTMin = CL.GetDouble("SkimDzeroPresenceAbovePTMin", 2.);
   bool ApplyDSelection = CL.GetBool("ApplyDSelection", false);
 
@@ -57,11 +58,16 @@ int main(int argc, char *argv[]) {
 
     MDzeroUPC.GetEntry(iE);
 
-    bool DRequirement = false;
-    for (int iD = 0; iD < MDzeroUPC.Dpt->size(); ++iD) {
-      if (MDzeroUPC.Dpt->at(iD) > SkimDzeroPresenceAbovePTMin) {
-        DRequirement = true;
-        break;
+    bool DRequirement;
+    if (!SkimDzeroPresence) {
+      DRequirement = true;
+    } else {
+      DRequirement = false;
+      for (int iD = 0; iD < MDzeroUPC.Dpt->size(); ++iD) {
+        if (MDzeroUPC.Dpt->at(iD) > SkimDzeroPresenceAbovePTMin) {
+          DRequirement = true;
+          break;
+        }
       }
     }
 
@@ -83,8 +89,8 @@ int main(int argc, char *argv[]) {
               "VXError %f VYError %f VZError %f\n"
               "Dsize %d\n", // Dpt->size() %d\n",
               // iE,
-              MDzeroUPC.Run, MDzeroUPC.Lumi, MDzeroUPC.Event, (int)MDzeroUPC.isL1ZDCOr, (int)MDzeroUPC.isL1ZDCXORJet8,
-              (int)MDzeroUPC.selectedBkgFilter, (int)MDzeroUPC.selectedVtxFilter, (int)(MDzeroUPC.gammaN->at(4)),
+              MDzeroUPC.Run, MDzeroUPC.Lumi, MDzeroUPC.Event, MDzeroUPC.isL1ZDCOr, MDzeroUPC.isL1ZDCXORJet8,
+              MDzeroUPC.selectedBkgFilter, MDzeroUPC.selectedVtxFilter, (int)(MDzeroUPC.gammaN->at(4)),
               (int)(MDzeroUPC.Ngamma->at(4)), MDzeroUPC.VX, MDzeroUPC.VY, MDzeroUPC.VZ, MDzeroUPC.VXError,
               MDzeroUPC.VYError, MDzeroUPC.VZError, MDzeroUPC.Dsize);
 
