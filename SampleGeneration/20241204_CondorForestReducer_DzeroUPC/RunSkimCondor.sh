@@ -4,8 +4,8 @@ XROOTD_SERVER="root://xrootd.cmsaf.mit.edu/"
 T2_PARENT_DIR="/store/user/jdlang/run3_2024PromptReco"
 T2_OUTPUT_DIR="/store/user/jdlang/run3_2024PromptRecoSkims_HIForward_20241211"
 RUNLIST=(
-#  388000 388004 388005 388006 388020
-#  388021 388037 388038 388039 388048
+  388000 388004 388005 388006 388020
+  388021 388037 388038 388039 388048
   388049 388050 388056 388090 388091
   388092 388095 388121 388122 388168
 ### Runs below are not processed!
@@ -54,7 +54,6 @@ for RUN in ${RUNLIST[@]}; do
     done < $FILELIST
     # Submit final job file list
     submit_condor_jobs $BASENAME $JOBLIST $CONFIGDIR
-    sleep 3 # add pause between PDs to offset streams from T2_MIT
+    sleep 2 # small pause between PDs to offset streams from T2_MIT
   done # end PD loop
-  sleep 15 # add pause between runs to offset streams from T2_MIT
 done # end RUN loop
