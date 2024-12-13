@@ -4,9 +4,21 @@ XROOTD_SERVER=$1
 T2_INPUT_DIR=$2
 FILELIST=$3
 
+# WARNING! ONLY USE THIS FOR xrdfs FUNCTIONS, NEVER FOR TRANSFERS!!!
+XROOTD_FS=(
+  "root://xrootd3.cmsaf.mit.edu/"
+  "root://xrootd4.cmsaf.mit.edu/"
+  "root://xrootd5.cmsaf.mit.edu/"
+  "root://xrootd6.cmsaf.mit.edu/"
+  "root://xrootd7.cmsaf.mit.edu/"
+  "root://xrootd8.cmsaf.mit.edu/"
+  "root://xrootd9.cmsaf.mit.edu/"
+)
+RND=$((RANDOM % 7))
+
 # Make list of all files in parent dir
 rm $FILELIST
-xrdfs $XROOTD_SERVER ls -R $T2_INPUT_DIR >> $FILELIST
+xrdfs ${XROOTD_FS[$RND]} ls -R $T2_INPUT_DIR >> $FILELIST
 wait
 if [ -z "$FILELIST" ]; then
   echo "No files found in remote directory: $T2_INPUT_DIR"

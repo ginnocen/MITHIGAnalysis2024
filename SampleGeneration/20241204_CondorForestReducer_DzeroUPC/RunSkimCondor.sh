@@ -1,14 +1,13 @@
 #!/bin/bash
 
-XROOTD_SERVER="root://xrootd5.cmsaf.mit.edu/"
+XROOTD_SERVER="root://xrootd.cmsaf.mit.edu/"
 T2_PARENT_DIR="/store/user/jdlang/run3_2024PromptReco"
 T2_OUTPUT_DIR="/store/user/jdlang/run3_2024PromptRecoSkims_HIForward_20241211"
 RUNLIST=(
-  388000
-#  388004 388005 388006 388020
+#  388000 388004 388005 388006 388020
 #  388021 388037 388038 388039 388048
-#  388049 388050 388056 388090 388091
-#  388092 388095 388121 388122 388168
+  388049 388050 388056 388090 388091
+  388092 388095 388121 388122 388168
 ### Runs below are not processed!
 #  388192 388305 388306 388317 388349
 #  388350 388368 388369 388384 388389 
@@ -20,11 +19,11 @@ RUNLIST=(
 )
 PDMIN=0
 PDMAX=19
-#FILES_PER_JOB=100
 
 DATE=$(date +%Y%m%d)
 
 xrdfs $XROOTD_SERVER mkdir -p $T2_OUTPUT_DIR
+mkdir -p "forestLists"
 
 submit_condor_jobs() {
   local BASENAME=$1
@@ -42,10 +41,9 @@ for RUN in ${RUNLIST[@]}; do
     CONFIGDIR="condorConfigs/${DATE}_${RUN}_${PD}"
     mkdir -p $CONFIGDIR
     T2_INPUT_DIR="${T2_PARENT_DIR}/Run3UPC2024_PromptReco_${RUN}_HIForward${PD}/"
-    FILELIST="filelist_${RUN}_${PD}.txt"
+    FILELIST="forestLists/filelist_${RUN}_${PD}.txt"
     ./MakeSkimFileList.sh $XROOTD_SERVER $T2_INPUT_DIR $FILELIST
     # Iterate through list to make individual jobs
-#    PART=1
     BASENAME="${RUN}_HIForward${PD}"
     JOBLIST="${CONFIGDIR}/${BASENAME}_joblist.txt"
     rm $JOBLIST
@@ -53,19 +51,10 @@ for RUN in ${RUNLIST[@]}; do
     while IFS= read -r LINE; do
       echo "$LINE" >> "$JOBLIST"
       FILE_COUNTER=$((FILE_COUNTER + 1))
-#      if ! (( $FILE_COUNTER % FILES_PER_JOB )); then
-#        submit_condor_jobs $BASENAME $JOBLIST $CONFIGDIR
-#        wait
-#        # Make new job file
-#        PART=$((PART + 1))
-#        BASENAME="${RUN}_HIForward${PD}_${PART}"
-#        JOBLIST="${CONFIGDIR}/${BASENAME}_joblist.txt"
-#        rm $JOBLIST
-#      fi
     done < $FILELIST
     # Submit final job file list
     submit_condor_jobs $BASENAME $JOBLIST $CONFIGDIR
-    sleep 10 # add 10 second pause between PDs to offset streams from T2_MIT
+    sleep 3 # add pause between PDs to offset streams from T2_MIT
   done # end PD loop
-  sleep 60 # add 1 minute pause between runs to offset streams from T2_MIT
+  sleep 15 # add pause between runs to offset streams from T2_MIT
 done # end RUN loop
