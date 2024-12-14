@@ -3,19 +3,19 @@ default: TestRun
 TestRun: Execute
 	./Execute --Input /data/NewSkims23_24/20241102_ForestOldReco23sample_Dataexample/HiForestMiniAOD_UPCPbPb23_HiVertex_279.root \
                   --Output SkimReco_UPCPbPb23_HiVertex_279.root --Year 2023 --IsData true \
-                  --ApplyTriggerRejection false \
+                  --ApplyTriggerRejection 0 \
                   --ApplyEventRejection false \
                   --ApplyZDCGapRejection false \
-                  --ApplyDRejection false \
+                  --ApplyDRejection 0 \
                   --PFTree particleFlowAnalyser/pftree
 
 TestRunBase: Execute
 	./Execute --Input /data/NewSkims23_24/20241102_ForestOldReco23sample_Dataexample/HiForestMiniAOD_UPCPbPb23_HiVertex_279.root \
                   --Output SkimReco_UPCPbPb23_HiVertex_279.root --Year 2023 --IsData true \
-                  --ApplyTriggerRejection false \
+                  --ApplyTriggerRejection 0 \
                   --ApplyEventRejection false \
                   --ApplyZDCGapRejection false \
-                  --ApplyDRejection false \
+                  --ApplyDRejection 0 \
                   --PFTree particleFlowAnalyser/pftree
 
 Execute: ReduceForest.cpp
