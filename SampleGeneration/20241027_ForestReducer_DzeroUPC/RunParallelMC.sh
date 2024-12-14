@@ -24,7 +24,7 @@ while IFS= read -r file; do
             --Output "$OUTPUTMC/output_$counterMC.root" \
             --Year 2023 \
             --IsData false \
-            --ApplyDPreselection true \
+            --ApplyDPreselection 1 \
             --PFTree particleFlowAnalyser/pftree \
             --DGenTree Dfinder/ntGen &
     ((counterMC++))
