@@ -23,8 +23,8 @@ cat > $SCRIPT <<EOF1
 
 CLUSTER=\$1
 PROC=\$2
-ROOT_LIST="rootList_\${CLUSTER}-\${PROC}.txt"
-MERGED_ROOT="merged_\${CLUSTER}-\${PROC}.root"
+ROOT_LIST="rootList_\${CLUSTER}_\${PROC}.txt"
+MERGED_ROOT="merged_\${CLUSTER}_\${PROC}.root"
 
 echo ""
 echo ">>> Host info"
@@ -48,10 +48,12 @@ cmsenv
 git cms-merge-topic CmsHI:forest_CMSSW_14_1_X
 wait
 cd ../../
+which root
+which hadd
 
 echo ""
 echo ">>> Setting up directory"
-xrdcp -r root://xrootd5.cmsaf.mit.edu//store/user/jdlang/MITHIGAnalysis2024 .
+xrdcp -r -f  root://xrootd.cmsaf.mit.edu//store/user/jdlang/MITHIGAnalysis2024 .
 wait
 ls -l
 cd MITHIGAnalysis2024/SampleGeneration/CondorForestReducer_DzeroUPC/
@@ -64,6 +66,7 @@ echo ""
 echo ">>> Compiling skimmer"
 make
 wait
+sleep 1
 if ! [ -f "Execute" ]; then
   echo "ERROR: Unable to compile executable!"
   exit 2
@@ -77,7 +80,7 @@ while read -r ROOT_T2; do
   ROOT_IN="\${ROOT_T2##*/}"
 #  ROOT_OUT="temp_skim_\${CLUSTER}\${PROC}_\${COUNTER}.root"
   ROOT_OUT="tempskim_\${CLUSTER}\${PROC}_\${ROOT_IN}"
-  xrdcp \$ROOT_T2 .
+  xrdcp -f \$ROOT_T2 .
   wait
   if ! [ -f "\$ROOT_IN" ]; then
     echo "--- ERROR! Missing root file: \$ROOT_IN"

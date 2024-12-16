@@ -20,10 +20,10 @@ TestRunBase: Execute
 
 Execute: ReduceForest.cpp
 	CGO_ENABLED=0
-	g++ ReduceForest.cpp -o Execute \
-		-Wl,-Bstatic -lpthread -lc \
-		-Wl,-Bdynamic `root-config --cflags --libs` \
-		-I$(ProjectBase)/CommonCode/include $(ProjectBase)/CommonCode/library/Messenger.o
 #	g++ ReduceForest.cpp -o Execute \
-#		`root-config --cflags --glibs` \
+#		-Wl,-Bstatic -lpthread -lc \
+#		-Wl,-Bdynamic `root-config --cflags --libs` \
 #		-I$(ProjectBase)/CommonCode/include $(ProjectBase)/CommonCode/library/Messenger.o
+	g++ ReduceForest.cpp -o Execute \
+		`root-config --cflags --glibs` \
+		-I$(ProjectBase)/CommonCode/include $(ProjectBase)/CommonCode/library/Messenger.o
