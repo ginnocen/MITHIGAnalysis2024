@@ -121,7 +121,19 @@ xrdfs $XROOTD_SERVER rm $T2_OUTPUT
 sleep 1
 xrdcp -f \$MERGED_ROOT $XROOTD_SERVER/$T2_OUTPUT
 wait
-xrdfs $XROOTD_SERVER ls -l $T2_OUTPUT
+
+# Check if copying over worked. If not, then try again
+T2SIZE=$(xrdfs $XROOTD_SERVER ls -l $T2_OUTPUT | awk '{print $4}')
+wait
+LOCALSIZE=$(ls -l \$MERGED_ROOT | awk '{print $5}')
+if ! (( \$T2SIZE - \$LOCALSIZE )); then
+  xrdcp -f \$MERGED_ROOT $XROOTD_SERVER/$T2_OUTPUT
+  wait
+  sleep 300
+fi
+
+T2FILE=$("
+LOCALFILE=
 
 echo ">>> Done!"
 
