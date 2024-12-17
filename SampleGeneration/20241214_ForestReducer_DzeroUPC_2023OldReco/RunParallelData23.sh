@@ -1,5 +1,5 @@
 #!/bin/bash
-MAXCORES=120
+MAXCORES=100
 
 NAME="20241216_ForestDfinderData23LowPtSkim_v1"
 OUTPUT="output"
