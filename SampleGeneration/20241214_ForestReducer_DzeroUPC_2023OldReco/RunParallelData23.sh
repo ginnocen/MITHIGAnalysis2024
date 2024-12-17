@@ -4,8 +4,7 @@ MAXCORES=120
 NAME="20241216_ForestDfinderData23LowPtSkim_v1"
 OUTPUT="output"
 counter=0
-#filelist="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/InputListForests/20241106_filelist_SkimOldReco23sample_DataAll.txt"
-filelist="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/InputListForests/tet.txt"
+filelist="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/InputListForests/20241106_filelist_SkimOldReco23sample_DataAll.txt"
 MERGEDOUTPUT="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsData/$NAME.root"
 #MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT
