@@ -1,5 +1,5 @@
 CMSFOLDER=/home/$USER/CMSSW_13_2_4/src
-
+CURRENTFOLDER=$(pwd)
 if [ ! -d $CMSFOLDER ]; then
     echo "You need to define the folder where the CMSSW environment is located"
     exit 1
@@ -29,6 +29,6 @@ source SetupAnalysis.sh
 cd CommonCode/
 make
 cd ..
-cd SampleGeneration/20241027_ForestReducer_DzeroUPC
+cd $CURRENTFOLDER
 make
 rm Skim*.root

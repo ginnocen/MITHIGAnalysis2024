@@ -8,6 +8,16 @@ filelistMC="/data/NewSkims23_24/InputLists/20241106_filelist_SkimOldReco23sample
 MERGEDOUTPUTMC="/data/NewSkims23_24/$NAMEMC.root"
 rm $MERGEDOUTPUTMC
 
+
+# Function to monitor active processes
+wait_for_slot() {
+    while (( $(jobs -r | wc -l) >= MAXCORES )); do
+        # Wait a bit before checking again
+        sleep 1
+    done
+}
+
+
 # Check if the filelist is empty
 if [[ ! -s "$filelistMC" ]]; then
     echo "No matching files found in Samples directory."
@@ -24,15 +34,16 @@ while IFS= read -r file; do
             --Output "$OUTPUTMC/output_$counterMC.root" \
             --Year 2023 \
             --IsData false \
-            --ApplyDPreselection 1 \
+            --ApplyTriggerRejection 2 \
+            --ApplyEventRejection false \
+            --ApplyZDCGapRejection false \
+            --ApplyDRejection 0 \
             --PFTree particleFlowAnalyser/pftree \
             --DGenTree Dfinder/ntGen &
-    ((counterMC++))
-    if (( counterMC % $MAXCORES == 0 )); then
-        wait
-    fi
-done < "$filelistMC"
-wait
+    ((counter++))
+    wait_for_slot
+done < "$filelist"
+wait 
 
 hadd $MERGEDOUTPUTMC $OUTPUTMC/output_*.root
 echo "All done MC!"

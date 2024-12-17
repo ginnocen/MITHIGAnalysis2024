@@ -760,7 +760,8 @@ public:
    std::vector<float> *DsvpvDisErr_2D;
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
-   std::vector<bool>  *DpassCut;
+   std::vector<bool> *DpassCut23PAS;
+   std::vector<bool> *DpassCut23LowPt;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;
