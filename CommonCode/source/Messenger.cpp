@@ -3156,6 +3156,22 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete MJTHadronFlavor;
       delete MJTNcHad;
       delete MJTNbHad;
+      delete singleMuEta1;
+      delete singleMuPhi1;
+      delete singleMuPt1;
+      delete singleMuDxy1;
+      delete singleMuDxyError1;
+      delete singleMuDz1;
+      delete singleMuDzError1;
+      delete singleMuCharge1;
+      delete singleMuEta2;
+      delete singleMuPhi2;
+      delete singleMuPt2;
+      delete singleMuDxy2;
+      delete singleMuDxyError2;
+      delete singleMuDz2;
+      delete singleMuDzError2;
+      delete singleMuCharge2;
    }
 }
 
@@ -3196,6 +3212,22 @@ bool MuMuJetMessenger::Initialize()
    MJTHadronFlavor = nullptr;
    MJTNcHad = nullptr;
    MJTNbHad = nullptr;
+   singleMuEta1 = nullptr;
+   singleMuPhi1 = nullptr;
+   singleMuPt1 = nullptr;
+   singleMuDxy1 = nullptr;
+   singleMuDxyError1 = nullptr;
+   singleMuDz1 = nullptr;
+   singleMuDzError1 = nullptr;
+   singleMuCharge1 = nullptr;
+   singleMuEta2 = nullptr;
+   singleMuPhi2 = nullptr;
+   singleMuPt2 = nullptr;
+   singleMuDxy2 = nullptr;
+   singleMuDxyError2 = nullptr;
+   singleMuDz2 = nullptr;
+   singleMuDzError2 = nullptr;
+   singleMuCharge2 = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -3235,6 +3267,22 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->SetBranchAddress("MJTNcHad", &MJTNcHad);
    Tree->SetBranchAddress("MJTNbHad", &MJTNbHad);
+   Tree->SetBranchAddress("singleMuEta1", &singleMuEta1);
+   Tree->SetBranchAddress("singleMuPhi1", &singleMuPhi1);
+   Tree->SetBranchAddress("singleMuPt1", &singleMuPt1);
+   Tree->SetBranchAddress("singleMuDxy1", &singleMuDxy1);
+   Tree->SetBranchAddress("singleMuDxyError1", &singleMuDxyError1);
+   Tree->SetBranchAddress("singleMuDz1", &singleMuDz1);
+   Tree->SetBranchAddress("singleMuDzError1", &singleMuDzError1);
+   Tree->SetBranchAddress("singleMuCharge1", &singleMuCharge1);
+   Tree->SetBranchAddress("singleMuEta2", &singleMuEta2);
+   Tree->SetBranchAddress("singleMuPhi2", &singleMuPhi2);
+   Tree->SetBranchAddress("singleMuPt2", &singleMuPt2);
+   Tree->SetBranchAddress("singleMuDxy2", &singleMuDxy2);
+   Tree->SetBranchAddress("singleMuDxyError2", &singleMuDxyError2);
+   Tree->SetBranchAddress("singleMuDz2", &singleMuDz2);
+   Tree->SetBranchAddress("singleMuDzError2", &singleMuDzError2);
+   Tree->SetBranchAddress("singleMuCharge2", &singleMuCharge2);
    return true;
 }
 
@@ -3288,6 +3336,22 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    MJTHadronFlavor = new std::vector<int>();
    MJTNcHad = new std::vector<int>();
    MJTNbHad = new std::vector<int>();
+   singleMuEta1 = new std::vector<float>();
+   singleMuPhi1 = new std::vector<float>();
+   singleMuPt1 = new std::vector<float>();
+   singleMuDxy1 = new std::vector<float>();
+   singleMuDxyError1 = new std::vector<float>();
+   singleMuDz1 = new std::vector<float>();
+   singleMuDzError1 = new std::vector<float>();
+   singleMuCharge1 = new std::vector<int>();
+   singleMuEta2 = new std::vector<float>();
+   singleMuPhi2 = new std::vector<float>();
+   singleMuPt2 = new std::vector<float>();
+   singleMuDxy2 = new std::vector<float>();
+   singleMuDxyError2 = new std::vector<float>();
+   singleMuDz2 = new std::vector<float>();
+   singleMuDzError2 = new std::vector<float>();
+   singleMuCharge2 = new std::vector<int>();
 
    Tree = T;
 
@@ -3329,6 +3393,22 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->Branch("MJTNcHad", &MJTNcHad);
    Tree->Branch("MJTNbHad", &MJTNbHad);
+   Tree->Branch("singleMuEta1", &singleMuEta1);
+   Tree->Branch("singleMuPhi1", &singleMuPhi1);
+   Tree->Branch("singleMuPt1", &singleMuPt1);
+   Tree->Branch("singleMuDxy1", &singleMuDxy1);
+   Tree->Branch("singleMuDxyError1", &singleMuDxyError1);
+   Tree->Branch("singleMuDz1", &singleMuDz1);
+   Tree->Branch("singleMuDzError1", &singleMuDzError1);
+   Tree->Branch("singleMuCharge1",&singleMuCharge1);
+   Tree->Branch("singleMuEta2", &singleMuEta2);
+   Tree->Branch("singleMuPhi2", &singleMuPhi2);
+   Tree->Branch("singleMuPt2", &singleMuPt2);
+   Tree->Branch("singleMuDxy2", &singleMuDxy2);
+   Tree->Branch("singleMuDxyError2", &singleMuDxyError2);
+   Tree->Branch("singleMuDz2", &singleMuDz2);
+   Tree->Branch("singleMuDzError2", &singleMuDzError2);
+   Tree->Branch("singleMuCharge2",&singleMuCharge2);
    return true;
 }
 
@@ -3375,7 +3455,24 @@ void MuMuJetMessenger::Clear()
    MJTHadronFlavor->clear();
    MJTNcHad->clear();
    MJTNbHad->clear();
+   singleMuPhi1->clear();
+   singleMuEta1->clear();
+   singleMuPt1->clear();
+   singleMuDxy1->clear();
+   singleMuDxyError1->clear();
+   singleMuDz1->clear();
+   singleMuDzError1->clear();
+   singleMuCharge1->clear();
+   singleMuPhi2->clear();
+   singleMuEta2->clear();
+   singleMuPt2->clear();
+   singleMuDxy2->clear();
+   singleMuDxyError2->clear();
+   singleMuDz2->clear();
+   singleMuDzError2->clear();
+   singleMuCharge2->clear();
 }
+
 
 void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
 {
@@ -3419,6 +3516,24 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(MJTHadronFlavor != nullptr && M.MJTHadronFlavor != nullptr)   *MJTHadronFlavor = *(M.MJTHadronFlavor);
    if(MJTNcHad != nullptr && M.MJTNcHad != nullptr)   *MJTNcHad = *(M.MJTNcHad);
    if(MJTNbHad != nullptr && M.MJTNbHad != nullptr)   *MJTNbHad = *(M.MJTNbHad);
+   if(singleMuEta1 != nullptr && M.singleMuEta1 != nullptr)   *singleMuEta1 = *(M.singleMuEta1);
+   if(singleMuPhi1 != nullptr && M.singleMuPhi1 != nullptr)   *singleMuPhi1 = *(M.singleMuPhi1);
+   if(singleMuPt1 != nullptr && M.singleMuPt1 != nullptr )   *singleMuPt1 = *(M.singleMuPt1);
+   if(singleMuDxy1 != nullptr && M.singleMuDxy1 != nullptr)   *singleMuDxy1 = *(M.singleMuDxy1);
+   if(singleMuDxyError1 != nullptr && M.singleMuDxyError1 != nullptr)   *singleMuDxyError1 = *(M.singleMuDxyError1);
+   if(singleMuDz1 != nullptr && M.singleMuDz1 != nullptr)   *singleMuDz1 = *(M.singleMuDz1);
+   if(singleMuDzError1 != nullptr && M.singleMuDzError1 != nullptr)   *singleMuDzError1 = *(M.singleMuDzError1);
+   if(singleMuCharge1 != nullptr && M.singleMuCharge1 != nullptr)   *singleMuCharge1 = *(M.singleMuCharge1);
+   if(singleMuEta2 != nullptr && M.singleMuEta2 != nullptr)   *singleMuEta2 = *(M.singleMuEta2);
+   if(singleMuPhi2 != nullptr && M.singleMuPhi2 != nullptr)   *singleMuPhi2 = *(M.singleMuPhi2);
+   if(singleMuPt2 != nullptr && M.singleMuPt2 != nullptr )   *singleMuPt2 = *(M.singleMuPt2);
+   if(singleMuDxy2 != nullptr && M.singleMuDxy2 != nullptr)   *singleMuDxy2 = *(M.singleMuDxy2);
+   if(singleMuDxyError2 != nullptr && M.singleMuDxyError2 != nullptr)   *singleMuDxyError2 = *(M.singleMuDxyError2);
+   if(singleMuDz2 != nullptr && M.singleMuDz2 != nullptr)   *singleMuDz1 = *(M.singleMuDz2);
+   if(singleMuDzError2 != nullptr && M.singleMuDzError2 != nullptr)   *singleMuDzError2 = *(M.singleMuDzError2);
+   if(singleMuCharge2 != nullptr && M.singleMuCharge2 != nullptr)   *singleMuCharge2 = *(M.singleMuCharge2);
+
+
 }
 
 bool MuMuJetMessenger::FillEntry()
@@ -3435,4 +3550,66 @@ bool MuMuJetMessenger::FillEntry()
    Clear();
 
    return true;
+}
+
+
+MuAnaTreeMessenger::MuAnaTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+MuAnaTreeMessenger::MuAnaTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+MuAnaTreeMessenger::MuAnaTreeMessenger(TTree *MuAnaTree)
+{
+   Initialize(MuAnaTree);
+}
+
+bool MuAnaTreeMessenger::Initialize(TTree *MuAnaTree)
+{
+   Tree = MuAnaTree;
+   return Initialize();
+}
+
+bool MuAnaTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->SetBranchAddress("recoPt", &MuPT);
+   Tree->SetBranchAddress("recoEta", &MuEta);
+   Tree->SetBranchAddress("recoPhi", &MuPhi);
+   Tree->SetBranchAddress("globalDxy", &MuDxy);
+   Tree->SetBranchAddress("globalDxyErr", &MuDxyError);
+   Tree->SetBranchAddress("globalDz", &MuDz);
+   Tree->SetBranchAddress("globalDzErr", &MuDzError);
+   Tree->SetBranchAddress("recoCharge", &MuCharge);
+
+
+   return true;
+}
+
+bool MuAnaTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
+bool MuAnaTreeMessenger::DimuonPassTightCut(int index)
+{
+
+   bool TightCut = false;
+
+   return TightCut;
 }

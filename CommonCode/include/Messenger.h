@@ -22,12 +22,14 @@ class GGTreeMessenger;
 class RhoTreeMessenger;
 class SkimTreeMessenger;
 class JetTreeMessenger;
+class CharmHadronTreeMessenger;
 class GenParticleTreeMessenger;
 class PFTreeMessenger;
 class TriggerTreeMessenger;
 class TriggerObjectTreeMessenger;
 class TrackTreeMessenger;
 class MuTreeMessenger;
+class MuAnaTreeMessenger;
 class PbPbTrackTreeMessenger;
 class PbPbUPCTrackTreeMessenger;
 class ZDCTreeMessenger;
@@ -170,6 +172,21 @@ public:
    float JetCSVV2N[JETCOUNTMAX];
    float JetCSVV1P[JETCOUNTMAX];
    float JetCSVV2P[JETCOUNTMAX];
+   float JetUParT[JETCOUNTMAX];
+   float JetUParT_u[JETCOUNTMAX];
+   float JetUParT_d[JETCOUNTMAX];
+   float JetUParT_s[JETCOUNTMAX];
+   float JetUParT_c[JETCOUNTMAX];
+   float JetUParT_b[JETCOUNTMAX];
+   float JetUParT_g[JETCOUNTMAX];
+   float JetUParT_bb[JETCOUNTMAX];
+   float JetUParT_tau[JETCOUNTMAX];
+   float JetUParT_lepb[JETCOUNTMAX];
+   float JetUParT_ele[JETCOUNTMAX];
+   float JetUParT_mu[JETCOUNTMAX];
+   float JetUParT_ptnu[JETCOUNTMAX];
+   float JetUParT_ptcorr[JETCOUNTMAX];
+
    std::vector<std::vector<float> > *JetSubJetPT;
    std::vector<std::vector<float> > *JetSubJetEta;
    std::vector<std::vector<float> > *JetSubJetPhi;
@@ -216,13 +233,14 @@ public:
    int JetPFNEM[JETCOUNTMAX];
    int JetPFMUM[JETCOUNTMAX];
 public:
-   JetTreeMessenger(TFile &File, std::string TreeName = "akCs4PFJetAnalyzer/t");
-   JetTreeMessenger(TFile *File, std::string TreeName = "akCs4PFJetAnalyzer/t");
+   JetTreeMessenger(TFile &File, std::string TreeName = "akCs0PFJetAnalyzer/t");
+   JetTreeMessenger(TFile *File, std::string TreeName = "akCs0PFJetAnalyzer/t");
    JetTreeMessenger(TTree *JetTree);
    bool Initialize(TTree *JetTree);
    bool Initialize();
    bool GetEntry(int iEntry);
 };
+
 
 class GenParticleTreeMessenger
 {
@@ -434,6 +452,28 @@ public:
    bool GetEntry(int iEntry);
 };
 
+class MuAnaTreeMessenger
+{
+public:
+   TTree *Tree;
+   std::vector<float> *MuPT = nullptr;
+   std::vector<float> *MuEta = nullptr;
+   std::vector<float> *MuPhi = nullptr;
+   std::vector<float> *MuDxy = nullptr;
+   std::vector<float> *MuDxyError = nullptr;
+   std::vector<float> *MuDz = nullptr;
+   std::vector<float> *MuDzError = nullptr;
+   std::vector<int> *MuCharge = nullptr;
+public:
+   MuAnaTreeMessenger(TFile &File, std::string TreeName = "muonAnalyzer/MuonTree");
+   MuAnaTreeMessenger(TFile *File, std::string TreeName = "muonAnalyzer/MuonTree");
+   MuAnaTreeMessenger(TTree *MuAnaTree);
+   bool Initialize(TTree *MuAnaTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+   bool DimuonPassTightCut(int index);
+};
+
 class MuTreeMessenger
 {
 public:
@@ -517,6 +557,7 @@ public:
    float DiDxy2[MUMAX];
    float DiDz1[MUMAX];
    float DiDz2[MUMAX];
+//   float DiDxy1Error[MUMAX];
 public:
    MuTreeMessenger(TFile &File, std::string TreeName = "hltMuTree/HLTMuTree");
    MuTreeMessenger(TFile *File, std::string TreeName = "hltMuTree/HLTMuTree");
@@ -833,6 +874,24 @@ public:
    std::vector<int> *MJTHadronFlavor;
    std::vector<int> *MJTNcHad;
    std::vector<int> *MJTNbHad;
+   //variables from muonAnalyzer/MuonTree
+   std::vector<float> *singleMuEta1;
+   std::vector<float> *singleMuPhi1;
+   std::vector<float> *singleMuPt1;
+   std::vector<float> *singleMuDxy1;
+   std::vector<float> *singleMuDxyError1;
+   std::vector<float> *singleMuDz1;
+   std::vector<float> *singleMuDzError1;
+   std::vector<int> *singleMuCharge1;
+   std::vector<float> *singleMuEta2;
+   std::vector<float> *singleMuPhi2;
+   std::vector<float> *singleMuPt2;
+   std::vector<float> *singleMuDxy2;
+   std::vector<float> *singleMuDxyError2;
+   std::vector<float> *singleMuDz2;
+   std::vector<float> *singleMuDzError2;
+   std::vector<int> *singleMuCharge2;
+
 private:
    bool WriteMode;
    bool Initialized;
