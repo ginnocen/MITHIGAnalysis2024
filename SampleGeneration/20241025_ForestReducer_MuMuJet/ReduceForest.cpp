@@ -53,6 +53,7 @@ int main(int argc, char *argv[]) {
     PbPbTrackTreeMessenger MTrack(InputFile);
     GenParticleTreeMessenger MGen(InputFile);
     PFTreeMessenger MPF(InputFile, PFTreeName);
+    MuAnaTreeMessenger MMuAna(InputFile); //muons from muonAnalyzer, the "singleMu" tree
     MuTreeMessenger MMu(InputFile);
     SkimTreeMessenger MSkim(InputFile);
     TriggerTreeMessenger MTrigger(InputFile);
@@ -83,6 +84,7 @@ int main(int argc, char *argv[]) {
       MSkim.GetEntry(iE);
       MTrigger.GetEntry(iE);
       MJet.GetEntry(iE);
+      MMuAna.GetEntry(iE);
       MMuMuJet.Clear();
 
       ////////////////////////////////////////
@@ -197,6 +199,19 @@ int main(int argc, char *argv[]) {
         // variable to identify the highest pt dimuon pair
         float maxmumuPt = 0.;
         int maxMuMuIndex = -1;
+	
+	 //for loop for printing out singleMu tree content;
+	 //
+/*	 for (int i = 0; i < MMuAna.MuPT->size(); i++)
+	{
+		cout << MMuAna.MuPT->at(i) << endl;
+		cout << MMuAna.MuPhi->at(i) << endl;
+		cout << MMuAna.MuEta->at(i) << endl;
+		cout << MMuAna.MuCharge->at(i) << endl;
+		cout << MMuAna.MuDxy->at(i) << endl;
+		cout << MMuAna.MuDxyError->at(i) << endl;
+	}
+*/
 
         for (int ipair = 0; ipair < MMu.NDi; ipair++) {
           if (MMu.DiCharge1[ipair] == MMu.DiCharge2[ipair])
@@ -215,10 +230,10 @@ int main(int argc, char *argv[]) {
             continue;
           if (deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta2[ipair], MMu.DiPhi2[ipair]) > 0.3)
             continue;
-          //if (fabs(MMu.DiDxy1[ipair]) < 0.01)
-          //  continue;
-          //if (fabs(MMu.DiDxy2[ipair]) < 0.01)
-          //  continue;
+          if (fabs(MMu.DiDxy1[ipair]) < 0.01)
+            continue;
+          if (fabs(MMu.DiDxy2[ipair]) < 0.01)
+            continue;
           // build dimuon TLorentzVector
           TLorentzVector Mu1, Mu2;
           Mu1.SetPtEtaPhiM(MMu.DiPT1[ipair], MMu.DiEta1[ipair], MMu.DiPhi1[ipair], M_MU);
