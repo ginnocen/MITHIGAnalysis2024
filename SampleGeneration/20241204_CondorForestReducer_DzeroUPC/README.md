@@ -1,3 +1,11 @@
+# Requirements
+
+* CMSSW_14_1_4_patch5
+* ROOT v6.30
+* g++ 12.3
+* Enterprise Linux 9 (el9) with x86_64 architecture
+
+
 # Setup
 
 You will need an account for 
