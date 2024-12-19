@@ -1,6 +1,6 @@
 #!/bin/bash
 MAXCORES=120
-SAMPLEID=0
+SAMPLEID=4
 
 echo "Running on sample ID: $SAMPLEID"
 
@@ -10,6 +10,12 @@ if [ "$SAMPLEID" -eq 0 ]; then
 elif [ "$SAMPLEID" -eq 1 ]; then
     NAMEMC="20241216_v1_filelist20241216_Pthat0_ForceD0Decay100M_BeamA_v1"
     FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat0/UnmergedForests/ForcedD0Decay100M_BeamA"
+elif [ "$SAMPLEID" -eq 2 ]; then
+    NAMEMC="20241216_v1_filelist20241216_Pthat0_ForceD0Decay100M_BeamB_v1"
+    FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat0/UnmergedForests/ForcedD0Decay100M_BeamB"
+elif [ "$SAMPLEID" -eq 3 ]; then
+    NAMEMC="20241216_v1_filelist20241216_Pthat2_ForceD0Decay100M_BeamA_v1"
+    FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat2/UnmergedForests/ForcedD0Decay100M_BeamA"
 fi
 
 echo "Running on sample: $NAMEMC"
