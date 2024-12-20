@@ -28,6 +28,7 @@ class TriggerTreeMessenger;
 class TriggerObjectTreeMessenger;
 class TrackTreeMessenger;
 class MuTreeMessenger;
+class SingleMuTreeMessenger;
 class PbPbTrackTreeMessenger;
 class PbPbUPCTrackTreeMessenger;
 class ZDCTreeMessenger;
@@ -527,6 +528,27 @@ public:
    bool DimuonPassTightCut(int index);
 };
 
+class SingleMuTreeMessenger
+{
+public:
+   TTree *Tree;
+   std::vector<float> *SingleMuPT;
+   std::vector<float> *SingleMuEta;
+   std::vector<float> *SingleMuPhi;
+   std::vector<float> *SingleMuDxy;
+   std::vector<float> *SingleMuDxyError;
+   std::vector<float> *SingleMuDz;
+   std::vector<float> *SingleMuDzError;
+   std::vector<float> *SingleMuCharge;
+
+public:
+   SingleMuTreeMessenger(TFile &File, std::string TreeName = "muonAnalyzer/muonTree");
+   SingleMuTreeMessenger(TFile *File, std::string TreeName = "muonAnalyzer/muonTree");
+   SingleMuTreeMessenger(TTree *SingleMuTree);
+   bool Initialize(TTree *SingleMuTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+};
 class PbPbTrackTreeMessenger
 {
 public:

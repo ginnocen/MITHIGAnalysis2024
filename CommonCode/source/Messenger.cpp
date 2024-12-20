@@ -1735,6 +1735,66 @@ bool MuTreeMessenger::DimuonPassTightCut(int index)
    return TightCut;
 }
 
+SingleMuTreeMessenger::SingleMuTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+SingleMuTreeMessenger::SingleMuTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+SingleMuTreeMessenger::SingleMuTreeMessenger(TTree *SingleMuTree)
+{
+   Initialize(SingleMuTree);
+}
+
+bool SingleMuTreeMessenger::Initialize(TTree *SingleMuTree)
+{
+   Tree = SingleMuTree;
+   return Initialize();
+}
+
+bool SingleMuTreeMessenger::Initialize(){
+
+  if(Tree == nullptr)
+    return false;
+
+    SingleMuPT = nullptr;
+    SingleMuEta = nullptr;
+    SingleMuPhi = nullptr;
+    SingleMuDxy = nullptr;
+    SingleMuDxyError = nullptr;
+    SingleMuDz = nullptr;
+    SingleMuDzError = nullptr;
+    SingleMuCharge = nullptr;
+
+    Tree->SetBranchAddress("SingleMuPt", &SingleMuPT);
+    Tree->SetBranchAddress("SingleMuEta", &SingleMuEta);
+    Tree->SetBranchAddress("SingleMuPhi", &SingleMuPhi);
+    Tree->SetBranchAddress("SingleMuDxy", &SingleMuDxy);
+    Tree->SetBranchAddress("SingleMuDxyError", &SingleMuDxyError);
+    Tree->SetBranchAddress("SingleMuDz", &SingleMuDz);
+    Tree->SetBranchAddress("SingleMuDzError", &SingleMuDzError);
+    Tree->SetBranchAddress("SingleMuCharge", &SingleMuCharge);
+    return true;
+}
+
+bool SingleMuTreeMessenger::GetEntry(int iEntry)
+{
+  if(Tree == nullptr)
+    return false;
+
+  Tree->GetEntry(iEntry);
+  return true;
+}
+
 PbPbTrackTreeMessenger::PbPbTrackTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());
