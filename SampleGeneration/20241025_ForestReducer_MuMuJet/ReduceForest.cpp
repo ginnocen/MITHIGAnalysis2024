@@ -20,7 +20,6 @@ int main(int argc, char *argv[]);
 double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
 double deltaR(double eta1, double phi1, double eta2, double phi2);
-bool isMuonSelected(SingleMuTreeMessenger *M, int i);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
@@ -55,7 +54,6 @@ int main(int argc, char *argv[]) {
     GenParticleTreeMessenger MGen(InputFile);
     PFTreeMessenger MPF(InputFile, PFTreeName);
     MuTreeMessenger MMu(InputFile);
-    SingleMuTreeMessenger MSingleMu(InputFile);
     SkimTreeMessenger MSkim(InputFile);
     TriggerTreeMessenger MTrigger(InputFile);
     JetTreeMessenger MJet(InputFile, PFJetCollection);
@@ -73,6 +71,7 @@ int main(int argc, char *argv[]) {
         Bar.Update(iE);
         Bar.Print();
       }
+
       MEvent.GetEntry(iE);
       MGen.GetEntry(iE);
       if (IsPP == true)
@@ -81,7 +80,6 @@ int main(int argc, char *argv[]) {
         MTrack.GetEntry(iE);
       MPF.GetEntry(iE);
       MMu.GetEntry(iE);
-      MSingleMu.GetEntry(iE);
       MSkim.GetEntry(iE);
       MTrigger.GetEntry(iE);
       MJet.GetEntry(iE);
@@ -198,70 +196,58 @@ int main(int argc, char *argv[]) {
         float muDR = -999.;
         // variable to identify the highest pt dimuon pair
         float maxmumuPt = 0.;
-        int maxMu1Index = -1;
-        int maxMu2Index = -1;
+        int maxMuMuIndex = -1;
 
-        int nSingleMu = MSingleMu.SingleMuPT->size();
-        for (int isinglemu1 = 0; isinglemu1 < nSingleMu; isinglemu1++){
-          if (isMuonSelected(&MSingleMu, isinglemu1) == false)
-	    continue;
-            for (int isinglemu2 = isinglemu1 + 1; isinglemu2 < nSingleMu; isinglemu2++){
-              if (isMuonSelected(&MSingleMu, isinglemu2) == false)
-		continue;
-              int charge1 = MSingleMu.SingleMuCharge->at(isinglemu1);
-              int charge2 = MSingleMu.SingleMuCharge->at(isinglemu2);
-              if (charge1 == charge2)
-		continue;
-              float jetEta = MJet.JetEta[ijet];
-              float jetPhi = MJet.JetPhi[ijet];
-              float muEta1 = MSingleMu.SingleMuEta->at(isinglemu1);
-              float muPhi1 = MSingleMu.SingleMuPhi->at(isinglemu1);
-              float muEta2 = MSingleMu.SingleMuEta->at(isinglemu2);
-              float muPhi2 = MSingleMu.SingleMuPhi->at(isinglemu2);
-              if (deltaR(jetEta, jetPhi, muEta1, muPhi1) > 0.3) continue;
-              if (deltaR(jetEta, jetPhi, muEta2, muPhi2) > 0.3) continue;
-              TLorentzVector Mu1, Mu2;
-              Mu1.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu1), muEta1, muPhi1, M_MU);
-              Mu2.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu2), muEta2, muPhi2, M_MU);
-              TLorentzVector MuMu = Mu1 + Mu2;
-              if (MuMu.M() > 130) continue;
-              if (MuMu.Eta() > 2.4) continue;
-              if (MuMu.Pt() > maxmumuPt) {
-		maxmumuPt = MuMu.Pt();
-		maxMu1Index = isinglemu1;
-		maxMu2Index = isinglemu2;
-	      } // end if dimuon pT larger than current max
-            } // end loop over single muon 2
-        } // end loop over single muon 1
-        if (maxmumuPt > 0. && maxMu1Index >= 0 && maxMu2Index >= 0) {
-          isJetTagged = true;
-          muPt1 = MSingleMu.SingleMuPT->at(maxMu1Index);
-          muPt2 = MSingleMu.SingleMuPT->at(maxMu2Index);
-          muEta1 = MSingleMu.SingleMuEta->at(maxMu1Index);
-          muEta2 = MSingleMu.SingleMuEta->at(maxMu2Index);
-          muPhi1 = MSingleMu.SingleMuPhi->at(maxMu1Index);
-          muPhi2 = MSingleMu.SingleMuPhi->at(maxMu2Index);
-          muDiDxy1 = MSingleMu.SingleMuDxy->at(maxMu1Index);
-          muDiDxy2 = MSingleMu.SingleMuDxy->at(maxMu2Index);
+        for (int ipair = 0; ipair < MMu.NDi; ipair++) {
+          if (MMu.DiCharge1[ipair] == MMu.DiCharge2[ipair])
+            continue;
+          if (fabs(MMu.DiEta1[ipair]) > 2.3)
+            continue;
+          if (fabs(MMu.DiEta2[ipair]) > 2.3)
+            continue;
+          if (fabs(MMu.DiPT1[ipair]) < 3)
+            continue;
+          if (fabs(MMu.DiPT2[ipair]) < 3)
+            continue;
+          if (MMu.DiMass[ipair] > 130)
+            continue;
+          if (deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta1[ipair], MMu.DiPhi1[ipair]) > 0.3)
+            continue;
+          if (deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta2[ipair], MMu.DiPhi2[ipair]) > 0.3)
+            continue;
+          //if (fabs(MMu.DiDxy1[ipair]) < 0.01)
+          //  continue;
+          //if (fabs(MMu.DiDxy2[ipair]) < 0.01)
+          //  continue;
+          // build dimuon TLorentzVector
           TLorentzVector Mu1, Mu2;
-          Mu1.SetPtEtaPhiM(muPt1, muEta1, muPhi1, M_MU);
-          Mu2.SetPtEtaPhiM(muPt2, muEta2, muPhi2, M_MU);
+          Mu1.SetPtEtaPhiM(MMu.DiPT1[ipair], MMu.DiEta1[ipair], MMu.DiPhi1[ipair], M_MU);
+          Mu2.SetPtEtaPhiM(MMu.DiPT2[ipair], MMu.DiEta2[ipair], MMu.DiPhi2[ipair], M_MU);
           TLorentzVector MuMu = Mu1 + Mu2;
-          mumuMass = MuMu.M();
-          mumuEta = MuMu.Eta();
-          mumuY = MuMu.Rapidity();
-          mumuPhi = MuMu.Phi();
-          mumuPt = MuMu.Pt();
-          float jetEta = MJet.JetEta[ijet];
-          float jetPhi = MJet.JetPhi[ijet];
-          float muEta1 = MSingleMu.SingleMuEta->at(maxMu1Index);
-          float muPhi1 = MSingleMu.SingleMuPhi->at(maxMu1Index);
-          float muEta2 = MSingleMu.SingleMuEta->at(maxMu2Index);
-          float muPhi2 = MSingleMu.SingleMuPhi->at(maxMu2Index);
-          DRJetmu1 = deltaR(jetEta, jetPhi, muEta1, muPhi1);
-          DRJetmu2 = deltaR(jetEta, jetPhi, muEta2, muPhi2);
-          muDeta = muEta1 - muEta2;
-          muDphi = PhiRangePositive(DeltaPhi(muPhi1, muPhi2)); 
+          if (MuMu.Pt() > maxmumuPt) {
+            maxmumuPt = MuMu.Pt();
+            maxMuMuIndex = ipair;
+          } // end if dimuon pT larger than current max
+        }   // end loop over dimuon pairs
+        if (maxmumuPt > 0. && maxMuMuIndex >= 0) {
+          isJetTagged = true;
+          muPt1 = MMu.DiPT1[maxMuMuIndex];
+          muPt2 = MMu.DiPT2[maxMuMuIndex];
+          muEta1 = MMu.DiEta1[maxMuMuIndex];
+          muEta2 = MMu.DiEta2[maxMuMuIndex];
+          muPhi1 = MMu.DiPhi1[maxMuMuIndex];
+          muPhi2 = MMu.DiPhi2[maxMuMuIndex];
+          muDiDxy1 = MMu.DiDxy1[maxMuMuIndex];
+          muDiDxy2 = MMu.DiDxy2[maxMuMuIndex];
+          mumuMass = MMu.DiMass[maxMuMuIndex];
+          mumuEta = MMu.DiEta[maxMuMuIndex];
+          mumuY = MMu.DiRapidity[maxMuMuIndex];
+          mumuPhi = MMu.DiPhi[maxMuMuIndex];
+          mumuPt = MMu.DiPT[maxMuMuIndex];
+          DRJetmu1 = deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta1[maxMuMuIndex], MMu.DiPhi1[maxMuMuIndex]);
+          DRJetmu2 = deltaR(MJet.JetEta[ijet], MJet.JetPhi[ijet], MMu.DiEta2[maxMuMuIndex], MMu.DiPhi2[maxMuMuIndex]);
+          muDeta = MMu.DiEta1[maxMuMuIndex] - MMu.DiEta2[maxMuMuIndex];
+          muDphi = PhiRangePositive(DeltaPhi(MMu.DiPhi1[maxMuMuIndex], MMu.DiPhi2[maxMuMuIndex]));
           muDR = sqrt(muDeta * muDeta + muDphi * muDphi);
         } // end if dimuon pair found
         MMuMuJet.IsMuMuTagged->push_back(isJetTagged);
@@ -360,21 +346,4 @@ double deltaR(double eta1, double phi1, double eta2, double phi2) {
     dPhi = 2 * M_PI - dPhi;
   }
   return std::sqrt(dEta * dEta + dPhi * dPhi);
-}
-bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
-  if (M == nullptr)
-    return false;
-  if (M->Tree == nullptr)
-    return false;
-  if (M->SingleMuPT->at(i) < 3.)
-    return false;
-  if (fabs(M->SingleMuEta->at(i)) > 2.3)
-    return false;
-  if (M->SingleMuIsTracker->at(i)  == 0 ||
-      M->SingleMuIsGlobal->at(i)   == 0 || 
-      M->SingleMuHybridSoft->at(i) == 0 ||
-      M->SingleMuIsGood->at(i)     == 0)
-    return false;
-
-  return true;
 }
