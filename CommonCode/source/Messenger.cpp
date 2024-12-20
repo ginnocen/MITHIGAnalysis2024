@@ -1735,6 +1735,74 @@ bool MuTreeMessenger::DimuonPassTightCut(int index)
    return TightCut;
 }
 
+SingleMuTreeMessenger::SingleMuTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+SingleMuTreeMessenger::SingleMuTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+SingleMuTreeMessenger::SingleMuTreeMessenger(TTree *SingleMuTree)
+{
+   Initialize(SingleMuTree);
+}
+
+bool SingleMuTreeMessenger::Initialize(TTree *SingleMuTree)
+{
+   Tree = SingleMuTree;
+   return Initialize();
+}
+
+bool SingleMuTreeMessenger::Initialize(){
+
+  if(Tree == nullptr)
+    return false;
+
+    SingleMuPT = nullptr;
+    SingleMuEta = nullptr;
+    SingleMuPhi = nullptr;
+    SingleMuDxy = nullptr;
+    SingleMuDxyError = nullptr;
+    SingleMuDz = nullptr;
+    SingleMuDzError = nullptr;
+    SingleMuCharge = nullptr;
+    SingleMuIsGood = nullptr;
+    SingleMuIsGlobal = nullptr;
+    SingleMuIsTracker = nullptr;
+    SingleMuHybridSoft = nullptr;
+
+    Tree->SetBranchAddress("recoPt", &SingleMuPT);
+    Tree->SetBranchAddress("recoEta", &SingleMuEta);
+    Tree->SetBranchAddress("recoPhi", &SingleMuPhi);
+    Tree->SetBranchAddress("globalDxy", &SingleMuDxy);
+    Tree->SetBranchAddress("globalDxyErr", &SingleMuDxyError);
+    Tree->SetBranchAddress("globalDz", &SingleMuDz);
+    Tree->SetBranchAddress("globalDzErr", &SingleMuDzError);
+    Tree->SetBranchAddress("recoCharge", &SingleMuCharge);
+    Tree->SetBranchAddress("recoIsGood", &SingleMuIsGood);
+    Tree->SetBranchAddress("recoIsGlobal", &SingleMuIsGlobal);
+    Tree->SetBranchAddress("recoIsTracker", &SingleMuIsTracker);
+    Tree->SetBranchAddress("recoIDHybridSoft", &SingleMuHybridSoft);
+    return true;
+}
+
+bool SingleMuTreeMessenger::GetEntry(int iEntry)
+{
+  if(Tree == nullptr)
+    return false;
+
+  Tree->GetEntry(iEntry);
+  return true;
+}
+
 PbPbTrackTreeMessenger::PbPbTrackTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());
