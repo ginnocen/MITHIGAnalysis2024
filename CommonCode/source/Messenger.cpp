@@ -1774,15 +1774,23 @@ bool SingleMuTreeMessenger::Initialize(){
     SingleMuDz = nullptr;
     SingleMuDzError = nullptr;
     SingleMuCharge = nullptr;
+    SingleMuIsGood = nullptr;
+    SingleMuIsGlobal = nullptr;
+    SingleMuIsTracker = nullptr;
+    SingleMuHybridSoft = nullptr;
 
-    Tree->SetBranchAddress("SingleMuPt", &SingleMuPT);
-    Tree->SetBranchAddress("SingleMuEta", &SingleMuEta);
-    Tree->SetBranchAddress("SingleMuPhi", &SingleMuPhi);
-    Tree->SetBranchAddress("SingleMuDxy", &SingleMuDxy);
-    Tree->SetBranchAddress("SingleMuDxyError", &SingleMuDxyError);
-    Tree->SetBranchAddress("SingleMuDz", &SingleMuDz);
-    Tree->SetBranchAddress("SingleMuDzError", &SingleMuDzError);
-    Tree->SetBranchAddress("SingleMuCharge", &SingleMuCharge);
+    Tree->SetBranchAddress("recoPt", &SingleMuPT);
+    Tree->SetBranchAddress("recoEta", &SingleMuEta);
+    Tree->SetBranchAddress("recoPhi", &SingleMuPhi);
+    Tree->SetBranchAddress("globalDxy", &SingleMuDxy);
+    Tree->SetBranchAddress("globalDxyErr", &SingleMuDxyError);
+    Tree->SetBranchAddress("globalDz", &SingleMuDz);
+    Tree->SetBranchAddress("globalDzErr", &SingleMuDzError);
+    Tree->SetBranchAddress("recoCharge", &SingleMuCharge);
+    Tree->SetBranchAddress("recoIsGood", &SingleMuIsGood);
+    Tree->SetBranchAddress("recoIsGlobal", &SingleMuIsGlobal);
+    Tree->SetBranchAddress("recoIsTracker", &SingleMuIsTracker);
+    Tree->SetBranchAddress("recoIDHybridSoft", &SingleMuHybridSoft);
     return true;
 }
 

@@ -539,11 +539,15 @@ public:
    std::vector<float> *SingleMuDxyError;
    std::vector<float> *SingleMuDz;
    std::vector<float> *SingleMuDzError;
-   std::vector<float> *SingleMuCharge;
+   std::vector<int> *SingleMuCharge;
+   std::vector<bool> *SingleMuIsGood;
+   std::vector<bool> *SingleMuIsGlobal;
+   std::vector<bool> *SingleMuIsTracker;
+   std::vector<bool> *SingleMuHybridSoft;
 
 public:
-   SingleMuTreeMessenger(TFile &File, std::string TreeName = "muonAnalyzer/muonTree");
-   SingleMuTreeMessenger(TFile *File, std::string TreeName = "muonAnalyzer/muonTree");
+   SingleMuTreeMessenger(TFile &File, std::string TreeName = "muonAnalyzer/MuonTree");
+   SingleMuTreeMessenger(TFile *File, std::string TreeName = "muonAnalyzer/MuonTree");
    SingleMuTreeMessenger(TTree *SingleMuTree);
    bool Initialize(TTree *SingleMuTree);
    bool Initialize();
