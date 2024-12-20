@@ -9,6 +9,7 @@ rm -rf output
 rm *.txt*
 rm SkimReco.root
 rm .DS_Store
+CURRENTDIR=$PWD
 
 cd /home/ginnocen/CMSSW_13_2_4/src
 cmsenv
@@ -20,6 +21,6 @@ source SetupAnalysis.sh
 cd CommonCode/
 make
 cd ..
-cd SampleGeneration/20241025_ForestReducer_MuMuJet
+cd $CURRENTDIR
 make
 rm Skim*.root
