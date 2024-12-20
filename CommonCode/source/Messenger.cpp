@@ -2903,8 +2903,6 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    DsvpvDisErr_2D = new std::vector<float>();
    Dalpha = new std::vector<float>();
    Ddtheta = new std::vector<float>();
-   DpassCut23PAS = new std::vector<bool>();
-   DpassCut23LowPt = new std::vector<bool>();
    Dgen = new std::vector<int>();
    DisSignalCalc = new std::vector<bool>();
    DisSignalCalcPrompt = new std::vector<bool>();

@@ -42,3 +42,13 @@
 		bash massfit.sh fitSettings/xxx.json
 		### This will create a <FitDir>/ for each (pt,y)-binned micro tree sample, and the input card argument would be copied under this folder as fitConfig.json
 		```
+
+### Plotting macro for cross-sections and efficiencies as a function of rapidity
+```bash
+make PlotCrossSection
+./PlotCrossSection --InputPoints fullAnalysis/pt2-5_y-2--1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y-1-0_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y0-1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y1-2_IsGammaN1/MassFit/correctedYields.md
+./PlotCrossSection --InputPoints fullAnalysis/pt2-5_y-2--1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y-1-0_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y0-1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y1-2_IsGammaN0/MassFit/correctedYields.md
+```
+<!-- dropbox_uploader.sh upload *.pdf /tmp/ -->
+
+<!-- make PlotCrossSection; ./PlotCrossSection --InputPoints fullAnalysis_pthat2eff_gammaN/pt2-5_y-2--1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis_pthat2eff_gammaN/pt2-5_y-1-0_IsGammaN1/MassFit/correctedYields.md,fullAnalysis_pthat2eff_gammaN/pt2-5_y0-1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis_pthat2eff_gammaN/pt2-5_y1-2_IsGammaN1/MassFit/correctedYields.md; dropbox_uploader.sh upload *.pdf /tmp/ -->

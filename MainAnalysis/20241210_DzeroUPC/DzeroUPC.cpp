@@ -32,8 +32,15 @@ bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) { return tr
 // Check if the event pass eventSelection criteria
 //============================================================//
 bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
-  if (par.IsData == false)
+  if (!par.IsData)
+  {
+    // if (par.IsGammaN && b->gapgammaN == false)
+    //   return false;
+    // if (!par.IsGammaN && b->gapNgamma == false)
+    //   return false;
+    if (b->nVtx >= 3) return false;
     return true;
+  }
   if (b->selectedBkgFilter == false || b->selectedVtxFilter == false)
     return false;
   if (par.IsGammaN && (b->ZDCgammaN && b->gapgammaN) == false)
@@ -55,8 +62,12 @@ public:
   DzeroUPCTreeMessenger *MDzeroUPC;
   TNtuple *nt;
   string title;
+  TH1D *hDenEvtEff;
+  TH1D *hNumEvtEff;
+  TH1D *hRatioEvtEff;
   TH1D *hDenDEff;
   TH1D *hNumDEff;
+  TH1D *hRatioDEff;
 
   DataAnalyzer(const char *filename, const char *outFilename, const char *mytitle = "")
       : inf(new TFile(filename)), MDzeroUPC(new DzeroUPCTreeMessenger(*inf, string("Tree"))), title(mytitle),
@@ -76,10 +87,16 @@ public:
   void analyze(Parameters &par) {
     outf->cd();
     hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", 60, 1.7, 2.0);
+    hDenEvtEff = new TH1D(Form("hDenEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
+    hNumEvtEff = new TH1D(Form("hNumEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
+    hRatioEvtEff = (TH1D*) hNumEvtEff->Clone("hRatioEvtEff");
     hDenDEff = new TH1D(Form("hDenDEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hNumDEff = new TH1D(Form("hNumDEff%s", title.c_str()), "", 1, 0.5, 1.5);
+    hRatioDEff = (TH1D*) hNumDEff->Clone("hRatioDEff");
 
     hDmass->Sumw2();
+    hDenEvtEff->Sumw2();
+    hNumEvtEff->Sumw2();
     hDenDEff->Sumw2();
     hNumDEff->Sumw2();
 
@@ -94,8 +111,31 @@ public:
         Bar.Update(i);
         Bar.Print();
       }
+
+      // Check if the event is a signal MC event, a.k.a., having at least one gen-level D candidate that falls into the (pt,y) bin of interest
+      bool isSigMCEvt = false;
+      if (!par.IsData){
+        for (unsigned long j = 0; j < MDzeroUPC->Gpt->size(); j++) {
+          if (MDzeroUPC->Gpt->at(j) < par.MinDzeroPT)
+            continue;
+          if (MDzeroUPC->Gpt->at(j) > par.MaxDzeroPT)
+            continue;
+          if (MDzeroUPC->Gy->at(j) < par.MinDzeroY)
+            continue;
+          if (MDzeroUPC->Gy->at(j) > par.MaxDzeroY)
+            continue;
+          if (MDzeroUPC->GisSignalCalc->at(j) == false)
+            continue;
+          isSigMCEvt = true;
+        }
+      }
+
+      if (!par.IsData && isSigMCEvt) hDenEvtEff->Fill(1);
+
       // Check if the event passes the selection criteria
       if (eventSelection(MDzeroUPC, par)) {
+        if (!par.IsData && isSigMCEvt) hNumEvtEff->Fill(1);
+
         for (unsigned long j = 0; j < MDzeroUPC->Dalpha->size(); j++) {
           if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT)
             continue;
@@ -105,7 +145,8 @@ public:
             continue;
           if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY)
             continue;
-          if (MDzeroUPC->DpassCut->at(j) == false)
+          // if (MDzeroUPC->DpassCut23PAS->at(j) == false)
+          if (MDzeroUPC->DpassCut23LowPt->at(j) == false)
             continue;
           hDmass->Fill((*MDzeroUPC->Dmass)[j]);
           if (!par.IsData) {
@@ -138,16 +179,26 @@ public:
   void writeHistograms(TFile *outf) {
     outf->cd();
     smartWrite(hDmass);
+    hRatioEvtEff->Divide(hNumEvtEff, hDenEvtEff, 1, 1, "B");
+    hRatioDEff->Divide(hNumDEff, hDenDEff, 1, 1, "B");
+    hDenEvtEff->Write();
+    hNumEvtEff->Write();
+    hRatioEvtEff->Write();
     hDenDEff->Write();
     hNumDEff->Write();
+    hRatioDEff->Write();
     smartWrite(nt);
   }
 
 private:
   void deleteHistograms() {
     delete hDmass;
+    delete hDenEvtEff;
+    delete hNumEvtEff;
+    delete hRatioEvtEff;
     delete hDenDEff;
     delete hNumDEff;
+    delete hRatioDEff;
   }
 };
 
