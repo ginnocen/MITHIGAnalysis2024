@@ -846,9 +846,15 @@ public:
    std::vector<float> *muPhi1;
    std::vector<float> *muPhi2;
    std::vector<float> *muDiDxy1;
+   std::vector<float> *muDiDxy1Err;
    std::vector<float> *muDiDxy2;
+   std::vector<float> *muDiDxy2Err;
    std::vector<float> *muDiDz1;
+   std::vector<float> *muDiDz1Err;
    std::vector<float> *muDiDz2;
+   std::vector<float> *muDiDz2Err;
+   std::vector<float> *muDiDxy1Dxy2;
+   std::vector<float> *muDiDxy1Dxy2Err;
    std::vector<float> *mumuMass;
    std::vector<float> *mumuEta;
    std::vector<float> *mumuY;
