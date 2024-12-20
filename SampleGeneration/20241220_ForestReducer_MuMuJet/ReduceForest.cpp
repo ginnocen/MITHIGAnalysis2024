@@ -186,6 +186,8 @@ int main(int argc, char *argv[]) {
         float muPhi2 = -999.;
         float muDiDxy1 = -999.;
         float muDiDxy2 = -999.;
+        float muDiDz1 = -999.;
+        float muDiDz2 = -999.;
         float mumuMass = -999.;
         float mumuEta = -999.;
         float mumuY = -999.;
@@ -243,6 +245,8 @@ int main(int argc, char *argv[]) {
           muPhi2 = MSingleMu.SingleMuPhi->at(maxMu2Index);
           muDiDxy1 = MSingleMu.SingleMuDxy->at(maxMu1Index);
           muDiDxy2 = MSingleMu.SingleMuDxy->at(maxMu2Index);
+          muDiDz1 = MSingleMu.SingleMuDz->at(maxMu1Index);
+          muDiDz2 = MSingleMu.SingleMuDz->at(maxMu2Index);
           TLorentzVector Mu1, Mu2;
           Mu1.SetPtEtaPhiM(muPt1, muEta1, muPhi1, M_MU);
           Mu2.SetPtEtaPhiM(muPt2, muEta2, muPhi2, M_MU);
@@ -273,6 +277,8 @@ int main(int argc, char *argv[]) {
         MMuMuJet.muPhi2->push_back(muPhi2);
         MMuMuJet.muDiDxy1->push_back(muDiDxy1);
         MMuMuJet.muDiDxy2->push_back(muDiDxy2);
+        MMuMuJet.muDiDz1->push_back(muDiDz1);
+        MMuMuJet.muDiDz2->push_back(muDiDz2);
         MMuMuJet.mumuMass->push_back(mumuMass);
         MMuMuJet.mumuEta->push_back(mumuEta);
         MMuMuJet.mumuY->push_back(mumuY);

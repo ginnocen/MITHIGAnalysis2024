@@ -3219,6 +3219,8 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete muPhi2;
       delete muDiDxy1;
       delete muDiDxy2;
+      delete muDiDz1;
+      delete muDiDz2;
       delete mumuMass;
       delete mumuEta;
       delete mumuY;
@@ -3259,6 +3261,8 @@ bool MuMuJetMessenger::Initialize()
    muPhi2 = nullptr;
    muDiDxy1 = nullptr;
    muDiDxy2 = nullptr;
+   muDiDz1 = nullptr;
+   muDiDz2 = nullptr;
    mumuMass = nullptr;
    mumuEta = nullptr;
    mumuY = nullptr;
@@ -3298,6 +3302,8 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("muPhi2", &muPhi2);
    Tree->SetBranchAddress("muDiDxy1", &muDiDxy1);
    Tree->SetBranchAddress("muDiDxy2", &muDiDxy2);
+   Tree->SetBranchAddress("muDiDz1", &muDiDz1);
+   Tree->SetBranchAddress("muDiDz2", &muDiDz2);
    Tree->SetBranchAddress("mumuMass", &mumuMass);
    Tree->SetBranchAddress("mumuEta", &mumuEta);
    Tree->SetBranchAddress("mumuY", &mumuY);
@@ -3351,6 +3357,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    muPhi2 = new std::vector<float>();
    muDiDxy1 = new std::vector<float>();
    muDiDxy2 = new std::vector<float>();
+   muDiDz1 = new std::vector<float>();
+   muDiDz2 = new std::vector<float>();
    mumuMass = new std::vector<float>();
    mumuEta = new std::vector<float>();
    mumuY = new std::vector<float>();
@@ -3392,6 +3400,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("muPhi2", &muPhi2);
    Tree->Branch("muDiDxy1", &muDiDxy1);
    Tree->Branch("muDiDxy2", &muDiDxy2);
+   Tree->Branch("muDiDz1", &muDiDz1);
+   Tree->Branch("muDiDz2", &muDiDz2);
    Tree->Branch("mumuMass", &mumuMass);
    Tree->Branch("mumuEta", &mumuEta);
    Tree->Branch("mumuY", &mumuY);
@@ -3438,6 +3448,8 @@ void MuMuJetMessenger::Clear()
    muPhi2->clear();
    muDiDxy1->clear();
    muDiDxy2->clear();
+   muDiDz1->clear();
+   muDiDz2->clear();
    mumuMass->clear();
    mumuEta->clear();
    mumuY->clear();
@@ -3482,6 +3494,8 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(muPhi2 != nullptr && M.muPhi2 != nullptr)   *muPhi2 = *(M.muPhi2);
    if(muDiDxy1 != nullptr && M.muDiDxy1 != nullptr)   *muDiDxy1 = *(M.muDiDxy1);
    if(muDiDxy2 != nullptr && M.muDiDxy2 != nullptr)   *muDiDxy2 = *(M.muDiDxy2);
+   if(muDiDz1 != nullptr && M.muDiDz1 != nullptr)   *muDiDz1 = *(M.muDiDz1);
+   if(muDiDz2 != nullptr && M.muDiDz2 != nullptr)   *muDiDz2 = *(M.muDiDz2);
    if(mumuMass != nullptr && M.mumuMass != nullptr)   *mumuMass = *(M.mumuMass);
    if(mumuEta != nullptr && M.mumuEta != nullptr)   *mumuEta = *(M.mumuEta);
    if(mumuY != nullptr && M.mumuY != nullptr)   *mumuY = *(M.mumuY);
