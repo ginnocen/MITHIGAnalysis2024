@@ -8,7 +8,7 @@ rm -rf output
 rm *.txt*
 rm SkimReco.root
 rm .DS_Store
-
+CURRENTDIR=$PWD
 cd /home/ginnocen/CMSSW_13_2_4/src
 cmsenv
 
@@ -18,7 +18,6 @@ cd ../../
 source SetupAnalysis.sh
 cd CommonCode/
 make
-cd ..
-cd /home/ginnocen/MITHIGAnalysis2024/MainAnalysis/20241125_gtoccbar
+cd $CURRENTDIR
 make
 rm Skim*.root

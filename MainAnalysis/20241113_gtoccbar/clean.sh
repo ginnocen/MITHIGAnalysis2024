@@ -18,7 +18,6 @@ cd ../../
 source SetupAnalysis.sh
 cd CommonCode/
 make
-cd ..
 cd /home/ginnocen/MITHIGAnalysis2024/MainAnalysis/20241113_gtoccbar
 make
 rm Skim*.root
