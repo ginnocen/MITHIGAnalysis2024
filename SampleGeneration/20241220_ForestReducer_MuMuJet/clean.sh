@@ -1,4 +1,5 @@
 rm Execute
+rm filterEvents
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
 rm MergedOutput.root
