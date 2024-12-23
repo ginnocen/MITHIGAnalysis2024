@@ -19,7 +19,6 @@ using namespace std;
 int main(int argc, char *argv[]);
 double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
-double deltaR(double eta1, double phi1, double eta2, double phi2);
 bool isMuonSelected(SingleMuTreeMessenger *M, int i);
 
 int main(int argc, char *argv[]) {
@@ -226,8 +225,14 @@ int main(int argc, char *argv[]) {
               float muPhi1 = MSingleMu.SingleMuPhi->at(isinglemu1);
               float muEta2 = MSingleMu.SingleMuEta->at(isinglemu2);
               float muPhi2 = MSingleMu.SingleMuPhi->at(isinglemu2);
-              if (deltaR(jetEta, jetPhi, muEta1, muPhi1) > 0.3) continue;
-              if (deltaR(jetEta, jetPhi, muEta2, muPhi2) > 0.3) continue;
+              float dPhiMu1Jet_ = DeltaPhi(muPhi1, jetPhi);
+              float dEtaMu1Jet_ = muEta1 - jetEta;
+              float dPhiMu2Jet_ = DeltaPhi(muPhi2, jetPhi);
+              float dEtaMu2Jet_ = muEta2 - jetEta;
+              float dRMu1Jet = sqrt(dPhiMu1Jet_*dPhiMu1Jet_ + dEtaMu1Jet_*dEtaMu1Jet_);
+              float dRMu2Jet = sqrt(dPhiMu2Jet_*dPhiMu2Jet_ + dEtaMu2Jet_*dEtaMu2Jet_);
+              if (dRMu1Jet > 0.3) continue;
+              if (dRMu2Jet > 0.3) continue;
               TLorentzVector Mu1, Mu2;
               Mu1.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu1), muEta1, muPhi1, M_MU);
               Mu2.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu2), muEta2, muPhi2, M_MU);
@@ -274,10 +279,14 @@ int main(int argc, char *argv[]) {
           float muPhi1 = MSingleMu.SingleMuPhi->at(maxMu1Index);
           float muEta2 = MSingleMu.SingleMuEta->at(maxMu2Index);
           float muPhi2 = MSingleMu.SingleMuPhi->at(maxMu2Index);
-          DRJetmu1 = deltaR(jetEta, jetPhi, muEta1, muPhi1);
-          DRJetmu2 = deltaR(jetEta, jetPhi, muEta2, muPhi2);
+          float dPhiMu1Jet_ = DeltaPhi(muPhi1, jetPhi);
+          float dEtaMu1Jet_ = muEta1 - jetEta;
+          float dPhiMu2Jet_ = DeltaPhi(muPhi2, jetPhi);
+          float dEtaMu2Jet_ = muEta2 - jetEta;
+          float dRMu1Jet = sqrt(dPhiMu1Jet_*dPhiMu1Jet_ + dEtaMu1Jet_*dEtaMu1Jet_);
+          float dRMu2Jet = sqrt(dPhiMu2Jet_*dPhiMu2Jet_ + dEtaMu2Jet_*dEtaMu2Jet_);
           muDeta = muEta1 - muEta2;
-          muDphi = PhiRangePositive(DeltaPhi(muPhi1, muPhi2)); 
+          muDphi = DeltaPhi(muPhi1, muPhi2);
           muDR = sqrt(muDeta * muDeta + muDphi * muDphi);
         } // end if dimuon pair found
         MMuMuJet.IsMuMuTagged->push_back(isJetTagged);
@@ -376,15 +385,6 @@ double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent) {
   return Sum;
 }
 
-double deltaR(double eta1, double phi1, double eta2, double phi2) {
-  double dEta = eta1 - eta2;
-  double dPhi = std::fabs(phi1 - phi2);
-  // Correct for the periodicity of the azimuthal angle
-  if (dPhi > M_PI) {
-    dPhi = 2 * M_PI - dPhi;
-  }
-  return std::sqrt(dEta * dEta + dPhi * dPhi);
-}
 bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
   if (M == nullptr)
     return false;
