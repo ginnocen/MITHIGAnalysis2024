@@ -9,7 +9,7 @@
 
 void macroValidation() {
 
-  TFile *fin = new TFile("MuMuTaggedFilteredSkimMC.root");
+  TFile *fin = new TFile("SkimMCFiltered_OnlyEventswithMuMuTaggedJets.root");
   fin->ls();
   TTree *Tree = (TTree *)fin->Get("Tree");
   const int nClasses = 4;
