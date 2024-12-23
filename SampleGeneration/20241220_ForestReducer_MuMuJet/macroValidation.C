@@ -28,7 +28,7 @@ void macroValidation() {
                                   "2c2b"
                                  };
   //TCut jetCut = "JetPT>100 && JetPT<140 && abs(JetEta)<2.0 && fabs(muDR)<0.15";
-  TCut jetCut = "JetPT>100 && abs(JetEta)<2.0 && muPt1 > 4 && muPt2 > 3.";
+  TCut jetCut = "JetPT>100 && abs(JetEta)<2.0 && muPt1 > 4 && muPt2 > 4.";
   for (int i = 0; i < nClasses; i++) {
     hMass[i] = new TH1F(Form("hMass_%s", classNames[i].Data()), Form(";Mass; Entries"), 50, 0.,10.);
     hLogSqrtmuDiDxy1Dxy2[i] = new TH1F(Form("hLogSqrtmuDiDxy1Dxy2_%s", classNames[i].Data()), Form(";LogSqrtmuDiDxy1Dxy2; Entries"), 24, -6, 0);
@@ -36,6 +36,7 @@ void macroValidation() {
     hLogSqrtmuDiDxy1Dxy2[i]->Sumw2();
     Tree->Draw(Form("mumuMass>>hMass_%s", classNames[i].Data()), var[i] && jetCut);
     Tree->Draw(Form("log(sqrt(muDiDxy1Dxy2))>>hLogSqrtmuDiDxy1Dxy2_%s", classNames[i].Data()), var[i] && jetCut);
+    std::cout << "Entries for " << classNames[i] << " = " << hMass[i]->GetEntries() << std::endl;
   }
   hMass[0]->SetMinimum(0.);
   hMass[0]->SetMaximum(hMass[0]->GetMaximum() * 2);
