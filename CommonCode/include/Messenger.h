@@ -422,6 +422,11 @@ public:
    float Gpt[DZEROGENCOUNTMAX];
    float Gy[DZEROGENCOUNTMAX];
    int GpdgId[DZEROGENCOUNTMAX];
+   int Gdau1pdgId[DZEROGENCOUNTMAX];
+   int Gdau2pdgId[DZEROGENCOUNTMAX];
+   int Gdau3pdgId[DZEROGENCOUNTMAX];
+   int Gdau4pdgId[DZEROGENCOUNTMAX];
+   int GnDa[DZEROGENCOUNTMAX];
    int GisSignal[DZEROGENCOUNTMAX];
    int GcollisionId[DZEROGENCOUNTMAX];
    int GSignalType[DZEROGENCOUNTMAX];
@@ -792,6 +797,9 @@ public:
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;
    std::vector<bool> *DisSignalCalcFeeddown;
+   std::vector<bool> *DisSwapCalc;
+   std::vector<bool> *DisD0CalcLeftSideBand;  // D0 decay in the left side band (dominated by KK-state)
+   std::vector<bool> *DisD0CalcRightSideBand; // D0 decay in the right side band (dominated by pipi-state)
    //MC only quantities
    int Gsize;
    std::vector<float> *Gpt;

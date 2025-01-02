@@ -20,11 +20,15 @@ using namespace std;
 
 #include "ValidateHist.h"
 
+#define D0_MASS 1.8648
+
 // copy from main analysis
 void calcRapidityGapsInput(std::vector<float> *pfE, std::vector<float> *pfPt, std::vector<float> *pfEta,
                            std::vector<int> *pfId, int &nPFHFMinus_, int &nPFHFPlus_);
 
 bool tightsel(int j, DzeroTreeMessenger &MDzero, std::string varySel = "");
+
+bool GisSignalwFSR(int GpdgId, int Gdau1pdgId, int Gdau2pdgId, int Gdau3pdgId, int Gdau4pdgId, int GnDa, int GisSignal);
 
 int findBestVertex(PbPbUPCTrackTreeMessenger &MTrackPbPbUPC) {
   int BestVertex = -1;
@@ -225,23 +229,35 @@ int main(int argc, char *argv[]) {
                       MDzero.DsvpvDistance_2D[iD], MDzero.DsvpvDisErr_2D[iD], MDzero.Ddtheta[iD]);
 
       if (!IsData) {
-        bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;
+        bool isSignalGenMatched = MDzero.Dgenpt[iD] > 0. &&
+                                  (MDzero.Dgen[iD] == 23333 || MDzero.Dgen[iD] == 41022 || MDzero.Dgen[iD] == 41044);
         bool isPromptGenMatched = isSignalGenMatched && (MDzero.DgenBAncestorpdgId[iD] == 0);
         bool isFeeddownGenMatched =
             isSignalGenMatched && ((MDzero.DgenBAncestorpdgId[iD] >= 500 && MDzero.DgenBAncestorpdgId[iD] < 600) ||
                                    (MDzero.DgenBAncestorpdgId[iD] > -600 && MDzero.DgenBAncestorpdgId[iD] <= -500));
+        bool isSwapGenMatched = MDzero.Dgenpt[iD] > 0. &&
+                                (MDzero.Dgen[iD] == 23344 || MDzero.Dgen[iD] == 41122 || MDzero.Dgen[iD] == 41144);
+        bool isD0DecayLeftSideBand = MDzero.Dgenpt[iD] > 0. && (MDzero.Dgen[iD] == 333 && MDzero.Dmass[iD] < D0_MASS);
+        bool isD0DecayRightSideBand = MDzero.Dgenpt[iD] > 0. && (MDzero.Dgen[iD] == 333 && MDzero.Dmass[iD] > D0_MASS);
 
-        fprintf(outfile, "Dgen %d DisSignalCalc %o DisSignalCalcPrompt %o DisSignalCalcFeeddown %o\n", MDzero.Dgen[iD],
-                isSignalGenMatched, isPromptGenMatched, isFeeddownGenMatched);
+        fprintf(outfile,
+                "Dgen %d DisSignalCalc %o DisSignalCalcPrompt %o DisSignalCalcFeeddown %o\n"
+                "DisSwapCalc %d DisD0CalcLeftSideBand %d DisD0CalcRightSideBand %d",
+                MDzero.Dgen[iD], isSignalGenMatched, isPromptGenMatched, isFeeddownGenMatched, isSwapGenMatched,
+                isD0DecayLeftSideBand, isD0DecayRightSideBand);
 
         v.FillRecoDGenMatchedInfo(MDzero.Dgen[iD], (int)isSignalGenMatched, (int)isPromptGenMatched,
-                                  (int)isFeeddownGenMatched);
+                                  (int)isFeeddownGenMatched, (int)isSwapGenMatched, (int)isD0DecayLeftSideBand,
+                                  (int)isD0DecayRightSideBand);
       }
     }
 
     if (!IsData) {
       for (int iG = 0; iG < MDzeroGen.Gsize; ++iG) {
-        bool isSignalGen = (MDzeroGen.GisSignal[iG] == 1 || MDzeroGen.GisSignal[iG] == 2) && MDzeroGen.Gpt[iG] > 0.;
+        bool isSignalGen = MDzeroGen.Gpt[iG] > 0. &&
+                           GisSignalwFSR(MDzeroGen.GpdgId[iG], MDzeroGen.Gdau1pdgId[iG], MDzeroGen.Gdau2pdgId[iG],
+                                         MDzeroGen.Gdau3pdgId[iG], MDzeroGen.Gdau4pdgId[iG], MDzeroGen.GnDa[iG],
+                                         MDzeroGen.GisSignal[iG]);
         bool isPromptGen = isSignalGen && MDzeroGen.GBAncestorpdgId[iG] == 0;
         bool isFeeddownGen =
             isSignalGen && ((MDzeroGen.GBAncestorpdgId[iG] >= 500 && MDzeroGen.GBAncestorpdgId[iG] < 600) ||
@@ -449,4 +465,51 @@ bool tightsel(int j, DzeroTreeMessenger &MDzero, std::string varySel) {
 
   // if(ishi_) cut = true; // wtf is this
   return cut;
+}
+
+bool GisSignalwFSR(int GpdgId, int Gdau1pdgId, int Gdau2pdgId, int Gdau3pdgId, int Gdau4pdgId, int GnDa,
+                   int GisSignal) {
+  const int PION_PDGID = 211;
+  const int KAON_PDGID = 321;
+  const int DZERO_PDGID = 421;
+  const int GAMMA_PDGID = 22;
+  constexpr bool match_all_sign = true;
+
+  // 421 -> -321, 211
+  bool isKplusPiminusDecay = (GpdgId == DZERO_PDGID) && (Gdau1pdgId == (-KAON_PDGID) && Gdau2pdgId == PION_PDGID ||
+                                                         Gdau2pdgId == (-KAON_PDGID) && Gdau1pdgId == PION_PDGID);
+  // -421 -> 321, -211
+  bool isKminusPiplusDecay = (GpdgId == (-DZERO_PDGID)) && (Gdau1pdgId == KAON_PDGID && Gdau2pdgId == (-PION_PDGID) ||
+                                                            Gdau2pdgId == KAON_PDGID && Gdau1pdgId == (-PION_PDGID));
+  if (match_all_sign) {
+    // 421 -> 321, 211
+    isKplusPiminusDecay = (TMath::Abs(GpdgId) == DZERO_PDGID) &&
+                          (TMath::Abs(Gdau1pdgId) == KAON_PDGID && TMath::Abs(Gdau2pdgId) == PION_PDGID ||
+                           TMath::Abs(Gdau2pdgId) == KAON_PDGID && TMath::Abs(Gdau1pdgId) == PION_PDGID);
+    isKminusPiplusDecay = isKplusPiminusDecay;
+  }
+  bool isOneGamma = (Gdau3pdgId == GAMMA_PDGID);
+  bool isTwoGamma = (Gdau4pdgId == GAMMA_PDGID);
+
+  switch (GnDa) {
+  case 2: {
+    if ((GisSignal == 1 || GisSignal == 2) != (isKplusPiminusDecay || isKminusPiplusDecay)) {
+      std::cout << "Warning! " << __PRETTY_FUNCTION__ << "doesn't match previous definition"
+                << "\n";
+    }
+    return isKplusPiminusDecay || isKminusPiplusDecay;
+    break;
+  }
+  case 3: {
+    return (isKplusPiminusDecay || isKminusPiplusDecay) && isOneGamma;
+    break;
+  }
+  case 4: {
+    return (isKplusPiminusDecay || isKminusPiplusDecay) && isOneGamma && isTwoGamma;
+    break;
+  }
+  default:
+    return false;
+    break;
+  }
 }

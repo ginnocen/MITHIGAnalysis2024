@@ -138,13 +138,19 @@ int main(int argc, char *argv[]) {
                       MDzeroUPC.DsvpvDisErr_2D->at(iD), MDzeroUPC.Ddtheta->at(iD));
 
       if (!IsData) {
-        fprintf(outfile, "Dgen %d DisSignalCalc %d DisSignalCalcPrompt %d DisSignalCalcFeeddown %d\n",
+        fprintf(outfile,
+                "Dgen %d DisSignalCalc %d DisSignalCalcPrompt %d DisSignalCalcFeeddown %d\n"
+                "DisSwapCalc %d DisD0CalcLeftSideBand %d DisD0CalcRightSideBand %d",
                 MDzeroUPC.Dgen->at(iD), (int)(MDzeroUPC.DisSignalCalc->at(iD)),
-                (int)(MDzeroUPC.DisSignalCalcPrompt->at(iD)), (int)(MDzeroUPC.DisSignalCalcFeeddown->at(iD)));
+                (int)(MDzeroUPC.DisSignalCalcPrompt->at(iD)), (int)(MDzeroUPC.DisSignalCalcFeeddown->at(iD)),
+                (int)(MDzeroUPC.DisSwapCalc->at(iD)), (int)(MDzeroUPC.DisD0CalcLeftSideBand->at(iD)),
+                (int)(MDzeroUPC.DisD0CalcRightSideBand->at(iD)));
 
         v.FillRecoDGenMatchedInfo(MDzeroUPC.Dgen->at(iD), (int)(MDzeroUPC.DisSignalCalc->at(iD)),
                                   (int)(MDzeroUPC.DisSignalCalcPrompt->at(iD)),
-                                  (int)(MDzeroUPC.DisSignalCalcFeeddown->at(iD)));
+                                  (int)(MDzeroUPC.DisSignalCalcFeeddown->at(iD)), (int)(MDzeroUPC.DisSwapCalc->at(iD)),
+                                  (int)(MDzeroUPC.DisD0CalcLeftSideBand->at(iD)),
+                                  (int)(MDzeroUPC.DisD0CalcRightSideBand->at(iD)));
       }
     }
 
