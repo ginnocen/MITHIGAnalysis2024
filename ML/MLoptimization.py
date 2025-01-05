@@ -130,7 +130,7 @@ with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
 # 2. Extract necessary info from the config
-input_file = config["root_file"]
+input_file_mc = config["root_file_mc"]
 tree_name = config["tree_name"]
 output_csv = config["output_csv"]
 branches = config["branches"]
@@ -139,7 +139,7 @@ ptmax = config["ptmax"]
 ymin = config["ymin"]
 ymax = config["ymax"]
 
-df = process_root_file(input_file, tree_name, output_csv, branches)
+df = process_root_file(input_file_mc, tree_name, output_csv, branches)
 df["DsvpvSign"] = df["DsvpvDistance"] / df["DsvpvDisErr"]
 df["DsvpvSign_2D"] = df["DsvpvDistance_2D"] / df["DsvpvDisErr_2D"]
 
