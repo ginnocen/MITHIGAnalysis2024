@@ -1,4 +1,4 @@
-root_file: "/Users/ginnocen/Desktop/MITHIGAnalysis2024/Skims/SkimsMC/20241216_v1_filelist20241216_Pthat2_ForceD0Decay100M_BeamA_v1/mergedfile.root"  # Replace with your ROOT file name
+root_file_mc: "/Users/ginnocen/Desktop/MITHIGAnalysis2024/Skims/SkimsMC/20241216_v1_filelist20241216_Pthat2_ForceD0Decay100M_BeamA_v1/mergedfile.root"  # Replace with your ROOT file name
 tree_name: "Tree"          # Replace with your TTree name
 output_csv: "output_csv"
 branches:
