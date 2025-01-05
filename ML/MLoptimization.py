@@ -2,10 +2,13 @@ import uproot
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, learning_curve
 from sklearn.metrics import roc_auc_score
 import yaml
-def process_root_file(input_file, tree_name, output_csv, branches):
+import matplotlib.pyplot as plt
+
+
+def process_root_file(input_file, tree_name, branches):
     # Load the tree and extract branches
     print(f"Processing file: {input_file}")
     with uproot.open(input_file) as file:
@@ -20,71 +23,9 @@ def process_root_file(input_file, tree_name, output_csv, branches):
     # Create a DataFrame from the filtered data
     df = pd.DataFrame(filtered_arrays)
 
-    # Save the DataFrame to a CSV file
-    df.to_csv(output_csv, index=False)
-    print(f"Processed data saved to {output_csv}")
-
     return df
 
-def add_xgboost_score_to_df(X_test, y_test, y_pred, output_csv):
-    # Create a new DataFrame from X_test or copy it
-    df_scored = X_test.copy()
 
-    # Add the true label
-    df_scored["true_label"] = y_test.values
-
-    # Add the XGBoost score (probability of being signal)
-    df_scored["xgboost_score"] = y_pred
-
-    # Save the scored DataFrame to CSV
-    df_scored.to_csv(output_csv, index=False)
-    print(f"Scored DataFrame saved to {output_csv}")
-
-    return df_scored
-
-
-def train_xgboost(df_signal, df_background, features, test_size=0.3, random_state=42):
-    # Label the signal and background
-    df_signal["label"] = 1
-    df_background["label"] = 0
-
-    # Combine signal and background
-    df_combined = pd.concat([df_signal, df_background], axis=0).reset_index(drop=True)
-
-    # Split features (X) and labels (y)
-    X = df_combined[features]
-    y = df_combined["label"]
-
-    # Create train/test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state
-    )
-
-    # Initialize and train the XGBoost classifier
-    model = xgb.XGBClassifier(
-        max_depth=3,
-        learning_rate=0.1,
-        n_estimators=850,
-        objective="binary:logistic",
-        n_jobs=10,
-        gamma=0.0,
-        min_child_weight=3,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        colsample_bynode=1,
-        random_state=0,
-        tree_method="hist",
-    )
-
-    model.fit(X_train, y_train)
-
-    # Predict probabilities for the positive class (label=1)
-    y_pred = model.predict_proba(X_test)[:, 1]
-
-    # Compute the ROC AUC score
-    auc_score = roc_auc_score(y_test, y_pred)
-
-    return model, auc_score, X_test, y_test, y_pred
 
 def apply_xgboost_model(df_original, model, features, output_csv=None):
     import numpy as np
@@ -111,6 +52,7 @@ def apply_xgboost_model(df_original, model, features, output_csv=None):
 
     return df_scored
 
+
 def csv_to_root(csv_file_path, root_file_path, tree_name="Tree"):
     # 1. Read the CSV file into a DataFrame
     df = pd.read_csv(csv_file_path)
@@ -123,8 +65,56 @@ def csv_to_root(csv_file_path, root_file_path, tree_name="Tree"):
     with uproot.recreate(root_file_path) as f:
         f[tree_name] = data_dict
 
-    print(f"CSV data from '{csv_file_path}' written to '{root_file_path}' with TTree '{tree_name}'.")
+    print(
+        f"CSV data from '{csv_file_path}' written to '{root_file_path}' with TTree '{tree_name}'.")
 
+
+def plot_xgb_learning_curve(model, X_train, y_train,
+                            cv=5,
+                            scoring="roc_auc",
+                            n_jobs=-1,
+                            train_sizes=np.linspace(0.1, 1.0, 5),
+                            ylim=(0.5, 1.4),
+                            figsize=(8, 6),
+                            title="Learning Curve (XGBoost)"):
+    sizes, train_scores, test_scores = learning_curve(
+        estimator=model,
+        X=X_train,
+        y=y_train,
+        cv=cv,
+        scoring=scoring,
+        n_jobs=n_jobs,
+        train_sizes=train_sizes
+    )
+
+    train_scores_mean = np.mean(train_scores, axis=1)
+    train_scores_std  = np.std(train_scores, axis=1)
+    test_scores_mean  = np.mean(test_scores, axis=1)
+    test_scores_std   = np.std(test_scores, axis=1)
+
+    plt.figure(figsize=figsize)
+    plt.plot(sizes, train_scores_mean, 'o-', color='r', label='Training score')
+    plt.fill_between(sizes,
+                     train_scores_mean - train_scores_std,
+                     train_scores_mean + train_scores_std,
+                     alpha=0.2,
+                     color='r')
+
+    plt.plot(sizes, test_scores_mean, 'o-', color='g', label='Cross-validation score')
+    plt.fill_between(sizes,
+                     test_scores_mean - test_scores_std,
+                     test_scores_mean + test_scores_std,
+                     alpha=0.2,
+                     color='g')
+
+    plt.title(title)
+    if ylim is not None:
+        plt.ylim(*ylim)
+    plt.xlabel('Training Examples')
+    plt.ylabel('ROC AUC' if scoring == "roc_auc" else scoring)
+    plt.legend(loc='best')
+    plt.grid(True)
+    plt.show()
 
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
@@ -133,30 +123,20 @@ with open("config.yaml", "r") as f:
 input_file_mc = config["root_file_mc"]
 tree_name = config["tree_name"]
 output_csv = config["output_csv"]
+output_root = config["output_root"]
 ptmin = config["ptmin"]
 ptmax = config["ptmax"]
 ymin = config["ymin"]
 ymax = config["ymax"]
-output_model= config["output_model"]
+output_model = config["output_model"]
 
-branches = ["Dmass",
-            "Dchi2cl", 
-            "Dpt",
-            "Dy",
-            "Dtrk1Pt",
-            "Dtrk2Pt",
-            "DsvpvDistance",
-            "DsvpvDisErr",
-            "DsvpvDistance_2D",
-            "DsvpvDisErr_2D",
-            "Dalpha",
-            "Ddtheta",
-            "Dgen",
-            "DisSignalCalc",
-            "DisSignalCalcPrompt",
-            "DisSignalCalcFeeddown"]
+branches = [
+    "Dmass", "Dchi2cl", "Dpt", "Dy", "Dtrk1Pt", "Dtrk2Pt", "DsvpvDistance", "DsvpvDisErr",
+    "DsvpvDistance_2D", "DsvpvDisErr_2D", "Dalpha", "Ddtheta", "Dgen", "DisSignalCalc",
+    "DisSignalCalcPrompt", "DisSignalCalcFeeddown"
+]
 
-df = process_root_file(input_file_mc, tree_name, output_csv, branches)
+df = process_root_file(input_file_mc, tree_name, branches)
 df["DsvpvSign"] = df["DsvpvDistance"] / df["DsvpvDisErr"]
 df["DsvpvSign_2D"] = df["DsvpvDistance_2D"] / df["DsvpvDisErr_2D"]
 
@@ -165,14 +145,59 @@ df = df[(df["Dpt"] > ptmin) & (df["Dpt"] < ptmax) & (df["Dy"] > ymin) & (df["Dy"
 # select based on Dpt > 2 and Dpt < 4
 df_signal = df[df["DisSignalCalcPrompt"] == 1]
 df_background = df[df["DisSignalCalcPrompt"] == 0]
-features = ["Dchi2cl", "Dalpha", "Ddtheta", "DsvpvSign", "DsvpvSign_2D", "Dtrk1Pt", "Dtrk2Pt"]
-# Train the model
-model, auc_score, X_test, y_test, y_pred = train_xgboost(df_signal, df_background, features)
-print("XGBoost trained successfully.")
-print(f"Test ROC AUC: {auc_score:.4f}")
+df_signal["label"] = 1
+df_background["label"] = 0
+features = ["Dchi2cl", "Dalpha", "DsvpvSign", "Dtrk1Pt", "Dtrk2Pt"]
+df_combined = pd.concat([df_signal, df_background], axis=0).reset_index(drop=True)
 
-csv_path_scored = "original_scored.csv"
-df_scored = apply_xgboost_model(df, model, features, output_csv=csv_path_scored)
-csv_to_root(csv_path_scored, "original_scored.root")
+# Split features (X) and labels (y)
+X = df_combined[features]
+y = df_combined["label"]
+
+# Create train/test split
+random_state = 42
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_state)
+
+# Initialize and train the XGBoost classifier
+model = xgb.XGBClassifier(
+    max_depth=3,
+    learning_rate=0.1,
+    n_estimators=850,
+    objective="binary:logistic",
+    n_jobs=10,
+    gamma=0.0,
+    min_child_weight=3,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    colsample_bynode=1,
+    random_state=0,
+    tree_method="hist",
+)
+
+
+# Plot the learning curve
+plot_xgb_learning_curve(
+    model=model,
+    X_train=X_train,
+    y_train=y_train,
+    cv=5,
+    scoring="roc_auc",
+    train_sizes=np.linspace(0.1, 1.0, 5),
+    ylim=(0.5, 1.4)
+)
+
+# Fit the model to the full training set
+model.fit(X_train, y_train)
+
+# Predict probabilities for the positive class (label=1)
+y_pred_test = model.predict_proba(X_test)[:, 1]
+
+# Compute the ROC AUC score
+auc_score_test = roc_auc_score(y_test, y_pred_test)
+print(f"Test ROC AUC: {auc_score_test:.4f}")
+
+# Add the XGBoost score to original DataFrame and save it to a CSV file
+df_scored = apply_xgboost_model(df, model, features, output_csv=output_csv)
+csv_to_root(output_csv, output_root, tree_name="Tree")
 model.save_model(output_model)
 # Apply the model to the test data and save the results
