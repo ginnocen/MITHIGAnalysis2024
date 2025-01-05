@@ -4,7 +4,7 @@ import numpy as np
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
-
+import yaml
 def process_root_file(input_file, tree_name, output_csv, branches):
     # Load the tree and extract branches
     print(f"Processing file: {input_file}")
@@ -125,34 +125,25 @@ def csv_to_root(csv_file_path, root_file_path, tree_name="Tree"):
 
     print(f"CSV data from '{csv_file_path}' written to '{root_file_path}' with TTree '{tree_name}'.")
 
-# Usage
-input_file = "my_file.root"
-tree_name = "Tree"
-output_csv = "my_file.csv"
-branches = [
-    "Dmass",
-    "Dchi2cl",
-    "Dpt",
-    "Dy",
-    "Dtrk1Pt",
-    "Dtrk2Pt",
-    "DsvpvDistance",
-    "DsvpvDisErr",
-    "DsvpvDistance_2D",
-    "DsvpvDisErr_2D",
-    "Dalpha",
-    "Ddtheta",
-    "Dgen",
-    "DisSignalCalc",
-    "DisSignalCalcPrompt",
-    "DisSignalCalcFeeddown"
-]
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+
+# 2. Extract necessary info from the config
+input_file = config["root_file"]
+tree_name = config["tree_name"]
+output_csv = config["output_csv"]
+branches = config["branches"]
+ptmin = config["ptmin"]
+ptmax = config["ptmax"]
+ymin = config["ymin"]
+ymax = config["ymax"]
 
 df = process_root_file(input_file, tree_name, output_csv, branches)
 df["DsvpvSign"] = df["DsvpvDistance"] / df["DsvpvDisErr"]
 df["DsvpvSign_2D"] = df["DsvpvDistance_2D"] / df["DsvpvDisErr_2D"]
 
-df = df[(df["Dpt"] > 1) & (df["Dpt"] < 2)]
+df = df[(df["Dpt"] > ptmin) & (df["Dpt"] < ptmax) & (df["Dy"] > ymin) & (df["Dy"] < ymax)]
 # create training samples for signal and background
 # select based on Dpt > 2 and Dpt < 4
 df_signal = df[df["DisSignalCalcPrompt"] == 1]
