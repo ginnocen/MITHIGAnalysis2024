@@ -133,11 +133,28 @@ with open("config.yaml", "r") as f:
 input_file_mc = config["root_file_mc"]
 tree_name = config["tree_name"]
 output_csv = config["output_csv"]
-branches = config["branches"]
 ptmin = config["ptmin"]
 ptmax = config["ptmax"]
 ymin = config["ymin"]
 ymax = config["ymax"]
+output_model= config["output_model"]
+
+branches = ["Dmass",
+            "Dchi2cl", 
+            "Dpt",
+            "Dy",
+            "Dtrk1Pt",
+            "Dtrk2Pt",
+            "DsvpvDistance",
+            "DsvpvDisErr",
+            "DsvpvDistance_2D",
+            "DsvpvDisErr_2D",
+            "Dalpha",
+            "Ddtheta",
+            "Dgen",
+            "DisSignalCalc",
+            "DisSignalCalcPrompt",
+            "DisSignalCalcFeeddown"]
 
 df = process_root_file(input_file_mc, tree_name, output_csv, branches)
 df["DsvpvSign"] = df["DsvpvDistance"] / df["DsvpvDisErr"]
@@ -157,4 +174,5 @@ print(f"Test ROC AUC: {auc_score:.4f}")
 csv_path_scored = "original_scored.csv"
 df_scored = apply_xgboost_model(df, model, features, output_csv=csv_path_scored)
 csv_to_root(csv_path_scored, "original_scored.root")
+model.save_model(output_model)
 # Apply the model to the test data and save the results
