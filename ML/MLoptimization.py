@@ -9,8 +9,7 @@ from sklearn.metrics import roc_auc_score
 import yaml
 import matplotlib.pyplot as plt
 
-
-def process_root_file(input_file, tree_name, branches):
+def process_root_file(input_file, tree_name, branches, ptmin, ptmax, ymin, ymax):
     # Load the tree and extract branches
     print(f"Loading tree and extracting branches from : {input_file}")
     with uproot.open(input_file) as file:
@@ -28,6 +27,9 @@ def process_root_file(input_file, tree_name, branches):
 
     # Create a DataFrame from the filtered data
     df = pd.DataFrame(filtered_arrays)
+    df = df[(df["Dpt"] > ptmin) & (df["Dpt"] < ptmax) & (df["Dy"] > ymin) & (df["Dy"] < ymax)]
+    df["DsvpvSign"] = df["DsvpvDistance"] / df["DsvpvDisErr"]
+    df["DsvpvSign_2D"] = df["DsvpvDistance_2D"] / df["DsvpvDisErr_2D"]
 
     return df
 
@@ -117,12 +119,10 @@ def plot_xgb_learning_curve(model,
 #with open("config.yaml", "r") as f:
 #    config = yaml.safe_load(f)
 
-# branches contains the list of the variables that will be converted into numpy array
-
 branches = [
     "Dmass", "Dchi2cl", "Dpt", "Dy", "Dtrk1Pt", "Dtrk2Pt", "DsvpvDistance", "DsvpvDisErr",
     "DsvpvDistance_2D", "DsvpvDisErr_2D", "Dalpha", "Ddtheta", "Dgen", "DisSignalCalc",
-    "DisSignalCalcPrompt", "DisSignalCalcFeeddown"
+    "DisSignalCalcPrompt", "DisSignalCalcFeeddown", "DpassCut23LowPt"
 ]
 
 # Extract necessary info from the config
@@ -139,38 +139,35 @@ branches = [
 
 
 parser = argparse.ArgumentParser(description="Process arguments for MLoptimization.py")
+parser.add_argument("--random_state", default=42)
 parser.add_argument("--input_file_mc", default="/Users/ginnocen/Desktop/MITHIGAnalysis2024/Skims/SkimsMC/20241216_v1_filelist20241216_Pthat2_ForceD0Decay100M_BeamA_v1/mergedfile.root")
 parser.add_argument("--tree_name", default="Tree")
-parser.add_argument("--output_csv", default="output_pt_p1p2_y_m1p1.cvs")
-parser.add_argument("--output_root", default="output_pt_p1p2_y_m1p1.root")
 parser.add_argument("--ptmin", default=1)
 parser.add_argument("--ptmax", default=2)
 parser.add_argument("--ymin", default=-1)
 parser.add_argument("--ymax", default=+1)
 parser.add_argument("--output_model", default="XGBoostMConly_pt_p1p2_y_m1p1.json")
-parser.add_argument("--random_state", default=42)
+parser.add_argument("--output_csv", default="outputmctraining_pt_p1p2_y_m1p1.cvs")
+parser.add_argument("--output_root", default="outputmctraining_pt_p1p2_y_m1p1.root")
 args = parser.parse_args()
 
+random_state = args.random_state
 input_file_mc = args.input_file_mc
 tree_name = args.tree_name
-output_csv = args.output_csv
-output_root = args.output_root
 ptmin = float(args.ptmin)
 ptmax = float(args.ptmax)
 ymin = float(args.ymin)
 ymax = float(args.ymax)
 output_model = args.output_model
-random_state = args.random_state
+output_csv = args.output_csv
+output_root = args.output_root
 # Here we define the signifiance variables, which are not defined in the skimmed trees
 
-df = process_root_file(input_file_mc, tree_name, branches)
-df["DsvpvSign"] = df["DsvpvDistance"] / df["DsvpvDisErr"]
-df["DsvpvSign_2D"] = df["DsvpvDistance_2D"] / df["DsvpvDisErr_2D"]
+df = process_root_file(input_file_mc, tree_name, branches, ptmin, ptmax, ymin, ymax)
 
 # here we consider only D candidates within a range of pT and rapidity (boundaries are
 # read from the config file
 
-df = df[(df["Dpt"] > ptmin) & (df["Dpt"] < ptmax) & (df["Dy"] > ymin) & (df["Dy"] < ymax)]
 # create training samples for signal and background
 # in this version of the code, the signal is defined as the prompt D candidates,
 # all the rest is tagged as background
@@ -225,6 +222,7 @@ plot_xgb_learning_curve(model=model,
 # FIXME: we should make sure that the model is re-trained from scratch
 
 model.fit(X_train, y_train)
+model.save_model(output_model)
 
 # Predict probabilities for the positive class (label=1)
 y_pred_test = model.predict_proba(X_test)[:, 1]
@@ -232,8 +230,3 @@ y_pred_test = model.predict_proba(X_test)[:, 1]
 # Compute the ROC AUC score
 auc_score_test = roc_auc_score(y_test, y_pred_test)
 print(f"Test ROC AUC: {auc_score_test:.4f}")
-
-# Add the XGBoost score to original MC sample and save it to a CSV file
-#df_scored = apply_xgboost_model(df, model, features, output_csv=output_csv)
-#csv_to_root(output_csv, output_root, tree_name="Tree")
-model.save_model(output_model)
