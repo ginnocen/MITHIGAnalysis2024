@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split, learning_curve
 from sklearn.metrics import roc_auc_score
 import yaml
 import matplotlib.pyplot as plt
+from sklearn.inspection import DecisionBoundaryDisplay
 
 def process_root_file(input_file, tree_name, branches, ptmin, ptmax, ymin, ymax):
     # Load the tree and extract branches
@@ -113,29 +114,48 @@ def plot_xgb_learning_curve(model,
     plt.ylabel('ROC AUC' if scoring == "roc_auc" else scoring)
     plt.legend(loc='best')
     plt.grid(True)
-    plt.show()
+    plt.savefig("learningcurve.png", dpi=300, bbox_inches="tight")
 
 
-#with open("config.yaml", "r") as f:
-#    config = yaml.safe_load(f)
+def plot_xgb_feature_importance(model,
+                                X_train,
+                                y_train,
+                                scoring="roc_auc",
+                                n_jobs=-1,
+                                figsize=(8, 6),
+                                title="Feature Importances (XGBoost)"):
+    importances = model.feature_importances_
+
+    # 2. Determine feature names
+    if hasattr(X_train, "columns"):
+        # If X_train is a DataFrame, use the column names
+        feature_names = X_train.columns
+    else:
+        # Otherwise, create generic names
+        feature_names = [f"Feature_{i}" for i in range(X_train.shape[1])]
+
+    # 3. Sort features by importance for a nicer plot
+    sorted_idx = np.argsort(importances)
+    sorted_importances = importances[sorted_idx]
+    sorted_features = [feature_names[i] for i in sorted_idx]
+
+    # 4. Plot a horizontal bar chart
+    plt.figure(figsize=figsize)
+    plt.barh(sorted_features, sorted_importances, color="skyblue")
+    plt.title(title)
+    plt.xlabel("Importance")
+    plt.ylabel("Features")
+    plt.grid(True, axis="x", alpha=0.5)
+    plt.tight_layout()
+    plt.savefig("feature_importance..png", dpi=300, bbox_inches="tight")
+
+    return importances
 
 branches = [
     "Dmass", "Dchi2cl", "Dpt", "Dy", "Dtrk1Pt", "Dtrk2Pt", "DsvpvDistance", "DsvpvDisErr",
     "DsvpvDistance_2D", "DsvpvDisErr_2D", "Dalpha", "Ddtheta", "Dgen", "DisSignalCalc",
     "DisSignalCalcPrompt", "DisSignalCalcFeeddown", "DpassCut23LowPt"
 ]
-
-# Extract necessary info from the config
-#input_file_mc = config["root_file_mc"]
-#tree_name = config["tree_name"]
-#output_csv = config["output_csv"]
-#output_root = config["output_root"]
-#ptmin = config["ptmin"]
-#ptmax = config["ptmax"]
-#ymin = config["ymin"]
-#ymax = config["ymax"]
-#output_model = config["output_model"]
-#random_state = config["random_state"]
 
 
 parser = argparse.ArgumentParser(description="Process arguments for MLoptimization.py")
@@ -223,6 +243,14 @@ plot_xgb_learning_curve(model=model,
 
 model.fit(X_train, y_train)
 model.save_model(output_model)
+
+plot_xgb_feature_importance(model=model,
+                            X_train=X,       # Only used to extract feature names
+                            y_train=y,       # Not used here
+                            scoring="roc_auc",
+                            n_jobs=-1,
+                            figsize=(6, 4),
+                            title="Feature Importances (Fully Trained Model)")
 
 # Predict probabilities for the positive class (label=1)
 y_pred_test = model.predict_proba(X_test)[:, 1]
