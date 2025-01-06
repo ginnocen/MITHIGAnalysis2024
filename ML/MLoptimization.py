@@ -1,3 +1,5 @@
+import sys
+import argparse
 import uproot
 import pandas as pd
 import numpy as np
@@ -112,8 +114,8 @@ def plot_xgb_learning_curve(model,
     plt.show()
 
 
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+#with open("config.yaml", "r") as f:
+#    config = yaml.safe_load(f)
 
 # branches contains the list of the variables that will be converted into numpy array
 
@@ -124,17 +126,41 @@ branches = [
 ]
 
 # Extract necessary info from the config
-input_file_mc = config["root_file_mc"]
-tree_name = config["tree_name"]
-output_csv = config["output_csv"]
-output_root = config["output_root"]
-ptmin = config["ptmin"]
-ptmax = config["ptmax"]
-ymin = config["ymin"]
-ymax = config["ymax"]
-output_model = config["output_model"]
-random_state = config["random_state"]
+#input_file_mc = config["root_file_mc"]
+#tree_name = config["tree_name"]
+#output_csv = config["output_csv"]
+#output_root = config["output_root"]
+#ptmin = config["ptmin"]
+#ptmax = config["ptmax"]
+#ymin = config["ymin"]
+#ymax = config["ymax"]
+#output_model = config["output_model"]
+#random_state = config["random_state"]
 
+
+parser = argparse.ArgumentParser(description="Process arguments for MLoptimization.py")
+parser.add_argument("--input_file_mc", default="/Users/ginnocen/Desktop/MITHIGAnalysis2024/Skims/SkimsMC/20241216_v1_filelist20241216_Pthat2_ForceD0Decay100M_BeamA_v1/mergedfile.root")
+parser.add_argument("--tree_name", default="Tree")
+parser.add_argument("--output_csv", default="output_pt_p1p2_y_m1p1.cvs")
+parser.add_argument("--output_root", default="output_pt_p1p2_y_m1p1.root")
+parser.add_argument("--ptmin", default=1)
+parser.add_argument("--ptmax", default=2)
+parser.add_argument("--ymin", default=-1)
+parser.add_argument("--ymax", default=+1)
+parser.add_argument("--output_model", default="XGBoostMConly_pt_p1p2_y_m1p1.json")
+parser.add_argument("--random_state", default=42)
+args = parser.parse_args()
+
+input_file_mc = args.input_file_mc
+tree_name = args.tree_name
+output_csv = args.output_csv
+output_root = args.output_root
+ptmin = float(args.ptmin)
+ptmax = float(args.ptmax)
+ymin = float(args.ymin)
+ymax = float(args.ymax)
+output_model = args.output_model
+random_state = args.random_state
 # Here we define the signifiance variables, which are not defined in the skimmed trees
 
 df = process_root_file(input_file_mc, tree_name, branches)
