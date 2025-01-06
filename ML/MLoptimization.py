@@ -10,14 +10,18 @@ import matplotlib.pyplot as plt
 
 def process_root_file(input_file, tree_name, branches):
     # Load the tree and extract branches
-    print(f"Processing file: {input_file}")
+    print(f"Loading tree and extracting branches from : {input_file}")
     with uproot.open(input_file) as file:
         tree = file[tree_name]
         arrays = {branch: tree[branch].array(library="np") for branch in branches}
 
     # Filter events where len(Dmass) > 0
     dmass = arrays["Dmass"]
+    # mask will be used to filter out events with no D candidates
     mask = np.array([len(event) > 0 for event in dmass])
+
+    # IMPORTANT: the operation below is needed cause some of the branches
+    # are standard vectors
     filtered_arrays = {branch: np.concatenate(arrays[branch][mask]) for branch in branches}
 
     # Create a DataFrame from the filtered data
@@ -26,9 +30,7 @@ def process_root_file(input_file, tree_name, branches):
     return df
 
 
-
 def apply_xgboost_model(df_original, model, features, output_csv=None):
-    import numpy as np
 
     # Check that df_original contains all the required features
     for f in features:
@@ -54,22 +56,17 @@ def apply_xgboost_model(df_original, model, features, output_csv=None):
 
 
 def csv_to_root(csv_file_path, root_file_path, tree_name="Tree"):
-    # 1. Read the CSV file into a DataFrame
     df = pd.read_csv(csv_file_path)
-
-    # 2. Convert the DataFrame to a dictionary of column_name -> numpy array
-    #    uproot can write these columns as a TTree
     data_dict = {col: df[col].to_numpy() for col in df.columns}
-
-    # 3. Create or overwrite a ROOT file and write the TTree
     with uproot.recreate(root_file_path) as f:
         f[tree_name] = data_dict
-
     print(
         f"CSV data from '{csv_file_path}' written to '{root_file_path}' with TTree '{tree_name}'.")
 
 
-def plot_xgb_learning_curve(model, X_train, y_train,
+def plot_xgb_learning_curve(model,
+                            X_train,
+                            y_train,
                             cv=5,
                             scoring="roc_auc",
                             n_jobs=-1,
@@ -77,20 +74,18 @@ def plot_xgb_learning_curve(model, X_train, y_train,
                             ylim=(0.5, 1.4),
                             figsize=(8, 6),
                             title="Learning Curve (XGBoost)"):
-    sizes, train_scores, test_scores = learning_curve(
-        estimator=model,
-        X=X_train,
-        y=y_train,
-        cv=cv,
-        scoring=scoring,
-        n_jobs=n_jobs,
-        train_sizes=train_sizes
-    )
+    sizes, train_scores, test_scores = learning_curve(estimator=model,
+                                                      X=X_train,
+                                                      y=y_train,
+                                                      cv=cv,
+                                                      scoring=scoring,
+                                                      n_jobs=n_jobs,
+                                                      train_sizes=train_sizes)
 
     train_scores_mean = np.mean(train_scores, axis=1)
-    train_scores_std  = np.std(train_scores, axis=1)
-    test_scores_mean  = np.mean(test_scores, axis=1)
-    test_scores_std   = np.std(test_scores, axis=1)
+    train_scores_std = np.std(train_scores, axis=1)
+    test_scores_mean = np.mean(test_scores, axis=1)
+    test_scores_std = np.std(test_scores, axis=1)
 
     plt.figure(figsize=figsize)
     plt.plot(sizes, train_scores_mean, 'o-', color='r', label='Training score')
@@ -116,10 +111,19 @@ def plot_xgb_learning_curve(model, X_train, y_train,
     plt.grid(True)
     plt.show()
 
+
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
-# 2. Extract necessary info from the config
+# branches contains the list of the variables that will be converted into numpy array
+
+branches = [
+    "Dmass", "Dchi2cl", "Dpt", "Dy", "Dtrk1Pt", "Dtrk2Pt", "DsvpvDistance", "DsvpvDisErr",
+    "DsvpvDistance_2D", "DsvpvDisErr_2D", "Dalpha", "Ddtheta", "Dgen", "DisSignalCalc",
+    "DisSignalCalcPrompt", "DisSignalCalcFeeddown"
+]
+
+# Extract necessary info from the config
 input_file_mc = config["root_file_mc"]
 tree_name = config["tree_name"]
 output_csv = config["output_csv"]
@@ -129,33 +133,41 @@ ptmax = config["ptmax"]
 ymin = config["ymin"]
 ymax = config["ymax"]
 output_model = config["output_model"]
+random_state = config["random_state"]
 
-branches = [
-    "Dmass", "Dchi2cl", "Dpt", "Dy", "Dtrk1Pt", "Dtrk2Pt", "DsvpvDistance", "DsvpvDisErr",
-    "DsvpvDistance_2D", "DsvpvDisErr_2D", "Dalpha", "Ddtheta", "Dgen", "DisSignalCalc",
-    "DisSignalCalcPrompt", "DisSignalCalcFeeddown"
-]
+# Here we define the signifiance variables, which are not defined in the skimmed trees
 
 df = process_root_file(input_file_mc, tree_name, branches)
 df["DsvpvSign"] = df["DsvpvDistance"] / df["DsvpvDisErr"]
 df["DsvpvSign_2D"] = df["DsvpvDistance_2D"] / df["DsvpvDisErr_2D"]
 
+# here we consider only D candidates within a range of pT and rapidity (boundaries are
+# read from the config file
+
 df = df[(df["Dpt"] > ptmin) & (df["Dpt"] < ptmax) & (df["Dy"] > ymin) & (df["Dy"] < ymax)]
 # create training samples for signal and background
-# select based on Dpt > 2 and Dpt < 4
+# in this version of the code, the signal is defined as the prompt D candidates,
+# all the rest is tagged as background
+
 df_signal = df[df["DisSignalCalcPrompt"] == 1]
 df_background = df[df["DisSignalCalcPrompt"] == 0]
+
+# for convenience, we label the candidates in the signal df as label = 1
+# and those in the background df as label = 0
+
 df_signal["label"] = 1
 df_background["label"] = 0
-features = ["Dchi2cl", "Dalpha", "DsvpvSign", "Dtrk1Pt", "Dtrk2Pt"]
+
 df_combined = pd.concat([df_signal, df_background], axis=0).reset_index(drop=True)
+
+# features are the variables used for the optimization
+features = ["Dchi2cl", "Dalpha", "DsvpvSign", "Dtrk1Pt", "Dtrk2Pt"]
 
 # Split features (X) and labels (y)
 X = df_combined[features]
 y = df_combined["label"]
 
-# Create train/test split
-random_state = 42
+# Create train/test split, test_size defines the fraction of candidates that are used for testing
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=random_state)
 
 # Initialize and train the XGBoost classifier
@@ -174,19 +186,18 @@ model = xgb.XGBClassifier(
     tree_method="hist",
 )
 
-
 # Plot the learning curve
-plot_xgb_learning_curve(
-    model=model,
-    X_train=X_train,
-    y_train=y_train,
-    cv=5,
-    scoring="roc_auc",
-    train_sizes=np.linspace(0.1, 1.0, 5),
-    ylim=(0.5, 1.4)
-)
+plot_xgb_learning_curve(model=model,
+                        X_train=X_train,
+                        y_train=y_train,
+                        cv=5,
+                        scoring="roc_auc",
+                        train_sizes=np.linspace(0.1, 1.0, 5),
+                        ylim=(0.5, 1.4))
 
 # Fit the model to the full training set
+# FIXME: we should make sure that the model is re-trained from scratch
+
 model.fit(X_train, y_train)
 
 # Predict probabilities for the positive class (label=1)
@@ -196,8 +207,7 @@ y_pred_test = model.predict_proba(X_test)[:, 1]
 auc_score_test = roc_auc_score(y_test, y_pred_test)
 print(f"Test ROC AUC: {auc_score_test:.4f}")
 
-# Add the XGBoost score to original DataFrame and save it to a CSV file
-df_scored = apply_xgboost_model(df, model, features, output_csv=output_csv)
-csv_to_root(output_csv, output_root, tree_name="Tree")
+# Add the XGBoost score to original MC sample and save it to a CSV file
+#df_scored = apply_xgboost_model(df, model, features, output_csv=output_csv)
+#csv_to_root(output_csv, output_root, tree_name="Tree")
 model.save_model(output_model)
-# Apply the model to the test data and save the results
