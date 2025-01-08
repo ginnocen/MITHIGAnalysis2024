@@ -132,9 +132,6 @@ if ! (( \$T2SIZE - \$LOCALSIZE )); then
   sleep 300
 fi
 
-T2FILE=$("
-LOCALFILE=
-
 echo ">>> Done!"
 
 EOF1
