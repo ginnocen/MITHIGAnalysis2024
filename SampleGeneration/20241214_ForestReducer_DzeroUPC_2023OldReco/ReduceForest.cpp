@@ -237,7 +237,13 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
         MDzeroUPC.Dmass->push_back(MDzero.Dmass[iD]);
         MDzeroUPC.Dtrk1Pt->push_back(MDzero.Dtrk1Pt[iD]);
+        MDzeroUPC.Dtrk1P->push_back(MDzero.Dtrk1P[iD]);
+        MDzeroUPC.Dtrk1Idx->push_back(MDzero.Dtrk1Idx[iD]);
+        MDzeroUPC.Dtrk1dedx->push_back(MDzero.Dtrk1dedx[iD]);
         MDzeroUPC.Dtrk2Pt->push_back(MDzero.Dtrk2Pt[iD]);
+        MDzeroUPC.Dtrk2P->push_back(MDzero.Dtrk2P[iD]);
+        MDzeroUPC.Dtrk2Idx->push_back(MDzero.Dtrk2Idx[iD]);
+        MDzeroUPC.Dtrk2dedx->push_back(MDzero.Dtrk2dedx[iD]);
         MDzeroUPC.Dchi2cl->push_back(MDzero.Dchi2cl[iD]);
         MDzeroUPC.DsvpvDistance->push_back(MDzero.DsvpvDistance[iD]);
         MDzeroUPC.DsvpvDisErr->push_back(MDzero.DsvpvDisErr[iD]);

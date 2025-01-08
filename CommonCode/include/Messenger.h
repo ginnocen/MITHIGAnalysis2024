@@ -386,12 +386,14 @@ public:
    float Dy[DZEROCOUNTMAX];
    float Dmass[DZEROCOUNTMAX];
    float Dtrk1Pt[DZEROCOUNTMAX];
+   float Dtrk1P[DZEROCOUNTMAX];
    float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1PtErr[DZEROCOUNTMAX];
    float Dtrk1highPurity[DZEROCOUNTMAX];
    int Dtrk1Idx[DZEROCOUNTMAX];
    float Dtrk1dedx[DZEROCOUNTMAX];
    float Dtrk2Pt[DZEROCOUNTMAX];
+   float Dtrk2P[DZEROCOUNTMAX];
    float Dtrk2Eta[DZEROCOUNTMAX];
    float Dtrk2PtErr[DZEROCOUNTMAX];
    float Dtrk2highPurity[DZEROCOUNTMAX];
@@ -782,7 +784,13 @@ public:
    std::vector<float> *Dy;
    std::vector<float> *Dmass;
    std::vector<float> *Dtrk1Pt;
+   std::vector<float> *Dtrk1P;
+   std::vector<int> *Dtrk1Idx;
+   std::vector<float> *Dtrk1dedx;
    std::vector<float> *Dtrk2Pt;
+   std::vector<float> *Dtrk2P;
+   std::vector<int> *Dtrk2Idx;
+   std::vector<float> *Dtrk2dedx;
    std::vector<float> *Dchi2cl;
    std::vector<float> *DsvpvDistance;
    std::vector<float> *DsvpvDisErr;
