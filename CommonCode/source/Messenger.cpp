@@ -1481,10 +1481,14 @@ bool DzeroTreeMessenger::Initialize()
    Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
    Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
    Tree->SetBranchAddress("Dtrk1highPurity", &Dtrk1highPurity);
+   Tree->SetBranchAddress("Dtrk1Idx", &Dtrk1Idx);
+   if(Tree->GetBranch("Dtrk1dedx")) Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
    Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
    Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
    Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
    Tree->SetBranchAddress("Dtrk2highPurity", &Dtrk2highPurity);
+   Tree->SetBranchAddress("Dtrk2Idx", &Dtrk2Idx);
+   if(Tree->GetBranch("Dtrk2dedx")) Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
    Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
    Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
    Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);

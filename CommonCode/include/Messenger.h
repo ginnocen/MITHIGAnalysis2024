@@ -389,10 +389,14 @@ public:
    float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1PtErr[DZEROCOUNTMAX];
    float Dtrk1highPurity[DZEROCOUNTMAX];
+   int Dtrk1Idx[DZEROCOUNTMAX];
+   float Dtrk1dedx[DZEROCOUNTMAX];
    float Dtrk2Pt[DZEROCOUNTMAX];
    float Dtrk2Eta[DZEROCOUNTMAX];
    float Dtrk2PtErr[DZEROCOUNTMAX];
    float Dtrk2highPurity[DZEROCOUNTMAX];
+   int Dtrk2Idx[DZEROCOUNTMAX];
+   float Dtrk2dedx[DZEROCOUNTMAX];
    float Dchi2cl[DZEROCOUNTMAX];
    float DsvpvDistance[DZEROCOUNTMAX];
    float DsvpvDisErr[DZEROCOUNTMAX];
