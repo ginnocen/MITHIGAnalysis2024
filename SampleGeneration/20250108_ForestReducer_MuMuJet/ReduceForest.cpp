@@ -11,7 +11,7 @@ using namespace std;
 #include "ProgressBar.h"
 
 #include "TrackResidualCorrector.h"
-#include "tnp_weight.h"
+#include "tnp_weight_lowptPbPb.h"
 #include "trackingEfficiency2017pp.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
@@ -326,15 +326,15 @@ int main(int argc, char *argv[]) {
          {
 		 double Centrality = MMuMuJet.hiBin*0.5;
                   MMuMuJet.ExtraMuWeight[0] =
-                     tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, -1)
-                     / tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, 0)
-                     * tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, -1)
-                     / tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, 0);
+                     tnp_weight_trk_pbpb(muEta1, -1)
+                     / tnp_weight_trk_pbpb(muEta1, 0)
+                     * tnp_weight_trk_pbpb(muEta2, -1)
+                     / tnp_weight_trk_pbpb(muEta2, 0);
                   MMuMuJet.ExtraMuWeight[1] =
-                     tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, -2)
-                     / tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, 0)
-                     * tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, -2)
-                     / tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, 0);
+                     tnp_weight_trk_pbpb(muEta1, -2)
+                     / tnp_weight_trk_pbpb(muEta1, 0)
+                     * tnp_weight_trk_pbpb(muEta2, -2)
+                     / tnp_weight_trk_pbpb(muEta2, 0);
                   MMuMuJet.ExtraMuWeight[2] =
                      tnp_weight_muid_pbpb(muEta1, -1)
                      / tnp_weight_muid_pbpb(muEta1, 0)
@@ -346,22 +346,28 @@ int main(int argc, char *argv[]) {
                      * tnp_weight_muid_pbpb(muEta2, -2)
                      / tnp_weight_muid_pbpb(muEta2, 0);
                   MMuMuJet.ExtraMuWeight[4] =
-                     tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, -1)
-                     / tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, 0);
+                     tnp_weight_trg_pbpb(muPt1, muEta1, -1)
+		     / tnp_weight_trg_pbpb(muPt1, muEta1, 0)
+                     * tnp_weight_trg_pbpb(muPt2, muEta2, -1)
+		     / tnp_weight_trg_pbpb(muPt2, muEta2, 0);
+
                   MMuMuJet.ExtraMuWeight[5] =
-                     tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, -2)
-                     / tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, 0);
+                     tnp_weight_trg_pbpb(muPt1, muEta1, -2)
+		     / tnp_weight_trg_pbpb(muPt1, muEta1, 0)
+                     * tnp_weight_trg_pbpb(muPt2, muEta2, -2)
+		     / tnp_weight_trg_pbpb(muPt2, muEta2,0);
 
                   MMuMuJet.ExtraMuWeight[6] =
-                     tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, 1)
-                     / tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, 0)
-                     * tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, 1)
-                     / tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, 0);
+                     tnp_weight_trk_pbpb(muEta1, 1)
+                     / tnp_weight_trk_pbpb(muEta1,  0)
+                     * tnp_weight_trk_pbpb(muEta2,  1)
+                     / tnp_weight_trk_pbpb(muEta2,  0);
+
                   MMuMuJet.ExtraMuWeight[7] =
-                     tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, 2)
-                     / tnp_weight_glbPFtrk_pbpb(muEta1, Centrality, 0)
-                     * tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, 2)
-                     / tnp_weight_glbPFtrk_pbpb(muEta2, Centrality, 0);
+                     tnp_weight_trk_pbpb(muEta1,  2)
+                     / tnp_weight_trk_pbpb(muEta1,  0)
+                     * tnp_weight_trk_pbpb(muEta2,  2)
+                     / tnp_weight_trk_pbpb(muEta2,  0);
                   MMuMuJet.ExtraMuWeight[8] =
                      tnp_weight_muid_pbpb(muEta1, 1)
                      / tnp_weight_muid_pbpb(muEta1, 0)
@@ -373,13 +379,18 @@ int main(int argc, char *argv[]) {
                      * tnp_weight_muid_pbpb(muEta2, 2)
                      / tnp_weight_muid_pbpb(muEta2, 0);
 
-                  MMuMuJet.ExtraMuWeight[10] =
-                     tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, 1)
-                     / tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, 0);
-                  MMuMuJet.ExtraMuWeight[11] =
-                     tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, 2)
-                     / tnp_weight_trig_double_pbpb(muPt1, muEta1, Centrality, muPt2, muEta2, Centrality, 0);
 
+                  MMuMuJet.ExtraMuWeight[10] =
+                     tnp_weight_trg_pbpb(muPt1, muEta1, 1)
+		     / tnp_weight_trg_pbpb(muPt1, muEta1, 0)
+                     * tnp_weight_trg_pbpb(muPt2, muEta2, 1)
+		     / tnp_weight_trg_pbpb(muPt2, muEta2,0);
+
+                  MMuMuJet.ExtraMuWeight[4] =
+                     tnp_weight_trg_pbpb(muPt1, muEta1, 2)
+		     / tnp_weight_trg_pbpb(muPt1, muEta1, 0)
+                     * tnp_weight_trg_pbpb(muPt2, muEta2, 2)
+		     / tnp_weight_trg_pbpb(muPt2, muEta2,0);
 
          } 
 
