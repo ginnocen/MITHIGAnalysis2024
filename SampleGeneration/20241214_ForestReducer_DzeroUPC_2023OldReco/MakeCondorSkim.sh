@@ -52,9 +52,7 @@ which root
 which hadd
 echo ""
 echo ">>> Setting up directory"
-while ! [ -d "MITHIGAnalysis2024" ]; do
-  xrdcp -r -f --notlsok root://xrootd.cmsaf.mit.edu//store/user/$USER/MITHIGAnalysis2024 .
-done
+xrdcp -r -f --notlsok root://xrootd.cmsaf.mit.edu//store/user/$USER/MITHIGAnalysis2024 .
 cd MITHIGAnalysis2024
 source SetupAnalysis.sh
 wait
