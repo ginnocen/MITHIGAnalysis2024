@@ -11,12 +11,12 @@ MASTER_FILE_LIST="${CONFIG_DIR}/forestFilesForSkim.txt"
 FILES_PER_JOB=200
 # Resource request in GB:
 JOB_MEMORY=5
-JOB_STORAGE=10
+JOB_STORAGE=20
 
 # Includes VOMS proxy in process
-REFRESH_PROXY=1
+REFRESH_PROXY=0
 # Copies key scripts from MITHIGAnalysis to T2_US_MIT for compiler
-COPY_TO_T2=1
+COPY_TO_T2=0
 
 if [[ $REFRESH_PROXY -eq 1 ]]; then
   voms-proxy-init -rfc -voms cms -valid 120:00
@@ -53,9 +53,6 @@ while IFS= read -r LINE; do
   echo "$LINE" >> "$JOB_LIST"
   FILE_COUNTER=$((FILE_COUNTER + 1))
   if (( $FILE_COUNTER % $FILES_PER_JOB == 0 )); then
-    if [[ JOB_COUNTER -eq 3 ]]; then
-      break
-    fi
     submit_condor_jobs $BASENAME $JOB_LIST $JOB_COUNTER
     JOB_COUNTER=$((JOB_COUNTER + 1))
     BASENAME="job${JOB_COUNTER}"
