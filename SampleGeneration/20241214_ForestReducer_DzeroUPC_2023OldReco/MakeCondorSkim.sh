@@ -4,9 +4,11 @@
 BASENAME=$1
 JOB_LIST=$2
 CONFIG_DIR=$3
-XROOTD_SERVER=$4
+OUTPUT_SERVER=$4
 OUTPUT_PATH=$5
 PROXYFILE=$6
+JOB_MEMORY=$7
+JOB_STORAGE=$8
 
 ANALYSIS_SUBDIR='SampleGeneration/20241214_ForestReducer_DzeroUPC_2023OldReco/'
 SCRIPT="${CONFIG_DIR}/${BASENAME}_script.sh"
@@ -103,6 +105,7 @@ while read -r ROOT_IN_T2; do
     --IsData true \\
     --PFTree particleFlowAnalyser/pftree &
   wait
+  sleep 1
   rm \$ROOT_IN_LOCAL
   ((COUNTER++))
 done < $JOB_LIST_NAME
@@ -117,7 +120,7 @@ hadd -ff ${BASENAME}_merged.root output/${BASENAME}_*.root
 wait
 echo ""
 echo ">>> Transferring merged root file to T2"
-xrdcp -f --notlsok ${BASENAME}_merged.root ${XROOTD_SERVER}${OUTPUT_PATH}
+xrdcp -f --notlsok ${BASENAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
 wait
 echo ""
 echo ">>> Done!"
@@ -134,8 +137,8 @@ sleep 0.5
 cat > $CONFIG <<EOF2
 ### Job settings
 Universe                = vanilla
-request_disk            = 6GB
-request_memory          = 3GB
+request_disk            = ${JOB_STORAGE}GB
+request_memory          = ${JOB_MEMORY}GB
 initialdir              = $PWD/
 executable              = $PWD/$SCRIPT
 arguments               = \$(ClusterId) \$(ProcId)
