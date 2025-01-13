@@ -1,6 +1,5 @@
 #!/bin/bash
 
-<<<<<<<< HEAD:SampleGeneration/20241203_CondorForestReducer/MakeCondorSkim.sh
 BASENAME=${1}
 JOB_LIST=${2}
 CONFIG_DIR=${3}
@@ -11,18 +10,6 @@ JOB_MEMORY=${7}
 JOB_STORAGE=${8}
 CMSSW_VERSION=${9}
 ANALYSIS_SUBDIR=${10}
-========
-BASENAME=$1
-JOB_LIST=$2
-CONFIG_DIR=$3
-OUTPUT_SERVER=$4
-OUTPUT_PATH=$5
-PROXYFILE=$6
-JOB_MEMORY=$7
-JOB_STORAGE=$8
-CMSSW_VERSION=$9
-ANALYSIS_SUBDIR=$10
->>>>>>>> 97ac3a6 (Initial restructuring of condor skimming code to work across multiple reducer configs):SampleGeneration/20250113_CondorForestReducer/MakeCondorSkim.sh
 
 SCRIPT="${CONFIG_DIR}/${BASENAME}_script.sh"
 CONFIG="${CONFIG_DIR}/${BASENAME}_config.condor"
