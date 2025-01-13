@@ -1,5 +1,4 @@
 #!/bin/bash
-# THIS CONFIG IS FOR CMSSW_13_2_4 ONLY
 
 BASENAME=$1
 JOB_LIST=$2
@@ -9,11 +8,11 @@ OUTPUT_PATH=$5
 PROXYFILE=$6
 JOB_MEMORY=$7
 JOB_STORAGE=$8
+CMSSW_VERSION=$9
+ANALYSIS_SUBDIR=$10
 
-ANALYSIS_SUBDIR='SampleGeneration/20241214_ForestReducer_DzeroUPC_2023OldReco/'
 SCRIPT="${CONFIG_DIR}/${BASENAME}_script.sh"
 CONFIG="${CONFIG_DIR}/${BASENAME}_config.condor"
-
 JOB_LIST_NAME="${JOB_LIST##*/}"
 PROXYFILE_NAME="${PROXYFILE##*/}"
 
@@ -41,12 +40,12 @@ voms-proxy-info
 
 # Setup
 echo ""
-echo ">>> Setting up CMSSW_13_2_4"
+echo ">>> Setting up ${CMSSW_VERSION}"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 wait
-cmsrel CMSSW_13_2_4
+cmsrel $CMSSW_VERSION
 wait
-cd CMSSW_13_2_4/src/
+cd ${CMSSW_VERSION}/src/
 cmsenv
 wait
 cd ../../
@@ -69,7 +68,7 @@ echo ""
 echo ">>> Compiling skimmer"
 # Must manually compile to avoid error from missing test file
 g++ ReduceForest.cpp -o Execute \\
-  `root-config --cflags --glibs` \\
+  \$(root-config --cflags --glibs) \\
   -I\$ProjectBase/CommonCode/include \$ProjectBase/CommonCode/library/Messenger.o
 wait
 sleep 1
