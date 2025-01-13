@@ -30,12 +30,13 @@ if [[ $REFRESH_PROXY -eq 1 ]]; then
   export PROXYFILE=~/x509up_u$(id -u)
 fi
 if [[ $COPY_TO_T2 -eq 1 ]]; then
-  ../20250113_CondorForestReducer/CopyToT2.sh
+  ../20241203_CondorForestReducer/CopyToT2.sh
   wait
 fi
 xrdfs $OUTPUT_SERVER mkdir -p $OUTPUT_DIR
 mkdir -p $CONFIG_DIR
-../20250113_CondorForestReducer/MakeXrdFileList.sh $SOURCE_SERVER $SOURCE_DIR $MASTER_FILE_LIST
+../20241203_CondorForestReducer/MakeXrdFileList.sh $SOURCE_SERVER $SOURCE_DIR \
+  $MASTER_FILE_LIST
 
 # Function for job submission
 submit_condor_jobs() {
@@ -43,7 +44,7 @@ submit_condor_jobs() {
   local JOB_LIST=$2
   local JOB_COUNTER=$3
   OUTPUT_PATH="${OUTPUT_DIR}/skim_output_${JOB_COUNTER}.root"
-  ../20250113_CondorForestReducer/MakeCondorSkim.sh $BASENAME $JOB_LIST \
+  ../20241203_CondorForestReducer/MakeCondorSkim.sh $BASENAME $JOB_LIST \
     $CONFIG_DIR $OUTPUT_SERVER $OUTPUT_PATH $PROXYFILE $JOB_MEMORY \
     $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_SUBDIR
   wait

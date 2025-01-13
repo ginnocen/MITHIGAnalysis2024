@@ -1,0 +1,279 @@
+000 (131592.000.000) 2024-12-03 15:46:51 Job submitted from host: <18.4.134.206:9615?addrs=18.4.134.206-9615&alias=submit06.mit.edu&noUDP&sock=schedd_3296551_5e7f>
+...
+028 (131592.000.000) 2024-12-03 15:46:51 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:46:51.607"
+EventTypeNumber = 28
+JOB_GLIDEIN_ClusterId = "$$(GLIDEIN_ClusterId:Unknown)"
+JOB_GLIDEIN_Entry_Name = "$$(GLIDEIN_Entry_Name:Unknown)"
+JOB_GLIDEIN_Factory = "$$(GLIDEIN_Factory:Unknown)"
+JOB_GLIDEIN_Name = "$$(GLIDEIN_Name:Unknown)"
+JOB_GLIDEIN_ProcId = "$$(GLIDEIN_ProcId:Unknown)"
+JOB_GLIDEIN_Schedd = "$$(GLIDEIN_Schedd:Unknown)"
+JOB_GLIDEIN_Site = "$$(GLIDEIN_Site:Unknown)"
+JOB_GLIDEIN_SiteWMS = "$$(GLIDEIN_SiteWMS:Unknown)"
+JOB_GLIDEIN_SiteWMS_JobId = "$$(GLIDEIN_SiteWMS_JobId:Unknown)"
+JOB_GLIDEIN_SiteWMS_Queue = "$$(GLIDEIN_SiteWMS_Queue:Unknown)"
+JOB_GLIDEIN_SiteWMS_Slot = "$$(GLIDEIN_SiteWMS_Slot:Unknown)"
+JOB_Site = "$$(GLIDEIN_Site:Unknown)"
+MyType = "SubmitEvent"
+Proc = 0
+SubmitHost = "<18.4.134.206:9615?addrs=18.4.134.206-9615&alias=submit06.mit.edu&noUDP&sock=schedd_3296551_5e7f>"
+Subproc = 0
+TriggerEventTypeName = "ULOG_SUBMIT"
+TriggerEventTypeNumber = 0
+...
+040 (131592.000.000) 2024-12-03 15:52:19 Started transferring input files
+	Transferring to host: <172.19.0.2:39425?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9632#1949152%20131.225.189.210:9618%3faddrs%3d[2620-6a-0-8421--cd]-9618+131.225.189.210-9618%26alias%3dcmssrvz03.fnal.gov%26noUDP%26sock%3dcollector9644#2850046&PrivNet=cmspilot-3388057.0-red-c1621.unl.edu&addrs=172.19.0.2-39425&alias=cmspilot-3388057.0-red-c1621.unl.edu&noUDP>
+...
+028 (131592.000.000) 2024-12-03 15:52:19 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:52:19.433"
+EventTypeNumber = 28
+Host = "<172.19.0.2:39425?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9632#1949152%20131.225.189.210:9618%3faddrs%3d[2620-6a-0-8421--cd]-9618+131.225.189.210-9618%26alias%3dcmssrvz03.fnal.gov%26noUDP%26sock%3dcollector9644#2850046&PrivNet=cmspilot-3388057.0-red-c1621.unl.edu&addrs=172.19.0.2-39425&alias=cmspilot-3388057.0-red-c1621.unl.edu&noUDP>"
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+MyType = "FileTransferEvent"
+Proc = 0
+Subproc = 0
+TriggerEventTypeName = "ULOG_FILE_TRANSFER"
+TriggerEventTypeNumber = 40
+Type = 2
+...
+040 (131592.000.000) 2024-12-03 15:52:19 Finished transferring input files
+...
+028 (131592.000.000) 2024-12-03 15:52:19 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:52:19.680"
+EventTypeNumber = 28
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+MyType = "FileTransferEvent"
+Proc = 0
+Subproc = 0
+TriggerEventTypeName = "ULOG_FILE_TRANSFER"
+TriggerEventTypeNumber = 40
+Type = 3
+...
+001 (131592.000.000) 2024-12-03 15:52:20 Job executing on host: <172.19.0.2:41683?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9644#1837248%20131.225.189.210:9618%3faddrs%3d[2620-6a-0-8421--cd]-9618+131.225.189.210-9618%26alias%3dcmssrvz03.fnal.gov%26noUDP%26sock%3dcollector9638#2737827&PrivNet=cmspilot-3388057.0-red-c1621.unl.edu&addrs=172.19.0.2-41683&alias=cmspilot-3388057.0-red-c1621.unl.edu&noUDP>
+	SlotName: slot1_6@cmspilot-3388057.0-red-c1621.unl.edu
+	CondorScratchDir = "/var/lib/condor/execute/dir_1958397/glide_lIHD0R/execute/dir_3663281"
+	Cpus = 1
+	Disk = 5686162
+	Memory = 3072
+...
+028 (131592.000.000) 2024-12-03 15:52:20 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:52:20.706"
+EventTypeNumber = 28
+ExecuteHost = "<172.19.0.2:41683?CCBID=128.142.196.160:9618%3faddrs%3d[2001-1458-301-4f--100-74]-9618+128.142.196.160-9618%26alias%3dvocms0815.cern.ch%26noUDP%26sock%3dcollector9644#1837248%20131.225.189.210:9618%3faddrs%3d[2620-6a-0-8421--cd]-9618+131.225.189.210-9618%26alias%3dcmssrvz03.fnal.gov%26noUDP%26sock%3dcollector9638#2737827&PrivNet=cmspilot-3388057.0-red-c1621.unl.edu&addrs=172.19.0.2-41683&alias=cmspilot-3388057.0-red-c1621.unl.edu&noUDP>"
+ExecuteProps = [ Disk = 5686162; Memory = 3072; Cpus = 1; CondorScratchDir = "/var/lib/condor/execute/dir_1958397/glide_lIHD0R/execute/dir_3663281" ]
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+MyType = "ExecuteEvent"
+Proc = 0
+SlotName = "slot1_6@cmspilot-3388057.0-red-c1621.unl.edu"
+Subproc = 0
+TriggerEventTypeName = "ULOG_EXECUTE"
+TriggerEventTypeNumber = 1
+...
+006 (131592.000.000) 2024-12-03 15:52:29 Image size of job updated: 2070876
+	29  -  MemoryUsage of job (MB)
+	53856  -  ResidentSetSize of job (KB)
+	29563  -  ProportionalSetSize of job (KB)
+...
+028 (131592.000.000) 2024-12-03 15:52:29 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:52:29.791"
+EventTypeNumber = 28
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+MemoryUsage = 29
+MyType = "JobImageSizeEvent"
+Proc = 0
+ProportionalSetSize = 29563
+ResidentSetSize = 53856
+Size = 2070876
+Subproc = 0
+TriggerEventTypeName = "ULOG_IMAGE_SIZE"
+TriggerEventTypeNumber = 6
+...
+006 (131592.000.000) 2024-12-03 15:54:20 Image size of job updated: 3082116
+	385  -  MemoryUsage of job (MB)
+	393644  -  ResidentSetSize of job (KB)
+	29563  -  ProportionalSetSize of job (KB)
+...
+028 (131592.000.000) 2024-12-03 15:54:20 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:54:20.905"
+EventTypeNumber = 28
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+MemoryUsage = 385
+MyType = "JobImageSizeEvent"
+Proc = 0
+ProportionalSetSize = 29563
+ResidentSetSize = 393644
+Size = 3082116
+Subproc = 0
+TriggerEventTypeName = "ULOG_IMAGE_SIZE"
+TriggerEventTypeNumber = 6
+...
+040 (131592.000.000) 2024-12-03 15:54:21 Started transferring output files
+...
+028 (131592.000.000) 2024-12-03 15:54:21 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:54:21.176"
+EventTypeNumber = 28
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+MyType = "FileTransferEvent"
+Proc = 0
+Subproc = 0
+TriggerEventTypeName = "ULOG_FILE_TRANSFER"
+TriggerEventTypeNumber = 40
+Type = 5
+...
+040 (131592.000.000) 2024-12-03 15:54:21 Finished transferring output files
+...
+028 (131592.000.000) 2024-12-03 15:54:21 Job ad information event triggered.
+Cluster = 131592
+EventTime = "2024-12-03T15:54:21.248"
+EventTypeNumber = 28
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+MyType = "FileTransferEvent"
+Proc = 0
+Subproc = 0
+TriggerEventTypeName = "ULOG_FILE_TRANSFER"
+TriggerEventTypeNumber = 40
+Type = 6
+...
+005 (131592.000.000) 2024-12-03 15:54:22 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:02, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:02, Sys 0 00:00:00  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	7194  -  Run Bytes Sent By Job
+	2014  -  Run Bytes Received By Job
+	7194  -  Total Bytes Sent By Job
+	2014  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated 
+	   Cpus                 :                 1         1 
+	   Disk (KB)            :      237  3145728   5686162 
+	   Memory (MB)          :       29     3072      3072 
+
+	Job terminated of its own accord at 2024-12-03T20:54:20Z with exit-code 0.
+...
+028 (131592.000.000) 2024-12-03 15:54:22 Job ad information event triggered.
+Cluster = 131592
+Cpus = 1
+Disk = 5686162
+DiskUsage = 237
+EventTime = "2024-12-03T15:54:22.171"
+EventTypeNumber = 28
+JOB_GLIDEIN_ClusterId = "799807"
+JOB_GLIDEIN_Entry_Name = "CMS_T2_US_Nebraska_Red_gw2_whole_cms"
+JOB_GLIDEIN_Factory = "CERN-Prod"
+JOB_GLIDEIN_Name = "gfactory_instance"
+JOB_GLIDEIN_ProcId = "0"
+JOB_GLIDEIN_Schedd = "schedd_glideins8@vocms0206.cern.ch"
+JOB_GLIDEIN_Site = "Nebraska"
+JOB_GLIDEIN_SiteWMS = "HTCondor"
+JOB_GLIDEIN_SiteWMS_JobId = "3388057.0"
+JOB_GLIDEIN_SiteWMS_Queue = "red-gw2.unl.edu"
+JOB_GLIDEIN_SiteWMS_Slot = "slot1_1@cmspilot-3388057.0-red-c1621.unl.edu"
+JOB_Site = "Nebraska"
+Memory = 3072
+MemoryUsage = 29
+MyType = "JobTerminatedEvent"
+Proc = 0
+ReceivedBytes = 2014.0
+RequestCpus = 1
+RequestDisk = 3145728
+RequestMemory = 3072
+ReturnValue = 0
+RunLocalUsage = "Usr 0 00:00:00, Sys 0 00:00:00"
+RunRemoteUsage = "Usr 0 00:00:02, Sys 0 00:00:00"
+SentBytes = 7194.0
+Subproc = 0
+TerminatedNormally = true
+ToE = [ ExitBySignal = false; HowCode = 0; Who = "itself"; How = "OF_ITS_OWN_ACCORD"; ExitCode = 0; When = 1733259260 ]
+TotalLocalUsage = "Usr 0 00:00:00, Sys 0 00:00:00"
+TotalReceivedBytes = 2014.0
+TotalRemoteUsage = "Usr 0 00:00:02, Sys 0 00:00:00"
+TotalSentBytes = 7194.0
+TriggerEventTypeName = "ULOG_JOB_TERMINATED"
+TriggerEventTypeNumber = 5
+...
