@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # xrootd server (e.g. "root://xrootd.cmsaf.mit.edu/")
-XROOTD_SERVER=$1
+XROOTD_SERVER=${1}
 # Path to dir with files on server (can have subdirs)
-SOURCE_DIR=$2
+SOURCE_DIR=${2}
 # Filename for output list
-FILE_LIST=$3
+FILE_LIST=${3}
 
 # Make list of all files in parent dir
 rm $FILE_LIST
