@@ -15,7 +15,7 @@ Numbered arguments for RunCondorSkim.sh:
     9 ) ANALYSIS_DIR: Path on T2_US_MIT to copy of MITHIGAnalysis2024 repo,
         containing only key files for compilers.
     10) ANALYSIS_SUBDIR: Subdirectory within ANALYSIS_DIR containing
-        the specific ForestReducer.cpp script to use.
+        the specific ReduceForest.cpp script to use.
     11) CONFIG_DIR: local directory where condor configs will be saved.
     12) MASTER_FILE_LIST: text file that will contain list of all 
         root files in SOURCE_DIR.
@@ -49,18 +49,39 @@ if [ $# -ne $n_args  ]; then
   echo "Insufficient number of arguments given!"
   echo "$usage"
   exit 1
+else
+  echo ">>> Starting RunCondorSkim.sh with the following arguments:"
+  echo "SOURCE_SERVER:    $SOURCE_SERVER"
+  echo "SOURCE_DIR:       $SOURCE_DIR"
+  echo "OUTPUT_SERVER:    $OUTPUT_SERVER"
+  echo "OUTPUT_DIR:       $OUTPUT_DIR"
+  echo "FILES_PER_JOB:    $FILES_PER_JOB"
+  echo "JOB_MEMORY:       $JOB_MEMORY"
+  echo "JOB_STORAGE:      $JOB_STORAGE"
+  echo "CMSSW_VERSION:    $CMSSW_VERSION"
+  echo "ANALYSIS_DIR:     $ANALYSIS_DIR"
+  echo "ANALYSIS_SUBDIR:  $ANALYSIS_SUBDIR"
+  echo "CONFIG_DIR:       $CONFIG_DIR"
+  echo "MASTER_FILE_LIST: $MASTER_FILE_LIST"
+  echo "REFRESH_PROXY:    $REFRESH_PROXY"
+  echo "COPY_TO_T2:       $COPY_TO_T2"
 fi
+
 if [[ $REFRESH_PROXY -eq 1 ]]; then
+  echo ">>> Refresh VOMS proxy"
   voms-proxy-init -rfc -voms cms -valid 120:00
   cp /tmp/x509up_u'$(id -u)' ~/
   export PROXYFILE=~/x509up_u$(id -u)
 fi
 if [[ $COPY_TO_T2 -eq 1 ]]; then
+  echo ">>> Copying local MITHIGAnalysis2024 files to T2_US_MIT"
   $ProjectBase/$condor_skim_dir/CopyToT2.sh $ANALYSIS_DIR $ANALYSIS_SUBDIR
   wait
 fi
+echo ">>> Setting up local workspace"
 xrdfs $OUTPUT_SERVER mkdir -p $OUTPUT_DIR
 mkdir -p $CONFIG_DIR
+echo ">>> Making master file list $MASTER_FILE_LIST"
 $ProjectBase/$condor_skim_dir/MakeXrdFileList.sh $SOURCE_SERVER $SOURCE_DIR $MASTER_FILE_LIST
 
 # Function for job submission
@@ -68,9 +89,12 @@ submit_condor_jobs() {
   local JOB_NAME=${1}
   local JOB_LIST=${2}
   local JOB_COUNTER=${3}
+  echo "Making configs for $JOB_NAME"
   OUTPUT_PATH="${OUTPUT_DIR}/skim_output_${JOB_COUNTER}.root"
   $ProjectBase/$condor_skim_dir/MakeCondorSkim.sh $JOB_NAME $JOB_LIST $CONFIG_DIR $OUTPUT_SERVER $OUTPUT_PATH $PROXYFILE $JOB_MEMORY $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_DIR $ANALYSIS_SUBDIR
   wait
+  echo "Submitted $JOB_NAME"
+  echo ""
   sleep 0.5
   return 0
 }
@@ -81,6 +105,8 @@ JOB_COUNTER=1
 JOB_NAME="job${JOB_COUNTER}"
 JOB_LIST="${CONFIG_DIR}/${JOB_NAME}_filelist.txt"
 rm $JOB_LIST
+echo ">>> Creating jobs"
+echo ""
 while IFS= read -r LINE; do
   echo "$LINE" >> "$JOB_LIST"
   FILE_COUNTER=$((FILE_COUNTER + 1))
@@ -93,3 +119,4 @@ while IFS= read -r LINE; do
 done < $MASTER_FILE_LIST
 # Submit final job list
 submit_condor_jobs $JOB_NAME $JOB_LIST $JOB_COUNTER
+echo ">>> Done with RunCondorSkim.sh!"

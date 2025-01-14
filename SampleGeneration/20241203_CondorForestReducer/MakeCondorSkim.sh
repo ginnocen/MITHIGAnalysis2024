@@ -55,7 +55,7 @@ which root
 which hadd
 echo ""
 echo ">>> Setting up directory"
-xrdcp -r -f -N -t 3 --notlsok root://xrootd.cmsaf.mit.edu/$ANALYSIS_DIR .
+xrdcp -r -f -N --retry 3 --retry-policy continue --notlsok root://xrootd.cmsaf.mit.edu/$ANALYSIS_DIR .
 cd $(basename "$ANALYSIS_DIR")
 source SetupAnalysis.sh
 wait
@@ -89,7 +89,7 @@ ROOT_OUT_LIST="${JOB_NAME}_rootOut.txt"
 while read -r ROOT_IN_T2; do
   ROOT_IN_LOCAL="forest_\${COUNTER}.root"
   ROOT_OUT="output/${JOB_NAME}_\${COUNTER}.root"
-  xrdcp -f -N -t 3 --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
+  xrdcp -f -N --retry 3 --retry-policy continue --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
   XRD_PID=\$!
   wait \$XRD_PID
   echo \$(ls -lh \$ROOT_IN_LOCAL) >> \$ROOT_IN_LIST
@@ -127,11 +127,11 @@ HADD_PID=\$!
 wait \$HADD_PID
 echo ""
 echo ">>> Transferring merged root file to T2"
-xrdcp -f -N -t 3 --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
+xrdcp -f -N --retry 3 --retry-policy continue --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
 XRD_PID=\$!
 wait \$XRD_PID
-xrdcp -f -N -t 3 --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
-xrdcp -f -N -t 3 --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
+xrdcp -f -N --retry 3 --retry-policy continue --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
+xrdcp -f -N --retry 3 --retry-policy continue --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
 echo ""
 echo ">>> Done!"
 

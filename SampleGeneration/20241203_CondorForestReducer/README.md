@@ -1,12 +1,4 @@
-# Requirements
-
-* CMSSW_13_2_4
-* ROOT v6.30
-* g++ 11
-* Enterprise Linux 9 (el9) with x86_64 architecture
-
-
-# Setup
+# First-time Setup
 
 You will need an account for 
 [MIT SubMIT](https://submit.mit.edu/submit-users-guide/index.html) and a 
@@ -20,11 +12,22 @@ Connect to Submit:
 ssh <user>@submit.mit.edu
 ```
 
-Navigate to your working directory and install CMSSW:
+Navigate to your working directory and install CMSSW.
+
+For data processed in 2023 and earlier:
 ```bash
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 cmsrel CMSSW_13_2_4
 cd CMSSW_13_2_4/src/
+cmsenv
+cd -
+```
+
+For data processed in 2024 and 2025:
+```bash
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+cmsrel CMSSW_14_1_7
+cd CMSSW_14_1_7/src/
 cmsenv
 cd -
 ```
@@ -34,16 +37,55 @@ Clone the MITHIGAnalysis2024 repository:
 git clone --recursive git@github.com:ginnocen/MITHIGAnalysis2024.git
 cd MITHIGAnalysis2024/
 source SetupAnalysis.sh
+```
+
+Navigate to the forest reducer directory for your analysis, for example: 
+```bash
 cd SampleGeneration/20241214_ForestReducer_DzeroUPC_2023OldReco/
 source clean.sh
 ```
 
 You should be ready. If you make changes to `ReduceForest.cpp`, `makefile`, or 
 change anything under the `include/` folder or `MITHIGAnalysis2024/CommonCode/`,
-then you will need to update the slimmed repo files on `T2_US_MIT`. Edit the 
-paths in `CopyToT2.sh` and run with:
+then you will need to update the slimmed repo files on `T2_US_MIT`. Add the 
+paths to `CopyToT2.sh` (**do not delete paths from this file!**), located here:
+```
+MITHIGAnalysis2024/SampleGeneration/20241203_CondorForestReducer/CopyToT2.sh
+```
+
+You can then run this script on its own:
 ```bash
 bash CopyToT2.sh
+```
+Or set the following variable in your `InitCondorSkim.sh` script to `1` :
+```bash
+# Copy key scripts from MITHIGAnalysis to T2_US_MIT for compiler
+COPY_TO_T2=1
+```
+
+# Recurring Setup
+
+## 1. Initialize CMSSW environment
+```bash
+cd CMSSW_X_Y_Z/src/
+cmsenv
+cd -
+```
+
+## 2. Source analysis scripts
+```bash
+cd MITHIGAnalysis2024/
+source SetupAnalysis.sh
+cd SampleGeneration/20YYMMDD_ForestReducer/
+source clean.sh
+```
+
+## 3. Initialize VOMS credentials
+```bash
+voms-proxy-init -rfc -voms cms -valid 120:00
+
+# If your proxy file saves to /tmp/ you must move it!
+cp /tmp/x509up_u'$(id -u)' ~/
 ```
 
 # Skimming with Condor
@@ -52,25 +94,27 @@ bash CopyToT2.sh
 
 **Easy Process**
 
-Set the following variables at the top of `RunCondorSkim.sh`:
+Copy `InitCondorSkim.sh` to your directory within `SampleGeneration`. Adjust
+the parameters as needed. Descriptions of parameters can be found by running:
 ```bash
-# Includes VOMS proxy in process
-REFRESH_PROXY=1
-# Copies key scripts from MITHIGAnalysis to T2_US_MIT for compiler
+bash $ProjectBase/SampleGeneration/20241203_CondorForestReducer/RunCondorSkim.sh
+```
+
+Two parameters that **do not** need to be used every time are below:
+```bash
+# Include VOMS proxy in process
+REFRESH_PROXY=0
+# Copy key scripts from MITHIGAnalysis to T2_US_MIT for compiler
 COPY_TO_T2=1
 ```
-This will prompt you to initiate your VOMS certificate and copy changes. If you
+The first prompts renewing your VOMS certificate, while the second copies 
+changes to the local repo to a folder on T2_US_MIT. If you
 are starting multiple sets of jobs in a short time or without changing other 
-files, you can set these to `0`.
+files, you can safely set these to `0`.
 
-**Manual Process**
-
-Refresh your VOMS proxy and run `RunCondorSkim.sh`:
+**When ready, run your configuration file:**
 ```bash
-voms-proxy-init -rfc -voms cms -valid 72:00
-cp /tmp/x509up_u'$(id -u)' ~/
-
-bash RunCondorSkim.sh
+bash InitCondorSkim.sh
 ```
 
 Check the status of condor jobs with:
@@ -97,27 +141,24 @@ jobX_out_<job_id>.txt
 ```
 
 
-## Making Changes
+## Important Central Files
 
-Edit `RunSkimCondor.sh` to select the runs and PD range to skim over. You can 
-also edit `MakeXrdFileList.sh` and `MakeCondorSkim.sh` to change the Condor 
-configuration and job script template without having to copy changed files 
-over to T2.
+**The following files are used for all condor-based forest reducers**! Do not
+change these without validation.
 
-
-
-## Important Files
 
 **RunCondorSkim.sh**
 
-Loops over the configured list of runs and PDs and submits one job for each
-run + PD combination. You can also edit this to change the source and output 
+Loops over all forest files in the provided directory. Configure the settings
+from `InitCondorSkim.sh`,You can also edit this to change the source and output 
 locations on `T2_US_MIT`.
+
 
 **MakeXrdFileList.sh**
 
 Makes a master list of file paths from any xrootd enable server (such as 
 `T2_US_MIT`) that will be filtered and processed in jobs.
+
 
 **MakeCondorSkim.sh**
 
@@ -126,12 +167,14 @@ the Condor servers. The job script starts after `cat > $SCRIPT <<EOF1` and ends
 at the line `EOF1`. The Condor config starts after `cat > $CONFIG <<EOF2` and
 ends at `EOF2`.
 
+
 **CopyToT2.sh**
 
 Copies essential files from the local `MITHIGAnalysis2024` repo to `T2_US_MIT`
 so they can be copied to every server at the start of a new job. This should
 only be needed if `ReduceForest.cpp`, `makefile`, `include/` or 
 `MITHIGAnalysis2024/CommonCode/` are changed.
+
 
 # Useful Commands
 
