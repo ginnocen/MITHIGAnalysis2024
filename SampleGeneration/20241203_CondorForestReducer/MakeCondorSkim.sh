@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASENAME=${1}
+JOB_NAME=${1}
 JOB_LIST=${2}
 CONFIG_DIR=${3}
 OUTPUT_SERVER=${4}
@@ -9,12 +9,14 @@ PROXYFILE=${6}
 JOB_MEMORY=${7}
 JOB_STORAGE=${8}
 CMSSW_VERSION=${9}
-ANALYSIS_SUBDIR=${10}
+ANALYSIS_DIR=${10}
+ANALYSIS_SUBDIR=${11}
 
-SCRIPT="${CONFIG_DIR}/${BASENAME}_script.sh"
-CONFIG="${CONFIG_DIR}/${BASENAME}_config.condor"
-JOB_LIST_NAME="${JOB_LIST##*/}"
-PROXYFILE_NAME="${PROXYFILE##*/}"
+SCRIPT="${CONFIG_DIR}/${JOB_NAME}_script.sh"
+CONFIG="${CONFIG_DIR}/${JOB_NAME}_config.condor"
+JOB_LIST_NAME=$(basename "$JOB_LIST")
+PROXYFILE_NAME=$(basename "$PROXYFILE")
+OUTPUT_DIR=$(dirname "$OUTPUT_PATH")
 
 
 
@@ -53,8 +55,8 @@ which root
 which hadd
 echo ""
 echo ">>> Setting up directory"
-xrdcp -r -f --notlsok root://xrootd.cmsaf.mit.edu//store/user/$USER/MITHIGAnalysis2024 .
-cd MITHIGAnalysis2024
+xrdcp -r -f -N -t 3 --notlsok root://xrootd.cmsaf.mit.edu/$ANALYSIS_DIR .
+cd $(basename "$ANALYSIS_DIR")
 source SetupAnalysis.sh
 wait
 cd CommonCode/
@@ -82,14 +84,18 @@ echo ""
 echo ">>> Running skimmer"
 mkdir -p "output"
 COUNTER=0
+ROOT_IN_LIST="${JOB_NAME}_rootIn.txt"
+ROOT_OUT_LIST="${JOB_NAME}_rootOut.txt"
 while read -r ROOT_IN_T2; do
   ROOT_IN_LOCAL="forest_\${COUNTER}.root"
-  ROOT_OUT="output/${BASENAME}_\${COUNTER}.root"
-  xrdcp -f -N -s --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
-  wait
+  ROOT_OUT="output/${JOB_NAME}_\${COUNTER}.root"
+  xrdcp -f -N -t 3 --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
+  XRD_PID=\$!
+  wait \$XRD_PID
+  echo \$(ls -lh \$ROOT_IN_LOCAL) >> \$ROOT_IN_LIST
   if ! [ -f "\$ROOT_IN_LOCAL" ]; then
     echo "--- ERROR! Missing root file: \$ROOT_IN_LOCAL"
-    exit 1
+    continue
   fi
   echo "--- Processing file: \$ROOT_IN_LOCAL"
   ./Execute --Input \$ROOT_IN_LOCAL \\
@@ -103,24 +109,29 @@ while read -r ROOT_IN_T2; do
     --ZDCPlus1nThreshold 1100 \\
     --IsData true \\
     --PFTree particleFlowAnalyser/pftree &
-  wait
+  SKIM_PID=\$!
+  wait \$SKIM_PID
   sleep 1
+  echo \$(ls -lh \$ROOT_OUT) >> \$ROOT_OUT_LIST
   rm \$ROOT_IN_LOCAL
   ((COUNTER++))
 done < $JOB_LIST_NAME
-wait
 echo ""
 echo ">>> Completed \$COUNTER jobs!"
 
 # Merge and transfer
 echo ""
 echo ">>> Merging root files"
-hadd -ff ${BASENAME}_merged.root output/${BASENAME}_*.root
-wait
+hadd -ff -k -j1 ${JOB_NAME}_merged.root output/${JOB_NAME}_*.root
+HADD_PID=\$!
+wait \$HADD_PID
 echo ""
 echo ">>> Transferring merged root file to T2"
-xrdcp -f --notlsok ${BASENAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
-wait
+xrdcp -f -N -t 3 --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
+XRD_PID=\$!
+wait \$XRD_PID
+xrdcp -f -N -t 3 --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
+xrdcp -f -N -t 3 --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
 echo ""
 echo ">>> Done!"
 
@@ -154,9 +165,9 @@ MAX_TRANSFER_INPUT_MB   = 400
 
 ### Logging
 notification            = Error
-output                  = ${CONFIG_DIR}/${BASENAME}_out_\$(ClusterId)_\$(ProcId).txt
-error                   = ${CONFIG_DIR}/${BASENAME}_err_\$(ClusterId)_\$(ProcId).txt
-log                     = ${CONFIG_DIR}/${BASENAME}_log_\$(ClusterId)_\$(ProcId).txt
+output                  = ${CONFIG_DIR}/${JOB_NAME}_out_\$(ClusterId)_\$(ProcId).txt
+error                   = ${CONFIG_DIR}/${JOB_NAME}_err_\$(ClusterId)_\$(ProcId).txt
+log                     = ${CONFIG_DIR}/${JOB_NAME}_log_\$(ClusterId)_\$(ProcId).txt
 
 ### Server settings
 MY.WantOS               = "el9"
