@@ -20,8 +20,8 @@ DATE=$(date +%Y%m%d)
 CONFIG_DIR="condorSkimConfigs_${DATE}"
 MASTER_FILE_LIST="${CONFIG_DIR}/forestFilesForSkim.txt"
 # Include VOMS proxy in process
-REFRESH_PROXY=1
+REFRESH_PROXY=0
 # Copy key scripts from MITHIGAnalysis to T2_US_MIT for compiler
-COPY_TO_T2=1
+COPY_TO_T2=0
 
 $ProjectBase/SampleGeneration/20241203_CondorForestReducer/RunCondorSkim.sh $SOURCE_SERVER $SOURCE_DIR $OUTPUT_SERVER $OUTPUT_DIR $FILES_PER_JOB $JOB_MEMORY $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_SUBDIR $CONFIG_DIR $MASTER_FILE_LIST $REFRESH_PROXY $COPY_TO_T2
