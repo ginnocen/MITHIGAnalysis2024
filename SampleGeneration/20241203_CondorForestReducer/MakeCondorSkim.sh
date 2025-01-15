@@ -44,24 +44,19 @@ voms-proxy-info
 echo ""
 echo ">>> Setting up ${CMSSW_VERSION}"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-wait
 cmsrel $CMSSW_VERSION
-wait
 cd ${CMSSW_VERSION}/src/
 cmsenv
-wait
 cd ../../
 which root
 which hadd
 echo ""
 echo ">>> Setting up directory"
-xrdcp -r -f -N --retry 3 --retry-policy continue --notlsok root://xrootd.cmsaf.mit.edu/$ANALYSIS_DIR .
+xrdcp -r -N --retry 2 --retry-policy continue --notlsok root://xrootd.cmsaf.mit.edu/$ANALYSIS_DIR .
 cd $(basename "$ANALYSIS_DIR")
 source SetupAnalysis.sh
-wait
 cd CommonCode/
 make
-wait
 cd ../$ANALYSIS_SUBDIR
 cp ../../../$JOB_LIST_NAME .
 cp ../../../$PROXYFILE_NAME .
@@ -72,7 +67,6 @@ echo ">>> Compiling skimmer"
 g++ ReduceForest.cpp -o Execute \\
   \$(root-config --cflags --glibs) \\
   -I\$ProjectBase/CommonCode/include \$ProjectBase/CommonCode/library/Messenger.o
-wait
 sleep 1
 if ! [ -f "Execute" ]; then
   echo "ERROR: Unable to compile executable!"
@@ -89,7 +83,7 @@ ROOT_OUT_LIST="${JOB_NAME}_rootOut.txt"
 while read -r ROOT_IN_T2; do
   ROOT_IN_LOCAL="forest_\${COUNTER}.root"
   ROOT_OUT="output/${JOB_NAME}_\${COUNTER}.root"
-  xrdcp -f -N --retry 3 --retry-policy continue --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
+  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
   XRD_PID=\$!
   wait \$XRD_PID
   echo \$(ls -lh \$ROOT_IN_LOCAL) >> \$ROOT_IN_LIST
@@ -108,7 +102,8 @@ while read -r ROOT_IN_T2; do
     --ZDCMinus1nThreshold 1000 \\
     --ZDCPlus1nThreshold 1100 \\
     --IsData true \\
-    --PFTree particleFlowAnalyser/pftree &
+    --PFTree particleFlowAnalyser/pftree \\
+    --HideProgressBar true &
   SKIM_PID=\$!
   wait \$SKIM_PID
   sleep 1
@@ -122,16 +117,13 @@ echo ">>> Completed \$COUNTER jobs!"
 # Merge and transfer
 echo ""
 echo ">>> Merging root files"
-hadd -ff -k -j1 ${JOB_NAME}_merged.root output/${JOB_NAME}_*.root
-HADD_PID=\$!
-wait \$HADD_PID
+hadd -ff -k ${JOB_NAME}_merged.root output/${JOB_NAME}_*.root
+echo \$(ls -lh \{JOB_NAME}_merged.root) >> \$ROOT_OUT_LIST
 echo ""
 echo ">>> Transferring merged root file to T2"
-xrdcp -f -N --retry 3 --retry-policy continue --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
-XRD_PID=\$!
-wait \$XRD_PID
-xrdcp -f -N --retry 3 --retry-policy continue --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
-xrdcp -f -N --retry 3 --retry-policy continue --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
+xrdcp -N --retry 2 --retry-policy continue --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
+xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
+xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
 echo ""
 echo ">>> Done!"
 

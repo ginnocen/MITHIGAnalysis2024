@@ -22,12 +22,14 @@ Numbered arguments for RunCondorSkim.sh:
     13) REFRESH_PROXY: (0 or 1) Initiate a new VOMS proxy before processing.
     14) COPY_TO_T2: (0 or 1) Copy key files in MITHIGAnalysis2024 to T2_US_MIT. 
         This is necessary for jobs to compile ForestReducer.cpp.
+    15) MAX_JOBS: (optional) Limit total number of submitted jobs. 
+        Intended for testing/debugging.
 
 Run using an external script to configure arguments, such as InitCondorSkim.sh:
     bash InitCondorSkim.sh
 "
 condor_skim_dir="SampleGeneration/20241203_CondorForestReducer"
-n_args=14
+n_args=15
 
 # Set input variables
 SOURCE_SERVER=${1}
@@ -44,8 +46,9 @@ CONFIG_DIR=${11}
 MASTER_FILE_LIST=${12}
 REFRESH_PROXY=${13}
 COPY_TO_T2=${14}
+MAX_JOBS=${15:-0}
 
-if [ $# -ne $n_args  ]; then
+if [ $# -ne $n_args || $# -ne $((n_args - 1)) ]; then
   echo "Insufficient number of arguments given!"
   echo "$usage"
   exit 1
@@ -58,6 +61,9 @@ else
   echo "FILES_PER_JOB:    $FILES_PER_JOB"
   echo "JOB_MEMORY:       $JOB_MEMORY"
   echo "JOB_STORAGE:      $JOB_STORAGE"
+  if [ $MAX_JOBS -ne 0 ]; then
+    echo "MAX_JOBS:         $MAX_JOBS"
+  fi
   echo "CMSSW_VERSION:    $CMSSW_VERSION"
   echo "ANALYSIS_DIR:     $ANALYSIS_DIR"
   echo "ANALYSIS_SUBDIR:  $ANALYSIS_SUBDIR"
@@ -90,7 +96,7 @@ submit_condor_jobs() {
   local JOB_LIST=${2}
   local JOB_COUNTER=${3}
   echo "Making configs for $JOB_NAME"
-  OUTPUT_PATH="${OUTPUT_DIR}/skim_output_${JOB_COUNTER}.root"
+  OUTPUT_PATH="${OUTPUT_DIR}/skim_${JOB_COUNTER}.root"
   $ProjectBase/$condor_skim_dir/MakeCondorSkim.sh $JOB_NAME $JOB_LIST $CONFIG_DIR $OUTPUT_SERVER $OUTPUT_PATH $PROXYFILE $JOB_MEMORY $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_DIR $ANALYSIS_SUBDIR
   wait
   echo "Submitted $JOB_NAME"
@@ -109,14 +115,18 @@ echo ">>> Creating jobs"
 echo ""
 while IFS= read -r LINE; do
   echo "$LINE" >> "$JOB_LIST"
-  FILE_COUNTER=$((FILE_COUNTER + 1))
+  ((FILE_COUNTER++))
   if (( $FILE_COUNTER % $FILES_PER_JOB == 0 )); then
-    submit_condor_jobs $JOB_NAME $JOB_LIST $JOB_COUNTER
-    JOB_COUNTER=$((JOB_COUNTER + 1))
+    if (( $JOB_COUNTER == $MAX_JOBS )); then
+      break
+    fi
+    submit_condor_jobs $JOB_NAME $JOB_LIST
+    ((JOB_COUNTER++))
     JOB_NAME="job${JOB_COUNTER}"
     JOB_LIST="${CONFIG_DIR}/${JOB_NAME}_filelist.txt"
   fi
 done < $MASTER_FILE_LIST
 # Submit final job list
-submit_condor_jobs $JOB_NAME $JOB_LIST $JOB_COUNTER
+submit_condor_jobs $JOB_NAME $JOB_LIST $JOB_COUNTER $FILE_COUNTER
+
 echo ">>> Done with RunCondorSkim.sh!"

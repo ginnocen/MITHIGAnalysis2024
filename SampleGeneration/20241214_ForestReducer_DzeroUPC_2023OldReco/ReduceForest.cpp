@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string DGenTreeName = CL.Get("DGenTree", "Dfinder/ntGen");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcdigi");
+  bool HideProgressBar = CL.GetBool("HideProgressBar", false);
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
@@ -71,17 +72,21 @@ int main(int argc, char *argv[]) {
     DzeroGenTreeMessenger MDzeroGen(InputFile, DGenTreeName);
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);
     METFilterTreeMessenger MMETFilter(InputFile);
-
+    
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);
-    Bar.SetStyle(-1);
+    if (!HideProgressBar) {
+      Bar.SetStyle(-1);
+    }
 
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
 
     for (int iE = 0; iE < EntryCount; iE++) {
-      if (EntryCount < 300 || (iE % (EntryCount / 250)) == 0) {
+      if (!HideProgressBar &&
+        (EntryCount < 300 || (iE % (EntryCount / 250)) == 0)
+      ) {
         Bar.Update(iE);
         Bar.Print();
       }
@@ -261,10 +266,11 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.Dsize = countSelDzero;
       MDzeroUPC.FillEntry();
     }
-
-    Bar.Update(EntryCount);
-    Bar.Print();
-    Bar.PrintLine();
+    if (!HideProgressBar) {
+      Bar.Update(EntryCount);
+      Bar.Print();
+      Bar.PrintLine();
+    }
 
     InputFile.Close();
   }

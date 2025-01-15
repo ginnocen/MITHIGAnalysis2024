@@ -35,14 +35,14 @@ xrdfs $XROOTD_SERVER rmdir $ANALYSIS_DIR
 echo "--- Remaking $ANALYSIS_DIR..."
 xrdfs $XROOTD_SERVER mkdir -p $ANALYSIS_DIR
 echo "--- Copying files in MITHIGAnalysis2024/CommonCode..."
-xrdcp --force --parallel 5 --recursive --retry 2 --retry-policy continue ../../CommonCode $XROOTD_SERVER/$ANALYSIS_DIR/
-xrdcp --force --retry 2 --retry-policy continue ../../SetupAnalysis.sh $XROOTD_SERVER/$ANALYSIS_DIR/
+xrdcp --parallel 5 --recursive --retry 2 --retry-policy continue ../../CommonCode $XROOTD_SERVER/$ANALYSIS_DIR/
+xrdcp --retry 2 --retry-policy continue ../../SetupAnalysis.sh $XROOTD_SERVER/$ANALYSIS_DIR/
 for ANALYSIS_SUBDIR in ${ANALYSIS_SUBDIRS[@]}; do
   echo "--- Copying files in MITHIGAnalysis2024/$ANALYSIS_SUBDIR..."
   xrdfs root://xrootd.cmsaf.mit.edu/ mkdir -p $ANALYSIS_DIR/$ANALYSIS_SUBDIR
-  xrdcp --force --parallel 5 --recursive --retry 2 --retry-policy continue --parallel 5 $ProjectBase/$ANALYSIS_SUBDIR/include $XROOTD_SERVER/$ANALYSIS_DIR/$ANALYSIS_SUBDIR/
-  xrdcp --force --retry 2 --retry-policy continue $ProjectBase/$ANALYSIS_SUBDIR/ReduceForest.cpp $XROOTD_SERVER/$ANALYSIS_DIR/$ANALYSIS_SUBDIR/
-  xrdcp --force --retry 2 --retry-policy continue $ProjectBase/$ANALYSIS_SUBDIR/makefile $XROOTD_SERVER/$ANALYSIS_DIR/$ANALYSIS_SUBDIR/
+  xrdcp --parallel 5 --recursive --retry 2 --retry-policy continue --parallel 5 $ProjectBase/$ANALYSIS_SUBDIR/include $XROOTD_SERVER/$ANALYSIS_DIR/$ANALYSIS_SUBDIR/
+  xrdcp --retry 2 --retry-policy continue $ProjectBase/$ANALYSIS_SUBDIR/ReduceForest.cpp $XROOTD_SERVER/$ANALYSIS_DIR/$ANALYSIS_SUBDIR/
+  xrdcp --retry 2 --retry-policy continue $ProjectBase/$ANALYSIS_SUBDIR/makefile $XROOTD_SERVER/$ANALYSIS_DIR/$ANALYSIS_SUBDIR/
 done
 
 echo ">>> Done!"
