@@ -3300,9 +3300,12 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
    Tree->SetBranchAddress("NPU", &NPU);
+   Tree->SetBranchAddress("NCollWeight", &NCollWeight);
+   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
+
    Tree->SetBranchAddress("JetPT", &JetPT);
    Tree->SetBranchAddress("JetEta", &JetEta);
-   Tree->SetBranchAddress("JetPhi", &JetPhi);
+   Tree->SetBranchAddress("JetPhi",&JetPhi);
    Tree->SetBranchAddress("IsMuMuTagged", &IsMuMuTagged);
    Tree->SetBranchAddress("muPt1", &muPt1);
    Tree->SetBranchAddress("muPt2", &muPt2);
@@ -3410,6 +3413,9 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("VYError", &VYError, "VYError/F");
    Tree->Branch("VZError", &VZError, "VZError/F");
    Tree->Branch("NPU", &NPU, "NPU/I");
+   Tree->Branch("NCollWeight", &NCollWeight,  "NCollWeight/F");
+   Tree->Branch("ExtraMuWeight", &ExtraMuWeight, "ExtraMuWeight[12]/F");
+
    Tree->Branch("JetPT", &JetPT);
    Tree->Branch("JetEta", &JetEta);
    Tree->Branch("JetPhi", &JetPhi);
@@ -3464,6 +3470,11 @@ void MuMuJetMessenger::Clear()
    VYError = 0;
    VZError = 0;
    NPU = 0;
+   NCollWeight = 1;
+  
+   for(int i = 0; i < 12; i++)
+      ExtraMuWeight[i] = 1;
+
    JetPT->clear();
    JetEta->clear();
    JetPhi->clear();
@@ -3514,6 +3525,10 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    VYError      = M.VYError;
    VZError      = M.VZError;
    NPU          = M.NPU;
+   NCollWeight  = M.NCollWeight;
+
+   for(int i = 0; i < 12; i++)
+      ExtraMuWeight[i] = M.ExtraMuWeight[i];
 
 
    if(JetPT != nullptr && M.JetPT != nullptr)   *JetPT = *(M.JetPT);
