@@ -63,9 +63,6 @@ else
   echo "FILES_PER_JOB:    $FILES_PER_JOB"
   echo "JOB_MEMORY:       $JOB_MEMORY"
   echo "JOB_STORAGE:      $JOB_STORAGE"
-  if [ $MAX_JOBS -ne 0 ]; then
-    echo "MAX_JOBS:         $MAX_JOBS"
-  fi
   echo "CMSSW_VERSION:    $CMSSW_VERSION"
   echo "CONFIG_DIR:       $CONFIG_DIR"
   echo "MASTER_FILE_LIST: $MASTER_FILE_LIST"
