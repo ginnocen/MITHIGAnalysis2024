@@ -61,9 +61,6 @@ else
   echo "FILES_PER_JOB:    $FILES_PER_JOB"
   echo "JOB_MEMORY:       $JOB_MEMORY"
   echo "JOB_STORAGE:      $JOB_STORAGE"
-  if [ $MAX_JOBS -ne 0 ]; then
-    echo "MAX_JOBS:         $MAX_JOBS"
-  fi
   echo "CMSSW_VERSION:    $CMSSW_VERSION"
   echo "ANALYSIS_DIR:     $ANALYSIS_DIR"
   echo "ANALYSIS_SUBDIR:  $ANALYSIS_SUBDIR"
@@ -71,6 +68,9 @@ else
   echo "MASTER_FILE_LIST: $MASTER_FILE_LIST"
   echo "REFRESH_PROXY:    $REFRESH_PROXY"
   echo "COPY_TO_T2:       $COPY_TO_T2"
+  if [ $MAX_JOBS -ne 0 ]; then
+    echo "MAX_JOBS:         $MAX_JOBS"
+  fi
 fi
 
 if [[ $REFRESH_PROXY -eq 1 ]]; then
@@ -120,13 +120,13 @@ while IFS= read -r LINE; do
     if (( $JOB_COUNTER == $MAX_JOBS )); then
       break
     fi
-    submit_condor_jobs $JOB_NAME $JOB_LIST
+    submit_condor_jobs $JOB_NAME $JOB_LIST $JOB_COUNTER
     ((JOB_COUNTER++))
     JOB_NAME="job${JOB_COUNTER}"
     JOB_LIST="${CONFIG_DIR}/${JOB_NAME}_filelist.txt"
   fi
 done < $MASTER_FILE_LIST
 # Submit final job list
-submit_condor_jobs $JOB_NAME $JOB_LIST $JOB_COUNTER $FILE_COUNTER
+submit_condor_jobs $JOB_NAME $JOB_LIST $JOB_COUNTER
 
 echo ">>> Done with RunCondorSkim.sh!"

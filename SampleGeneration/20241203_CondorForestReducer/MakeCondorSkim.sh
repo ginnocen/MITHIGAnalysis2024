@@ -28,6 +28,7 @@ cat > $SCRIPT <<EOF1
 
 CLUSTER=\$1
 PROC=\$2
+SAVE_IO_LISTS=1
 
 # OS config checks
 echo ""
@@ -104,9 +105,7 @@ while read -r ROOT_IN_T2; do
     --IsData true \\
     --PFTree particleFlowAnalyser/pftree \\
     --HideProgressBar true &
-  SKIM_PID=\$!
-  wait \$SKIM_PID
-  sleep 1
+  wait
   echo \$(ls -lh \$ROOT_OUT) >> \$ROOT_OUT_LIST
   rm \$ROOT_IN_LOCAL
   ((COUNTER++))
@@ -122,8 +121,10 @@ echo \$(ls -lh \{JOB_NAME}_merged.root) >> \$ROOT_OUT_LIST
 echo ""
 echo ">>> Transferring merged root file to T2"
 xrdcp -N --retry 2 --retry-policy continue --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
-xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
-xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
+if [ \$SAVE_IO_LISTS -eq 1 ]; then
+  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
+  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
+fi
 echo ""
 echo ">>> Done!"
 
