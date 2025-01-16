@@ -5,10 +5,11 @@ import pandas as pd
 import numpy as np
 import xgboost as xgb
 from sklearn.model_selection import train_test_split, learning_curve
-from sklearn.metrics import roc_auc_score
+from sklearn.metrics import roc_auc_score, roc_curve
 import yaml
 import matplotlib.pyplot as plt
 from sklearn.inspection import DecisionBoundaryDisplay
+
 
 def process_root_file(input_file, tree_name, branches, ptmin, ptmax, ymin, ymax):
     # Load the tree and extract branches
@@ -151,16 +152,20 @@ def plot_xgb_feature_importance(model,
 
     return importances
 
+
 branches = [
     "Dmass", "Dchi2cl", "Dpt", "Dy", "Dtrk1Pt", "Dtrk2Pt", "DsvpvDistance", "DsvpvDisErr",
     "DsvpvDistance_2D", "DsvpvDisErr_2D", "Dalpha", "Ddtheta", "Dgen", "DisSignalCalc",
     "DisSignalCalcPrompt", "DisSignalCalcFeeddown", "DpassCut23LowPt"
 ]
 
-
 parser = argparse.ArgumentParser(description="Process arguments for MLoptimization.py")
 parser.add_argument("--random_state", default=42)
-parser.add_argument("--input_file_mc", default="/Users/ginnocen/Desktop/MITHIGAnalysis2024/Skims/SkimsMC/20241216_v1_filelist20241216_Pthat2_ForceD0Decay100M_BeamA_v1/mergedfile.root")
+parser.add_argument(
+    "--input_file_mc",
+    default=
+    "/Users/ginnocen/Desktop/MITHIGAnalysis2024/Skims/SkimsMC/20241216_v1_filelist20241216_Pthat2_ForceD0Decay100M_BeamA_v1/mergedfile.root"
+)
 parser.add_argument("--tree_name", default="Tree")
 parser.add_argument("--ptmin", default=1)
 parser.add_argument("--ptmax", default=2)
@@ -244,13 +249,14 @@ plot_xgb_learning_curve(model=model,
 model.fit(X_train, y_train)
 model.save_model(output_model)
 
-plot_xgb_feature_importance(model=model,
-                            X_train=X,       # Only used to extract feature names
-                            y_train=y,       # Not used here
-                            scoring="roc_auc",
-                            n_jobs=-1,
-                            figsize=(6, 4),
-                            title="Feature Importances (Fully Trained Model)")
+plot_xgb_feature_importance(
+    model=model,
+    X_train=X,  # Only used to extract feature names
+    y_train=y,  # Not used here
+    scoring="roc_auc",
+    n_jobs=-1,
+    figsize=(6, 4),
+    title="Feature Importances (Fully Trained Model)")
 
 # Predict probabilities for the positive class (label=1)
 y_pred_test = model.predict_proba(X_test)[:, 1]
@@ -258,3 +264,13 @@ y_pred_test = model.predict_proba(X_test)[:, 1]
 # Compute the ROC AUC score
 auc_score_test = roc_auc_score(y_test, y_pred_test)
 print(f"Test ROC AUC: {auc_score_test:.4f}")
+
+fpr, tpr, thresholds = roc_curve(y_test, y_pred_test)
+plt.figure()
+plt.plot(fpr, tpr, label=f"ROC Curve (AUC = {auc_score_test:.2f})")
+plt.plot([0, 1], [0, 1], 'k--', label="Random Guess")
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+plt.legend(loc="lower right")
+plt.savefig("roccurve.png", dpi=300, bbox_inches="tight")
