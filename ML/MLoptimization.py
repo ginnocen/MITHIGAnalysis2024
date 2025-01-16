@@ -8,8 +8,6 @@ from sklearn.model_selection import train_test_split, learning_curve
 from sklearn.metrics import roc_auc_score, roc_curve
 import yaml
 import matplotlib.pyplot as plt
-from sklearn.inspection import DecisionBoundaryDisplay
-
 
 def process_root_file(input_file, tree_name, branches, ptmin, ptmax, ymin, ymax):
     # Load the tree and extract branches
