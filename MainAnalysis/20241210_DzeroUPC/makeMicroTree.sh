@@ -15,6 +15,8 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 	IsGammaN=$(echo $MicroTree | jq -r '.IsGammaN')
 	TriggerChoice=$(echo $MicroTree | jq -r '.TriggerChoice')
 	IsData=$(echo $MicroTree | jq -r '.IsData')
+	DoSystRapGap=$(echo $MicroTree | jq -r '.DoSystRapGap')
+	DoSystD=$(echo $MicroTree | jq -r '.DoSystD')
 	mkdir -p $MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/
 	Output=$MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/${MicroTreeBaseName}
 
@@ -26,6 +28,8 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 										--IsGammaN $IsGammaN \
 										--TriggerChoice $TriggerChoice \
 										--IsData $IsData \
-										--Output $Output
+										--DoSystRapGap $DoSystRapGap \
+										--DoSystD $DoSystD \
+										--Output $Output &
 
 done

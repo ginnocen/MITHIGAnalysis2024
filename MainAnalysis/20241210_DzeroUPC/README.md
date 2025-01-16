@@ -45,11 +45,17 @@
 		```
 
 ### Plotting macro for cross-sections and efficiencies as a function of rapidity
-```bash
-make PlotCrossSection
-./PlotCrossSection --InputPoints fullAnalysis/pt2-5_y-2--1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y-1-0_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y0-1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y1-2_IsGammaN1/MassFit/correctedYields.md
-./PlotCrossSection --InputPoints fullAnalysis/pt2-5_y-2--1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y-1-0_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y0-1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y1-2_IsGammaN0/MassFit/correctedYields.md
-```
-<!-- dropbox_uploader.sh upload *.pdf /tmp/ -->
+- Example command lines for the executable `PlotCrossSection`:
+	```bash
+	make PlotCrossSection
+	./PlotCrossSection --MinDzeroPT 2 --MaxDzeroPT 5 --IsGammaN 1 \
+	--InputPoints fullAnalysis/pt2-5_y-2--1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y-1-0_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y0-1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt2-5_y1-2_IsGammaN1/MassFit/correctedYields.md 
+	./PlotCrossSection --MinDzeroPT 2 --MaxDzeroPT 5 --IsGammaN 0 \
+	--InputPoints fullAnalysis/pt2-5_y-2--1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y-1-0_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y0-1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt2-5_y1-2_IsGammaN0/MassFit/correctedYields.md
+	```
 
-<!-- make PlotCrossSection; ./PlotCrossSection --InputPoints fullAnalysis_pthat2eff_gammaN/pt2-5_y-2--1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis_pthat2eff_gammaN/pt2-5_y-1-0_IsGammaN1/MassFit/correctedYields.md,fullAnalysis_pthat2eff_gammaN/pt2-5_y0-1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis_pthat2eff_gammaN/pt2-5_y1-2_IsGammaN1/MassFit/correctedYields.md; dropbox_uploader.sh upload *.pdf /tmp/ -->
+- Controlling shell script:
+	```bash
+	make PlotCrossSection
+	bash plot.sh plotSettings/fullAnalysis.json
+	```

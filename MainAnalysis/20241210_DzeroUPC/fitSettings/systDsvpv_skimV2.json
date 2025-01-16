@@ -1,0 +1,145 @@
+{
+  "FitDir": "MassFit",
+  "MicroTrees": [
+    {
+      "dataInput": "systDsvpv/pt1-2_y-1-1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt1-2_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt1-2_y-1-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y-1-1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y-1-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt1-2_y-1-1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt1-2_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt1-2_y-1-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y-1-1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y-1-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt2-5_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt2-5_y1-2_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt5-8_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt5-8_y1-2_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systDsvpv/pt8-12_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "systDsvpv/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,systDsvpv/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systDsvpv/pt8-12_y1-2_IsGammaN0/MC.root"
+    }
+  ]
+}

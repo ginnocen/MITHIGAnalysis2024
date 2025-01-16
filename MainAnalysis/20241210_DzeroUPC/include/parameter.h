@@ -3,8 +3,22 @@
 //============================================================//
 class Parameters {
 public:
-    Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN, int TriggerChoice, bool IsData, float scaleFactor = 1.0)
-	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor) {}
+    Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN, int TriggerChoice, bool IsData, float scaleFactor = 1.0,
+                int in_DoSystRapGap = 0, int in_DoSystD = 0)
+	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor)
+    {
+        if (in_DoSystRapGap!=0 && in_DoSystRapGap != 1 && in_DoSystRapGap != -1)
+        {
+            printf("[Error] Couldn't recognize the option DoSystRapGap=%d (should be 0 = nominal, 1 = tight, -1: loose). Exiting...\n", in_DoSystRapGap);
+            exit(1);
+        } else { DoSystRapGap = in_DoSystRapGap; }
+
+        if (in_DoSystD!=0 && in_DoSystD != 1 && in_DoSystD != 2)
+        {
+            printf("[Error] Couldn't recognize the option DoSystD=%d (should be 0 = nominal, 1 = Dsvpv variation, 2: DtrkPt variation). Exiting...\n", in_DoSystD);
+            exit(1);
+        } else { DoSystD = in_DoSystD; }
+    }
     Parameters() {}
    string input;          // Input file name
    string output;         // Output file name
@@ -16,6 +30,11 @@ public:
    int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
    bool IsData;           // Data or MC
    float scaleFactor;     // Scale factor
+   int DoSystRapGap;      // Systematic study: apply the alternative event selections
+                          // 0 = nominal, 1 = tight, -1: loose
+   int DoSystD;           // Systematic study: apply the alternative D selections
+                          // 0 = nominal, 1 = Dsvpv variation, 2: DtrkPt variation
+
    int nThread;           // Number of Threads
    int nChunk;            // Process the Nth chunk
    void printParameters() const {
@@ -29,6 +48,12 @@ public:
        cout << "TriggerChoice: " << TriggerChoice << endl;
        cout << "IsData: " << IsData << endl;
        cout << "Scale factor: " << scaleFactor << endl;
+       cout << "DoSystRapGap: " << ((DoSystRapGap==0)? "No" :
+                                    (DoSystRapGap==1)? "Tight" : "Loose")
+                                << endl;
+       cout << "DoSystD: "      << ((DoSystD==0)? "No" :
+                                    (DoSystD==1)? "Dsvpv variation" : "DtrkPt variation")
+                                << endl;
        cout << "Number of Threads: " << nThread << endl;
        cout << "Process the Nth chunk: " << nChunk << endl;
 
@@ -57,7 +82,11 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hIsData->SetBinContent(1, par.IsData);
     TH1D* hScaleFactor = new TH1D("parScaleFactor", "parScaleFactor", 1, 0, 1);
     hScaleFactor->SetBinContent(1, par.scaleFactor);
-    
+    TH1D* hDoSystRapGap = new TH1D("parDoSystRapGap", "parDoSystRapGap", 1, 0, 1);
+    hDoSystRapGap->SetBinContent(1, par.DoSystRapGap);
+    TH1D* hDoSystD = new TH1D("parDoSystD", "parDoSystD", 1, 0, 1);
+    hDoSystD->SetBinContent(1, par.DoSystD);
+
     // Write histograms to the output file
     hMinDzeroPT->Write();
     hMaxDzeroPT->Write();
@@ -67,6 +96,8 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hTriggerChoice->Write();
     hIsData->Write();
     hScaleFactor->Write();
+    hDoSystRapGap->Write();
+    hDoSystD->Write();
 
     // Clean up
     delete hMinDzeroPT;
@@ -77,4 +108,6 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     delete hTriggerChoice;
     delete hIsData;
     delete hScaleFactor;
+    delete hDoSystRapGap;
+    delete hDoSystD;
 }

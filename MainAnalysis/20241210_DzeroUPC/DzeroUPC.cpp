@@ -32,25 +32,42 @@ bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) { return tr
 // Check if the event pass eventSelection criteria
 //============================================================//
 bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
-  if (!par.IsData)
+  if (par.IsData)
   {
-    // if (par.IsGammaN && b->gapgammaN == false)
-    //   return false;
-    // if (!par.IsGammaN && b->gapNgamma == false)
-    //   return false;
-    if (b->nVtx >= 3) return false;
-    return true;
+    if (par.TriggerChoice == 1 && b->isL1ZDCOr == false)
+      return false;
+    if (par.TriggerChoice == 2 && b->isL1ZDCXORJet8 == false)
+      return false;
   }
+
   if (b->selectedBkgFilter == false || b->selectedVtxFilter == false)
     return false;
-  if (par.IsGammaN && (b->ZDCgammaN && b->gapgammaN) == false)
-    return false;
-  if (!par.IsGammaN && (b->ZDCNgamma && b->gapNgamma) == false)
-    return false;
-  if (par.TriggerChoice == 1 && b->isL1ZDCOr == false)
-    return false;
-  if (par.TriggerChoice == 2 && b->isL1ZDCXORJet8 == false)
-    return false;
+
+  if (par.DoSystRapGap==-1)
+  {
+    // alternative (loose) rapidity gap selection
+    if (par.IsGammaN && b->gammaN_EThreshSyst15() == false)
+      return false;
+    if (!par.IsGammaN && b->Ngamma_EThreshSyst15() == false)
+      return false;
+  }
+  else if (par.DoSystRapGap==1)
+  {
+    // alternative (tight) rapidity gap selection
+    if (par.IsGammaN && b->gammaN_EThreshSyst5p5() == false)
+      return false;
+    if (!par.IsGammaN && b->Ngamma_EThreshSyst5p5() == false)
+      return false;
+  }
+  else
+  {
+    // nominal rapidity gap selection
+    if (par.IsGammaN && (b->ZDCgammaN && b->gapgammaN) == false)
+      return false;
+    if (!par.IsGammaN && (b->ZDCNgamma && b->gapNgamma) == false)
+      return false;
+  }
+
   if (b->nVtx >= 3) return false;
   return true;
 }
@@ -146,8 +163,10 @@ public:
           if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY)
             continue;
           // if (MDzeroUPC->DpassCut23PAS->at(j) == false)
-          if (MDzeroUPC->DpassCut23LowPt->at(j) == false)
-            continue;
+          if (par.DoSystD==0 && MDzeroUPC->DpassCut23LowPt->at(j) == false) continue;
+          if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpv->at(j) == false) continue;
+          if (par.DoSystD==2 && MDzeroUPC->DpassCut23PASSystDtrkPt->at(j) == false) continue;
+
           hDmass->Fill((*MDzeroUPC->Dmass)[j]);
           if (!par.IsData) {
             nt->Fill((*MDzeroUPC->Dmass)[j], (*MDzeroUPC->Dgen)[j]);
@@ -216,8 +235,14 @@ int main(int argc, char *argv[]) {
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
   int TriggerChoice = CL.GetInt("TriggerChoice", 2); // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
   float scaleFactor = CL.GetDouble("scaleFactor", 1); // Scale factor for the number of events to be processed.
+  int DoSystRapGap = CL.GetInt("DoSystRapGap", 0);   // Systematic study: apply the alternative event selections
+                                                     // 0 = nominal, 1 = tight, -1: loose
+  int DoSystD = CL.GetInt("DoSystD", 0);             // Systematic study: apply the alternative D selections
+                                                     // 0 = nominal, 1 = Dsvpv variation, 2: DtrkPt variation
+
   bool IsData = CL.GetBool("IsData", 0);              // Data or MC
-  Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, IsData, scaleFactor);
+  Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, IsData, scaleFactor,
+                 DoSystRapGap, DoSystD);
   par.input = CL.Get("Input", "mergedSample.root"); // Input file
   par.output = CL.Get("Output", "output.root");     // Output file
   par.nThread = CL.GetInt("nThread", 1);            // The number of threads to be used for parallel processing.
