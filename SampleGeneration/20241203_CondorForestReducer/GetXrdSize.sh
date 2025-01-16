@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# Define specific xrootd server for faster processing
-XROOTD_SERVER="root://xrootd5.cmsaf.mit.edu"
-REMOTE_DIR="/store/user/jdlang/run3_2024PromptRecoSkims_HIForward_20241210/"
+# Default values (will be used if no args given)
+XROOTD_SERVER_DEF="root://xrootd.cmsaf.mit.edu"
+REMOTE_DIR_DEF="/store/user/jdlang/run3_2023ReReco_Skims/"
 
-# Make dated list of all files in parent dir
+# Overwrite if run with args
+XROOTD_SERVER=${1:-$XROOTD_SERVER_DEF}
+REMOTE_DIR=${2:-$REMOTE_DIR_DEF}
+
+# Make dated list of all files in given directory
 DATE=$(date +%Y%m%d)
-FILE_LIST="run3_2024PromptReco_${DATE}.txt"
+FILE_LIST="filelist_$(basename $REMOTE_DIR)_${DATE}.txt"
 rm $FILE_LIST
 xrdfs $XROOTD_SERVER ls -R -l $REMOTE_DIR >> $FILE_LIST
 if [ -z "$FILE_LIST" ]; then
@@ -14,15 +18,15 @@ if [ -z "$FILE_LIST" ]; then
     exit 1
 fi
 # Temp file for valid paths
-temp_file=$(mktemp)
+TEMP_FILE=$(mktemp)
 # Keep only paths ending with '.root'
 while IFS= read -r line; do
   if [[ "$line" =~ \.root$ ]]; then
-    echo "$line" >> "$temp_file"
+    echo "$line" >> "$TEMP_FILE"
   fi
 done < $FILE_LIST
 # Replace the original file with the temp file
-mv "$temp_file" "$FILE_LIST"
+mv "$TEMP_FILE" "$FILE_LIST"
 
 # Calculate the total size, file by file
 TOTAL_SIZE=0
