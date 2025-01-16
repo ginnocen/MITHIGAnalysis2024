@@ -1,9 +1,12 @@
-CMSFOLDER=$HOME/CMSSW_14_1_4_patch5/src
-WORKFOLDER=$PWD
-
+CMSFOLDER=/home/$USER/CMSSW_14_1_7/src
+CMSSUBMIT=/home/submit/$USER/CMSSW_14_1_7/src
+if [ -d $CMSSUBMIT ]; then
+    CMSFOLDER=$CMSSUBMIT
+fi
+CURRENTFOLDER=$(pwd)
 if [ ! -d $CMSFOLDER ]; then
     echo "You need to define the folder where the CMSSW environment is located"
-    exit 1
+    kill -INT $$
 else
     echo "CMSSW environment is located at $CMSFOLDER"
 fi
