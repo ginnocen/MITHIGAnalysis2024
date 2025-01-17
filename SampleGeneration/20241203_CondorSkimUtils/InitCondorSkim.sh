@@ -1,8 +1,16 @@
 #!/bin/bash
+# InitCondorSkim.sh
+# Author: Jordan Lang (jdlang)
+#
+# DO NOT RUN THIS DIRECTLY! This script is intended to be called by a
+# RunCondorSkim.sh file in a separate folder. To skim files, navigate to the
+# subdirectory of MITHIGAnalysis2024/SampleGeneration/ that has the version of
+# ReduceForest.cpp you want to use. Then run:
+#     bash RunCondorSkim.sh
 
 # Usage and internal variables
 usage="
-Numbered arguments for RunCondorSkim.sh:
+Positional arguments (RunCondorSkim.sh -> InitCondorSkim.sh):
     1 ) SOURCE_SERVER: xrootd server address for source/input files.
     2 ) SOURCE_DIR: Parent directory on SOURCE_SERVER containing forest files.
         This is recursively searched, so files within subfolders are fine.
@@ -79,11 +87,14 @@ if [[ $REFRESH_PROXY -eq 1 ]]; then
   cp /tmp/x509up_u'$(id -u)' ~/
   export PROXYFILE=~/x509up_u$(id -u)
 fi
-if [[ $COPY_TO_T2 -eq 1 ]]; then
-  echo ">>> Copying local MITHIGAnalysis2024 files to T2_US_MIT"
-  $ProjectBase/$condor_skim_dir/CopyToT2.sh $ANALYSIS_DIR $ANALYSIS_SUBDIR
-  wait
-fi
+#if [[ $COPY_TO_T2 -eq 1 ]]; then
+#  echo ">>> Copying local MITHIGAnalysis2024 files to T2_US_MIT"
+#  $ProjectBase/$condor_skim_dir/CopyToT2.sh $ANALYSIS_DIR $ANALYSIS_SUBDIR
+#  wait
+#fi
+
+tar -cvf MITHIGAnalysis2024.tar -T ../condor_skim_dir/AnalysisCompressionList.txt
+
 echo ">>> Setting up local workspace"
 xrdfs $OUTPUT_SERVER mkdir -p $OUTPUT_DIR
 mkdir -p $CONFIG_DIR
@@ -97,7 +108,7 @@ submit_condor_jobs() {
   local JOB_COUNTER=${3}
   echo "Making configs for $JOB_NAME"
   OUTPUT_PATH="${OUTPUT_DIR}/skim_${JOB_COUNTER}.root"
-  $ProjectBase/$condor_skim_dir/MakeCondorSkim.sh $JOB_NAME $JOB_LIST $CONFIG_DIR $OUTPUT_SERVER $OUTPUT_PATH $PROXYFILE $JOB_MEMORY $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_DIR $ANALYSIS_SUBDIR
+  $ProjectBase/$condor_skim_dir/MakeCondorConfigs.sh $JOB_NAME $JOB_LIST $CONFIG_DIR $OUTPUT_SERVER $OUTPUT_PATH $PROXYFILE $JOB_MEMORY $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_DIR $ANALYSIS_SUBDIR
   wait
   echo "Submitted $JOB_NAME"
   echo ""
