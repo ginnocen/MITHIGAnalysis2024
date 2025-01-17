@@ -9,8 +9,7 @@ PROXYFILE=${6}
 JOB_MEMORY=${7}
 JOB_STORAGE=${8}
 CMSSW_VERSION=${9}
-ANALYSIS_DIR=${10}
-ANALYSIS_SUBDIR=${11}
+ANALYSIS_SUBDIR=${10}
 
 SCRIPT="${CONFIG_DIR}/${JOB_NAME}_script.sh"
 CONFIG="${CONFIG_DIR}/${JOB_NAME}_config.condor"
@@ -42,7 +41,6 @@ export X509_USER_KEY=$PROXYFILE_NAME
 voms-proxy-info
 
 # Setup
-echo ""
 echo ">>> Setting up ${CMSSW_VERSION}"
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 cmsrel $CMSSW_VERSION
@@ -51,10 +49,9 @@ cmsenv
 cd ../../
 which root
 which hadd
-echo ""
 echo ">>> Setting up directory"
-xrdcp -r -N --retry 2 --retry-policy continue --notlsok root://xrootd.cmsaf.mit.edu/$ANALYSIS_DIR .
-cd $(basename "$ANALYSIS_DIR")
+tar -xf MITHIGAnalysis2024.tar
+cd MITHIGAnalysis2024
 source SetupAnalysis.sh
 cd CommonCode/
 make
@@ -62,7 +59,6 @@ cd ../$ANALYSIS_SUBDIR
 cp ../../../$JOB_LIST_NAME .
 cp ../../../$PROXYFILE_NAME .
 ls -l
-echo ""
 echo ">>> Compiling skimmer"
 # Must manually compile to avoid error from missing test file
 g++ ReduceForest.cpp -o Execute \\
@@ -75,7 +71,6 @@ if ! [ -f "Execute" ]; then
 fi
 
 # Skimming
-echo ""
 echo ">>> Running skimmer"
 mkdir -p "output"
 COUNTER=0
@@ -84,9 +79,8 @@ ROOT_OUT_LIST="${JOB_NAME}_rootOut.txt"
 while read -r ROOT_IN_T2; do
   ROOT_IN_LOCAL="forest_\${COUNTER}.root"
   ROOT_OUT="output/${JOB_NAME}_\${COUNTER}.root"
-  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
-  XRD_PID=\$!
-  wait \$XRD_PID
+  xrdcp -N -S 4 --retry 2 --retry-policy continue --notlsok \$ROOT_IN_T2 \$ROOT_IN_LOCAL
+  wait
   echo \$(ls -lh \$ROOT_IN_LOCAL) >> \$ROOT_IN_LIST
   if ! [ -f "\$ROOT_IN_LOCAL" ]; then
     echo "--- ERROR! Missing root file: \$ROOT_IN_LOCAL"
@@ -110,22 +104,19 @@ while read -r ROOT_IN_T2; do
   rm \$ROOT_IN_LOCAL
   ((COUNTER++))
 done < $JOB_LIST_NAME
-echo ""
 echo ">>> Completed \$COUNTER jobs!"
 
 # Merge and transfer
-echo ""
 echo ">>> Merging root files"
 hadd -ff -k ${JOB_NAME}_merged.root output/${JOB_NAME}_*.root
 echo \$(ls -lh \{JOB_NAME}_merged.root) >> \$ROOT_OUT_LIST
-echo ""
 echo ">>> Transferring merged root file to T2"
-xrdcp -N --retry 2 --retry-policy continue --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
+xrdcp -N -S 4 --retry 2 --retry-policy continue --notlsok ${JOB_NAME}_merged.root ${OUTPUT_SERVER}${OUTPUT_PATH}
 if [ \$SAVE_IO_LISTS -eq 1 ]; then
-  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_IN_LIST
-  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/\$ROOT_OUT_LIST
+  xrdfs ${OUTPUT_SERVER} mkdir -p ${OUTPUT_DIR}/file_lists
+  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_IN_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/file_lists/\$ROOT_IN_LIST
+  xrdcp -N --retry 2 --retry-policy continue --notlsok \$ROOT_OUT_LIST ${OUTPUT_SERVER}${OUTPUT_DIR}/file_lists/\$ROOT_OUT_LIST
 fi
-echo ""
 echo ">>> Done!"
 
 EOF1
@@ -152,7 +143,7 @@ max_retries             = 1
 
 ### File transfer
 should_transfer_files   = YES
-transfer_input_files    = $JOB_LIST
+transfer_input_files    = $JOB_LIST,MITHIGAnalysis2024.tar
 MAX_TRANSFER_INPUT_MB   = 400
 #on_exit_remove          = (ExitBySignal == False) && (ExitCode == 0)
 
