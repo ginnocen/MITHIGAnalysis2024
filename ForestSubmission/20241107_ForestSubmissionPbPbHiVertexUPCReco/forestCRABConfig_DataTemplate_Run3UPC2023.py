@@ -29,10 +29,11 @@ config.Data.runRange = run
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 1000
 config.Data.lumiMask = '/eos/user/c/cmsdqm/www/CAF/certification/Collisions23HI/Cert_Collisions2023HI_374288_375823_Golden.json'
-config.Data.outLFNDirBase = '/store/user/' + username + '/run3_2023Data_Jan2025ReReco/' + config.General.requestName
+#config.Data.outLFNDirBase = '/store/user/' + username + '/run3_2023Data_Dec2024ReReco/' + config.General.requestName
+config.Data.outLFNDirBase = '/store/group/phys_heavyions/' + username + '/run3_2023Data_Dec2024ReReco/' + config.General.requestName
 config.Data.publication = False
 config.Data.allowNonValidInputDataset = True
 
 config.section_("Site")
 #config.Site.whitelist = ['T2_US_Vanderbilt', 'T2_US_Nebraska', 'T2_CH_CERN']
-config.Site.storageSite = 'T2_US_MIT'
+config.Site.storageSite = 'T2_CH_CERN'

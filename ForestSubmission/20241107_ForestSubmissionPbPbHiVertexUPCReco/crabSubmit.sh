@@ -18,8 +18,7 @@ RUNLIST=(
 #  388579 388582 388583 388613 388620
 #  388622 388624 388710 388711 388713
 ### 2023 Valid Runs
-  374804
-#  374810 374828 374833
+  374804 374810 374828 374833
 #  374834 374925 374950 374951 374953
 #  374961 374970 374997 374998 375001
 #  375002 375007 375013 375055 375058
@@ -63,11 +62,11 @@ if [[ $ISDATA -eq 1 ]]; then
       # Copy CRAB config from template
       rm forestCRABConfig_Data_Run3UPC.py
       if [[ $RUNYEAR -eq 2023 ]]; then
-        JOBTAG="Run3_2023UPC_2025ReReco_${RUN}_${PDNAME}"
+        JOBTAG="Run3_2023UPC_${RUN}"
         DATASET="/${PDNAME}/HIRun2023A-1Dec2024-v1/MINIAOD"
         cp forestCRABConfig_DataTemplate_Run3UPC2023.py forestCRABConfig_Data_Run3UPC.py
       elif [[ $RUNYEAR -eq 2024 ]]; then
-        JOBTAG="Run3_2024UPC_2024PromptReco_${RUN}_${PDNAME}"
+        JOBTAG="Run3_2024UPC_${RUN}"
         DATASET="/${PDNAME}/HIRun2024A-PromptReco-v1/MINIAOD"
         cp forestCRABConfig_DataTemplate_Run3UPC2024.py forestCRABConfig_Data_Run3UPC.py
       fi

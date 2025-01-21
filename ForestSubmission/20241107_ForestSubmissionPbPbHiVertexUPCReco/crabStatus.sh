@@ -99,18 +99,18 @@ for RUN in ${RUNLIST[@]}; do
         break
         
       elif [[ "$CHOICE" == "r" ]]; then
-        #echo "Set maxmemory (default is ${MAXMEMORY}): "
-        #read -r ARGMEMORY
-        #echo "Set maxjobruntime (default is ${MAXRUNTIME}): "
-        #read -r ARGRUNTIME
+        echo "Set maxmemory (default is ${MAXMEMORY}): "
+        read -r ARGMEMORY
+        echo "Set maxjobruntime (default is ${MAXRUNTIME}): "
+        read -r ARGRUNTIME
         RESUBMEMORY=$MAXMEMORY
         RESUBRUNTIME=$MAXRUNTIME
-        #if ! [ -z "$ARGMEMORY" ]; then
-        #  RESUBMEMORY=$ARGMEMORY
-        #fi
-        #if ! [ -z "$ARGRUNTIME" ]; then
-        #  RESUBRUNTIME=$ARGRUNTIME
-        #fi
+        if ! [ -z "$ARGMEMORY" ]; then
+          RESUBMEMORY=$ARGMEMORY
+        fi
+        if ! [ -z "$ARGRUNTIME" ]; then
+          RESUBRUNTIME=$ARGRUNTIME
+        fi
         echo "crab resubmit --maxmemory ${RESUBMEMORY} --maxjobruntime ${RESUBRUNTIME} -d ${WORKAREA}/crab_${JOBTAG}"
         crab resubmit --maxmemory $RESUBMEMORY --maxjobruntime $RESUBRUNTIME -d $WORKAREA/crab_$JOBTAG
         wait
