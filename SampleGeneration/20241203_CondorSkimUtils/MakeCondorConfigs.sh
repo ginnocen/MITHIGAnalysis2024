@@ -10,6 +10,7 @@ JOB_MEMORY=${7}
 JOB_STORAGE=${8}
 CMSSW_VERSION=${9}
 ANALYSIS_SUBDIR=${10}
+YEAR=${11}
 
 SCRIPT="${CONFIG_DIR}/${JOB_NAME}_script.sh"
 CONFIG="${CONFIG_DIR}/${JOB_NAME}_config.condor"
@@ -17,7 +18,12 @@ JOB_LIST_NAME=$(basename "$JOB_LIST")
 PROXYFILE_NAME=$(basename "$PROXYFILE")
 OUTPUT_DIR=$(dirname "$OUTPUT_PATH")
 
-
+ZDCM_THRESHOLD=1000
+ZDCP_THRESHOLD=1100
+if [[ $YEAR -eq 2024 ]]; then
+  ZDCM_THRESHOLD=900
+  ZDCP_THRESHOLD=900
+fi
 
 # MAKE CONDOR SCRIPT ==========================================================
 rm $SCRIPT

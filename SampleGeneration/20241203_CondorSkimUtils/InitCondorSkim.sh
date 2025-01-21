@@ -24,7 +24,8 @@ Positional arguments (RunCondorSkim.sh -> InitCondorSkim.sh):
     10) MASTER_FILE_LIST: text file that will contain list of all 
         root files in SOURCE_DIR.
     11) REFRESH_PROXY: (0 or 1) Initiate a new VOMS proxy before processing.
-    12) MAX_JOBS: (optional) Limit total number of submitted jobs. 
+    12) DATA_YEAR: Year that data was taken.
+    13) MAX_JOBS: (optional) Limit total number of submitted jobs. 
         Intended for testing/debugging.
 
 Run using an external script to configure arguments, such as InitCondorSkim.sh:
@@ -46,7 +47,8 @@ CMSSW_VERSION=${8}
 CONFIG_DIR=${9}
 MASTER_FILE_LIST=${10}
 REFRESH_PROXY=${11}
-MAX_JOBS=${12:-0}
+DATA_YEAR=${12}
+MAX_JOBS=${13:-0}
 
 if [ $# -ne $n_args || $# -ne $((n_args - 1)) ]; then
   echo "Insufficient number of arguments given!"
@@ -60,6 +62,7 @@ else
   echo "SOURCE_DIR:       $SOURCE_DIR"
   echo "OUTPUT_SERVER:    $OUTPUT_SERVER"
   echo "OUTPUT_DIR:       $OUTPUT_DIR"
+  echo "DATA_YEAR:        $DATA_YEAR"
   echo "FILES_PER_JOB:    $FILES_PER_JOB"
   echo "JOB_MEMORY:       $JOB_MEMORY"
   echo "JOB_STORAGE:      $JOB_STORAGE"
@@ -94,7 +97,7 @@ submit_condor_jobs() {
   local JOB_COUNTER=${3}
   echo "Making configs for $JOB_NAME"
   OUTPUT_PATH="${OUTPUT_DIR}/skim_${JOB_COUNTER}.root"
-  $ProjectBase/$CONDOR_SUBDIR/MakeCondorConfigs.sh $JOB_NAME $JOB_LIST $CONFIG_DIR $OUTPUT_SERVER $OUTPUT_PATH $PROXYFILE $JOB_MEMORY $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_SUBDIR
+  $ProjectBase/$CONDOR_SUBDIR/MakeCondorConfigs.sh $JOB_NAME $JOB_LIST $CONFIG_DIR $OUTPUT_SERVER $OUTPUT_PATH $PROXYFILE $JOB_MEMORY $JOB_STORAGE $CMSSW_VERSION $ANALYSIS_SUBDIR $DATA_YEAR
   wait
   echo "Submitted $JOB_NAME"
   echo ""
