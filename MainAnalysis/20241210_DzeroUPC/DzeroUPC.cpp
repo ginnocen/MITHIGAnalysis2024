@@ -163,8 +163,9 @@ public:
           if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY)
             continue;
           // if (MDzeroUPC->DpassCut23PAS->at(j) == false)
-          if (par.DoSystD==0 && MDzeroUPC->DpassCut23LowPt->at(j) == false) continue;
-          if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpv->at(j) == false) continue;
+          if (par.DoSystD==0 && MDzeroUPC->DpassCut23PAS->at(j) == false) continue;
+          // if (par.DoSystD==0 && MDzeroUPC->DpassCut23LowPt->at(j) == false) continue;
+          if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpvSig->at(j) == false) continue;
           if (par.DoSystD==2 && MDzeroUPC->DpassCut23PASSystDtrkPt->at(j) == false) continue;
 
           hDmass->Fill((*MDzeroUPC->Dmass)[j]);

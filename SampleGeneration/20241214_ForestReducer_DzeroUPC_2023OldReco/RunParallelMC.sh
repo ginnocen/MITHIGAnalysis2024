@@ -1,25 +1,29 @@
 #!/bin/bash
 MAXCORES=120
-SAMPLEID=3
+SAMPLEID=0
 
 echo "Running on sample ID: $SAMPLEID"
 
 if [ "$SAMPLEID" -eq 0 ]; then
-    NAMEMC="20250110_v2_filelist20250110_Pthat5_100Million_Inclusive_BeamAv1"
+    NAMEMC="20250117_v3_Pthat5_100Million_Inclusive_BeamA"
     FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat5/UnmergedForests/100Million_Inclusive_v1"
     ISGAMMAN=true
 elif [ "$SAMPLEID" -eq 1 ]; then
-    NAMEMC="20250110_v2_filelist20250110_Pthat0_ForceD0Decay100M_BeamA_v1"
+    NAMEMC="20250117_v3_Pthat0_ForceD0Decay100M_BeamA"
     FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat0/UnmergedForests/ForcedD0Decay100M_BeamA"
     ISGAMMAN=true
 elif [ "$SAMPLEID" -eq 2 ]; then
-    NAMEMC="20250110_v2_filelist20250110_Pthat0_ForceD0Decay100M_BeamB_v1"
+    NAMEMC="20250117_v3_Pthat0_ForceD0Decay100M_BeamB"
     FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat0/UnmergedForests/ForcedD0Decay100M_BeamB"
     ISGAMMAN=false
 elif [ "$SAMPLEID" -eq 3 ]; then
-    NAMEMC="20250110_v2_filelist20250110_Pthat2_ForceD0Decay100M_BeamA_v1"
+    NAMEMC="20250117_v3_Pthat2_ForceD0Decay100M_BeamA"
     FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat2/UnmergedForests/ForcedD0Decay100M_BeamA"
     ISGAMMAN=true
+elif [ "$SAMPLEID" -eq 4 ]; then
+    NAMEMC="20250117_v3_Pthat2_ForceD0Decay100M_BeamB"
+    FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat2/UnmergedForests/100Million_ForcedD0Decay_BeamB_v1"
+    ISGAMMAN=false
 fi
 
 echo "Running on sample: $NAMEMC"
@@ -43,7 +47,7 @@ wait_for_slot() {
     done
 }
 
-ls $FOLDER/HiForestMiniAOD_*2*.root > $filelistMC
+ls $FOLDER/HiForestMiniAOD_*.root > $filelistMC
 echo "File list created successfully: $filelistMC"
 
 # Check if the filelist is empty

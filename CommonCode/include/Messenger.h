@@ -790,6 +790,8 @@ public:
    std::vector<bool> *DpassCut23LowPt;
    std::vector<bool> *DpassCut23PASSystDsvpvSig;
    std::vector<bool> *DpassCut23PASSystDtrkPt;
+   std::vector<bool> *DpassCut23PASSystDalpha;
+   std::vector<bool> *DpassCut23PASSystDchi2cl;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;

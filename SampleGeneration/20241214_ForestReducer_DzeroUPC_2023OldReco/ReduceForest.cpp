@@ -67,6 +67,8 @@ int main(int argc, char *argv[]) {
   // "LowPt":         reject !DpassCut23LowPt
   // "PASSystDsvpvSig":reject !DpassCut23PASSystDsvpvSig
   // "PASSystDtrkPt": reject !DpassCut23PASSystDtrkPt
+  // "PASSystDalpha": reject !DpassCut23PASSystDalpha
+  // "PASSystDchi2cl":reject !DpassCut23PASSystDchi2cl
   string ApplyDRejection = toLower(CL.Get("ApplyDRejection", "no"));
 
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
@@ -80,7 +82,7 @@ int main(int argc, char *argv[]) {
   MDzeroUPC.SetBranch(&Tree);
 
   // Allowed ApplyDRejection in lowercase
-  std::set<std::string> allowedApplyDRejection = {"or", "pas", "lowpt", "passystdsvpvsig", "passystdtrkpt", "no"};
+  std::set<std::string> allowedApplyDRejection = {"or", "pas", "lowpt", "passystdsvpvsig", "passystdtrkpt", "passystdalpha", "passystdchi2cl", "no"};
   // Validate the argument
   if (allowedApplyDRejection.find(ApplyDRejection) != allowedApplyDRejection.end()) {
     std::cout << "D filtering criterion: " << ApplyDRejection << std::endl;
@@ -286,8 +288,10 @@ int main(int argc, char *argv[]) {
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
         bool DpassCut23PAS_           = DmesonSelectionPrelim23(MDzero, iD);
         bool DpassCut23LowPt_         = DmesonSelectionLowPt23(MDzero, iD);
-        bool DpassCut23PASSystDsvpvSig_  = DmesonSelectionPrelim23SystDsvpv(MDzero, iD);
-        bool DpassCut23PASSystDtrkPt_ = DmesonSelectionPrelim23SystDtrkPt(MDzero, iD);
+        bool DpassCut23PASSystDsvpvSig_  = DmesonSelectionPrelim23SystDsvpvSig(MDzero, iD);
+        bool DpassCut23PASSystDtrkPt_    = DmesonSelectionPrelim23SystDtrkPt(MDzero, iD);
+        bool DpassCut23PASSystDalpha_    = DmesonSelectionPrelim23SystDalpha(MDzero, iD);
+        bool DpassCut23PASSystDchi2cl_   = DmesonSelectionPrelim23SystDchi2cl(MDzero, iD);
         if (IsData)
         {
           if (ApplyDRejection=="or")
@@ -295,15 +299,17 @@ int main(int argc, char *argv[]) {
             if (!DpassCut23PAS_ &&
                 !DpassCut23LowPt_ &&
                 !DpassCut23PASSystDsvpvSig_ &&
-                !DpassCut23PASSystDtrkPt_ ) continue;
+                !DpassCut23PASSystDtrkPt_ &&
+                !DpassCut23PASSystDalpha_ &&
+                !DpassCut23PASSystDchi2cl_ ) continue;
           }
-          // else if (ApplyDRejection=="ordered_or")
+          // else if (ApplyDRejection=="ordered_or") // obsoleted
           // {
           //   if (!DmesonSelectionLowPt23(MDzero, iD))
           //   {
           //     if (!DmesonSelectionPrelim23SystDtrkPt(MDzero, iD))
           //     {
-          //       if (!DmesonSelectionPrelim23SystDsvpv(MDzero, iD))
+          //       if (!DmesonSelectionPrelim23SystDsvpvSig(MDzero, iD))
           //       {
           //         if (!DmesonSelectionPrelim23(MDzero, iD))
           //         {
@@ -317,6 +323,8 @@ int main(int argc, char *argv[]) {
           else if (ApplyDRejection=="lowpt" && !DpassCut23LowPt_) continue;
           else if (ApplyDRejection=="passystdsvpvsig" && !DpassCut23PASSystDsvpvSig_) continue;
           else if (ApplyDRejection=="passystdtrkpt" && !DpassCut23PASSystDtrkPt_) continue;
+          else if (ApplyDRejection=="passystdalpha" && !DpassCut23PASSystDalpha_) continue;
+          else if (ApplyDRejection=="passystdchi2cl" && !DpassCut23PASSystDchi2cl_) continue;
         }
         countSelDzero++;
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
@@ -335,6 +343,8 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DpassCut23LowPt->push_back(DpassCut23LowPt_);
         MDzeroUPC.DpassCut23PASSystDsvpvSig->push_back(DpassCut23PASSystDsvpvSig_);
         MDzeroUPC.DpassCut23PASSystDtrkPt->push_back(DpassCut23PASSystDtrkPt_);
+        MDzeroUPC.DpassCut23PASSystDalpha->push_back(DpassCut23PASSystDalpha_);
+        MDzeroUPC.DpassCut23PASSystDchi2cl->push_back(DpassCut23PASSystDchi2cl_);
         if (IsData == false) {
           MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
           bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;

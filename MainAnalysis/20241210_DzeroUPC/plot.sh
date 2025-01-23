@@ -36,6 +36,9 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
 			[ "$nominalSampleRST" != "null" ] && cmd="$cmd --nominalSampleRST $nominalSampleRST"
 			[ "$nominalFitRST" != "null" ] && cmd="$cmd --nominalFitRST $nominalFitRST"
 
+  echo "Executing >>>>>>"
+  echo $cmd
+
 	$cmd >> $PlotDir/plot.log
 
 done

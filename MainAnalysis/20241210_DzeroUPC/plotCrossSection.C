@@ -13,6 +13,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <algorithm> // For std::max_element
 
 #include "plotCrossSection.h"
 
@@ -184,11 +185,15 @@ int main(int argc, char *argv[])
     double systLumiUncert = wSystLumi * correctedYieldValues[i];
     double systTrkUncert  = wSystTrk * correctedYieldValues[i];
     double systBRUncert   = wSystBR * correctedYieldValues[i];
+    double systPromptFrac = 0.05 * correctedYieldValues[i]; // [TODO] replaced the rel. syst. to the new study
+    double systPeakingBkg = 0.13 * correctedYieldValues[i]; // [TODO] replaced the rel. syst. to the new study
 
     systTotUncert[i] = TMath::Sqrt(
                           systLumiUncert * systLumiUncert +
                           systTrkUncert * systTrkUncert +
                           systBRUncert * systBRUncert +
+                          systPromptFrac * systPromptFrac +
+                          systPeakingBkg * systPeakingBkg +
                           systEvtSelUncert[i] * systEvtSelUncert[i] +
                           systRapGapUncert[i] * systRapGapUncert[i] +
                           systDsvpvUncert[i] * systDsvpvUncert[i] +
@@ -289,7 +294,7 @@ int main(int argc, char *argv[])
   hFrame2->GetXaxis()->SetTitle(Form("%sD^{0} y", (IsGammaN)? "+": "-"));
   hFrame2->SetStats(0);
   hFrame2->GetYaxis()->SetTitleOffset(1.5);
-  hFrame2->GetYaxis()->SetRangeUser(0, 0.6);
+  hFrame2->GetYaxis()->SetRangeUser(0, 0.8);
   hFrame2->Draw();
 
   TGraphErrors* gr2 = new TGraphErrors(RFBXbins.size(), RFBXbins.data(), RFBValues.data(), RFBXbinErrors.data(), RFBErrors.data());
@@ -362,7 +367,7 @@ int main(int argc, char *argv[])
   const char* latexText = Form("%d < D_{p_{T}} < %d (GeV/#it{c})", (int) MinDzeroPT, (int) MaxDzeroPT);
 
   plotGraph("#varepsilon_{event}", "D^{0} y",
-            0, 1.05,
+            0.95, 1.07,
             yValues, effEvtValues, yErrors, effEvtErrors,
             latexText,
             Form("%s/evtEff_pt%d-%d_IsGammaN%o.pdf",
@@ -371,7 +376,7 @@ int main(int argc, char *argv[])
                   IsGammaN));
 
   plotGraph("Numerator N_{event}", "D^{0} y",
-            0, 500,
+            0, (*std::max_element(numEvtValues.begin(), numEvtValues.end()))*1.3,
             yValues, numEvtValues, yErrors, numEvtErrors,
             latexText,
             Form("%s/evtNum_pt%d-%d_IsGammaN%o.pdf",
@@ -380,7 +385,7 @@ int main(int argc, char *argv[])
                   IsGammaN));
 
   plotGraph("Denominator N_{event}", "D^{0} y",
-            0, 500,
+            0, (*std::max_element(denEvtValues.begin(), denEvtValues.end()))*1.3,
             yValues, denEvtValues, yErrors, denEvtErrors,
             latexText,
             Form("%s/evtDen_pt%d-%d_IsGammaN%o.pdf",
@@ -398,7 +403,7 @@ int main(int argc, char *argv[])
                   IsGammaN));
 
   plotGraph("#varepsilon_{D}", "D^{0} y",
-            0, 0.2,
+            0, 0.2, //(*std::max_element(effDValues.begin(), effDValues.end()))*1.3,
             yValues, effDValues, yErrors, effDErrors,
             latexText,
             Form("%s/DEff_zoom_pt%d-%d_IsGammaN%o.pdf",
@@ -407,7 +412,7 @@ int main(int argc, char *argv[])
                   IsGammaN));
 
   plotGraph("Numerator N_{D}", "D^{0} y",
-            0, 40,
+            0, (*std::max_element(numDValues.begin(), numDValues.end()))*1.3,
             yValues, numDValues, yErrors, numDErrors,
             latexText,
             Form("%s/DNum_pt%d-%d_IsGammaN%o.pdf",
@@ -416,7 +421,7 @@ int main(int argc, char *argv[])
                   IsGammaN));
 
   plotGraph("Denominator N_{D}", "D^{0} y",
-            0, 500,
+            0, (*std::max_element(denDValues.begin(), denDValues.end()))*1.3,
             yValues, denDValues, yErrors, denDErrors,
             latexText,
             Form("%s/DDen_pt%d-%d_IsGammaN%o.pdf",
@@ -425,7 +430,7 @@ int main(int argc, char *argv[])
                   IsGammaN));
 
   plotGraph("Raw yield", "D^{0} y",
-            0, 280,
+            0, (*std::max_element(rawYieldValues.begin(), rawYieldValues.end()))*1.3,
             yValues, rawYieldValues, yErrors, rawYieldErrors,
             latexText,
             Form("%s/RawYield_pt%d-%d_IsGammaN%o.pdf",

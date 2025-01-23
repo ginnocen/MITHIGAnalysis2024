@@ -20,6 +20,19 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 	mkdir -p $MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/
 	Output=$MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/${MicroTreeBaseName}
 
+	echo "Executing >>>>>>"
+	echo ./ExecuteDzeroUPC --Input $Input \
+										--MinDzeroPT $MinDzeroPT \
+										--MaxDzeroPT $MaxDzeroPT \
+										--MinDzeroY $MinDzeroY \
+										--MaxDzeroY $MaxDzeroY \
+										--IsGammaN $IsGammaN \
+										--TriggerChoice $TriggerChoice \
+										--IsData $IsData \
+										--DoSystRapGap $DoSystRapGap \
+										--DoSystD $DoSystD \
+										--Output $Output
+
 	./ExecuteDzeroUPC --Input $Input \
 										--MinDzeroPT $MinDzeroPT \
 										--MaxDzeroPT $MaxDzeroPT \

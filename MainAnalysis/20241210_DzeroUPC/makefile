@@ -1,4 +1,4 @@
-default: ExecuteDzeroUPC MassFit CorrectedYields
+default: ExecuteDzeroUPC MassFit CorrectedYields PlotCrossSection
 
 ExecuteDzeroUPC: DzeroUPC.cpp
 	g++ DzeroUPC.cpp -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \

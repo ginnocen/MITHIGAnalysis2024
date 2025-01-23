@@ -1,7 +1,7 @@
 #!/bin/bash
 MAXCORES=100
 
-NAME="20250110_ForestDfinderData23LowPtSkim_v2"
+NAME="20250117_ForestDfinderData23Skim_v3"
 OUTPUT="output"
 counter=0
 filelist="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/InputListForests/20241106_filelist_SkimOldReco23sample_DataAll.txt"
