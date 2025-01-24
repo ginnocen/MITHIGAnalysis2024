@@ -421,6 +421,7 @@ public:
    int Gsize;
    float Gpt[DZEROGENCOUNTMAX];
    float Gy[DZEROGENCOUNTMAX];
+   float Gphi[DZEROGENCOUNTMAX];
    int GpdgId[DZEROGENCOUNTMAX];
    int GisSignal[DZEROGENCOUNTMAX];
    int GcollisionId[DZEROGENCOUNTMAX];
@@ -657,7 +658,7 @@ public:
    int Run;
    long long Event;
    int Lumi;
-   
+
    int hiBin;
    int hiBinUp;
    int hiBinDown;
@@ -677,9 +678,9 @@ public:
    float ExtraZWeight[12];
 
    int NVertex;
-   float VX, VY, VZ, VXError, VYError, VZError; 
+   float VX, VY, VZ, VXError, VYError, VZError;
    int NPU;
-   
+
    std::vector<float> *zMass;
    std::vector<float> *zEta;
    std::vector<float> *zY;
@@ -701,7 +702,7 @@ public:
    std::vector<float> *trackResidualWeight;
    std::vector<int> *trackCharge;
    std::vector<int> *subevent;
-   
+
    std::vector<float> *muEta1;
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
@@ -734,7 +735,7 @@ private:
    bool WriteMode;
    bool Initialized;
 
-public:   
+public:
    ZHadronMessenger(TFile &File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TFile *File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TTree *ZHadronTree = nullptr, bool SkipTrack = false);
@@ -849,6 +850,67 @@ public:
    bool Ngamma_EThreshSyst5p5() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(1); }
    bool Ngamma_EThreshSyst15()  { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(7); }
 
+};
+
+/* Class for the D0 Jet UPC analysis */
+class DzeroJetUPCTreeMessenger
+{
+public:
+   TTree *Tree;
+   int Run;
+   long long Event;
+   int Lumi;
+   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+
+   //D reco quantities
+   int Dsize;
+   std::vector<float> *Dpt;
+   std::vector<float> *Dphi;
+   std::vector<float> *Dy;
+   std::vector<float> *Dmass;
+   std::vector<bool>  *DpassCut23PAS;
+   std::vector<int>   *Dgen;
+
+   // inclusive jet quantites
+   int JetCount;
+   std::vector<float> *JetPt;
+   std::vector<float> *JetEta;
+   std::vector<float> *JetY;
+   std::vector<float> *JetPhi;
+   std::vector<bool>  *isD0Tagged;
+   std::vector<int>   *TaggedD0Index;
+
+   //MC only quantities
+   int Gsize;
+   float pthat;
+   std::vector<float> *Gpt;
+   std::vector<float> *Gy;
+   std::vector<float> *Gphi;
+   std::vector<float> *GenJetPt;
+   std::vector<float> *GenJetEta;
+   std::vector<float> *GenJetY;
+   std::vector<float> *GenJetPhi;
+   std::vector<float> *RefJetPt;
+   std::vector<float> *RefJetEta;
+   std::vector<float> *RefJetY;
+   std::vector<float> *RefJetPhi;
+
+private:
+   bool WriteMode;
+   bool Initialized;
+
+public:
+   DzeroJetUPCTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   DzeroJetUPCTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   DzeroJetUPCTreeMessenger(TTree *HFJetUPCTree = nullptr, bool Debug = false);
+   ~DzeroJetUPCTreeMessenger();
+   bool Initialize(TTree *HFJetUPCTree, bool Debug = false);
+   bool Initialize(bool Debug = false);
+   int GetEntries();
+   bool GetEntry(int iEntry);
+   bool SetBranch(TTree *T);
+   void Clear();
+   bool FillEntry();
 };
 
 class MuMuJetMessenger
