@@ -1,4 +1,4 @@
-default: ExecuteDzeroUPC MassFit CorrectedYields PlotCrossSection
+default: ExecuteDzeroUPC MassFit CorrectedYields PlotCrossSection PlotRapGapScan PlotHFDist
 
 ExecuteDzeroUPC: DzeroUPC.cpp
 	g++ DzeroUPC.cpp -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \
@@ -18,6 +18,16 @@ CorrectedYields: correctedYields.C
 PlotCrossSection: plotCrossSection.C
 	g++ plotCrossSection.C -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \
 		-o PlotCrossSection `root-config --cflags --glibs` -lRooFit -lRooFitCore \
+		$(ProjectBase)/CommonCode/library/Messenger.o
+
+PlotRapGapScan: rapGapScanPlotter/plotRapGapScan.C
+	g++ rapGapScanPlotter/plotRapGapScan.C -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \
+		-o PlotRapGapScan `root-config --cflags --glibs` -lRooFit -lRooFitCore \
+		$(ProjectBase)/CommonCode/library/Messenger.o
+
+PlotHFDist: rapGapScanPlotter/plotHFDist.C
+	g++ rapGapScanPlotter/plotHFDist.C -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \
+		-o PlotHFDist `root-config --cflags --glibs` -lRooFit -lRooFitCore \
 		$(ProjectBase)/CommonCode/library/Messenger.o
 
 TestRun: ExecuteDzeroUPC

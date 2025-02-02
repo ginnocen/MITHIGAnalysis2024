@@ -7,11 +7,16 @@ public:
                 int in_DoSystRapGap = 0, int in_DoSystD = 0)
 	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor)
     {
-        if (in_DoSystRapGap!=0 && in_DoSystRapGap != 1 && in_DoSystRapGap != -1)
+        if (in_DoSystRapGap > 9) {
+            printf("[Warning] Using custom rapidity gap energy threshold!");
+            DoSystRapGap = in_DoSystRapGap;
+        }
+        else if (in_DoSystRapGap!=0 && in_DoSystRapGap != 1 && in_DoSystRapGap != -1)
         {
             printf("[Error] Couldn't recognize the option DoSystRapGap=%d (should be 0 = nominal, 1 = tight, -1: loose). Exiting...\n", in_DoSystRapGap);
             exit(1);
-        } else { DoSystRapGap = in_DoSystRapGap; }
+        }
+        else { DoSystRapGap = in_DoSystRapGap; }
 
         if (in_DoSystD!=0 && in_DoSystD != 1 && in_DoSystD != 2 \
                           && in_DoSystD != 3 && in_DoSystD != 4)

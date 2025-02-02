@@ -1,0 +1,213 @@
+{
+    "PlotDir": "rapGapScanPlotter/plots",
+    "Plots": [
+        {
+            "MinDzeroPT": 1,
+            "MaxDzeroPT": 2,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 1,
+            "MaxDzeroPT": 2,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 1,
+            "HFEMax": "32,37,42,47,52,57,62,67,72,77,82,87,92,97,102,107,112,122,132,142,152,162"
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 0,
+            "HFEMax": "31,36,41,46,51,56,61,66,71,76,81,86,91,96,101,106,111,121,131,141,151,161"
+        }
+    ]
+}

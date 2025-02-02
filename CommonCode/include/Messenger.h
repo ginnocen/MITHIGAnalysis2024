@@ -834,6 +834,8 @@ public:
    void CopyNonTrack(DzeroUPCTreeMessenger &M);
    bool FillEntry();
 
+   float GetHFthresholdFromIndex(int ind) { return ((float)ind)/10.; }
+
    ///////////////////
    // Utility functions to examine passing a specific rapidity gap energy threshold -- 2
    // [Change accordingly] the declaration of gapEThresh_*
@@ -843,11 +845,14 @@ public:
    bool gammaN_EThreshNominal() { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(N_gapEThresh/2); }
    bool gammaN_EThreshSyst5p5() { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(1); }
    bool gammaN_EThreshSyst15()  { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(7); }
+   bool gammaN_EThreshCustom(int ind)  { return ( this->ZDCgammaN && this->HFEMaxPlus <= this->GetHFthresholdFromIndex(ind) ); }
+
    bool Ngamma_EThreshTight()   { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(0); }
    bool Ngamma_EThreshLoose()   { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(N_gapEThresh-1); }
    bool Ngamma_EThreshNominal() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(N_gapEThresh/2); }
    bool Ngamma_EThreshSyst5p5() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(1); }
    bool Ngamma_EThreshSyst15()  { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(7); }
+   bool Ngamma_EThreshCustom(int ind)  { return ( this->ZDCNgamma && this->HFEMaxMinus <= this->GetHFthresholdFromIndex(ind) ); }
 
 };
 

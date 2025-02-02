@@ -58,7 +58,14 @@ bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
       return false;
     if (!par.IsGammaN && b->Ngamma_EThreshSyst5p5() == false)
       return false;
-  }
+  } 
+  else if (par.DoSystRapGap > 9) {
+    // Custom rapidity gap threshold decision
+    if (par.IsGammaN && b->gammaN_EThreshCustom(par.DoSystRapGap) == false)
+      return false;
+    if (!par.IsGammaN && b->Ngamma_EThreshCustom(par.DoSystRapGap) == false)
+      return false;
+  } 
   else
   {
     // nominal rapidity gap selection
@@ -79,6 +86,8 @@ public:
   DzeroUPCTreeMessenger *MDzeroUPC;
   TNtuple *nt;
   string title;
+  TH2D *hHFEmaxPlus_vs_EvtMult;
+  TH2D *hHFEmaxMinus_vs_EvtMult;
   TH1D *hDenEvtEff;
   TH1D *hNumEvtEff;
   TH1D *hRatioEvtEff;
@@ -110,6 +119,17 @@ public:
     hDenDEff = new TH1D(Form("hDenDEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hNumDEff = new TH1D(Form("hNumDEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hRatioDEff = (TH1D*) hNumDEff->Clone("hRatioDEff");
+    hHFEmaxMinus_vs_EvtMult = nullptr;
+    hHFEmaxPlus_vs_EvtMult = nullptr;
+
+    bool doHFEmaxDistributions=(par.DoSystRapGap > 9);
+    if (doHFEmaxDistributions) {
+      hHFEmaxMinus_vs_EvtMult = new TH2D(Form("hHFEmaxMinus_vs_EvtMult%s", title.c_str()), "", 80, 0, 20, 200, 0, 1000);
+      hHFEmaxPlus_vs_EvtMult = new TH2D(Form("hHFEmaxPlus_vs_EvtMult%s", title.c_str()), "", 80, 0, 20, 200, 0, 1000);
+
+      hHFEmaxMinus_vs_EvtMult->Sumw2();
+      hHFEmaxPlus_vs_EvtMult->Sumw2();
+    }
 
     hDmass->Sumw2();
     hDenEvtEff->Sumw2();
@@ -178,6 +198,12 @@ public:
             }
           } else
             nt->Fill((*MDzeroUPC->Dmass)[j], 0);
+
+          // Fill HF E_max distributions for data
+          if(doHFEmaxDistributions && par.IsData) {
+            hHFEmaxMinus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxMinus, MDzeroUPC->nTrackInAcceptanceHP);
+            hHFEmaxPlus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxPlus, MDzeroUPC->nTrackInAcceptanceHP);
+          }
         } // end of reco-level Dzero loop
 
         if (!par.IsData && isSigMCEvt) {
@@ -193,6 +219,11 @@ public:
             if (MDzeroUPC->GisSignalCalc->at(j) == false)
               continue;
             hDenDEff->Fill(1);
+            // Fill HF E_max distributions for MC
+            if(doHFEmaxDistributions) {
+              hHFEmaxMinus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxMinus, MDzeroUPC->nTrackInAcceptanceHP);
+              hHFEmaxPlus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxPlus, MDzeroUPC->nTrackInAcceptanceHP);
+            }
           } // end of gen-level Dzero loop
         }   // end of gen-level Dzero loop
       }   // end of event selection
@@ -211,6 +242,8 @@ public:
     hNumDEff->Write();
     hRatioDEff->Write();
     smartWrite(nt);
+    smartWrite(hHFEmaxMinus_vs_EvtMult);
+    smartWrite(hHFEmaxPlus_vs_EvtMult);
   }
 
 private:
@@ -222,6 +255,8 @@ private:
     delete hDenDEff;
     delete hNumDEff;
     delete hRatioDEff;
+    delete hHFEmaxMinus_vs_EvtMult;
+    delete hHFEmaxPlus_vs_EvtMult;
   }
 };
 
