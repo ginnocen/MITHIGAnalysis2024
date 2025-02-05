@@ -61,9 +61,9 @@ bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
   } 
   else if (par.DoSystRapGap > 9) {
     // Custom rapidity gap threshold decision
-    if (par.IsGammaN && b->gammaN_EThreshCustom(par.DoSystRapGap) == false)
+    if (par.IsGammaN && b->gammaN_EThreshCustom(((float)par.DoSystRapGap)/10.) == false)
       return false;
-    if (!par.IsGammaN && b->Ngamma_EThreshCustom(par.DoSystRapGap) == false)
+    if (!par.IsGammaN && b->Ngamma_EThreshCustom(((float)par.DoSystRapGap)/10.) == false)
       return false;
   } 
   else
@@ -255,8 +255,12 @@ private:
     delete hDenDEff;
     delete hNumDEff;
     delete hRatioDEff;
-    delete hHFEmaxMinus_vs_EvtMult;
-    delete hHFEmaxPlus_vs_EvtMult;
+    if (hHFEmaxMinus_vs_EvtMult != nullptr) {
+      delete hHFEmaxMinus_vs_EvtMult;
+    }
+    if (hHFEmaxPlus_vs_EvtMult != nullptr) {
+      delete hHFEmaxPlus_vs_EvtMult;
+    }
   }
 };
 
@@ -276,6 +280,7 @@ int main(int argc, char *argv[]) {
   float scaleFactor = CL.GetDouble("scaleFactor", 1); // Scale factor for the number of events to be processed.
   int DoSystRapGap = CL.GetInt("DoSystRapGap", 0);   // Systematic study: apply the alternative event selections
                                                      // 0 = nominal, 1 = tight, -1: loose
+                                                     // 9 < DoSystRapGap: use custom HF energy threshold, the threshold value will be DoSystRapGap/10.
   int DoSystD = CL.GetInt("DoSystD", 0);             // Systematic study: apply the alternative D selections
                                                      // 0 = nominal, 1 = Dsvpv variation, 2: DtrkPt variation
                                                      // 3 = Dalpha variation, 4: Dchi2cl variation

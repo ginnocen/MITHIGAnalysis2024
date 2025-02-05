@@ -8,7 +8,8 @@ public:
 	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor)
     {
         if (in_DoSystRapGap > 9) {
-            printf("[Warning] Using custom rapidity gap energy threshold!");
+            // Custom HF energy threshold will be set to in_DoSystRapGap/10.
+            printf("[INFO] Using custom rapidity gap energy threshold! (option DoSystRapGap > 9)");
             DoSystRapGap = in_DoSystRapGap;
         }
         else if (in_DoSystRapGap!=0 && in_DoSystRapGap != 1 && in_DoSystRapGap != -1)
@@ -38,6 +39,7 @@ public:
    float scaleFactor;     // Scale factor
    int DoSystRapGap;      // Systematic study: apply the alternative event selections
                           // 0 = nominal, 1 = tight, -1: loose
+                          // 9 < DoSystRapGap: use custom HF energy threshold, the threshold value will be DoSystRapGap/10.
    int DoSystD;           // Systematic study: apply the alternative D selections
                           // 0 = nominal, 1 = Dsvpv variation, 2: DtrkPt variation
                           // 3 = Dalpha variation, 4: Dchi2cl variation
@@ -56,7 +58,8 @@ public:
        cout << "IsData: " << IsData << endl;
        cout << "Scale factor: " << scaleFactor << endl;
        cout << "DoSystRapGap: " << ((DoSystRapGap==0)? "No" :
-                                    (DoSystRapGap==1)? "Tight" : "Loose")
+                                    (DoSystRapGap==1)? "Tight" :
+                                    (DoSystRapGap > 9)? Form("Custom threshold (%.1f)", ((float) DoSystRapGap)/10.) : "Loose")
                                 << endl;
        cout << "DoSystD: "      << ((DoSystD==0)? "No" :
                                     (DoSystD==1)? "Dsvpv variation" :
