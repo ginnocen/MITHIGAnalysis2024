@@ -10,7 +10,7 @@ rm *.txt*
 rm SkimReco.root
 rm .DS_Store
 
-cd /home/ginnocen/CMSSW_13_2_4/src
+cd /home/$USER/CMSSW_13_2_4/src
 cmsenv
 
 cd -
@@ -20,6 +20,6 @@ source SetupAnalysis.sh
 cd CommonCode/
 make
 cd ..
-cd MainAnalysis/20241029_DzeroUPC/
+cd MainAnalysis/20241210_DzeroUPC/
 make
 rm Skim*.root

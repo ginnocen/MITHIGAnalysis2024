@@ -19,6 +19,8 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
 	effmcInput=$(echo $MicroTree | jq -r '.effmcInput')
 	doSyst_sig=$(echo $MicroTree | jq -r '.doSyst_sig')
 	doSyst_comb=$(echo $MicroTree | jq -r '.doSyst_comb')
+	doPkkk=$(echo $MicroTree | jq -r '.doPkkk')
+	doPkpp=$(echo $MicroTree | jq -r '.doPkpp') 
 	RstDir=$(dirname "$dataInput")
 	RstDir=${RstDir}/${FitDir}/
 	mkdir -p $RstDir
@@ -39,6 +41,8 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
   [ "$neventsInput" != "null" ] && cmd="$cmd --neventsInput $neventsInput"
   [ "$doSyst_sig" != "null" ] && cmd="$cmd --doSyst_sig $doSyst_sig"
   [ "$doSyst_comb" != "null" ] && cmd="$cmd --doSyst_comb $doSyst_comb"
+  [ "$doPkkk" != "null" ] && cmd="$cmd --doPkkk $doPkkk"
+  [ "$doPkpp" != "null" ] && cmd="$cmd --doPkpp $doPkpp"
   cmd="$cmd --Output fit.root --RstDir $RstDir"
 
   echo "Executing >>>>>>"

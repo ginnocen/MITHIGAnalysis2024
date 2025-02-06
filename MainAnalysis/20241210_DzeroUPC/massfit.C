@@ -614,6 +614,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
               string pkkkdat, string pkppdat,
               string eventsdat,
               bool doSyst_sig, bool doSyst_comb,
+              bool doPkkk, bool doPkpp,
               string plotTitle)
 {
   std::cout << "=======================================================" << std::endl;
@@ -645,11 +646,15 @@ void main_fit(TTree *datatree, string rstDir, string output,
   std::cout << "Swap Parameters:\n";
   swap.print();
 
-  std::cout << "KK Parameters:\n";
-  pkkk.print();
+  if (doPkkk) {
+    std::cout << "KK Parameters:\n";
+    pkkk.print();
+  }
 
-  std::cout << "pipi Parameters:\n";
-  pkpp.print();
+  if (doPkpp) {
+    std::cout << "pipi Parameters:\n";
+    pkpp.print();
+  }
 
   std::cout << "Event Parameters:\n";
   events.print();
@@ -666,17 +671,27 @@ void main_fit(TTree *datatree, string rstDir, string output,
 
   // Define the swap model: single Gaussian
   RooGaussian swapPDF("swap", "swap model", m, swap.mean, swap.sigma);
-
+  
   // Define the KK model: Crystal Ball
   RooCBShape pkkkPDF("peaking_kk", "peaking background KK state", m, pkkk.mean, pkkk.sigma, pkkk.alpha, pkkk.n );
-
+  
   // Define the pipi model: Crystal Ball
   RooCBShape pkppPDF("peaking_pipi", "peaking background pipi state", m, pkpp.mean, pkpp.sigma, pkpp.alpha, pkpp.n );
 
   // Define the combined model
-  RooAddPdf model("model", "signal + background", 
-                  RooArgList(siglPDF, swapPDF, pkkkPDF, pkppPDF, combPDF), 
-                  RooArgList(events.nsig, events.nswp, events.npkkk, events.npkpp, events.nbkg));
+  RooArgList PDFList(siglPDF, swapPDF);
+  RooArgList eventList(events.nsig, events.nswp);
+  if (doPkkk) {
+    PDFList.add(pkkkPDF);
+    eventList.add(events.npkkk);
+  }
+  if (doPkpp) {
+    PDFList.add(pkppPDF);
+    eventList.add(events.npkpp);
+  }
+  PDFList.add(combPDF);
+  eventList.add(events.nbkg);
+  RooAddPdf model("model", "signal + background", PDFList, eventList);
 
   // Fit the model to data
   RooFitResult* result = model.fitTo(data, Save());
@@ -693,8 +708,8 @@ void main_fit(TTree *datatree, string rstDir, string output,
   ws.import(siglPDF); // Signal PDF
   ws.import(combPDF); // Combinatorics PDF
   ws.import(swapPDF); // Swap PDF
-  ws.import(pkkkPDF); // Peaking KK PDF
-  ws.import(pkppPDF); // Peaking PiPi PDF
+  if (doPkkk) ws.import(pkkkPDF); // Peaking KK PDF
+  if (doPkpp) ws.import(pkppPDF); // Peaking PiPi PDF
 
   // Optionally, add the fit result
   if (result) {
@@ -716,8 +731,8 @@ void main_fit(TTree *datatree, string rstDir, string output,
   model.plotOn(frame);
   model.plotOn(frame, Components(siglPDF), LineStyle(kSolid), LineColor(kRed));
   model.plotOn(frame, Components(swapPDF), LineStyle(kSolid), LineColor(kOrange+1));
-  model.plotOn(frame, Components(pkkkPDF), LineStyle(kSolid), LineColor(kViolet-3));
-  model.plotOn(frame, Components(pkppPDF), LineStyle(kSolid), LineColor(kTeal-7));
+  if (doPkkk) model.plotOn(frame, Components(pkkkPDF), LineStyle(kSolid), LineColor(kViolet-3));
+  if (doPkpp) model.plotOn(frame, Components(pkppPDF), LineStyle(kSolid), LineColor(kTeal-7));
   model.plotOn(frame, Components(combPDF), LineStyle(kDashed), LineColor(kGray));
   frame->Draw();
 
@@ -727,26 +742,27 @@ void main_fit(TTree *datatree, string rstDir, string output,
   TLatex latex;
   latex.SetTextSize(0.03);
   latex.SetNDC();
-
+  
+  
+  int lineCount = 0;
   if (comb.doSyst)
   {
-    latex.DrawLatex(xpos, ypos - 0 * ypos_step, Form("a_{0} = %.3f #pm %.3f", comb.a0.getVal(), comb.a0.getError()));
-    latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("a_{1} = %.3f #pm %.3f", comb.a1.getVal(), comb.a1.getError()));
+    latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("a_{0} = %.3f #pm %.3f", comb.a0.getVal(), comb.a0.getError()));
+    latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("a_{1} = %.3f #pm %.3f", comb.a1.getVal(), comb.a1.getError()));
   } else {
-    latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("#lambda = %.3f #pm %.3f", comb.lambda.getVal(), comb.lambda.getError()));
+    latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("#lambda = %.3f #pm %.3f", comb.lambda.getVal(), comb.lambda.getError()));
   }
-  latex.DrawLatex(xpos, ypos - 2 * ypos_step, Form("Mean = %.3f #pm %.3f (%s)", sigl.mean.getVal(), sigl.mean.getError(), 
+  latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("Mean = %.3f #pm %.3f (%s)", sigl.mean.getVal(), sigl.mean.getError(),
                                                     sigl.mean.isConstant()? "fixed": "float" ));
 
-  latex.DrawLatex(xpos, ypos - 3 * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", events.nsig.getVal(), events.nsig.getError()));
-  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", events.nswp.getVal(),
+  latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", events.nsig.getVal(), events.nsig.getError()));
+  latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", events.nswp.getVal(),
                                                     events.nswp.getPropagatedError(*result)));
-  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("N_{KK} = %.3f #pm %.3f", events.npkkk.getVal(),
+  if (doPkkk) latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{KK} = %.3f #pm %.3f", events.npkkk.getVal(),
                                                     events.npkkk.getPropagatedError(*result)));
-  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("N_{#pi#pi} = %.3f #pm %.3f", events.npkpp.getVal(),
+  if (doPkpp) latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{#pi#pi} = %.3f #pm %.3f", events.npkpp.getVal(),
                                                     events.npkpp.getPropagatedError(*result)));
-  latex.DrawLatex(xpos, ypos - 7 * ypos_step, Form("N_{Comb} = %.3f #pm %.3f", events.nbkg.getVal(), events.nbkg.getError()));
-
+  latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Comb} = %.3f #pm %.3f", events.nbkg.getVal(), events.nbkg.getError()));
 
   double SoverB = events.nsig.getVal()/TMath::Sqrt(events.nsig.getVal()+events.nbkg.getVal());
 
@@ -799,6 +815,8 @@ int main(int argc, char *argv[]) {
   ///// for fitting systematics study
   bool doSyst_sig      = CL.GetBool  ("doSyst_sig", false); // do systematics study for the signal
   bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
+  bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
+  bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
   
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
   string rstDir  = CL.Get      ("RstDir","./");       // Label for output file
@@ -866,21 +884,22 @@ int main(int argc, char *argv[]) {
     for (auto file : sigswpInputs) sigswptree->Add(file.c_str());
     sigswpmc_fit(sigswptree, rstDir, sigldat, swapdat, plotTitle.str());
   }
-  if (!(KKmcInputs.size()==1 && KKmcInputs[0].find(".dat")!=string::npos)) {
+  if (doPkkk && !(KKmcInputs.size()==1 && KKmcInputs[0].find(".dat")!=string::npos)) {
     TChain *KKmctree = new TChain("nt");
     for (auto file : KKmcInputs) KKmctree->Add(file.c_str());
     kkmc_fit(KKmctree, rstDir, pkkkdat, plotTitle.str());
   }
-  if (!(pipimcInputs.size()==1 && pipimcInputs[0].find(".dat")!=string::npos)) {
+  if (doPkpp && !(pipimcInputs.size()==1 && pipimcInputs[0].find(".dat")!=string::npos)) {
     TChain *pipimctree = new TChain("nt");
     for (auto file : pipimcInputs) pipimctree->Add(file.c_str());
     pipimc_fit(mctree, rstDir, pkppdat, plotTitle.str());
   }
-
+  
   main_fit(datatree, rstDir, output,
            sigldat, swapdat, pkkkdat, pkppdat,
            nevtdat,
            doSyst_sig, doSyst_comb,
+           doPkkk, doPkpp,
            plotTitle.str());
 
   return 0;
