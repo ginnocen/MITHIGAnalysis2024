@@ -213,14 +213,12 @@ int main(int argc, char *argv[])
     double systTrkUncert  = wSystTrk * correctedYieldValues[i];
     double systBRUncert   = wSystBR * correctedYieldValues[i];
     double systPromptFrac = 0.05 * correctedYieldValues[i]; // [TODO] replaced the rel. syst. to the new study
-//    double systPeakingBkg = 0.13 * correctedYieldValues[i]; // [TODO] replaced the rel. syst. to the new study
 
     systTotUncert[i] = TMath::Sqrt(
                           systLumiUncert * systLumiUncert +
                           systTrkUncert * systTrkUncert +
                           systBRUncert * systBRUncert +
                           systPromptFrac * systPromptFrac +
-                          systPeakingBkg * systPeakingBkg +
                           systEvtSelUncert[i] * systEvtSelUncert[i] +
                           systRapGapUncert[i] * systRapGapUncert[i] +
                           systDsvpvUncert[i] * systDsvpvUncert[i] +
