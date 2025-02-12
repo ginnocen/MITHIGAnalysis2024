@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
   // latex.DrawLatex(0.15, 0.92, "CMS #it{Preliminary} 1.38 nb^{-1} (5.36 TeV PbPb)");
   // latex.DrawLatex(0.15, 0.86, "UPCs, ZDC Xn0n w/ gap");
   // latex.DrawLatex(0.15, 0.82, "Global uncert. #pm 5.05%");
-  latex.DrawLatex(0.6, 0.82, Form("%d < D_{p_{T}} < %d (GeV/#it{c})", (int) MinDzeroPT, (int) MaxDzeroPT));
+  latex.DrawLatex(0.6, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
 
   c1->Update();
   c1->SaveAs(Form("%s/correctedYieldValuesPlot_pt%d-%d_IsGammaN%o.pdf",
@@ -334,7 +334,7 @@ int main(int argc, char *argv[])
   gr2->SetLineWidth(2);
   gr2->Draw("P E1 SAME");
 
-  latex.DrawLatex(0.6, 0.82, Form("%d < D_{p_{T}} < %d (GeV/#it{c})", (int) MinDzeroPT, (int) MaxDzeroPT));
+  latex.DrawLatex(0.6, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
 
   c1->Update();
   c1->SaveAs(Form("%s/RFBPlot_pt%d-%d_IsGammaN%o.pdf",
