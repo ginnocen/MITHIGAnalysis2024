@@ -3,17 +3,33 @@
 # bash crabCheck.sh <run_number(opt)> <PD(opt)>
 # If no args are given, this will start from the first run in RUNLIST
 
-ARGRUN=$1
-ARGPD=$2
+AUTOLOOP=0
+_POSITIONAL=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -a)
+      AUTOLOOP=1
+      shift
+      ;;
+    *)
+      _POSITIONAL+=("$1")
+      shift
+      ;;
+  esac
+done
+
+# Set positional argumentsi
+ARGRUN=${_POSITIONAL[0]:-}
+ARGPD=${_POSITIONAL[1]:-}
 
 RUNLIST=(
 ### 2023 Valid Runs
-  374804 
-#  374810 374828 374833 374925
-#  374950 374951 374953 374961 374970
-#  374997 374998 375001 375002 375007
-#  375013 375055 375058 375060 375061
-#  375064 375110 375145 375164 375195
+  374804 374810 374828 374833 374925
+  374950 374951 374953 374961 374970
+  374997 374998 375001 375002 375007
+  375013 375055 375058 375060 375061
+  375064 375110 375145 375164 375195
 #  375202 375245 375252 375256 375259
 #  375300 375317 375391 375413 375415
 #  375440 375441 375448 375455 375463
@@ -37,7 +53,7 @@ for RUN in ${RUNLIST[@]}; do
   # If a run number is provided, skip to that run
   if ! [ -z "$ARGRUN" ]; then
     if [[ "$RUN" == "${ARGRUN}" ]]; then
-        unset ARGRUN
+        [[ "$AUTOLOOP" -eq "0" ]] && unset ARGRUN
     else
       continue
     fi
@@ -63,7 +79,9 @@ for RUN in ${RUNLIST[@]}; do
     echo ""
     echo "crab status -d ${WORKAREA}/crab_${JOBTAG} --verboseErrors"
     crab status -d $WORKAREA/crab_$JOBTAG --verboseErrors
-  
+    
+    [[ "$AUTOLOOP" -eq "1" ]] && continue
+
     # Prompt for user input
     VALIDCHOICE=0
     while [ 1 ]; do
