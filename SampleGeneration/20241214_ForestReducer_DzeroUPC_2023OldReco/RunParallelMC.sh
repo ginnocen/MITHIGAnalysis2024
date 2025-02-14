@@ -1,6 +1,6 @@
 #!/bin/bash
-MAXCORES=120
-SAMPLEID=0
+MAXCORES=40
+SAMPLEID=$1
 
 echo "Running on sample ID: $SAMPLEID"
 
@@ -24,6 +24,26 @@ elif [ "$SAMPLEID" -eq 4 ]; then
     NAMEMC="20250117_v3_Pthat2_ForceD0Decay100M_BeamB"
     FOLDER="/data/UPCD0analysis_2023data_HIN24003/ForestsMC/OfficialMC_pTHat2/UnmergedForests/100Million_ForcedD0Decay_BeamB_v1"
     ISGAMMAN=false
+elif [ "$SAMPLEID" -eq 5 ]; then
+    NAMEMC="20250213_v4_Pthat0_PromptPartonFiltered_ForcedD0Decay_D0Filtered_BeamA"
+    FOLDER="/data/UPCD0analysis_2023data_HIN25002/ForestsMC/PromptPartonFiltered_ForcedD0Decay_D0Filtered_BeamA"
+    ISGAMMAN=true
+elif [ "$SAMPLEID" -eq 6 ]; then
+    NAMEMC="20250213_v4_Pthat0_NonPromptPartonFiltered_ForcedD0Decay_D0Filtered_BeamA"
+    FOLDER="/data/UPCD0analysis_2023data_HIN25002/ForestsMC/NonPromptPartonFiltered_ForcedD0Decay_D0Filtered_BeamA"
+    ISGAMMAN=true
+elif [ "$SAMPLEID" -eq 7 ]; then
+    NAMEMC="20250213_v4_Pthat0_PromptPartonFiltered_BeamA"
+    FOLDER="/data/UPCD0analysis_2023data_HIN25002/ForestsMC/PromptPartonFiltered_BeamA"
+    ISGAMMAN=true
+elif [ "$SAMPLEID" -eq 8 ]; then
+    NAMEMC="20250213_v4_Pthat0_PromptPartonFiltered_BeamB"
+    FOLDER="/data/UPCD0analysis_2023data_HIN25002/ForestsMC/PromptPartonFiltered_BeamB"
+    ISGAMMAN=false
+elif [ "$SAMPLEID" -eq 9 ]; then
+    NAMEMC="20250213_v4_Pthat0_NonPromptPartonFiltered_BeamA"
+    FOLDER="/data/UPCD0analysis_2023data_HIN25002/ForestsMC/NonPromptPartonFiltered_BeamA"
+    ISGAMMAN=true
 fi
 
 echo "Running on sample: $NAMEMC"
