@@ -39,9 +39,9 @@ using namespace RooFit;
 
 using namespace std;
 
-#define DMASSMIN 1.68
-#define DMASSMAX 2.05
-#define DMASSNBINS 74
+#define DMASSMIN 1.67
+#define DMASSMAX 2.07
+#define DMASSNBINS 30
 
 struct ParamsBase {
   std::map<std::string, RooRealVar*> params; // Store RooRealVar objects
@@ -856,7 +856,7 @@ int main(int argc, char *argv[]) {
   // Construct the formatted string
   std::ostringstream plotTitle;
   plotTitle << parMinDzeroPT << " #leq D_{p_{T}} < " << parMaxDzeroPT
-            << " (GeV/#it{c}), " << parMinDzeroY << " #leq D_{y} < " << parMaxDzeroY
+            << " (GeV), " << parMinDzeroY << " #leq D_{y} < " << parMaxDzeroY
             << (parIsGammaN == 1 ? ", #gammaN" : ", N#gamma")
             << (parTriggerChoice == 1 ? ", ZDCOR" : ", ZDCXORJet8");
 
