@@ -411,7 +411,8 @@ struct EventParams {
 
 void styleframe_massfit(RooPlot* frame)
 {
-  frame->SetYTitle("dN_{Event}/dM #times 1/dp_{T}dy [GeV^{-2}]");
+  float binWidth = (DMASSMAX - DMASSMIN) / DMASSNBINS;
+  frame->SetYTitle(Form("Events / (%.4f GeV)", binWidth));
   frame->SetTitleSize(0.045, "XY");
   frame->SetTitleOffset(0.85, "XY");
 }
