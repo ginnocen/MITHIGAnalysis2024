@@ -769,6 +769,8 @@ void main_fit(TTree *datatree, string rstDir, string output,
   legend->AddEntry("combPDF","Combinatorics", "L");
   legend->Draw();
   
+  canvas->SaveAs(Form("%s/fit_result_full_legend.pdf", rstDir.c_str()));
+  
   TLatex latex;
   latex.SetTextSize(0.03);
   latex.SetNDC();
@@ -793,10 +795,12 @@ void main_fit(TTree *datatree, string rstDir, string output,
                                                     events.npkpp.getPropagatedError(*result)));
   latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Comb} = %.3f #pm %.3f", events.nbkg.getVal(), events.nbkg.getError()));
   
-  canvas->SaveAs(Form("%s/fit_result_full.pdf", rstDir.c_str()));
+  canvas->SaveAs(Form("%s/fit_result_full_param_legend.pdf", rstDir.c_str()));
   
   legend->Clear();
   canvas->Update();
+  
+  canvas->SaveAs(Form("%s/fit_result_full_param.pdf", rstDir.c_str()));
 
   double SoverB = events.nsig.getVal()/TMath::Sqrt(events.nsig.getVal()+events.nbkg.getVal());
 
@@ -825,7 +829,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
   latex.DrawLatex(0.20, ypos - 1 * ypos_step, Form("p-value = %.3e", p_value));
   latex.DrawLatex(0.20, ypos - 2 * ypos_step, Form("Significance = %.1f#sigma", significance));
 
-  canvas->SaveAs(Form("%s/fit_result_full_sigsum.pdf", rstDir.c_str()));
+  canvas->SaveAs(Form("%s/fit_result_full_param_stats.pdf", rstDir.c_str()));
 
   delete canvas;
 }
