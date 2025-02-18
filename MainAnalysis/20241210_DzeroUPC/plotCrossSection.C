@@ -303,7 +303,7 @@ int main(int argc, char *argv[])
   // latex.DrawLatex(0.15, 0.92, "CMS #it{Preliminary} 1.38 nb^{-1} (5.36 TeV PbPb)");
   // latex.DrawLatex(0.15, 0.86, "UPCs, ZDC Xn0n w/ gap");
   // latex.DrawLatex(0.15, 0.82, "Global uncert. #pm 5.05%");
-  latex.DrawLatex(0.6, 0.82, Form("%d < D_{p_{T}} < %d (GeVx`)", (int) MinDzeroPT, (int) MaxDzeroPT));
+  latex.DrawLatex(0.6, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
 
   c1->Update();
   c1->SaveAs(Form("%s/correctedYieldValuesPlot_pt%d-%d_IsGammaN%o.pdf",
