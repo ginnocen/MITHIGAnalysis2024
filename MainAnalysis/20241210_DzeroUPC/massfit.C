@@ -40,6 +40,7 @@ using namespace RooFit;
 
 using namespace std;
 
+#define DMASS 1.86484
 #define DMASSMIN 1.67
 #define DMASSMAX 2.07
 #define DMASSNBINS 32
@@ -166,18 +167,27 @@ struct SignalParams : public ParamsBase {
   RooRealVar sigma1;
   RooRealVar sigma2;
   RooRealVar frac1;
+  RooRealVar alpha;
+  RooFormulaVar sigma1Mod;
+  RooFormulaVar sigma2Mod;
 
   SignalParams() :
-    mean("sig_mean", "[signal] mean", 1.86484, 1.85, 1.88),
+    mean("sig_mean", "[signal] mean", DMASS, DMASS - 0.015, DMASS + 0.015),
     sigma1("sig_sigma1", "[signal] width of first Gaussian", 0.03, 0.0048, 0.155),
     sigma2("sig_sigma2", "[signal] width of second Gaussian", 0.01, 0.0048, 0.0465),
-    frac1("sig_frac1", "[signal] fraction of first Gaussian", 0.1, 0.001, 0.5) 
+    frac1("sig_frac1", "[signal] fraction of first Gaussian", 0.1, 0.001, 0.5),
+    alpha("sig_alpha", "[signal] modification to data Gaussian width", 0., -0.10, 0.10),
+    sigma1Mod("sig_sigma1Mod", "[signal] width mod factor for first Gaussian",
+              "sig_sigma1 * (1 + sig_alpha)", RooArgList(sigma1, alpha)),
+    sigma2Mod("sig_sigma2Mod", "[signal] width mod factor for second Gaussian",
+              "sig_sigma2 * (1 + sig_alpha)", RooArgList(sigma2, alpha))
   {
     // cout << "signal default" << endl;
     params[mean.GetName()] = &mean;
     params[sigma1.GetName()] = &sigma1;
     params[sigma2.GetName()] = &sigma2;
-    params[frac1 .GetName()] = &frac1;
+    params[frac1.GetName()] = &frac1;
+    params[alpha.GetName()] = &alpha;
   }
 
   SignalParams(string dat) : SignalParams() { readFromDat(dat); }
@@ -187,6 +197,22 @@ struct SignalParams : public ParamsBase {
     if (!doSyst)
     {
       mean.setConstant(false); // Nominal fit strategy is to let the mean value float
+    }
+  }
+  SignalParams(string dat, double floatSigMean, double floatSigAlpha) : SignalParams()
+  {
+    readFromDat(dat);
+    // Nominal model lets mean of data Gaussian float
+    if (floatSigMean > 0.)
+    {
+      mean.setConstant(false);
+      mean.setRange(DMASS - floatSigMean, DMASS + floatSigMean);
+    }
+    // Nominal model lets width of data Gaussian float
+    if (floatSigAlpha > 0.)
+    {
+      alpha.setConstant(false);
+      alpha.setRange(0. - floatSigAlpha, 0. + floatSigAlpha);
     }
   }
 };
@@ -625,8 +651,9 @@ void main_fit(TTree *datatree, string rstDir, string output,
               string sigldat, string swapdat,
               string pkkkdat, string pkppdat,
               string eventsdat,
-              bool doSyst_sig, bool doSyst_comb,
+              bool doSyst_comb,
               bool doPkkk, bool doPkpp,
+              double floatSigMean, double floatSigAlpha,
               string plotTitle)
 {
   std::cout << "=======================================================" << std::endl;
@@ -641,8 +668,9 @@ void main_fit(TTree *datatree, string rstDir, string output,
   RooDataSet data("data", "dataset", RooArgSet(m), Import(*datatree));
 
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
-
-  SignalParams sigl = SignalParams(sigldat, doSyst_sig);
+  
+  
+  SignalParams sigl = SignalParams(sigldat, floatSigMean, floatSigAlpha);
   SwapParams swap = SwapParams(swapdat);
   PeakingKKParams pkkk = PeakingKKParams(pkkkdat);
   PeakingPiPiParams pkpp = PeakingPiPiParams(pkppdat);
@@ -672,8 +700,8 @@ void main_fit(TTree *datatree, string rstDir, string output,
   events.print();
 
   // Define the signal model: double Gaussian
-  RooGaussian gauss1("gauss1", "first Gaussian", m, sigl.mean, sigl.sigma1);
-  RooGaussian gauss2("gauss2", "second Gaussian", m, sigl.mean, sigl.sigma2);
+  RooGaussian gauss1("gauss1", "first Gaussian", m, sigl.mean, sigl.sigma1Mod);
+  RooGaussian gauss2("gauss2", "second Gaussian", m, sigl.mean, sigl.sigma2Mod);
   RooAddPdf siglPDF("signal", "signal model", RooArgList(gauss1, gauss2), sigl.frac1);
 
   // Define the background model: (Nominal) Exponential (Systematics) Chebychev polynomial
@@ -785,7 +813,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
   }
   latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("Mean = %.3f #pm %.3f (%s)", sigl.mean.getVal(), sigl.mean.getError(),
                                                     sigl.mean.isConstant()? "fixed": "float" ));
-
+  latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("#alpha_{Sig} = %.3f #pm %.3f (%s)", sigl.alpha.getVal(), sigl.alpha.getError(), sigl.alpha.isConstant()? "fixed": "float" ));
   latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", events.nsig.getVal(), events.nsig.getError()));
   latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", events.nswp.getVal(),
                                                     events.nswp.getPropagatedError(*result)));
@@ -855,6 +883,14 @@ int main(int argc, char *argv[]) {
   bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
   bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
   bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
+  double floatSigMean   = CL.GetDouble("floatSigMean", 0.015); // let signal mean float within <D0_mass> +/- <value>
+  double floatSigAlpha  = CL.GetDouble("floatSigAlpha", 0.10); // let signal width float by <MC_width> * (1 +/- <value>)
+  
+  // Handle legacy setting of doSyst_sig
+  if (doSyst_sig) {
+    floatSigMean = 0.;
+    floatSigAlpha = 0.;
+  }
   
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
   string rstDir  = CL.Get      ("RstDir","./");       // Label for output file
@@ -936,8 +972,9 @@ int main(int argc, char *argv[]) {
   main_fit(datatree, rstDir, output,
            sigldat, swapdat, pkkkdat, pkppdat,
            nevtdat,
-           doSyst_sig, doSyst_comb,
+           doSyst_comb,
            doPkkk, doPkpp,
+           floatSigMean, floatSigAlpha,
            plotTitle.str());
 
   return 0;
