@@ -199,20 +199,20 @@ struct SignalParams : public ParamsBase {
       mean.setConstant(false); // Nominal fit strategy is to let the mean value float
     }
   }
-  SignalParams(string dat, double floatSigMean, double floatSigAlpha) : SignalParams()
+  SignalParams(string dat, double sigMeanRange, double sigAlphaRange) : SignalParams()
   {
     readFromDat(dat);
     // Nominal model lets mean of data Gaussian float
-    if (floatSigMean > 0.)
+    if (sigMeanRange > 0.)
     {
       mean.setConstant(false);
-      mean.setRange(DMASS - floatSigMean, DMASS + floatSigMean);
+      mean.setRange(DMASS - sigMeanRange, DMASS + sigMeanRange);
     }
     // Nominal model lets width of data Gaussian float
-    if (floatSigAlpha > 0.)
+    if (sigAlphaRange > 0.)
     {
       alpha.setConstant(false);
-      alpha.setRange(0. - floatSigAlpha, 0. + floatSigAlpha);
+      alpha.setRange(0. - sigAlphaRange, 0. + sigAlphaRange);
     }
   }
 };
@@ -653,7 +653,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
               string eventsdat,
               bool doSyst_comb,
               bool doPkkk, bool doPkpp,
-              double floatSigMean, double floatSigAlpha,
+              double sigMeanWidth, double sigAlphaWidth,
               string plotTitle)
 {
   std::cout << "=======================================================" << std::endl;
@@ -670,7 +670,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
   
   
-  SignalParams sigl = SignalParams(sigldat, floatSigMean, floatSigAlpha);
+  SignalParams sigl = SignalParams(sigldat, sigMeanWidth, sigAlphaWidth);
   SwapParams swap = SwapParams(swapdat);
   PeakingKKParams pkkk = PeakingKKParams(pkkkdat);
   PeakingPiPiParams pkpp = PeakingPiPiParams(pkppdat);
@@ -883,13 +883,13 @@ int main(int argc, char *argv[]) {
   bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
   bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
   bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
-  double floatSigMean   = CL.GetDouble("floatSigMean", 0.015); // let signal mean float within <D0_mass> +/- <value>
-  double floatSigAlpha  = CL.GetDouble("floatSigAlpha", 0.10); // let signal width float by <MC_width> * (1 +/- <value>)
+  double sigMeanRange   = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
+  double sigAlphaRange  = CL.GetDouble("sigAlphaRange", 0.10); // let signal width float by <MC_width> * (1 +/- <value>)
   
   // Handle legacy setting of doSyst_sig
   if (doSyst_sig) {
-    floatSigMean = 0.;
-    floatSigAlpha = 0.;
+    sigMeanRange = 0.;
+    sigAlphaRange = 0.;
   }
   
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
@@ -974,7 +974,7 @@ int main(int argc, char *argv[]) {
            nevtdat,
            doSyst_comb,
            doPkkk, doPkpp,
-           floatSigMean, floatSigAlpha,
+           sigMeanRange, sigAlphaRange,
            plotTitle.str());
 
   return 0;

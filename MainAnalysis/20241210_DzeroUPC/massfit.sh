@@ -21,8 +21,8 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
 	doSyst_comb=$(echo $MicroTree | jq -r '.doSyst_comb')
 	doPkkk=$(echo $MicroTree | jq -r '.doPkkk')
 	doPkpp=$(echo $MicroTree | jq -r '.doPkpp')
-	floatSigMean=$(echo $MicroTree | jq -r '.floatSigMean')
-	floatSigAlpha=$(echo $MicroTree | jq -r '.floatSigAlpha')
+	sigMeanRange=$(echo $MicroTree | jq -r '.sigMeanRange')
+	sigAlphaRange=$(echo $MicroTree | jq -r '.sigAlphaRange')
 	RstDir=$(dirname "$dataInput")
 	RstDir=${RstDir}/${FitDir}/
 	mkdir -p $RstDir
@@ -45,8 +45,8 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
   [ "$doSyst_comb" != "null" ] && cmd="$cmd --doSyst_comb $doSyst_comb"
   [ "$doPkkk" != "null" ] && cmd="$cmd --doPkkk $doPkkk"
   [ "$doPkpp" != "null" ] && cmd="$cmd --doPkpp $doPkpp"
-  [ "$floatSigMean" != "null" ] && cmd="$cmd --floatSigMean $floatSigMean"
-  [ "$floatSigAlpha" != "null" ] && cmd="$cmd --floatSigAlpha $floatSigAlpha"
+  [ "$sigMeanRange" != "null" ] && cmd="$cmd --sigMeanRange $sigMeanRange"
+  [ "$sigAlphaRange" != "null" ] && cmd="$cmd --sigAlphaRange $sigAlphaRange"
   
   cmd="$cmd --Output fit.root --RstDir $RstDir"
 
