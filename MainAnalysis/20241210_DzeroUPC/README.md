@@ -1,3 +1,5 @@
+# Overview
+
 ### Preparing the micro tree for analysis
 - Macro: `DzeroUPC.cpp`
 	- Applies all the event selections and D selections
@@ -59,3 +61,49 @@
 	make PlotCrossSection
 	bash plot.sh plotSettings/fullAnalysis.json
 	```
+
+# Steps for Full Analysis
+
+### Setup Environment
+```bash
+source clean.sh
+```
+Running this will set cmsenv, source analysis directories, 
+and recompile scripts.
+
+### 1. Make Micro Trees
+```bash
+bash makeMicroTree.sh sampleSettings/fullAnalysis_skimV3.json
+bash makeMicroTree.sh sampleSettings/systDsvpv_skimV3.json
+bash makeMicroTree.sh sampleSettings/systDtrkPt_skimV3.json
+bash makeMicroTree.sh sampleSettings/systRapGapLoose_skimV3.json
+bash makeMicroTree.sh sampleSettings/systRapGapTight_skimV3.json
+bash makeMicroTree.sh sampleSettings/systDalpha_skimV3.json
+bash makeMicroTree.sh sampleSettings/systDchi2cl_skimV3.json
+```
+
+### 2. Run Mass Fits
+```bash
+# These use full analysis MicroTrees:
+bash massfit.sh fitSettings/fullAnalysis_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systFitSigMean_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systFitSigAlpha_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systFitComb_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systFitPkBg_useGammaNForNgammaForFitFunc.json
+# These use full their respective MicroTrees:
+bash massfit.sh fitSettings/systDsvpv_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systDtrkPt_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systRapGapLoose_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systRapGapTight_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systDalpha_useGammaNForNgammaForFitFunc.json
+bash massfit.sh fitSettings/systDchi2cl_useGammaNForNgammaForFitFunc.json
+```
+
+Nominal fit plots can be found in `fullAnalysis/pt*-*_y*-*_IsGammaN*/MassFit/`.
+
+### 3. Plot Cross Sections
+```bash
+bash plot.sh plotSettings/fullAnalysis.json
+```
+
+Yield and efficiencty plots can be found in `plot/fullAnalysis/`.
