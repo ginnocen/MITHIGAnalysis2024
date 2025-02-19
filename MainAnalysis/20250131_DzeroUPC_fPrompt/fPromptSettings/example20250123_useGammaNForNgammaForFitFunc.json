@@ -1,0 +1,73 @@
+{
+  "FitDir": "DCAFit",
+  "fPromptTasks": [
+    {
+      "samples": {
+        "Data": {
+          "sampleInput": "example20250123/pt2-5_y-2--1_IsGammaN1/Data.root",
+          "massFitResult": "example20250123/pt2-5_y-2--1_IsGammaN1/MassFit/fit.root"
+        },
+        "MC": {
+          "sampleInput": "example20250123/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+          "massFitResult": "example20250123/pt2-5_y-2--1_IsGammaN1/MassFit_MC/fit.root"
+        }
+      },
+      "sideBand": "SBP",
+      "sideBandEdge": 3.0,
+      "promptInput": "example20250123/pt2-5_y-2--1_IsGammaN1/MC_prompt.root",
+      "nonPromptInput": "example20250123/pt2-5_y-2--1_IsGammaN1/MC_nonPrompt.root",
+      "fitting": "unbinned"
+    },
+    {
+      "samples": {
+        "Data": {
+          "sampleInput": "example20250123/pt2-5_y-1-0_IsGammaN1/Data.root",
+          "massFitResult": "example20250123/pt2-5_y-1-0_IsGammaN1/MassFit/fit.root"
+        },
+        "MC": {
+          "sampleInput": "example20250123/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+          "massFitResult": "example20250123/pt2-5_y-1-0_IsGammaN1/MassFit_MC/fit.root"
+        }
+      },
+      "sideBand": "SBP",
+      "sideBandEdge": 3.0,
+      "promptInput": "example20250123/pt2-5_y-1-0_IsGammaN1/MC_prompt.root",
+      "nonPromptInput": "example20250123/pt2-5_y-1-0_IsGammaN1/MC_nonPrompt.root",
+      "fitting": "unbinned"
+    },
+    {
+      "samples": {
+        "Data": {
+          "sampleInput": "example20250123/pt2-5_y0-1_IsGammaN1/Data.root",
+          "massFitResult": "example20250123/pt2-5_y0-1_IsGammaN1/MassFit/fit.root"
+        },
+        "MC": {
+          "sampleInput": "example20250123/pt2-5_y0-1_IsGammaN1/MC_inclusive.root",
+          "massFitResult": "example20250123/pt2-5_y0-1_IsGammaN1/MassFit_MC/fit.root"
+        }
+      },
+      "sideBand": "SBP",
+      "sideBandEdge": 3.0,
+      "promptInput": "example20250123/pt2-5_y0-1_IsGammaN1/MC_prompt.root",
+      "nonPromptInput": "example20250123/pt2-5_y0-1_IsGammaN1/MC_nonPrompt.root",
+      "fitting": "unbinned"
+    },
+    {
+      "samples": {
+        "Data": {
+          "sampleInput": "example20250123/pt2-5_y1-2_IsGammaN1/Data.root",
+          "massFitResult": "example20250123/pt2-5_y1-2_IsGammaN1/MassFit/fit.root"
+        },
+        "MC": {
+          "sampleInput": "example20250123/pt2-5_y1-2_IsGammaN1/MC_inclusive.root",
+          "massFitResult": "example20250123/pt2-5_y1-2_IsGammaN1/MassFit_MC/fit.root"
+        }
+      },
+      "sideBand": "SBP",
+      "sideBandEdge": 3.0,
+      "promptInput": "example20250123/pt2-5_y1-2_IsGammaN1/MC_prompt.root",
+      "nonPromptInput": "example20250123/pt2-5_y1-2_IsGammaN1/MC_nonPrompt.root",
+      "fitting": "unbinned"
+    }
+  ]
+}
