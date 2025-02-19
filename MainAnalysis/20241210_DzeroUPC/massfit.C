@@ -176,7 +176,7 @@ struct SignalParams : public ParamsBase {
     sigma1("sig_sigma1", "[signal] width of first Gaussian", 0.03, 0.0048, 0.155),
     sigma2("sig_sigma2", "[signal] width of second Gaussian", 0.01, 0.0048, 0.0465),
     frac1("sig_frac1", "[signal] fraction of first Gaussian", 0.1, 0.001, 0.5),
-    alpha("sig_alpha", "[signal] modification to data Gaussian width", 0., -0.10, 0.10),
+    alpha("sig_alpha", "[signal] modification to data Gaussian width", 0., -0.25, 0.25),
     sigma1Mod("sig_sigma1Mod", "[signal] width mod factor for first Gaussian",
               "sig_sigma1 * (1 + sig_alpha)", RooArgList(sigma1, alpha)),
     sigma2Mod("sig_sigma2Mod", "[signal] width mod factor for second Gaussian",
@@ -884,7 +884,7 @@ int main(int argc, char *argv[]) {
   bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
   bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
   double sigMeanRange   = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
-  double sigAlphaRange  = CL.GetDouble("sigAlphaRange", 0.10); // let signal width float by <MC_width> * (1 +/- <value>)
+  double sigAlphaRange  = CL.GetDouble("sigAlphaRange", 0.25); // let signal width float by <MC_width> * (1 +/- <value>)
   
   // Handle legacy setting of doSyst_sig
   if (doSyst_sig) {

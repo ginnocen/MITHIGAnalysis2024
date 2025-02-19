@@ -1,4 +1,5 @@
-#source clean.sh
+#!/bin/bash
+
 FitSettingCard=${1}
 FitDir=$(jq -r '.FitDir' $FitSettingCard)
 
