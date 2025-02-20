@@ -168,19 +168,13 @@ struct SignalParams : public ParamsBase {
   RooRealVar sigma2;
   RooRealVar frac1;
   RooRealVar alpha;
-  RooFormulaVar sigma1Mod;
-  RooFormulaVar sigma2Mod;
 
   SignalParams() :
     mean("sig_mean", "[signal] mean", DMASS, DMASS - 0.015, DMASS + 0.015),
     sigma1("sig_sigma1", "[signal] width of first Gaussian", 0.03, 0.0048, 0.155),
     sigma2("sig_sigma2", "[signal] width of second Gaussian", 0.01, 0.0048, 0.0465),
     frac1("sig_frac1", "[signal] fraction of first Gaussian", 0.1, 0.001, 0.5),
-    alpha("sig_alpha", "[signal] modification to data Gaussian width", 0., -0.25, 0.25),
-    sigma1Mod("sig_sigma1Mod", "[signal] width mod factor for first Gaussian",
-              "sig_sigma1 * (1 + sig_alpha)", RooArgList(sigma1, alpha)),
-    sigma2Mod("sig_sigma2Mod", "[signal] width mod factor for second Gaussian",
-              "sig_sigma2 * (1 + sig_alpha)", RooArgList(sigma2, alpha))
+    alpha("sig_alpha", "[signal] modification to data Gaussian width", 0.0, -0.25, 0.25)
   {
     // cout << "signal default" << endl;
     params[mean.GetName()] = &mean;
@@ -191,14 +185,6 @@ struct SignalParams : public ParamsBase {
   }
 
   SignalParams(string dat) : SignalParams() { readFromDat(dat); }
-  SignalParams(string dat, bool doSyst) : SignalParams()
-  {
-    readFromDat(dat);
-    if (!doSyst)
-    {
-      mean.setConstant(false); // Nominal fit strategy is to let the mean value float
-    }
-  }
   SignalParams(string dat, double sigMeanRange, double sigAlphaRange) : SignalParams()
   {
     readFromDat(dat);
@@ -212,7 +198,7 @@ struct SignalParams : public ParamsBase {
     if (sigAlphaRange > 0.)
     {
       alpha.setConstant(false);
-      alpha.setRange(0. - sigAlphaRange, 0. + sigAlphaRange);
+      alpha.setRange(0.0 - sigAlphaRange, 0.0 + sigAlphaRange);
     }
   }
 };
@@ -507,10 +493,11 @@ void sigswpmc_fit(TTree *mctree, string rstDir,
   latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("Sigma1 (Signal): %.3f #pm %.3f", sigl.sigma1.getVal(), sigl.sigma1.getError()));
   latex.DrawLatex(xpos, ypos - 2 * ypos_step, Form("Sigma2 (Signal): %.3f #pm %.3f", sigl.sigma2.getVal(), sigl.sigma2.getError()));
   latex.DrawLatex(xpos, ypos - 3 * ypos_step, Form("Frac1 (Signal): %.3f #pm %.3f", sigl.frac1.getVal(), sigl.frac1.getError()));
-  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("Mean (Swap): %.3f #pm %.3f", swap.mean.getVal(), swap.mean.getError()));
-  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("Sigma (Swap): %.3f #pm %.3f", swap.sigma.getVal(), swap.sigma.getError()));
-  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("N_{Sig}: %.3f #pm %.3f", nsig.getVal(), nsig.getError()));
-  latex.DrawLatex(xpos, ypos - 7 * ypos_step, Form("N_{Swap}: %.3f #pm %.3f", nswp.getVal(), nswp.getError()));
+  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("#alpha (Signal): %.3f #pm %.3f", sigl.alpha.getVal(), sigl.alpha.getError()));
+  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("Mean (Swap): %.3f #pm %.3f", swap.mean.getVal(), swap.mean.getError()));
+  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("Sigma (Swap): %.3f #pm %.3f", swap.sigma.getVal(), swap.sigma.getError()));
+  latex.DrawLatex(xpos, ypos - 7 * ypos_step, Form("N_{Sig}: %.3f #pm %.3f", nsig.getVal(), nsig.getError()));
+  latex.DrawLatex(xpos, ypos - 8 * ypos_step, Form("N_{Swap}: %.3f #pm %.3f", nswp.getVal(), nswp.getError()));
 
   canvas->SaveAs(Form("%s/fit_result_signal_and_swap.pdf", rstDir.c_str()));
   
@@ -653,7 +640,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
               string eventsdat,
               bool doSyst_comb,
               bool doPkkk, bool doPkpp,
-              double sigMeanWidth, double sigAlphaWidth,
+              double sigMeanRange, double sigAlphaRange,
               string plotTitle)
 {
   std::cout << "=======================================================" << std::endl;
@@ -669,8 +656,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
 
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
   
-  
-  SignalParams sigl = SignalParams(sigldat, sigMeanWidth, sigAlphaWidth);
+  SignalParams sigl = SignalParams(sigldat, sigMeanRange, sigAlphaRange);
   SwapParams swap = SwapParams(swapdat);
   PeakingKKParams pkkk = PeakingKKParams(pkkkdat);
   PeakingPiPiParams pkpp = PeakingPiPiParams(pkppdat);
@@ -700,8 +686,12 @@ void main_fit(TTree *datatree, string rstDir, string output,
   events.print();
 
   // Define the signal model: double Gaussian
-  RooGaussian gauss1("gauss1", "first Gaussian", m, sigl.mean, sigl.sigma1Mod);
-  RooGaussian gauss2("gauss2", "second Gaussian", m, sigl.mean, sigl.sigma2Mod);
+  RooFormulaVar sigma1alpha("sigma1alpha", "Signal width factor for first Gaussian",
+              "sig_sigma1 * (1 + sig_alpha)", RooArgList(sigl.sigma1, sigl.alpha));
+  RooFormulaVar sigma2alpha("sigma2alpha", "Signal width factor for second Gaussian",
+              "sig_sigma2 * (1 + sig_alpha)", RooArgList(sigl.sigma2, sigl.alpha));
+  RooGaussian gauss1("gauss1", "first Gaussian", m, sigl.mean, sigma1alpha);
+  RooGaussian gauss2("gauss2", "second Gaussian", m, sigl.mean, sigma2alpha);
   RooAddPdf siglPDF("signal", "signal model", RooArgList(gauss1, gauss2), sigl.frac1);
 
   // Define the background model: (Nominal) Exponential (Systematics) Chebychev polynomial
@@ -880,11 +870,12 @@ int main(int argc, char *argv[]) {
 
   ///// for fitting systematics study
   bool doSyst_sig      = CL.GetBool  ("doSyst_sig", false); // do systematics study for the signal
+  double sigMeanRange   = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
+  double sigAlphaRange  = CL.GetDouble("sigAlphaRange", 0.25); // let signal width float by <MC_width> * (1 +/- <value>)
   bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
   bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
   bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
-  double sigMeanRange   = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
-  double sigAlphaRange  = CL.GetDouble("sigAlphaRange", 0.25); // let signal width float by <MC_width> * (1 +/- <value>)
+
   
   // Handle legacy setting of doSyst_sig
   if (doSyst_sig) {
