@@ -768,6 +768,11 @@ void main_fit(TTree *datatree, string rstDir, string output,
   frame->Draw();
   
   canvas->SaveAs(Form("%s/fit_result_full_clean.pdf", rstDir.c_str()));
+  
+  sigl.writeToDat(Form("%s/datafit_sigl.dat", rstDir.c_str()));
+  swap.writeToDat(Form("%s/datafit_swap.dat", rstDir.c_str()));
+  pkkk.writeToDat(Form("%s/datafit_pkkk.dat", rstDir.c_str()));
+  pkpp.writeToDat(Form("%s/datafit_pkpp.dat", rstDir.c_str()));
 
   // Add parameter annotations
   double xpos = 0.60, ypos = 0.85, ypos_step = 0.05; // Starting position and step for annotations
@@ -870,8 +875,8 @@ int main(int argc, char *argv[]) {
 
   ///// for fitting systematics study
   bool doSyst_sig      = CL.GetBool  ("doSyst_sig", false); // do systematics study for the signal
-  double sigMeanRange   = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
-  double sigAlphaRange  = CL.GetDouble("sigAlphaRange", 0.25); // let signal width float by <MC_width> * (1 +/- <value>)
+  double sigMeanRange  = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
+  double sigAlphaRange = CL.GetDouble("sigAlphaRange", 0.25); // let signal width float by <MC_width> * (1 +/- <value>)
   bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
   bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
   bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
@@ -932,10 +937,10 @@ int main(int argc, char *argv[]) {
   string nevtdat;
   if (neventsInput=="")
   {
-    double nsig = mctree->GetEntries("(Dgen == 23333 || Dgen == 41022 || Dgen == 41044) && Dmass>1.68 && Dmass<2.05");
-    double nswp = mctree->GetEntries("(Dgen == 23344 || Dgen == 41122 || Dgen == 41144) && Dmass>1.68 && Dmass<2.05");
-    double npkkk = mctree->GetEntries("Dgen == 333 && Dmass < 1.8648 && Dmass>1.68 && Dmass<2.05");
-    double npkpp = mctree->GetEntries("Dgen == 333 && Dmass > 1.8648 && Dmass>1.68 && Dmass<2.05");
+    double nsig = mctree->GetEntries(Form("(Dgen == 23333 || Dgen == 41022 || Dgen == 41044) && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    double nswp = mctree->GetEntries(Form("(Dgen == 23344 || Dgen == 41122 || Dgen == 41144) && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    double npkkk = mctree->GetEntries(Form("Dgen == 333 && Dmass < 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    double npkpp = mctree->GetEntries(Form("Dgen == 333 && Dmass > 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
     nevtdat = Form("%s/events.dat", rstDir.c_str());
     EventParams::writeFracToDat(nevtdat, nswp / nsig,
                                          npkkk / nsig,
