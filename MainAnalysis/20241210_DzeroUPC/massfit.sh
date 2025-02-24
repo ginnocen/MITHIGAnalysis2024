@@ -1,4 +1,5 @@
-#source clean.sh
+#!/bin/bash
+
 FitSettingCard=${1}
 FitDir=$(jq -r '.FitDir' $FitSettingCard)
 
@@ -20,7 +21,9 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
 	doSyst_sig=$(echo $MicroTree | jq -r '.doSyst_sig')
 	doSyst_comb=$(echo $MicroTree | jq -r '.doSyst_comb')
 	doPkkk=$(echo $MicroTree | jq -r '.doPkkk')
-	doPkpp=$(echo $MicroTree | jq -r '.doPkpp') 
+	doPkpp=$(echo $MicroTree | jq -r '.doPkpp')
+	sigMeanRange=$(echo $MicroTree | jq -r '.sigMeanRange')
+	sigAlphaRange=$(echo $MicroTree | jq -r '.sigAlphaRange')
 	RstDir=$(dirname "$dataInput")
 	RstDir=${RstDir}/${FitDir}/
 	mkdir -p $RstDir
@@ -39,10 +42,12 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
   [ "$KKmcInputs" != "null" ] && cmd="$cmd --KKmcInputs $KKmcInputs"
   [ "$pipimcInputs" != "null" ] && cmd="$cmd --pipimcInputs $pipimcInputs"
   [ "$neventsInput" != "null" ] && cmd="$cmd --neventsInput $neventsInput"
-  [ "$doSyst_sig" != "null" ] && cmd="$cmd --doSyst_sig $doSyst_sig"
   [ "$doSyst_comb" != "null" ] && cmd="$cmd --doSyst_comb $doSyst_comb"
   [ "$doPkkk" != "null" ] && cmd="$cmd --doPkkk $doPkkk"
   [ "$doPkpp" != "null" ] && cmd="$cmd --doPkpp $doPkpp"
+  [ "$sigMeanRange" != "null" ] && cmd="$cmd --sigMeanRange $sigMeanRange"
+  [ "$sigAlphaRange" != "null" ] && cmd="$cmd --sigAlphaRange $sigAlphaRange"
+  
   cmd="$cmd --Output fit.root --RstDir $RstDir"
 
   echo "Executing >>>>>>"

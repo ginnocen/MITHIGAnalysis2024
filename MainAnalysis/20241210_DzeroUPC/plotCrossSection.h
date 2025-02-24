@@ -213,7 +213,8 @@ void printRatioArr(const std::vector<double>& vec1,
                    const std::string& delimiter = " ",
                    const std::string& headMsg = "",
                    const std::string& endMsg = "",
-                   int precision = 2)
+                   int precision = 2,
+                   int columnWidth = 6)
 {
   std::cout << headMsg; // Print the head string at the beginning
   if (precision >= 0)
@@ -223,7 +224,7 @@ void printRatioArr(const std::vector<double>& vec1,
 
   for (size_t i = 0; i < vec1.size(); ++i)
   {
-    std::cout << (vec1[i]/vec2[i])*100;
+    std::cout << std::setw(columnWidth) << (vec1[i]/vec2[i])*100;
     if (i < vec1.size() - 1) std::cout << delimiter;
   }
 

@@ -40,6 +40,7 @@ using namespace RooFit;
 
 using namespace std;
 
+#define DMASS 1.86484
 #define DMASSMIN 1.67
 #define DMASSMAX 2.07
 #define DMASSNBINS 32
@@ -166,27 +167,38 @@ struct SignalParams : public ParamsBase {
   RooRealVar sigma1;
   RooRealVar sigma2;
   RooRealVar frac1;
+  RooRealVar alpha;
 
   SignalParams() :
-    mean("sig_mean", "[signal] mean", 1.86484, 1.85, 1.88),
+    mean("sig_mean", "[signal] mean", DMASS, DMASS - 0.015, DMASS + 0.015),
     sigma1("sig_sigma1", "[signal] width of first Gaussian", 0.03, 0.0048, 0.155),
     sigma2("sig_sigma2", "[signal] width of second Gaussian", 0.01, 0.0048, 0.0465),
-    frac1("sig_frac1", "[signal] fraction of first Gaussian", 0.1, 0.001, 0.5) 
+    frac1("sig_frac1", "[signal] fraction of first Gaussian", 0.1, 0.001, 0.5),
+    alpha("sig_alpha", "[signal] modification to data Gaussian width", 0.0, -0.25, 0.25)
   {
     // cout << "signal default" << endl;
     params[mean.GetName()] = &mean;
     params[sigma1.GetName()] = &sigma1;
     params[sigma2.GetName()] = &sigma2;
-    params[frac1 .GetName()] = &frac1;
+    params[frac1.GetName()] = &frac1;
+    params[alpha.GetName()] = &alpha;
   }
 
   SignalParams(string dat) : SignalParams() { readFromDat(dat); }
-  SignalParams(string dat, bool doSyst) : SignalParams()
+  SignalParams(string dat, double sigMeanRange, double sigAlphaRange) : SignalParams()
   {
     readFromDat(dat);
-    if (!doSyst)
+    // Nominal model lets mean of data Gaussian float
+    if (sigMeanRange > 0.)
     {
-      mean.setConstant(false); // Nominal fit strategy is to let the mean value float
+      mean.setConstant(false);
+      mean.setRange(DMASS - sigMeanRange, DMASS + sigMeanRange);
+    }
+    // Nominal model lets width of data Gaussian float
+    if (sigAlphaRange > 0.)
+    {
+      alpha.setConstant(false);
+      alpha.setRange(0.0 - sigAlphaRange, 0.0 + sigAlphaRange);
     }
   }
 };
@@ -481,10 +493,11 @@ void sigswpmc_fit(TTree *mctree, string rstDir,
   latex.DrawLatex(xpos, ypos - 1 * ypos_step, Form("Sigma1 (Signal): %.3f #pm %.3f", sigl.sigma1.getVal(), sigl.sigma1.getError()));
   latex.DrawLatex(xpos, ypos - 2 * ypos_step, Form("Sigma2 (Signal): %.3f #pm %.3f", sigl.sigma2.getVal(), sigl.sigma2.getError()));
   latex.DrawLatex(xpos, ypos - 3 * ypos_step, Form("Frac1 (Signal): %.3f #pm %.3f", sigl.frac1.getVal(), sigl.frac1.getError()));
-  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("Mean (Swap): %.3f #pm %.3f", swap.mean.getVal(), swap.mean.getError()));
-  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("Sigma (Swap): %.3f #pm %.3f", swap.sigma.getVal(), swap.sigma.getError()));
-  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("N_{Sig}: %.3f #pm %.3f", nsig.getVal(), nsig.getError()));
-  latex.DrawLatex(xpos, ypos - 7 * ypos_step, Form("N_{Swap}: %.3f #pm %.3f", nswp.getVal(), nswp.getError()));
+  latex.DrawLatex(xpos, ypos - 4 * ypos_step, Form("#alpha (Signal): %.3f #pm %.3f", sigl.alpha.getVal(), sigl.alpha.getError()));
+  latex.DrawLatex(xpos, ypos - 5 * ypos_step, Form("Mean (Swap): %.3f #pm %.3f", swap.mean.getVal(), swap.mean.getError()));
+  latex.DrawLatex(xpos, ypos - 6 * ypos_step, Form("Sigma (Swap): %.3f #pm %.3f", swap.sigma.getVal(), swap.sigma.getError()));
+  latex.DrawLatex(xpos, ypos - 7 * ypos_step, Form("N_{Sig}: %.3f #pm %.3f", nsig.getVal(), nsig.getError()));
+  latex.DrawLatex(xpos, ypos - 8 * ypos_step, Form("N_{Swap}: %.3f #pm %.3f", nswp.getVal(), nswp.getError()));
 
   canvas->SaveAs(Form("%s/fit_result_signal_and_swap.pdf", rstDir.c_str()));
   
@@ -625,8 +638,9 @@ void main_fit(TTree *datatree, string rstDir, string output,
               string sigldat, string swapdat,
               string pkkkdat, string pkppdat,
               string eventsdat,
-              bool doSyst_sig, bool doSyst_comb,
+              bool doSyst_comb,
               bool doPkkk, bool doPkpp,
+              double sigMeanRange, double sigAlphaRange,
               string plotTitle)
 {
   std::cout << "=======================================================" << std::endl;
@@ -641,8 +655,8 @@ void main_fit(TTree *datatree, string rstDir, string output,
   RooDataSet data("data", "dataset", RooArgSet(m), Import(*datatree));
 
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
-
-  SignalParams sigl = SignalParams(sigldat, doSyst_sig);
+  
+  SignalParams sigl = SignalParams(sigldat, sigMeanRange, sigAlphaRange);
   SwapParams swap = SwapParams(swapdat);
   PeakingKKParams pkkk = PeakingKKParams(pkkkdat);
   PeakingPiPiParams pkpp = PeakingPiPiParams(pkppdat);
@@ -672,8 +686,12 @@ void main_fit(TTree *datatree, string rstDir, string output,
   events.print();
 
   // Define the signal model: double Gaussian
-  RooGaussian gauss1("gauss1", "first Gaussian", m, sigl.mean, sigl.sigma1);
-  RooGaussian gauss2("gauss2", "second Gaussian", m, sigl.mean, sigl.sigma2);
+  RooFormulaVar sigma1alpha("sigma1alpha", "Signal width factor for first Gaussian",
+              "sig_sigma1 * (1 + sig_alpha)", RooArgList(sigl.sigma1, sigl.alpha));
+  RooFormulaVar sigma2alpha("sigma2alpha", "Signal width factor for second Gaussian",
+              "sig_sigma2 * (1 + sig_alpha)", RooArgList(sigl.sigma2, sigl.alpha));
+  RooGaussian gauss1("gauss1", "first Gaussian", m, sigl.mean, sigma1alpha);
+  RooGaussian gauss2("gauss2", "second Gaussian", m, sigl.mean, sigma2alpha);
   RooAddPdf siglPDF("signal", "signal model", RooArgList(gauss1, gauss2), sigl.frac1);
 
   // Define the background model: (Nominal) Exponential (Systematics) Chebychev polynomial
@@ -750,6 +768,11 @@ void main_fit(TTree *datatree, string rstDir, string output,
   frame->Draw();
   
   canvas->SaveAs(Form("%s/fit_result_full_clean.pdf", rstDir.c_str()));
+  
+  sigl.writeToDat(Form("%s/datafit_sigl.dat", rstDir.c_str()));
+  swap.writeToDat(Form("%s/datafit_swap.dat", rstDir.c_str()));
+  pkkk.writeToDat(Form("%s/datafit_pkkk.dat", rstDir.c_str()));
+  pkpp.writeToDat(Form("%s/datafit_pkpp.dat", rstDir.c_str()));
 
   // Add parameter annotations
   double xpos = 0.60, ypos = 0.85, ypos_step = 0.05; // Starting position and step for annotations
@@ -785,7 +808,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
   }
   latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("Mean = %.3f #pm %.3f (%s)", sigl.mean.getVal(), sigl.mean.getError(),
                                                     sigl.mean.isConstant()? "fixed": "float" ));
-
+  latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("#alpha_{Sig} = %.3f #pm %.3f (%s)", sigl.alpha.getVal(), sigl.alpha.getError(), sigl.alpha.isConstant()? "fixed": "float" ));
   latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Sig} = %.3f #pm %.3f", events.nsig.getVal(), events.nsig.getError()));
   latex.DrawLatex(xpos, ypos - (lineCount++) * ypos_step, Form("N_{Swap} = %.3f #pm %.3f", events.nswp.getVal(),
                                                     events.nswp.getPropagatedError(*result)));
@@ -852,9 +875,18 @@ int main(int argc, char *argv[]) {
 
   ///// for fitting systematics study
   bool doSyst_sig      = CL.GetBool  ("doSyst_sig", false); // do systematics study for the signal
+  double sigMeanRange  = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
+  double sigAlphaRange = CL.GetDouble("sigAlphaRange", 0.25); // let signal width float by <MC_width> * (1 +/- <value>)
   bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
   bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
   bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
+
+  
+  // Handle legacy setting of doSyst_sig
+  if (doSyst_sig) {
+    sigMeanRange = 0.;
+    sigAlphaRange = 0.;
+  }
   
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
   string rstDir  = CL.Get      ("RstDir","./");       // Label for output file
@@ -905,10 +937,10 @@ int main(int argc, char *argv[]) {
   string nevtdat;
   if (neventsInput=="")
   {
-    double nsig = mctree->GetEntries("(Dgen == 23333 || Dgen == 41022 || Dgen == 41044) && Dmass>1.68 && Dmass<2.05");
-    double nswp = mctree->GetEntries("(Dgen == 23344 || Dgen == 41122 || Dgen == 41144) && Dmass>1.68 && Dmass<2.05");
-    double npkkk = mctree->GetEntries("Dgen == 333 && Dmass < 1.8648 && Dmass>1.68 && Dmass<2.05");
-    double npkpp = mctree->GetEntries("Dgen == 333 && Dmass > 1.8648 && Dmass>1.68 && Dmass<2.05");
+    double nsig = mctree->GetEntries(Form("(Dgen == 23333 || Dgen == 41022 || Dgen == 41044) && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    double nswp = mctree->GetEntries(Form("(Dgen == 23344 || Dgen == 41122 || Dgen == 41144) && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    double npkkk = mctree->GetEntries(Form("Dgen == 333 && Dmass < 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    double npkpp = mctree->GetEntries(Form("Dgen == 333 && Dmass > 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
     nevtdat = Form("%s/events.dat", rstDir.c_str());
     EventParams::writeFracToDat(nevtdat, nswp / nsig,
                                          npkkk / nsig,
@@ -936,8 +968,9 @@ int main(int argc, char *argv[]) {
   main_fit(datatree, rstDir, output,
            sigldat, swapdat, pkkkdat, pkppdat,
            nevtdat,
-           doSyst_sig, doSyst_comb,
+           doSyst_comb,
            doPkkk, doPkpp,
+           sigMeanRange, sigAlphaRange,
            plotTitle.str());
 
   return 0;

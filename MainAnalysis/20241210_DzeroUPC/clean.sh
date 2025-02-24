@@ -1,5 +1,9 @@
+rm CorrectedYields
 rm ExecuteDzeroUPC
 rm MassFit
+rm PlotCrossSection
+#rm PlotHFDist
+#rm PlotRapGapScan
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
 rm -rf Output
