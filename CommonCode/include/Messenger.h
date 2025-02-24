@@ -788,10 +788,6 @@ public:
    std::vector<float> *Ddtheta;
    std::vector<bool> *DpassCut23PAS;
    std::vector<bool> *DpassCut23LowPt;
-   std::vector<bool> *DpassCut23PASSystDsvpvSig;
-   std::vector<bool> *DpassCut23PASSystDtrkPt;
-   std::vector<bool> *DpassCut23PASSystDalpha;
-   std::vector<bool> *DpassCut23PASSystDchi2cl;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;
@@ -803,15 +799,6 @@ public:
    std::vector<bool> *GisSignalCalc;
    std::vector<bool> *GisSignalCalcPrompt;
    std::vector<bool> *GisSignalCalcFeeddown;
-
-   ///////////////////
-   // Defining the rapidity gap energy threshold array for the systematics study -- 1
-   // [Change accordingly] function gammaN_EThresh*()
-   ///////////////////
-   const int N_gapEThresh = 9;
-   // from tight to loose
-   const std::vector<float> gapEThresh_gammaN = {4.3, 5.5, 6.4, 7.8, 9.2, 10.6, 12.5, 15.0, 16.2};
-   const std::vector<float> gapEThresh_Ngamma = {4.5, 5.5, 6.5, 7.6, 8.6, 10.0, 12.0, 15.0, 16.0};
 
 public:   // Derived quantities
    bool GoodPhotonuclear; //FIXME: currently not implemented
@@ -833,25 +820,6 @@ public:
    void Clear();
    void CopyNonTrack(DzeroUPCTreeMessenger &M);
    bool FillEntry();
-
-   ///////////////////
-   // Utility functions to examine passing a specific rapidity gap energy threshold -- 2
-   // [Change accordingly] the declaration of gapEThresh_*
-   ///////////////////
-   bool gammaN_EThreshTight()   { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(0); }
-   bool gammaN_EThreshLoose()   { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(N_gapEThresh-1); }
-   bool gammaN_EThreshNominal() { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(N_gapEThresh/2); }
-   bool gammaN_EThreshSyst5p5() { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(1); }
-   bool gammaN_EThreshSyst15()  { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(7); }
-   bool gammaN_EThreshCustom(float threshold)  { return ( this->ZDCgammaN && this->HFEMaxPlus <= threshold ); }
-
-   bool Ngamma_EThreshTight()   { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(0); }
-   bool Ngamma_EThreshLoose()   { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(N_gapEThresh-1); }
-   bool Ngamma_EThreshNominal() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(N_gapEThresh/2); }
-   bool Ngamma_EThreshSyst5p5() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(1); }
-   bool Ngamma_EThreshSyst15()  { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(7); }
-   bool Ngamma_EThreshCustom(float threshold)  { return ( this->ZDCNgamma && this->HFEMaxMinus <= threshold ); }
-
 };
 
 class MuMuJetMessenger
@@ -865,12 +833,27 @@ public:
    float hiHF;
    int NVertex;
    float VX, VY, VZ, VXError, VYError, VZError;
+   float EventWeight;
+   float NCollWeight;
+   float PTHat;
+   float ExtraMuWeight[12];
    int NPU;
    //std::vectors
    std::vector<float> *JetPT;
    std::vector<float> *JetEta;
    std::vector<float> *JetPhi;
    std::vector<bool> *IsMuMuTagged;
+   //matched gen-level jet info
+   std::vector<float> *genJetPT;
+   std::vector<float> *genJetEta;
+   std::vector<float> *genJetPhi;
+   std::vector<bool> *genIsMuMuTagged;
+   //gen-level jet info
+   std::vector<float> *unmatchedGenJetPT;
+   std::vector<float> *unmatchedGenJetEta;
+   std::vector<float> *unmatchedGenJetPhi;
+   std::vector<bool> *unmatchedGenIsMuMuTagged;
+   //muon info
    std::vector<float> *muPt1;
    std::vector<float> *muPt2;
    std::vector<float> *muEta1;
@@ -897,6 +880,24 @@ public:
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
+
+   //gen-level muons
+   std::vector<float> *genMuPt1;
+   std::vector<float> *genMuPt2;
+   std::vector<float> *genMuEta1;
+   std::vector<float> *genMuEta2;
+   std::vector<float> *genMuPhi1;
+   std::vector<float> *genMuPhi2;
+   std::vector<float> *genMuMuMass;
+   std::vector<float> *genMuMuEta;
+   std::vector<float> *genMuMuY;
+   std::vector<float> *genMuMuPhi;
+   std::vector<float> *genMuMuPt;
+   std::vector<float> *genMuDeta;
+   std::vector<float> *genMuDphi;
+   std::vector<float> *genMuDR;
+
+   //gen-level counting of charm/beauty hadrons in jet
    std::vector<int> *MJTHadronFlavor;
    std::vector<int> *MJTNcHad;
    std::vector<int> *MJTNbHad;
