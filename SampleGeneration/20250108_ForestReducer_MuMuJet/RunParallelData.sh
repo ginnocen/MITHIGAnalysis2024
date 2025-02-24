@@ -1,11 +1,10 @@
 #!/bin/bash
 MAXCORES=120
 
-NAME="test"
-#"SkimMC2018PbPb_Version20241201_InputForest_20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL"
+NAME="SkimData2018PbPb_Version20241201_v4_ForestVersion_20241023_v220241023_v2"
 OUTPUT="output"
 counter=0
-filelist="/data/NewSkims_gtoccbar/InputList/20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL.txt"
+filelist="/data/NewSkims_gtoccbar/InputList/20241023_DataPbPb2018gtoccbar_v2.txt"
 MERGEDOUTPUT="/data/NewSkims_gtoccbar/$NAME.root"
 rm $MERGEDOUTPUT
 
@@ -31,7 +30,7 @@ mkdir $OUTPUT
 while IFS= read -r file; do
             echo "Processing $file"
             ./Execute --Input "$file" \
-            --IsData false \
+            --IsData true \
             --IsPP false \
             --Output "$OUTPUT/output_$counter.root" \
             --MinJetPT 40 --Fraction 1.0 & 

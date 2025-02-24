@@ -1,6 +1,8 @@
-rm Execute*
+rm Execute
+rm filterEvents
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
+rm MergedOutput.root
 rm -rf Output
 rm SkimReco.root
 rm list.txt
@@ -8,7 +10,7 @@ rm -rf output
 rm *.txt*
 rm SkimReco.root
 rm .DS_Store
-
+CURRENTDIR=$PWD
 cd /home/aholterm/CMSSW_13_2_4/src
 cmsenv
 
@@ -17,9 +19,8 @@ echo "CMSSW environment is set up"
 cd ../../
 source SetupAnalysis.sh
 cd CommonCode/
-pwd
 make
 cd ..
-cd /home/aholterm/MITHIGAnalysis2024/MainAnalysis/20241113_gtoccbar
+cd $CURRENTDIR
 make
 rm Skim*.root

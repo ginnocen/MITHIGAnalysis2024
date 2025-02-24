@@ -1,0 +1,9 @@
+IsMuMuTagged 1 1
+JetPT 70 10000
+muPt1 4 10000
+muPt2 4 10000
+muDiDxy1 0.01 10000
+muDiDxy2 0.01 10000
+MJTNcHad 0 1000 
+MJTNbHad 1 1 
+leadingjet_PTHat 0 2.85
