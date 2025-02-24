@@ -9,7 +9,7 @@ rm *.txt*
 rm SkimReco.root
 rm .DS_Store
 
-cd /home/aholterm/CMSSW_13_2_4/src
+cd /home/ginnocen/CMSSW_13_2_4/src
 cmsenv
 
 cd -
