@@ -9,7 +9,7 @@ rm *.txt*
 rm SkimReco.root
 rm .DS_Store
 
-cd /home/aholterm/CMSSW_13_2_4/src
+cd /home/ginnocen/CMSSW_13_2_4/src
 cmsenv
 
 cd -
@@ -17,9 +17,7 @@ echo "CMSSW environment is set up"
 cd ../../
 source SetupAnalysis.sh
 cd CommonCode/
-pwd
 make
-cd ..
-cd /home/aholterm/MITHIGAnalysis2024/MainAnalysis/20241113_gtoccbar
+cd /home/ginnocen/MITHIGAnalysis2024/MainAnalysis/20241113_gtoccbar
 make
 rm Skim*.root
