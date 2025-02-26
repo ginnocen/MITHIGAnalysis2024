@@ -430,7 +430,7 @@ void styleframe_massfit(RooPlot* frame)
 }
 
 void sigswpmc_fit(TTree *mctree, string rstDir,
-                string& sigldat, string& swapdat,
+                string& siglmcdat, string& swapdat,
                 string plotTitle)
 {
   std::cout << "=======================================================" << std::endl;
@@ -504,9 +504,9 @@ void sigswpmc_fit(TTree *mctree, string rstDir,
   sigl.print();
   swap.print();
 
-  sigldat=Form("%s/sigl.dat", rstDir.c_str());
+  siglmcdat=Form("%s/siglmc.dat", rstDir.c_str());
   swapdat=Form("%s/swap.dat", rstDir.c_str());
-  sigl.writeToDat(sigldat.c_str());
+  sigl.writeToDat(siglmcdat.c_str());
   swap.writeToDat(swapdat.c_str());
 
   delete canvas;
@@ -635,8 +635,8 @@ void pipimc_fit(TTree *mctree, string rstDir,
 }
 
 void main_fit(TTree *datatree, string rstDir, string output,
-              string sigldat, string swapdat,
-              string pkkkdat, string pkppdat,
+              string siglmcdat, string swapdat,
+              string pkkkdat, string pkppdat, string sigldatadat,
               string eventsdat,
               bool doSyst_comb,
               bool doPkkk, bool doPkpp,
@@ -656,7 +656,7 @@ void main_fit(TTree *datatree, string rstDir, string output,
 
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
   
-  SignalParams sigl = SignalParams(sigldat, sigMeanRange, sigAlphaRange);
+  SignalParams sigl = SignalParams(siglmcdat, sigMeanRange, sigAlphaRange);
   SwapParams swap = SwapParams(swapdat);
   PeakingKKParams pkkk = PeakingKKParams(pkkkdat);
   PeakingPiPiParams pkpp = PeakingPiPiParams(pkppdat);
@@ -746,7 +746,11 @@ void main_fit(TTree *datatree, string rstDir, string output,
     result->SetName("FitResult");
     ws.import(*result);
   }
-
+  
+  // Save data-fitted params to .dat file
+  sigldatadat=Form("%s/sigldata.dat", rstDir.c_str());
+  sigl.writeToDat(sigldatadat.c_str());
+  
   // Save the workspace into a ROOT file
   ws.Write();
   outputFile.Close();
@@ -768,11 +772,6 @@ void main_fit(TTree *datatree, string rstDir, string output,
   frame->Draw();
   
   canvas->SaveAs(Form("%s/fit_result_full_clean.pdf", rstDir.c_str()));
-  
-  sigl.writeToDat(Form("%s/datafit_sigl.dat", rstDir.c_str()));
-  swap.writeToDat(Form("%s/datafit_swap.dat", rstDir.c_str()));
-  pkkk.writeToDat(Form("%s/datafit_pkkk.dat", rstDir.c_str()));
-  pkpp.writeToDat(Form("%s/datafit_pkpp.dat", rstDir.c_str()));
 
   // Add parameter annotations
   double xpos = 0.60, ypos = 0.85, ypos_step = 0.05; // Starting position and step for annotations
@@ -857,7 +856,6 @@ void main_fit(TTree *datatree, string rstDir, string output,
   delete canvas;
 }
 
-
 int main(int argc, char *argv[]) {
   CommandLine CL(argc, argv);
   string dataInput     = CL.Get      ("dataInput",    "output.root"); // Input data file
@@ -933,7 +931,7 @@ int main(int argc, char *argv[]) {
   TChain *mctree = new TChain("nt");
   for (auto file : mcInputs) mctree->Add(file.c_str());
 
-  string sigldat, swapdat, pkkkdat, pkppdat;
+  string siglmcdat, swapdat, sigldatadat, pkkkdat, pkppdat;
   string nevtdat;
   if (neventsInput=="")
   {
@@ -952,7 +950,7 @@ int main(int argc, char *argv[]) {
   if (!(sigswpInputs.size()==1 && sigswpInputs[0].find(".dat")!=string::npos)) {
     TChain *sigswptree = new TChain("nt");
     for (auto file : sigswpInputs) sigswptree->Add(file.c_str());
-    sigswpmc_fit(sigswptree, rstDir, sigldat, swapdat, plotTitle.str());
+    sigswpmc_fit(sigswptree, rstDir, siglmcdat, swapdat, plotTitle.str());
   }
   if (doPkkk && !(KKmcInputs.size()==1 && KKmcInputs[0].find(".dat")!=string::npos)) {
     TChain *KKmctree = new TChain("nt");
@@ -966,7 +964,7 @@ int main(int argc, char *argv[]) {
   }
   
   main_fit(datatree, rstDir, output,
-           sigldat, swapdat, pkkkdat, pkppdat,
+           siglmcdat, swapdat, pkkkdat, pkppdat, sigldatadat,
            nevtdat,
            doSyst_comb,
            doPkkk, doPkpp,
