@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #source clean.sh
 SampleSettingCard=${1}
 MicroTreeDir=$(jq -r '.MicroTreeDir' $SampleSettingCard)
@@ -46,6 +44,5 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 										--DoSystRapGap $DoSystRapGap \
 										--DoSystD $DoSystD \
 										--Output $Output &
-done
 
-exit
+done
