@@ -42,6 +42,7 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
   [ "$KKmcInputs" != "null" ] && cmd="$cmd --KKmcInputs $KKmcInputs"
   [ "$pipimcInputs" != "null" ] && cmd="$cmd --pipimcInputs $pipimcInputs"
   [ "$neventsInput" != "null" ] && cmd="$cmd --neventsInput $neventsInput"
+  [ "$doSyst_sig" != "null" ] && cmd="$cmd --doSyst_sig $doSyst_sig"
   [ "$doSyst_comb" != "null" ] && cmd="$cmd --doSyst_comb $doSyst_comb"
   [ "$doPkkk" != "null" ] && cmd="$cmd --doPkkk $doPkkk"
   [ "$doPkpp" != "null" ] && cmd="$cmd --doPkpp $doPkpp"
