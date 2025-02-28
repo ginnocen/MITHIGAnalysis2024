@@ -112,7 +112,7 @@ public:
 
   void analyze(Parameters &par) {
     outf->cd();
-    hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", 60, 1.7, 2.0);
+    hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", 60, 1.56, 2.16);
     hDenEvtEff = new TH1D(Form("hDenEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hNumEvtEff = new TH1D(Form("hNumEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hRatioEvtEff = (TH1D*) hNumEvtEff->Clone("hRatioEvtEff");
@@ -271,8 +271,8 @@ int main(int argc, char *argv[]) {
   if (printHelpMessage(argc, argv))
     return 0;
   CommandLine CL(argc, argv);
-  float MinDzeroPT = CL.GetDouble("MinDzeroPT", 1);  // Minimum Dzero transverse momentum threshold for Dzero selection.
-  float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 2);  // Maximum Dzero transverse momentum threshold for Dzero selection.
+  float MinDzeroPT = CL.GetDouble("MinDzeroPT", 2);  // Minimum Dzero transverse momentum threshold for Dzero selection.
+  float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 5);  // Maximum Dzero transverse momentum threshold for Dzero selection.
   float MinDzeroY = CL.GetDouble("MinDzeroY", -2);   // Minimum Dzero rapidity threshold for Dzero selection.
   float MaxDzeroY = CL.GetDouble("MaxDzeroY", +2);   // Maximum Dzero rapidity threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
