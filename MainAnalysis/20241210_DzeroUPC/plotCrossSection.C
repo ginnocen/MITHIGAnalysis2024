@@ -1,5 +1,6 @@
 #include "TCanvas.h"
 #include "TGraphErrors.h"
+#include "TGraphAsymmErrors.h"
 #include "TH1F.h"
 #include "TAxis.h"
 #include "TLegend.h"
@@ -19,7 +20,6 @@
 
 using namespace std;
 
-
 int main(int argc, char *argv[])
 {
   CommandLine CL(argc, argv);
@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
   float MinDzeroPT = CL.GetDouble("MinDzeroPT", 2);  // Minimum Dzero transverse momentum threshold for Dzero selection.
   float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 5);  // Maximum Dzero transverse momentum threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
+  bool doAsymSyst = CL.GetBool("doAsymSyst", true); // Use asymmetric systematic uncertainties
 
   vector<string> inputPoints      = CL.GetStringVector("InputPoints",    ""); // Input corrected yields md files
 
@@ -170,13 +171,15 @@ int main(int argc, char *argv[])
   vector<double> systFitPkBgCorrectedYieldValues = getAltCorrectedYieldArr(inputPoints,
                     nominalFitRST, wSystFitPkBg,
                     MinDzeroPT, MaxDzeroPT, IsGammaN);
-
+  
   vector<double> systEvtSelUncert(nPoints);
   vector<double> systRapGapUncert(nPoints);
   vector<double> systDsvpvUncert(nPoints);
   vector<double> systDtrkPtUncert(nPoints);
   vector<double> systDalphaUncert(nPoints);
   vector<double> systDchi2clUncert(nPoints);
+  vector<double> systFitUncertPos(nPoints); // Positive mass fit uncert
+  vector<double> systFitUncertNeg(nPoints); // Negative mass fit uncert
   vector<double> systFitSigMeanUncert(nPoints);
   vector<double> systFitSigAlphaUncert(nPoints);
   vector<double> systFitCombUncert(nPoints);
@@ -191,56 +194,87 @@ int main(int argc, char *argv[])
       if (thisUncert > systRapGapUncert[i]) systRapGapUncert[i] = thisUncert;
     }
 
-    systDsvpvUncert[i]    = TMath::Abs(systDsvpvCorrectedYieldValues[i] - correctedYieldValues[i]);
-    systDtrkPtUncert[i]   = TMath::Abs(systDtrkPtCorrectedYieldValues[i] - correctedYieldValues[i]);
-    systDalphaUncert[i]   = TMath::Abs(systDalphaCorrectedYieldValues[i] - correctedYieldValues[i]);
-    systDchi2clUncert[i]  = TMath::Abs(systDchi2clCorrectedYieldValues[i] - correctedYieldValues[i]);
-    systFitSigMeanUncert[i]  = TMath::Abs(systFitSigMeanCorrectedYieldValues[i] - correctedYieldValues[i]);
-    systFitSigAlphaUncert[i] = TMath::Abs(systFitSigAlphaCorrectedYieldValues[i] - correctedYieldValues[i]);
-    systFitCombUncert[i]  = TMath::Abs(systFitCombCorrectedYieldValues[i] - correctedYieldValues[i]);
-    systFitPkBgUncert[i]  = TMath::Abs(systFitPkBgCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systDsvpvUncert[i]    = (systDsvpvCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systDtrkPtUncert[i]   = (systDtrkPtCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systDalphaUncert[i]   = (systDalphaCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systDchi2clUncert[i]  = (systDchi2clCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systFitSigMeanUncert[i]   = (systFitSigMeanCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systFitSigAlphaUncert[i]  = (systFitSigAlphaCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systFitCombUncert[i]  = (systFitCombCorrectedYieldValues[i] - correctedYieldValues[i]);
+    systFitPkBgUncert[i]  = (systFitPkBgCorrectedYieldValues[i] - correctedYieldValues[i]);
+    // Display mass fit uncertainties asymmetrically:
+    if (systFitSigMeanUncert[i] > 0) systFitUncertPos[i] += pow(systFitSigMeanUncert[i], 2);
+    else systFitUncertNeg[i] += pow(systFitSigMeanUncert[i], 2);
+    if (systFitSigAlphaUncert[i] > 0) systFitUncertPos[i] += pow(systFitSigAlphaUncert[i], 2);
+    else systFitUncertNeg[i] += pow(systFitSigAlphaUncert[i], 2);
+    if (systFitCombUncert[i] > 0) systFitUncertPos[i] += pow(systFitCombUncert[i], 2);
+    else systFitUncertNeg[i] += pow(systFitCombUncert[i], 2);
+    if (systFitPkBgUncert[i] > 0) systFitUncertPos[i] += pow(systFitPkBgUncert[i], 2);
+    else systFitUncertNeg[i] += pow(systFitPkBgUncert[i], 2);
+    systFitUncertPos[i] = TMath::Sqrt(systFitUncertPos[i]);
+    systFitUncertNeg[i] = TMath::Sqrt(systFitUncertNeg[i]);
   }
-
   printArr(correctedYieldValues, ", ", "correctedYieldValues: ");
   printArr(systRapGapCorrectedYieldValues[0], ", ", "systRapGapLoose: ");
   printArr(systRapGapCorrectedYieldValues[1], ", ", "systRapGapTight: ");
-  printRatioArr(systEvtSelUncert, correctedYieldValues,       " | ", "| EvtSel      | ", " |");
-  printRatioArr(systRapGapUncert, correctedYieldValues,       " | ", "| RapGap      | ", " |");
-  printRatioArr(systDsvpvUncert, correctedYieldValues,        " | ", "| Dsvpv       | ", " |");
-  printRatioArr(systDtrkPtUncert, correctedYieldValues,       " | ", "| DtrkPt      | ", " |");
-  printRatioArr(systDalphaUncert, correctedYieldValues,       " | ", "| Dalpha      | ", " |");
-  printRatioArr(systDchi2clUncert, correctedYieldValues,      " | ", "| Dchi2cl     | ", " |");
-  printRatioArr(systFitSigMeanUncert, correctedYieldValues,   " | ", "| FitSigMean  | ", " |");
-  printRatioArr(systFitSigAlphaUncert, correctedYieldValues,  " | ", "| FitSigAlpha | ", " |");
-  printRatioArr(systFitCombUncert, correctedYieldValues,      " | ", "| FitComb     | ", " |");
-  printRatioArr(systFitPkBgUncert, correctedYieldValues,      " | ", "| FitPkBg     | ", " |");
-
+  printRatioArr(systEvtSelUncert, correctedYieldValues,   " | ", "| EvtSel  | ", " |");
+  printRatioArr(systRapGapUncert, correctedYieldValues,   " | ", "| RapGap  | ", " |");
+  printRatioArr(systDsvpvUncert, correctedYieldValues,    " | ", "| Dsvpv   | ", " |");
+  printRatioArr(systDtrkPtUncert, correctedYieldValues,   " | ", "| DtrkPt  | ", " |");
+  printRatioArr(systDalphaUncert, correctedYieldValues,   " | ", "| Dalpha  | ", " |");
+  printRatioArr(systDchi2clUncert, correctedYieldValues,  " | ", "| Dchi2cl | ", " |");
+  printRatioArr(systFitUncertPos, correctedYieldValues,   " | ", "| FitPos  | ", " |");
+  printRatioArr(systFitUncertNeg, correctedYieldValues,   " | ", "| FitNeg  | ", " |");
+  vector<vector<double>> listSystSymmet = {
+    systEvtSelUncert,
+    systRapGapUncert,
+    systDsvpvUncert,
+    systDtrkPtUncert,
+    systDalphaUncert,
+    systDchi2clUncert
+  };
+  vector<vector<double>> listSystSigned = {
+    systFitSigMeanUncert,
+    systFitSigAlphaUncert,
+    systFitCombUncert,
+    systFitPkBgUncert
+  };
   vector<double> systTotUncert(nPoints);
+  vector<double> systTotUncertSym(nPoints);
+  vector<double> systTotUncertPos(nPoints);
+  vector<double> systTotUncertNeg(nPoints);
   for (int i = 0; i < nPoints; ++i)
   {
     double systLumiUncert = wSystLumi * correctedYieldValues[i];
     double systTrkUncert  = wSystTrk * correctedYieldValues[i];
     double systBRUncert   = wSystBR * correctedYieldValues[i];
     double systPromptFrac = 0.05 * correctedYieldValues[i]; // [TODO] replaced the rel. syst. to the new study
-
-    systTotUncert[i] = TMath::Sqrt(
-                          systLumiUncert * systLumiUncert +
+    systTotUncertSym[i] = systLumiUncert * systLumiUncert +
                           systTrkUncert * systTrkUncert +
                           systBRUncert * systBRUncert +
-                          systPromptFrac * systPromptFrac +
-                          systEvtSelUncert[i] * systEvtSelUncert[i] +
-                          systRapGapUncert[i] * systRapGapUncert[i] +
-                          systDsvpvUncert[i] * systDsvpvUncert[i] +
-                          systDtrkPtUncert[i] * systDtrkPtUncert[i] +
-                          systDalphaUncert[i] * systDalphaUncert[i] +
-                          systDchi2clUncert[i] * systDchi2clUncert[i] +
-                          systFitSigMeanUncert[i] * systFitSigMeanUncert[i] +
-                          systFitSigAlphaUncert[i] * systFitSigAlphaUncert[i] +
-                          systFitCombUncert[i] * systFitCombUncert[i] +
-                          systFitPkBgUncert[i] * systFitPkBgUncert[i]
-                       );
+                          systPromptFrac * systPromptFrac;
+    
+    for (int j = 0; j < listSystSymmet.size(); ++j) {
+      systTotUncertSym[i] += listSystSymmet[j][i] * listSystSymmet[j][i];
+    }
+    for (int j = 0; j < listSystSigned.size(); ++j) {
+      if (listSystSigned[j][i] > 0) systTotUncertPos[i] += listSystSigned[j][i] * listSystSigned[j][i];
+      else systTotUncertNeg[i] += listSystSigned[j][i] * listSystSigned[j][i];
+    }
+    // Symmetric uncertainty for legacy
+    systTotUncert[i] = TMath::Sqrt(systTotUncertSym[i] + systTotUncertPos[i] + systTotUncertNeg[i]);
+    // Calculate asymmetric uncertainties
+    systTotUncertPos[i] = TMath::Sqrt(systTotUncertSym[i] + systTotUncertPos[i]);
+    systTotUncertNeg[i] = TMath::Sqrt(systTotUncertSym[i] + systTotUncertNeg[i]);
+    systTotUncertSym[i] = TMath::Sqrt(systTotUncertSym[i]);
   }
-  printRatioArr(systTotUncert, correctedYieldValues, " | ", "| Total       | ", " |");
+  printRatioArr(systTotUncertSym, correctedYieldValues, " | ", "| SymSubTotal   | ", " |");
+  printRatioArr(systTotUncertPos, correctedYieldValues, " | ", "| TotalPos(+Sym)| ", " |");
+  printRatioArr(systTotUncertNeg, correctedYieldValues, " | ", "| TotalNeg(+Sym)| ", " |");
+  printRatioArr(systFitSigMeanUncert, correctedYieldValues,   " | ", "| Fit:SigMean   | ", " |");
+  printRatioArr(systFitSigAlphaUncert, correctedYieldValues,  " | ", "| Fit:SigAlpha  | ", " |");
+  printRatioArr(systFitCombUncert, correctedYieldValues,      " | ", "| Fit:Comb      | ", " |");
+  printRatioArr(systFitPkBgUncert, correctedYieldValues,      " | ", "| Fit:PkBg      | ", " |");
   printArr(systTotUncert, ", ", "systTotUncert: ");
 
   /////////////////////////////////
@@ -270,16 +304,23 @@ int main(int argc, char *argv[])
 
   gr->Draw("P E1 SAME");
 
-  // Create the uncertainty band (systematic)
-  TGraphErrors* gr_uncert = new TGraphErrors(nPoints, yValues.data(), correctedYieldValues.data(), yErrors.data(), correctedYieldErrors.data());
-  for (int i = 0; i < nPoints; ++i) {
-      gr_uncert->SetPoint(i, yValues[i], correctedYieldValues[i]); // Set the upper bound of the uncertainty
-      gr_uncert->SetPointError(i, yErrors[i], systTotUncert[i]); // Error is the systematic uncertainty
+  TGraphAsymmErrors* gr_uncert  = new TGraphAsymmErrors(nPoints, yValues.data(), correctedYieldValues.data(), yErrors.data(), correctedYieldErrors.data());
+  // Create symmetric uncertainty band (systematic)
+  if (!doAsymSyst) {
+    for (int i = 0; i < nPoints; ++i) {
+        gr_uncert->SetPoint(i, yValues[i], correctedYieldValues[i]); // Set the upper bound of the uncertainty
+        gr_uncert->SetPointError(i, yErrors[i], yErrors[i], systTotUncert[i], systTotUncert[i]); // Error is the systematic uncertainty
+    }
   }
-
+  // Create asymmetric uncertainty band (systematic)
+  else {
+    for (int i = 0; i < nPoints; ++i) {
+        gr_uncert->SetPoint(i, yValues[i], correctedYieldValues[i]); // Set the upper bound of the uncertainty
+        gr_uncert->SetPointError(i, yErrors[i], yErrors[i], systTotUncertNeg[i], systTotUncertPos[i]); // Error is the systematic uncertainty
+    }
+  }
   gr_uncert->SetFillColorAlpha(kRed,0.3); // Set color for uncertainty band (you can adjust it)
   gr_uncert->Draw("2 SAME"); // Draw the uncertainty band
-
 
   /////////////////////////////////
   // [TODO] Need to add a flag to decide whether to overlay the HIN-24-003 result
@@ -299,10 +340,10 @@ int main(int argc, char *argv[])
   gr_uncert_ref->Draw("2 SAME"); // Draw the uncertainty band
 
 
-  TLegend* leg = new TLegend(0.1, 0.15, 0.48, 0.28);
+  TLegend* leg = new TLegend(0.2, 0.78, 0.55, 0.90);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(gr, "New framework", "P");
+  leg->AddEntry(gr, "HIN-25-002", "P");
   leg->AddEntry(gr_ref, "HIN-24-003", "P");
   leg->Draw();
 

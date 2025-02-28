@@ -31,3 +31,5 @@ sleep 1
 # Produce updated cross sections:
 ./plot.sh plotSettings/fullAnalysis.json
 wait
+root -x -b -q plotMassfitSignalStudy.cpp
+wait

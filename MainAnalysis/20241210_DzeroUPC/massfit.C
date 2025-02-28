@@ -41,8 +41,8 @@ using namespace RooFit;
 using namespace std;
 
 #define DMASS 1.86484
-#define DMASSMIN 1.57
-#define DMASSMAX 2.17
+#define DMASSMIN 1.56
+#define DMASSMAX 2.16
 #define DMASSNBINS 30
 
 struct ParamsBase {
@@ -216,8 +216,8 @@ struct CombinatoricsBkgParams : public ParamsBase {
   CombinatoricsBkgParams(bool _doSyst=false) :
     doSyst(_doSyst),
     lambda("lambda", "lambda", -4.0, -10.0, 10.0),
-    a0("a0", "constant", 0.5, -1.0, 1.0),
-    a1("a1", "slope", -0.2, -1.0, 1.0)
+    a0("a1", "slope", -1.0, -2.0, 0.0),
+    a1("a2", "curve", 0.3, 0.0, 1.0)
   {
     // switch to allow the using the functionalities in the base class:
     // print, write and read
@@ -240,8 +240,8 @@ struct SwapParams : public ParamsBase {
   RooRealVar sigma;
 
   SwapParams() :
-    mean("swap_mean", "[swap] mean", 1.86484, 1.85, 1.88),
-    sigma("swap_sigma", "[swap] width of first Gaussian", 0.1, 0.03, 3.1)
+    mean("swap_mean", "[swap] mean", DMASS, DMASS - 0.015, DMASS + 0.015),
+    sigma("swap_sigma", "[swap] width of  Gaussian", 0.1, 0.03, 3.1)
   {
     params[mean.GetName()] = &mean;
     params[sigma.GetName()] = &sigma;
@@ -388,9 +388,9 @@ struct EventParams {
 
   // Constructor
   EventParams(double _nsig = 500, double _nbkg = 500,
-              double _fswp = 0.5, double _fpkkk = 0.5, double _fpkpp = 0.5)
-      : nsig("nsig", "number of signal events", _nsig, 0, _nsig * 3),
-        nbkg("nbkg", "number of background events", _nbkg, 0, _nbkg * 3),
+              double _fswp = 0.5, double _fpkkk = 0.0, double _fpkpp = 0.5)
+      : nsig("nsig", "number of signal events", _nsig, 0, _nsig * 5),
+        nbkg("nbkg", "number of background events", _nbkg, 0, _nbkg * 5),
         fswp("fswp", "fswp", _fswp),
         fpkkk("fpkkk", "fpkkk", _fpkkk),
         fpkpp("fpkpp", "fpkpp", _fpkpp),
@@ -444,8 +444,10 @@ void sigswpmc_fit(TTree *mctree, string rstDir,
 
   // Import data
   RooDataSet _data("_data", "dataset", RooArgSet(m, Dgen), Import(*mctree));
-  RooDataSet& data = *( (RooDataSet*) _data.reduce( "(Dgen == 23333 || Dgen == 41022 || Dgen == 41044) || "
-                                                    "(Dgen == 23344 || Dgen == 41122 || Dgen == 41144)") );
+  RooDataSet& data = *( (RooDataSet*) _data.reduce(Form(
+    "((Dgen == 23333 || Dgen == 41022 || Dgen == 41044) || "
+    " (Dgen == 23344 || Dgen == 41122 || Dgen == 41144)) &&"
+    "  Dmass > %f && Dmass < %f ", DMASSMIN, DMASSMAX)));
 
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
 
@@ -652,7 +654,8 @@ void main_fit(TTree *datatree, string rstDir, string output,
   RooRealVar m("Dmass", "Mass [GeV]", DMASSMIN, DMASSMAX);
 
   // Import data
-  RooDataSet data("data", "dataset", RooArgSet(m), Import(*datatree));
+  RooDataSet _data("data", "dataset", RooArgSet(m), Import(*datatree));
+  RooDataSet& data = *( (RooDataSet*) _data.reduce(Form("Dmass > %f && Dmass < %f ", DMASSMIN, DMASSMAX)));
 
   std::cout << "[Info] Number of entries: " << data.sumEntries() << std::endl;
   
@@ -937,8 +940,10 @@ int main(int argc, char *argv[]) {
   {
     double nsig = mctree->GetEntries(Form("(Dgen == 23333 || Dgen == 41022 || Dgen == 41044) && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
     double nswp = mctree->GetEntries(Form("(Dgen == 23344 || Dgen == 41122 || Dgen == 41144) && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
-    double npkkk = mctree->GetEntries(Form("Dgen == 333 && Dmass < 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
-    double npkpp = mctree->GetEntries(Form("Dgen == 333 && Dmass > 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    double npkkk = 0;
+    double npkpp = 0;
+    if (doPkkk) npkkk = mctree->GetEntries(Form("Dgen == 333 && Dmass < 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
+    if (doPkpp) npkpp = mctree->GetEntries(Form("Dgen == 333 && Dmass > 1.8648 && Dmass>%f && Dmass<%f", DMASSMIN, DMASSMAX));
     nevtdat = Form("%s/events.dat", rstDir.c_str());
     EventParams::writeFracToDat(nevtdat, nswp / nsig,
                                          npkkk / nsig,
