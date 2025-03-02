@@ -1476,6 +1476,7 @@ bool DzeroTreeMessenger::Initialize()
    Tree->SetBranchAddress("Dsize", &Dsize);
    Tree->SetBranchAddress("Dpt", &Dpt);
    Tree->SetBranchAddress("Dy", &Dy);
+   Tree->SetBranchAddress("Dphi", &Dphi);
    Tree->SetBranchAddress("Dmass", &Dmass);
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
    Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
@@ -1566,6 +1567,7 @@ bool DzeroGenTreeMessenger::Initialize()
    Tree->SetBranchAddress("Gpt", &Gpt);
    Tree->SetBranchAddress("Gy", &Gy);
    Tree->SetBranchAddress("GpdgId", &GpdgId);
+   Tree->SetBranchAddress("Gphi", &Gphi);
    Tree->SetBranchAddress("GisSignal", &GisSignal);
    Tree->SetBranchAddress("GcollisionId", &GcollisionId);
    Tree->SetBranchAddress("GSignalType", &GSignalType);
@@ -3199,6 +3201,289 @@ bool DzeroUPCTreeMessenger::FillEntry()
 
    return true;
 }
+
+DzeroJetUPCTreeMessenger::DzeroJetUPCTreeMessenger(TFile &File, std::string TreeName, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize(Debug);
+}
+
+DzeroJetUPCTreeMessenger::DzeroJetUPCTreeMessenger(TFile *File, std::string TreeName, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize(Debug);
+}
+
+DzeroJetUPCTreeMessenger::DzeroJetUPCTreeMessenger(TTree *HFjetUPCTree, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Initialize(HFjetUPCTree, Debug);
+}
+
+DzeroJetUPCTreeMessenger::~DzeroJetUPCTreeMessenger()
+{
+   if(Initialized == true && WriteMode == true)
+   {
+      delete Dpt;
+      delete DpassCutD0inJet;
+      delete Dy;
+      delete Dphi;
+      delete Dmass;
+      delete JetPt;
+      delete JetEta;
+      delete JetY;
+      delete JetPhi;
+      delete isD0TaggedGeomJet;
+      delete TaggedLeadingD0GeomInJetIndex;
+      delete Gpt;
+      delete Gy;
+      delete Gphi;
+      delete GenJetPt;
+      delete GenJetEta;
+      delete GenJetY;
+      delete GenJetPhi;
+      delete RefJetPt;
+      delete RefJetEta;
+      delete RefJetY;
+      delete RefJetPhi;
+   }
+}
+
+bool DzeroJetUPCTreeMessenger::Initialize(TTree *DzeroJetUPCTree, bool Debug)
+{
+   Tree = DzeroJetUPCTree;
+   return Initialize(Debug);
+}
+
+bool DzeroJetUPCTreeMessenger::Initialize(bool Debug)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Initialized = true;
+   Dpt = nullptr;
+   DpassCutD0inJet = nullptr;
+   Dy = nullptr;
+   Dphi = nullptr;
+   Dmass = nullptr;
+   Dgen = nullptr;
+   JetPt = nullptr;
+   JetEta = nullptr;
+   JetY = nullptr;
+   JetPhi = nullptr;
+   isD0TaggedGeomJet = nullptr;
+   TaggedLeadingD0GeomInJetIndex  = nullptr;
+   Gpt = nullptr;
+   Gy = nullptr;
+   Gphi = nullptr;
+   GenJetPt = nullptr;
+   GenJetEta = nullptr;
+   GenJetY = nullptr;
+   GenJetPhi = nullptr;
+   RefJetPt = nullptr;
+   RefJetEta = nullptr;
+   RefJetY = nullptr;
+   RefJetPhi = nullptr;
+
+   Tree->SetBranchAddress("Run", &Run);
+   Tree->SetBranchAddress("Event", &Event);
+   Tree->SetBranchAddress("Lumi", &Lumi);
+   Tree->SetBranchAddress("isL1ZDCOr", &isL1ZDCOr);
+   Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
+   Tree->SetBranchAddress("isL1ZDCXORJet12", &isL1ZDCXORJet12);
+   Tree->SetBranchAddress("isL1ZDCXORJet16", &isL1ZDCXORJet16);
+   Tree->SetBranchAddress("Dsize", &Dsize);
+   Tree->SetBranchAddress("Nch", &Nch);
+   Tree->SetBranchAddress("Dpt", &Dpt);
+   Tree->SetBranchAddress("Dy", &Dy);
+   Tree->SetBranchAddress("Dphi", &Dphi);
+   Tree->SetBranchAddress("Dmass", &Dmass);
+   Tree->SetBranchAddress("DpassCutD0inJet", &DpassCutD0inJet);
+   Tree->SetBranchAddress("Dgen", &Dgen);
+   Tree->SetBranchAddress("JetCount", &JetCount);
+   Tree->SetBranchAddress("JetPt", &JetPt);
+   Tree->SetBranchAddress("JetEta", &JetEta);
+   Tree->SetBranchAddress("JetY", &JetY);
+   Tree->SetBranchAddress("JetPhi", &JetPhi);
+   Tree->SetBranchAddress("isD0TaggedGeomJet", &isD0TaggedGeomJet);
+   Tree->SetBranchAddress("TaggedLeadingD0GeomInJetIndex", &TaggedLeadingD0GeomInJetIndex);
+   Tree->SetBranchAddress("pthat", &pthat);
+   Tree->SetBranchAddress("Gsize", &Gsize);
+   Tree->SetBranchAddress("Gpt", &Gpt);
+   Tree->SetBranchAddress("Gy", &Gy);
+   Tree->SetBranchAddress("Gphi", &Gphi);
+   Tree->SetBranchAddress("GenJetPt", &GenJetPt);
+   Tree->SetBranchAddress("GenJetEta", &GenJetEta);
+   Tree->SetBranchAddress("GenJetY", &GenJetY);
+   Tree->SetBranchAddress("GenJetPhi", &GenJetPhi);
+   Tree->SetBranchAddress("RefJetPt", &RefJetPt);
+   Tree->SetBranchAddress("RefJetEta", &RefJetEta);
+   Tree->SetBranchAddress("RefJetY", &RefJetY);
+   Tree->SetBranchAddress("RefJetPhi", &RefJetPhi);
+   return true;
+}
+
+int DzeroJetUPCTreeMessenger::GetEntries()
+{
+   if(Tree == nullptr)
+      return 0;
+   return Tree->GetEntries();
+}
+
+bool DzeroJetUPCTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
+bool DzeroJetUPCTreeMessenger::SetBranch(TTree *T)
+{
+   if(T == nullptr)
+      return false;
+
+   Initialized = true;
+   WriteMode = true;
+
+   Dpt = new std::vector<float>();
+   Dy = new std::vector<float>();
+   Dphi = new std::vector<float>();
+   Dmass = new std::vector<float>();
+   DpassCutD0inJet = new std::vector<bool>();
+   Dgen = new std::vector<int>();
+   JetPt = new std::vector<float>();
+   JetEta = new std::vector<float>();
+   JetY = new std::vector<float>();
+   JetPhi = new std::vector<float>();
+   isD0TaggedGeomJet = new std::vector<bool>();
+   TaggedLeadingD0GeomInJetIndex = new std::vector<int>();
+   Gpt = new std::vector<float>();
+   Gy = new std::vector<float>();
+   Gphi = new std::vector<float>();
+   GenJetPt = new std::vector<float>();
+   GenJetEta = new std::vector<float>();
+   GenJetY = new std::vector<float>();
+   GenJetPhi = new std::vector<float>();
+   RefJetPt = new std::vector<float>();
+   RefJetEta = new std::vector<float>();
+   RefJetY = new std::vector<float>();
+   RefJetPhi = new std::vector<float>();
+
+   Tree = T;
+
+   Tree->Branch("Run",                   &Run, "Run/I");
+   Tree->Branch("Event",                 &Event, "Event/L");
+   Tree->Branch("Lumi",                  &Lumi, "Lumi/I");
+   Tree->Branch("isL1ZDCOr",             &isL1ZDCOr, "isL1ZDCOr/O");
+   Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/O");
+   Tree->Branch("isL1ZDCXORJet12",       &isL1ZDCXORJet12, "isL1ZDCXORJet12/O");
+   Tree->Branch("isL1ZDCXORJet16",       &isL1ZDCXORJet16, "isL1ZDCXORJet16/O");
+   Tree->Branch("Nch",                   &Nch, "Nch/I");
+   Tree->Branch("Dsize",                 &Dsize);
+   Tree->Branch("Dpt",                   &Dpt);
+   Tree->Branch("Dy",                    &Dy);
+   Tree->Branch("Dphi",                  &Dphi);
+   Tree->Branch("Dmass",                 &Dmass);
+   Tree->Branch("DpassCutD0inJet",       &DpassCutD0inJet);
+   Tree->Branch("Dgen",                  &Dgen);
+   Tree->Branch("JetCount", &JetCount);
+   Tree->Branch("JetPt", &JetPt);
+   Tree->Branch("JetEta", &JetEta);
+   Tree->Branch("JetY", &JetY);
+   Tree->Branch("JetPhi", &JetPhi);
+   Tree->Branch("isD0TaggedGeomJet", &isD0TaggedGeomJet);
+   Tree->Branch("TaggedLeadingD0GeomInJetIndex", &TaggedLeadingD0GeomInJetIndex);
+
+   Tree->Branch("pthat",                 &pthat);
+   Tree->Branch("Gsize",                 &Gsize);
+   Tree->Branch("Gpt",                   &Gpt);
+   Tree->Branch("Gy",                    &Gy);
+   Tree->Branch("Gphi",                  &Gphi);
+
+   Tree->Branch("GenJetPt", &GenJetPt);
+   Tree->Branch("GenJetEta", &GenJetEta);
+   Tree->Branch("GenJetY", &GenJetY);
+   Tree->Branch("GenJetPhi", &GenJetPhi);
+   Tree->Branch("RefJetPt", &RefJetPt);
+   Tree->Branch("RefJetEta", &RefJetEta);
+   Tree->Branch("RefJetY", &RefJetY);
+   Tree->Branch("RefJetPhi", &RefJetPhi);
+
+   return true;
+}
+
+
+void DzeroJetUPCTreeMessenger::Clear()
+{
+   if(Initialized == false)
+      return;
+
+   Run = -999;
+   Event = -999;
+   Lumi = -999;
+   isL1ZDCOr = false;
+   isL1ZDCXORJet8 = false;
+   isL1ZDCXORJet12 = false;
+   isL1ZDCXORJet16 = false;
+   Dsize = 0;
+   Nch = -999; 
+   Dpt->clear();
+   Dy->clear();
+   Dphi->clear();
+   Dmass->clear();
+   DpassCutD0inJet->clear();
+   Dgen->clear();
+   JetCount = 0;
+   JetPt->clear();
+   JetEta->clear();
+   JetY->clear();
+   JetPhi->clear();
+   isD0TaggedGeomJet->clear();
+   TaggedLeadingD0GeomInJetIndex->clear();
+   Gsize = 0;
+   pthat = -1;
+   Gpt->clear();
+   Gy->clear();
+   Gphi->clear();
+   GenJetPt->clear();
+   GenJetEta->clear();
+   GenJetY->clear();
+   GenJetPhi->clear();
+   RefJetPt->clear();
+   RefJetEta->clear();
+   RefJetY->clear();
+   RefJetPhi->clear();
+}
+
+bool DzeroJetUPCTreeMessenger::FillEntry()
+{
+   if(Initialized == false)
+      return false;
+   if(WriteMode == false)
+      return false;
+
+   if(Tree == nullptr)
+      return false;
+
+   Tree->Fill();
+   Clear();
+
+   return true;
+}
+
 
 MuMuJetMessenger::MuMuJetMessenger(TFile &File, std::string TreeName)
 {

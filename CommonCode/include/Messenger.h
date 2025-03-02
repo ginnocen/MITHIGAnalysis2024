@@ -421,6 +421,7 @@ public:
    int Gsize;
    float Gpt[DZEROGENCOUNTMAX];
    float Gy[DZEROGENCOUNTMAX];
+   float Gphi[DZEROGENCOUNTMAX];
    int GpdgId[DZEROGENCOUNTMAX];
    int GisSignal[DZEROGENCOUNTMAX];
    int GcollisionId[DZEROGENCOUNTMAX];
@@ -853,6 +854,71 @@ public:
    bool Ngamma_EThreshCustom(float threshold)  { return ( this->ZDCNgamma && this->HFEMaxMinus <= threshold ); }
 
 };
+
+/* Class for the D0 Jet UPC analysis */
+class DzeroJetUPCTreeMessenger
+{
+public:
+   TTree *Tree;
+   int Run;
+   long long Event;
+   int Lumi;
+   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+
+   //charged hadron info
+   int Nch; 
+
+   //D reco quantities
+   int Dsize;
+   std::vector<float> *Dpt;
+   std::vector<float> *Dphi;
+   std::vector<float> *Dy;
+   std::vector<float> *Dmass;
+   std::vector<bool>  *DpassCutD0inJet;
+   std::vector<int>   *Dgen;
+
+   // inclusive jet quantites
+   int JetCount;
+   std::vector<float> *JetPt;
+   std::vector<float> *JetEta;
+   std::vector<float> *JetY;
+   std::vector<float> *JetPhi;
+   std::vector<bool>  *isD0TaggedGeomJet;
+   std::vector<int>   *TaggedLeadingD0GeomInJetIndex;
+
+   //MC only quantities
+   int Gsize;
+   float pthat;
+   std::vector<float> *Gpt;
+   std::vector<float> *Gy;
+   std::vector<float> *Gphi;
+   std::vector<float> *GenJetPt;
+   std::vector<float> *GenJetEta;
+   std::vector<float> *GenJetY;
+   std::vector<float> *GenJetPhi;
+   std::vector<float> *RefJetPt;
+   std::vector<float> *RefJetEta;
+   std::vector<float> *RefJetY;
+   std::vector<float> *RefJetPhi;
+
+private:
+   bool WriteMode;
+   bool Initialized;
+
+public:
+   DzeroJetUPCTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   DzeroJetUPCTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   DzeroJetUPCTreeMessenger(TTree *HFJetUPCTree = nullptr, bool Debug = false);
+   ~DzeroJetUPCTreeMessenger();
+   bool Initialize(TTree *HFJetUPCTree, bool Debug = false);
+   bool Initialize(bool Debug = false);
+   int GetEntries();
+   bool GetEntry(int iEntry);
+   bool SetBranch(TTree *T);
+   void Clear();
+   bool FillEntry();
+};
+
 
 class MuMuJetMessenger
 {
