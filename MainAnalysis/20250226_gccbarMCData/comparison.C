@@ -53,14 +53,14 @@ class Hist{
         //Set Addresses 
         TString feature_log = TString::Format("log10(abs(%s))", feature);
         TString weightExpression = TString::Format("(%s) * pow(%s, %d)", cut, "TotalWeight", collweight);
-        if(logx > 1){
+        if(logx == 1){
             T->Project(name, feature_log, weightExpression.Data()); 
         }
         else{
             T->Project(name, feature, weightExpression.Data()); 
         }         
-
-        if(logx > 1){
+        /*
+        if(logx == 1){
             cout << legend << endl;
             cout << "Histogram filled with: " << feature_log << " from " << infile << ", " << tree << endl;
             cout << cut << endl;
@@ -74,8 +74,14 @@ class Hist{
             cout << "Integral: " << h->Integral() << " Entries: " << h->GetEntries() << endl;
             cout << endl;
     
-        }
+        }*/
         
+         h->SetDirectory(0);
+         f->Close();
+        delete f;
+        
+    
+
         //cosmetic
         h->SetStats(0);
         h->SetLineWidth(3);
@@ -90,6 +96,7 @@ class Hist{
         //h->GetXaxis()->SetTitleOffset(1.555);
         if(xhi != xlow){h->GetXaxis()->SetRangeUser(xlow, xhi);}
         if(yhi != ylow){h->GetYaxis()->SetRangeUser(ylow, yhi);}
+        //else{h->GetYaxis()->SetRangeUser(0,0.0001);}
         cout << endl;
         return h;  
     }
@@ -141,27 +148,29 @@ class Hist2d{
         TString feature1_log = TString::Format("log10(abs(%s))", feature1);
         TString feature2_log = TString::Format("log10(abs(%s))", feature2);
         TString weightExpression = TString::Format("(%s) * pow(%s, %d)", cut, "TotalWeight", collweight);
-        if(logx > 0){
-            if(logy > 0){
-                TString concatenatedString = TString(feature1_log.Data()) + ":" + TString(feature2_log.Data());
+        if(logy > 0){
+            if(logx > 0){
+                TString concatenatedString = TString(feature2_log.Data()) + ":" + TString(feature1_log.Data());
                 T->Project(name, concatenatedString.Data(), weightExpression.Data());
 
             }
             else{
-                TString concatenatedString = TString(feature1_log.Data()) + ":" + TString(feature2);
+                TString concatenatedString = TString(feature2_log.Data()) + ":" + TString(feature1);
                 T->Project(name, concatenatedString.Data(), weightExpression.Data());
             }
         }
         else{
-            if(logy > 0){
-                TString concatenatedString = TString(feature1) + ":" + TString(feature2_log.Data());
+            if(logx > 0){
+                TString concatenatedString = TString(feature2) + ":" + TString(feature1_log.Data());
                 T->Project(name, concatenatedString.Data(), weightExpression.Data());
             }
             else{
-                TString concatenatedString = TString(feature1) + ":" + TString(feature2);
+                TString concatenatedString = TString(feature2) + ":" + TString(feature1);
                 T->Project(name, concatenatedString.Data(), weightExpression.Data());
             }
         }
+        //T->Delete();
+        f->Close();
 
         //cosmetic
         h->SetStats(0);
@@ -172,6 +181,7 @@ class Hist2d{
         h->GetXaxis()->SetTitle(xlabel);
         h->GetYaxis()->SetTitle(ylabel);
         h->GetZaxis()->SetTitle(zlabel);
+        cout << h->GetMean(2);
         
         if(xhi != xlow){h->GetXaxis()->SetRangeUser(xlow, xhi);}
         if(yhi != ylow){h->GetYaxis()->SetRangeUser(ylow, yhi);}
@@ -196,6 +206,7 @@ double unifscale(vector<TH1D*> vec){
 
 void finishplots(vector<Hist> vec = {},string name = "", int isnormalized = 0, int subtractfromfirst = 0, float yscale = 1.5, int plotlogy = 0, int errors = 0){
 
+    gStyle->SetOptTitle(0);
     int N = vec.size();
     vector<TH1D*> th1dvec;
     for(int i = 0; i<N; i++){
@@ -205,7 +216,9 @@ void finishplots(vector<Hist> vec = {},string name = "", int isnormalized = 0, i
     // normalize histograms (flag)
     if(isnormalized == 1){
         for(int i = 0; i<N; i++){
-        th1dvec[i]->Scale(1/th1dvec[i]->Integral());       
+        if(th1dvec[i]->Integral() > 0){
+        th1dvec[i]->Scale(1/th1dvec[i]->Integral()); }
+             
         }
     }
     
@@ -222,18 +235,19 @@ void finishplots(vector<Hist> vec = {},string name = "", int isnormalized = 0, i
     for(int i = 0; i<N; i++){
         //cout << vec[i].legend << ": " << th1dvec[i]->Integral() << endl;
         total+= th1dvec[i]->Integral();
-        th1dvec[i]->GetYaxis()->SetRangeUser(1e-6, u*yscale);
+        th1dvec[i]->GetYaxis()->SetRangeUser(1e-5, u*yscale);
     }
     //cout << "Total: " << total << endl;
     cout << "=================="<< endl;
 
     // make legend
-    TLegend*G = new TLegend(0.60,0.65,0.90,0.85);
+    TLegend*G = new TLegend(0.66,0.60,0.91,0.85);
     for(int i = 0; i<N; i++){
         G->AddEntry(th1dvec[i],vec[i].legend,"plf");
     }
     G->SetBorderSize(0);
-    G->SetFillStyle(0);  
+    G->SetFillStyle(0); 
+    G->SetTextSize(0.04); 
     //draw on canvas
 
     TCanvas*q = new TCanvas("","",600,500);
@@ -243,13 +257,17 @@ void finishplots(vector<Hist> vec = {},string name = "", int isnormalized = 0, i
     }
     for(int i = 0; i<N; i++){
         if(errors == 1){
+            th1dvec[i]->Sumw2();
             th1dvec[i]->Draw("colz same");
+            th1dvec[i]->Draw("hist same");
         }
         else{th1dvec[i]->Draw("hist same");}
     }
     G->Draw();
     drawHeader();
     q->SaveAs(name.c_str());
+    q->Clear();
+    //q->Delete();
 }
 
 
@@ -258,24 +276,5 @@ void finishplots(vector<Hist> vec = {},string name = "", int isnormalized = 0, i
 void comparison(){
     setTDRStyle();
     //histogram objects  
-    
 
-   string c1 = flavorselect(basic(),1,1,0,0);
-   string c2 = flavorselect(basic(),2,2,0,0);
-   string b1 = flavorselect(basic(),0,100,1,1);
-   string b2 = flavorselect(basic(),0,100,2,2);
-   string light = flavorselect(basic(),0,0,0,0);
-   
-    
-
-
-    Hist t1("mumuMass", "omc.root", basic2(), "mumutree", "1", "Dimuon Invariant Mass (GeV)", "counts",30,0,5,1,1,"Other",0,5,0,0,0,1);
-    Hist t2("mumuMass", "omc.root", c2.c_str(), "mumutree", "2", "Dimuon Invariant Mass (GeV)", "counts",30,0,5,2,1,"Double C",0,5,0,0,0,1);
-    Hist t3("mumuMass", "omc.root", b2.c_str(), "mumutree", "3", "Dimuon Invariant Mass (GeV)", "counts",30,0,5,6,1,"Double B",0,5,0,0,0,1);
-    Hist t4("mumuMass", "omc.root", c1.c_str(), "mumutree", "4", "Dimuon Invariant Mass (GeV)", "counts",30,0,5,3,1,"Single C",0,5,0,0,0,1);
-    Hist t5("mumuMass", "omc.root", b1.c_str(), "mumutree", "5", "Dimuon Invariant Mass (GeV)", "counts",30,0,5,4,1,"Single B",0,5,0,0,0,1);
-    Hist t6("mumuMass", "omc.root", light.c_str(), "mumutree", "6", "Dimuon Invariant Mass (GeV)", "counts",30,0,5,7,1,"Light Flavor",0,5,0,0,0,1);
-   
-   vector<Hist> Q = {t1,t2,t3,t4,t5,t6};
-   finishplots(Q,"tt.pdf",0,1,1.5,0,1);
 }
