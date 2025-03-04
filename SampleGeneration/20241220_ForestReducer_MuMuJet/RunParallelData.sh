@@ -1,5 +1,5 @@
 #!/bin/bash
-MAXCORES=120
+MAXCORES=40
 
 NAME="SkimData2018PbPb_Version20241201_v4_ForestVersion_20241023_v220241023_v2"
 OUTPUT="output"

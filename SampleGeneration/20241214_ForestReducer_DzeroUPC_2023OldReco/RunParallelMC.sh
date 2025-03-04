@@ -1,5 +1,5 @@
 #!/bin/bash
-MAXCORES=120
+MAXCORES=40
 SAMPLEID=0
 
 echo "Running on sample ID: $SAMPLEID"

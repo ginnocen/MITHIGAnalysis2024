@@ -1,5 +1,5 @@
 #!/bin/bash
-MAXCORES=120
+MAXCORES=40
 
 NAME="test"
 #"SkimMC2018PbPb_Version20241201_InputForest_20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL"

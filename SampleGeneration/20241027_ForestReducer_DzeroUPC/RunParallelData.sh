@@ -1,5 +1,5 @@
 #!/bin/bash
-MAXCORES=120
+MAXCORES=40
 
 NAME="2024117_ForestDfinderData"
 OUTPUT="output"

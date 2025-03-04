@@ -1,5 +1,5 @@
 #!/bin/bash
-MAXCORES=100
+MAXCORES=40
 
 NAMEMC="XYZ_filelist_SkimOldReco23sample_MCPthat2"
 OUTPUTMC="outputMC"
