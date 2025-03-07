@@ -22,7 +22,6 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
 	wSystFitComb=$(echo $Plot | jq -r '.wSystFitComb')
 	nominalSampleRST=$(echo $Plot | jq -r '.nominalSampleRST')
 	nominalFitRST=$(echo $Plot | jq -r '.nominalFitRST')
- 	doAsymSyst=$(echo $Plot | jq -r '.doAsymSyst')
 
   cmd="./PlotCrossSection --PlotDir $PlotDir --MinDzeroPT $MinDzeroPT --MaxDzeroPT $MaxDzeroPT --IsGammaN $IsGammaN --InputPoints $InputPoints"
 			[ "$wSystLumi" != "null" ] && cmd="$cmd --wSystLumi $wSystLumi"
@@ -36,7 +35,6 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
 			[ "$wSystFitComb" != "null" ] && cmd="$cmd --wSystFitComb $wSystFitComb"
 			[ "$nominalSampleRST" != "null" ] && cmd="$cmd --nominalSampleRST $nominalSampleRST"
 			[ "$nominalFitRST" != "null" ] && cmd="$cmd --nominalFitRST $nominalFitRST"
-			[ "$doAsymSyst" != "null" ] && cmd="$cmd --doAsymSyst $doAsymSyst"
 
   echo "Executing >>>>>>"
   echo $cmd
