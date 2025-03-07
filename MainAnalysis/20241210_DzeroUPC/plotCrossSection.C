@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   double         wSystLumi        = CL.GetDouble("wSystLumi", 0.05);             // Include luminosity systematics (relative uncertainty)
   double         wSystTrk         = CL.GetDouble("wSystTrk", 0.046);             // Include tracking systematics (relative uncertainty)
   double         wSystBR          = CL.GetDouble("wSystBR", 0.0076);             // Include branching ratio systematics (relative uncertainty)
-  bool           wSystEvtSel      = CL.GetBool("wSystEvtSel", false);             // Include event selection systematics
+  bool           wSystEvtSel      = CL.GetBool("wSystEvtSel", true);             // Include event selection systematics
   vector<string> wSystRapGapSel   = CL.GetStringVector("wSystRapGapSel", "systRapGapLoose,systRapGapTight");  // Include rapidity gap selection systematics -- the uncertainty is the average variation of the two
   string         wSystDsvpv       = CL.Get    ("wSystDsvpv", "systDsvpv");       // Include D selection systematics (with the variation on svpv significance). The input is the result directory name
   string         wSystDtrkPt      = CL.Get    ("wSystDtrkPt", "systDtrkPt");     // Include D selection systematics (with the variation on trkPt). The input is the result directory name
