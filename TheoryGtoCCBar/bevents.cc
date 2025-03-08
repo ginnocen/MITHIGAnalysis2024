@@ -17,40 +17,40 @@
 #include "fastjet/ClusterSequenceArea.hh"
 #include "fastjet/PseudoJet.hh"
 #include <algorithm>
-#include <cstdio> // needed for io
+#include <cstdio> 
 #include <cstring>
 #include <ctime>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <iostream> // needed for io
 #include <math.h>
 #include <sstream>
 #include <stdlib.h>
 #include <string>
-#include <time.h> /* time */
+#include <time.h>
 #include <valarray>
 #include <vector>
+#include <set>
 
 using namespace Pythia8;
 
-// Recursive function to collect final state particles
+//------------------------------------------------------------------------------
+// Recursive function to collect final-state particles from a given particle index
 void collectFinalStateParticles(const Event &event, int index, std::set<int> &visited,
                                 std::vector<int> &finalParticles) {
   // Prevent infinite loops
-  if (visited.find(index) != visited.end())
-    return;
+  if (visited.find(index) != visited.end()) return;
   visited.insert(index);
 
   // Get the particle
   const Particle &p = event[index];
 
-  // Check if it has daughters (if not, it's a final state particle)
+  // Check if it has daughters (if not, it's final-state)
   int d1 = p.daughter1();
   int d2 = p.daughter2();
 
   if (d1 == 0) {
-    finalParticles.push_back(index); // Store final state particle index
+    finalParticles.push_back(index); // Store final-state particle index
     return;
   }
 
@@ -60,137 +60,153 @@ void collectFinalStateParticles(const Event &event, int index, std::set<int> &vi
   }
 }
 
+//------------------------------------------------------------------------------
+// Helper function to get final-state particles for a given particle index
+// Ensures we start with a fresh visited set each time
+std::vector<int> getFinalStateParticles(const Event &event, int particleIndex) {
+  std::set<int> visited;
+  std::vector<int> finalParticles;
+  collectFinalStateParticles(event, particleIndex, visited, finalParticles);
+  return finalParticles;
+}
+
+//------------------------------------------------------------------------------
+// Recursive function to find a charm hadron in the decay chain
 int findCharmHadronInDecay(const Event &event, int index, std::set<int> &visited) {
   // Prevent infinite loops
-  if (visited.find(index) != visited.end())
-    return 0;
+  if (visited.find(index) != visited.end()) return 0;
   visited.insert(index);
 
   // Get the particle
   const Particle &p = event[index];
 
-  // Check if the particle has daughters (otherwise, it's a final-state particle)
+  // Check if the particle has daughters (otherwise, it's final-state)
   int d1 = p.daughter1();
   int d2 = p.daughter2();
 
-  if (d1 == 0)
-    return 0; // No daughters → cannot decay further
+  if (d1 == 0) return 0; // no daughters => cannot decay further
 
-  // Loop over all daughters
+  // Loop over daughters
   for (int i = d1; i <= d2; ++i) {
-    int pdgId = abs(event[i].id()); // Use abs() to handle antiparticles
-
+    int pdgId = std::abs(event[i].id()); // abs() to handle antiparticles
     // Check if this is a D meson (400-499) or a charm baryon (4000-4999)
     if ((pdgId >= 400 && pdgId <= 499) || (pdgId >= 4000 && pdgId <= 4999)) {
-      std::cout << "Charm hadron found: PDG ID = " << pdgId << " at index " << i << std::endl;
-      return pdgId; // Return the PDG ID of the found charm hadron
+      std::cout << "Charm hadron found: PDG ID = " << pdgId 
+                << " at index " << i << std::endl;
+      return pdgId; 
     }
-
-    // Recursively check if this daughter decays into a charm hadron
+    // Recursively check for charm hadron
     int result = findCharmHadronInDecay(event, i, visited);
-    if (result != 0) {
-      return result; // If found deeper in the decay chain, return it
-    }
+    if (result != 0) return result;
   }
 
-  return 0; // No charm hadron found in this decay chain
+  return 0;
 }
 
+//------------------------------------------------------------------------------
+// Wrapper to get a charm hadron (if any) from a given particle index
 int getIntermediateCharmHadron(const Event &event, int particleIndex) {
   std::set<int> visited;
   return findCharmHadronInDecay(event, particleIndex, visited);
 }
-// Function to check for opposite-sign muon pairs in finalParticles
-bool hasOppositeSignMuons(const Event &event, const std::vector<int> &finalParticles) {
-  bool hasMuon = false;
-  bool hasAntiMuon = false;
 
-  // Loop through final state particles
+//------------------------------------------------------------------------------
+// Check for opposite-sign muon pair in final state
+bool hasOppositeSignMuons(const Event &event, const std::vector<int> &finalParticles) {
+  bool hasMuMinus = false; // PDG 13
+  bool hasMuPlus  = false; // PDG -13
+
   for (int idx : finalParticles) {
     int pid = event[idx].id();
-    if (pid == 13)
-      hasAntiMuon = true; // Found mu+
-    if (pid == -13)
-      hasMuon = true; // Found mu-
+    if      (pid ==  13) hasMuMinus = true; 
+    else if (pid == -13) hasMuPlus  = true; 
 
-    // If both exist, return true
-    if (hasMuon && hasAntiMuon)
-      return true;
+    if (hasMuMinus && hasMuPlus) return true;
   }
   return false;
 }
 
+//------------------------------------------------------------------------------
+// Main
 int main(int argc, char *argv[]) {
 
+  // Basic settings
   Int_t nEvents = 1000;
-  Double_t eCM = 13000.0;
+  Double_t eCM  = 13000.0;
   Pythia pythia;
-  pythia.readString(Form("Beams:eCM = %g", eCM));
 
+  // Pythia settings
+  pythia.readString(Form("Beams:eCM = %g", eCM));
+  pythia.readString("Beams:idA = 2212");
+  pythia.readString("Beams:idB = 2212");
+  pythia.readString("Tune:pp = 14");
+  pythia.readString("PhaseSpace:pTHatMin = 5");
+  
   // Turn on HardQCD processes that produce b-bbar
   pythia.readString("HardQCD:gg2bbbar = on");
   pythia.readString("HardQCD:qqbar2bbbar = on");
 
-  pythia.readString("PhaseSpace:pTHatMin = 5");
-  // run pp collisions
-  pythia.readString("Beams:idA = 2212");
-  pythia.readString("Beams:idB = 2212");
-  pythia.readString("tune:pp = 14");
-  // turn on initial and final state radiation
+  // If you want showers on, set these to 'on' instead of 'off':
   pythia.readString("PartonLevel:ISR = off");
   pythia.readString("PartonLevel:FSR = off");
-  // Initialize the generator
-  // switch off decays
-  // pythia.readString("HadronLevel:Decay = off");
-  // pythia.readString("511:mayDecay = off"); // B0
-  // pythia.readString("521:mayDecay = off"); // B+
-  // pythia.readString("531:mayDecay = off"); // Bs
+
+  // Initialize
   pythia.init();
+
   int countergood = 0;
+
   // Event loop
   for (int iEvent = 0; iEvent < nEvents; ++iEvent) {
 
     // Generate the next event; skip if it fails
-    if (!pythia.next())
-      continue;
+    if (!pythia.next()) continue;
 
-    // Loop over all particles
+    // Loop over all particles in this event
     for (int i = 0; i < pythia.event.size(); ++i) {
 
-      // Check if this is a B0 or B+ (PDG IDs: B0=511, B+ =521).
-      // If you'd like B- or Bbar0 as well, you can check abs(id) == 511 or 521
+      // Check if this is a B0 or B+ (PDG IDs: 511 or 521)
       int pid = pythia.event[i].id();
-      std::set<int> visited;           // Set to track visited particles
-      std::vector<int> finalParticles; // List to store final state particles
-
       if (pid == 511 || pid == 521) {
-        // Print a header for clarity
-        collectFinalStateParticles(pythia.event, i, visited, finalParticles);
-        if (!hasOppositeSignMuons(pythia.event, finalParticles))
-          continue;
-        countergood++;
-        if (countergood > 4)
+
+        // Get final-state particles from B hadron
+        std::vector<int> finalParticles = getFinalStateParticles(pythia.event, i);
+
+        // Check if final state has an opposite-sign muon pair
+        if (!hasOppositeSignMuons(pythia.event, finalParticles)) continue;
+
+        ++countergood;
+
+        // Optional: break if you only want the first 5 total across events
+        if (countergood > 4) {
+          std::cout << "Found at least 5 B-hadrons with opposite-sign muons; stopping.\n";
           break;
-        std::cout << "------------------------------------------------------------------------------------------------"
-                  << std::endl;
-        std::cout << "------------------------------------------------------------------------------------------------"
-                  << std::endl;
-        std::cout << "Final State Particles the decay of Particle " << i << " (ID: " << pid << ")" << std::endl;
-        for (int idx : finalParticles) {
-          int pid = pythia.event[idx].id();
-          std::cout << "Particle " << idx << " (" << pythia.particleData.name(pid) << ", ID: " << pid << ")"
-                    << std::endl;
         }
+
+        // Print results
+        std::cout << "---------------------------------------------------------\n";
+        std::cout << "Event #" << iEvent << ", found B index = " << i 
+                  << " (PDG = " << pid << ") with opposite-sign muons.\n";
+
+        std::cout << "Final State Particles from B hadron:\n";
+        for (int idx : finalParticles) {
+          int fpid = pythia.event[idx].id();
+          std::cout << "  -> Index " << idx 
+                    << " : " << pythia.particleData.name(fpid) 
+                    << " (PDG ID = " << fpid << ")\n";
+        }
+
         int charmHadronPdg = getIntermediateCharmHadron(pythia.event, i);
         if (charmHadronPdg != 0) {
-          std::cout << "Event " << iEvent << ": Particle at index " << i << " decays into a charm hadron with PDG ID "
+          std::cout << "This B-hadron decays into charm hadron PDG ID = " 
                     << charmHadronPdg << std::endl;
         }
 
-        visited.clear();
-        finalParticles.clear();
-        // pythia.event.list();
-      }
-    }
-  }
+      } // end if (B hadron)
+    }   // end loop over particles
+
+    // If we found 5 or more, break out of the event loop too
+    if (countergood > 4) break;
+  } // end event loop
+
+  return 0;
 }
