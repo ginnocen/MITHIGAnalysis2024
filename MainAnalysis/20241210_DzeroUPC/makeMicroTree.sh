@@ -1,4 +1,5 @@
-#source clean.sh
+#!/bin/bash
+
 SampleSettingCard=${1}
 MicroTreeDir=$(jq -r '.MicroTreeDir' $SampleSettingCard)
 mkdir -p $MicroTreeDir
@@ -32,7 +33,6 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 										--DoSystRapGap $DoSystRapGap \
 										--DoSystD $DoSystD \
 										--Output $Output
-
 	./ExecuteDzeroUPC --Input $Input \
 										--MinDzeroPT $MinDzeroPT \
 										--MaxDzeroPT $MaxDzeroPT \
@@ -44,5 +44,12 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 										--DoSystRapGap $DoSystRapGap \
 										--DoSystD $DoSystD \
 										--Output $Output &
-
+	sleep 0.1
 done
+
+sleep 1
+while pgrep -x "ExecuteDzeroUPC" > /dev/null; do
+  sleep 2
+done
+wait
+exit 0

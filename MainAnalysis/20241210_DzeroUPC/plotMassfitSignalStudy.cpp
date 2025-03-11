@@ -42,9 +42,9 @@ using namespace RooFit;
 using namespace std;
 
 #define DMASS 1.86484
-#define DMASSMIN 1.67
-#define DMASSMAX 2.07
-#define DMASSNBINS 32
+#define DMASSMIN (DMASS - 0.4)
+#define DMASSMAX (DMASS + 0.4)
+#define DMASSNBINS 40
 
 struct ParamsBase {
   std::map<std::string, RooRealVar*> params; // Store RooRealVar objects
@@ -505,7 +505,7 @@ void plot_mean(
   legend->Draw();
   
   gStyle->SetOptStat(0);
-  canvas->SaveAs(Form("fullAnalysis/MassFitSignalStudy/%s_mean.pdf", plotLabel.c_str()));
+  canvas->SaveAs(Form("plot/MassFitSignalStudy/%s_mean.pdf", plotLabel.c_str()));
 }
 
 void plot_sigma1(
@@ -569,7 +569,7 @@ void plot_sigma1(
   legend->Draw();
   
   gStyle->SetOptStat(0);
-  canvas->SaveAs(Form("fullAnalysis/MassFitSignalStudy/%s_sigma1.pdf", plotLabel.c_str()));
+  canvas->SaveAs(Form("plot/MassFitSignalStudy/%s_sigma1.pdf", plotLabel.c_str()));
 }
 
 void plot_sigma2(
@@ -633,7 +633,7 @@ void plot_sigma2(
   legend->Draw();
   
   gStyle->SetOptStat(0);
-  canvas->SaveAs(Form("fullAnalysis/MassFitSignalStudy/%s_sigma2.pdf", plotLabel.c_str()));
+  canvas->SaveAs(Form("plot/MassFitSignalStudy/%s_sigma2.pdf", plotLabel.c_str()));
 }
 
 void plot_alpha(
@@ -685,7 +685,7 @@ void plot_alpha(
   legend->Draw();
   
   gStyle->SetOptStat(0);
-  canvas->SaveAs(Form("fullAnalysis/MassFitSignalStudy/%s_alpha.pdf", plotLabel.c_str()));
+  canvas->SaveAs(Form("plot/MassFitSignalStudy/%s_alpha.pdf", plotLabel.c_str()));
 }
 
 void plot_extractedSignal(
@@ -850,7 +850,7 @@ void plot_extractedSignal(
   legend->AddEntry(extrSigl_fitPkbg,  "Fit Syst: KK + #pi#pi Peaks", "lp");
   legend->Draw();
   
-  canvas->SaveAs(Form("fullAnalysis/MassFitSignalStudy/%s_extractedSignal_ratio.pdf", plotLabel.c_str()));
+  canvas->SaveAs(Form("plot/MassFitSignalStudy/%s_extractedSignal_ratio.pdf", plotLabel.c_str()));
   
   TH1D* diff_fitMean  = (TH1D*) extrSigl_fitMean->Clone("diff_fitMean");
   diff_fitMean->Add(extrSigl_nominal, -1);
@@ -881,7 +881,7 @@ void plot_extractedSignal(
   diff_fitMean->Draw("same");
   gStyle->SetOptStat(0);
   
-  canvas->SaveAs(Form("fullAnalysis/MassFitSignalStudy/%s_extractedSignal_difference.pdf", plotLabel.c_str()));
+  canvas->SaveAs(Form("plot/MassFitSignalStudy/%s_extractedSignal_difference.pdf", plotLabel.c_str()));
 }
 
 void plotMassfitSignalStudy()
@@ -892,7 +892,7 @@ void plotMassfitSignalStudy()
   int nPtBins = *(&ptBins + 1) - ptBins - 1;
   int nYBins = *(&yBins + 1) - yBins - 1;
   
-  system("mkdir -p fullAnalysis/MassFitSignalStudy/");
+  system("mkdir -p plot/MassFitSignalStudy/");
   
   // Iterate through gammaN options
   for (const int& gammaN : isGammaN) {

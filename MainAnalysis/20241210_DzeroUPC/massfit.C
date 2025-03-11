@@ -22,7 +22,6 @@
 
 #include "CommandLine.h" // Yi's Commandline bundle
 
-
 using namespace std;
 using namespace RooFit;
 #include <RooArgSet.h>
@@ -41,9 +40,9 @@ using namespace RooFit;
 using namespace std;
 
 #define DMASS 1.86484
-#define DMASSMIN 1.56
-#define DMASSMAX 2.16
-#define DMASSNBINS 30
+#define DMASSMIN (DMASS - 0.4)
+#define DMASSMAX (DMASS + 0.4)
+#define DMASSNBINS 20
 
 struct ParamsBase {
   std::map<std::string, RooRealVar*> params; // Store RooRealVar objects
@@ -215,7 +214,7 @@ struct CombinatoricsBkgParams : public ParamsBase {
 
   CombinatoricsBkgParams(bool _doSyst=false) :
     doSyst(_doSyst),
-    lambda("lambda", "lambda", -4.0, -10.0, 10.0),
+    lambda("lambda", "lambda", -4.0, -10.0, 0.0),
     a0("a1", "slope", -1.0, -2.0, 0.0),
     a1("a2", "curve", 0.3, 0.0, 1.0)
   {
@@ -753,6 +752,10 @@ void main_fit(TTree *datatree, string rstDir, string output,
   // Save data-fitted params to .dat file
   sigldatadat=Form("%s/sigldata.dat", rstDir.c_str());
   sigl.writeToDat(sigldatadat.c_str());
+  string swapdatadat=Form("%s/swapdata.dat", rstDir.c_str());
+  swap.writeToDat(swapdatadat.c_str());
+  string combdatadat=Form("%s/combdata.dat", rstDir.c_str());
+  comb.writeToDat(combdatadat.c_str());
   
   // Save the workspace into a ROOT file
   ws.Write();

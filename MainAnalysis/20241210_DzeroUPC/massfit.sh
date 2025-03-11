@@ -71,3 +71,4 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
 
   $cmd >> $RstDir/fit.log
 done
+wait

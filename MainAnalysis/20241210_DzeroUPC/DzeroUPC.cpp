@@ -18,6 +18,11 @@ using namespace std;
 #include "parameter.h"   // The parameters used in the analysis
 #include "utilities.h"   // Yen-Jie's random utility functions
 
+#define DMASS 1.86484
+#define DMASSMIN (DMASS - 0.4)
+#define DMASSMAX (DMASS + 0.4)
+#define DMASSNBINS 80
+
 //============================================================//
 // Function to check for configuration errors
 //============================================================//
@@ -112,7 +117,7 @@ public:
 
   void analyze(Parameters &par) {
     outf->cd();
-    hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", 60, 1.56, 2.16);
+    hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", DMASSNBINS, DMASSMIN, DMASSMAX);
     hDenEvtEff = new TH1D(Form("hDenEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hNumEvtEff = new TH1D(Form("hNumEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hRatioEvtEff = (TH1D*) hNumEvtEff->Clone("hRatioEvtEff");
@@ -302,4 +307,6 @@ int main(int argc, char *argv[]) {
   analyzer.writeHistograms(analyzer.outf);
   saveParametersToHistograms(par, analyzer.outf);
   cout << "done!" << analyzer.outf->GetName() << endl;
+  
+  return 0;
 }
