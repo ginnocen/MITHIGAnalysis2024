@@ -387,7 +387,7 @@ struct EventParams {
 
   // Constructor
   EventParams(double _nsig = 500, double _nbkg = 500,
-              double _fswp = 0.5, double _fpkkk = 0.0, double _fpkpp = 0.5)
+              double _fswp = 0.5, double _fpkkk = 0.5, double _fpkpp = 0.5)
       : nsig("nsig", "number of signal events", _nsig, 0, _nsig * 5),
         nbkg("nbkg", "number of background events", _nbkg, 0, _nbkg * 5),
         fswp("fswp", "fswp", _fswp),
