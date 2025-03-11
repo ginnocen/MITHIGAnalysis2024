@@ -1,0 +1,57 @@
+{
+  "FitDir": "MassFit",
+  "MicroTrees": [
+    {
+      "dataInput": "example20250123/pt2-5_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "example20250123/pt2-5_y1-2_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y-2--1_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false
+    },
+    {
+      "dataInput": "example20250123/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "fitmcInputs": "example20250123/pt2-5_y1-2_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y-2--1_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false,
+      "RstDir": "example20250123/pt2-5_y-2--1_IsGammaN1/MassFit_MC/"
+    },
+    {
+      "dataInput": "example20250123/pt2-5_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "example20250123/pt2-5_y0-1_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y-1-0_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false
+    },
+    {
+      "dataInput": "example20250123/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "fitmcInputs": "example20250123/pt2-5_y0-1_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y-1-0_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false,
+      "RstDir": "example20250123/pt2-5_y-1-0_IsGammaN1/MassFit_MC/"
+    },
+    {
+      "dataInput": "example20250123/pt2-5_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "example20250123/pt2-5_y-1-0_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y0-1_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false
+    },
+    {
+      "dataInput": "example20250123/pt2-5_y0-1_IsGammaN1/MC_inclusive.root",
+      "fitmcInputs": "example20250123/pt2-5_y-1-0_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y0-1_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false,
+      "RstDir": "example20250123/pt2-5_y0-1_IsGammaN1/MassFit_MC/"
+    },
+    {
+      "dataInput": "example20250123/pt2-5_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "example20250123/pt2-5_y-2--1_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y1-2_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false
+    },
+    {
+      "dataInput": "example20250123/pt2-5_y1-2_IsGammaN1/MC_inclusive.root",
+      "fitmcInputs": "example20250123/pt2-5_y-2--1_IsGammaN1/MC_inclusive_Pthat5.root,example20250123/pt2-5_y1-2_IsGammaN1/MC_inclusive_Pthat5.root",
+      "doPkkk": false,
+      "doPkpp": false,
+      "RstDir": "example20250123/pt2-5_y1-2_IsGammaN1/MassFit_MC/"
+    }
+  ]
+}
