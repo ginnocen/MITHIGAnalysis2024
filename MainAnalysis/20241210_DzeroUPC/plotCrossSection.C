@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
   float MinDzeroPT = CL.GetDouble("MinDzeroPT", 2);  // Minimum Dzero transverse momentum threshold for Dzero selection.
   float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 5);  // Maximum Dzero transverse momentum threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
+  bool UseMaxFitUncert = CL.GetBool("UseMaxFitUncert", false);
 
   vector<string> inputPoints      = CL.GetStringVector("InputPoints",    ""); // Input corrected yields md files
 
@@ -206,6 +207,9 @@ int main(int argc, char *argv[])
       systFitCombUncert[i] * systFitCombUncert[i] + 
       systFitPkBgUncert[i] * systFitPkBgUncert[i]
     );
+    if (UseMaxFitUncert) systFitUncert[i] = max({
+      systFitSigMeanUncert[i], systFitSigAlphaUncert[i],
+      systFitCombUncert[i], systFitPkBgUncert[i]});
   }
 
   printArr(correctedYieldValues, ", ", "correctedYieldValues: ");
