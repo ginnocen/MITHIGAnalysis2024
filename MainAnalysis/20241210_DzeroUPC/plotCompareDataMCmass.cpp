@@ -26,9 +26,9 @@ using namespace std;
 using namespace RooFit;
 
 #define DMASS 1.86484
-#define DMASSMIN (DMASS - 0.4)
-#define DMASSMAX (DMASS + 0.4)
-int DMASSNBINS = (DMASSMAX - DMASSMIN) * 100;
+#define DMASSMIN 1.67
+#define DMASSMAX 2.07
+#define DMASSNBINS 32
 string mcSource = "pthat0, forced D^{0}";
 string mcIncSource = "pthat5";
 
