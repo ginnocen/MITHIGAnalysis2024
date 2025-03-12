@@ -17,6 +17,7 @@ echo "CMSSW environment is set up"
 cd ../../
 source SetupAnalysis.sh
 cd CommonCode/
+pwd
 make
 cd /home/ginnocen/MITHIGAnalysis2024/MainAnalysis/20241113_gtoccbar
 make

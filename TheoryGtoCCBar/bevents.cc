@@ -34,6 +34,7 @@
 
 using namespace Pythia8;
 
+
 //------------------------------------------------------------------------------
 // Recursive function to collect final-state particles from a given particle index
 void collectFinalStateParticles(const Event &event, int index, std::set<int> &visited,
@@ -126,12 +127,102 @@ bool hasOppositeSignMuons(const Event &event, const std::vector<int> &finalParti
   return false;
 }
 
+
+//------------------------------------------------------------------------------
+// Get the interactions for each muon decay
+void printMuonDecayInfo(Event& event) {
+
+    int muons = 0;
+
+    for (int i = 0; i < event.size(); ++i) {
+        // Select muons (PDG ID: 13 for mu-, -13 for mu+)
+        if (abs(event[i].id()) == 13) {
+            int motherIdx = event[i].mother1();
+            muons +=1;
+            if (motherIdx > 0) {
+                Particle& mother = event[motherIdx];
+                std::cout << "Muon " << i << " (PDG ID: " << event[i].id()
+                          << ") comes from particle " << motherIdx 
+                          << " (PDG ID: " << mother.id() << ")\n";
+                
+                std::cout << "Other daughters of this mother:" << std::endl;
+                for (int j = 0; j < event.size(); ++j) {
+                    if (event[j].mother1() == motherIdx && j != i) {
+                        std::cout << " - Particle " << j 
+                                  << " (PDG ID: " << event[j].id() << ")\n";
+                    }
+                }
+                
+                std::cout << "--------------------------\n";
+            }
+        }
+        
+    }
+    std::cout << "--------------- " << muons << " ---------------\n";
+}
+
+void printMuonDecayChain(Event& event) {
+    for (int i = 0; i < event.size(); ++i) {
+        // Select muons (PDG ID: 13 for mu-, -13 for mu+)
+        if (abs(event[i].id()) == 13 && event[i].isFinal()) {
+            std::cout << "\nMuon " << i << " (PDG ID: " << event[i].id() << ")\n";
+            
+            int motherIdx = event[i].mother1();
+            while (motherIdx > 0) {
+                Particle& mother = event[motherIdx];
+                std::cout << " <- " << motherIdx << " (PDG ID: " << mother.id() << ")";
+                motherIdx = mother.mother1(); // Move up the decay chain
+            }
+            std::cout << "\n-----------------------------\n";
+        }
+    }
+    std::cout << "_________________" << endl;
+}
+
+void writeMuonDecayChainsToCSV(Event& event, int eventNumber, const std::string& filename) {
+    std::ofstream outFile;
+    outFile.open(filename, std::ios::app); // Append mode
+    
+    for (int i = 0; i < event.size(); ++i) {
+        // Select muons (PDG ID: 13 for mu-, -13 for mu+)
+        if (abs(event[i].id()) == 13 && event[i].isFinal()) {
+            outFile << eventNumber << "," << event[i].id() << "," << i;
+            
+            int motherIdx = event[i].mother1();
+            while (motherIdx > 0) {
+                Particle& mother = event[motherIdx];
+                outFile << "," << mother.id() << "," << motherIdx;
+                motherIdx = mother.mother1(); // Move up the decay chain
+            }
+            outFile << "\n";
+        }
+    }
+    outFile.close();
+}
+
+std::vector<int> DecayChain(Event &event,int idx){
+
+  std::vector<int> chain;
+
+    chain.push_back(event[idx].id());
+    chain.push_back(idx);
+
+    int motherIdx = event[idx].mother1();
+    while (motherIdx > 0) {
+        Particle& mother = event[motherIdx];
+        chain.push_back(mother.id());
+        chain.push_back(motherIdx);
+    }
+  
+    return chain;
+}
+
 //------------------------------------------------------------------------------
 // Main
 int main(int argc, char *argv[]) {
 
   // Basic settings
-  Int_t nEvents = 1000;
+  Int_t nEvents = 1000000;
   Double_t eCM  = 13000.0;
   Pythia pythia;
 
@@ -154,59 +245,44 @@ int main(int argc, char *argv[]) {
   pythia.init();
 
   int countergood = 0;
+  int bhads = 0;
 
   // Event loop
   for (int iEvent = 0; iEvent < nEvents; ++iEvent) {
 
     // Generate the next event; skip if it fails
     if (!pythia.next()) continue;
-
+    bhads = 0;
     // Loop over all particles in this event
     for (int i = 0; i < pythia.event.size(); ++i) {
 
       // Check if this is a B0 or B+ (PDG IDs: 511 or 521)
       int pid = pythia.event[i].id();
-      if (pid == 511 || pid == 521) {
-
+      if ((abs(pid) >= 500 && abs(pid) < 600) || (abs(pid) >= 5000 && abs(pid) < 6000)) {
+        bhads = 1;
         // Get final-state particles from B hadron
         std::vector<int> finalParticles = getFinalStateParticles(pythia.event, i);
 
         // Check if final state has an opposite-sign muon pair
         if (!hasOppositeSignMuons(pythia.event, finalParticles)) continue;
-
         ++countergood;
-
-        // Optional: break if you only want the first 5 total across events
-        if (countergood > 4) {
-          std::cout << "Found at least 5 B-hadrons with opposite-sign muons; stopping.\n";
+        writeMuonDecayChainsToCSV(pythia.event,iEvent,"events.csv");
+        // Optional: break if you only want the first 1000 total across events
+        if (countergood > 10000) {
+          std::cout << "Found at least 10000 B-hadrons with opposite-sign muons; stopping.\n";
           break;
         }
-
-        // Print results
-        std::cout << "---------------------------------------------------------\n";
-        std::cout << "Event #" << iEvent << ", found B index = " << i 
-                  << " (PDG = " << pid << ") with opposite-sign muons.\n";
-
-        std::cout << "Final State Particles from B hadron:\n";
-        for (int idx : finalParticles) {
-          int fpid = pythia.event[idx].id();
-          std::cout << "  -> Index " << idx 
-                    << " : " << pythia.particleData.name(fpid) 
-                    << " (PDG ID = " << fpid << ")\n";
-        }
-
-        int charmHadronPdg = getIntermediateCharmHadron(pythia.event, i);
-        if (charmHadronPdg != 0) {
-          std::cout << "This B-hadron decays into charm hadron PDG ID = " 
-                    << charmHadronPdg << std::endl;
-        }
-
       } // end if (B hadron)
+      if(bhads == 1) break;
     }   // end loop over particles
 
-    // If we found 5 or more, break out of the event loop too
-    if (countergood > 4) break;
+  if (countergood%100 == 0){
+    std::cout << countergood<< endl;
+  }
+    // If we found 1000 or more, break out of the event loop too
+    if (countergood > 10000) break;
   } // end event loop
+  std::cout << countergood << endl;
 
   return 0;
 }

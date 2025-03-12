@@ -1,7 +1,8 @@
 #!/bin/bash
 MAXCORES=40
 
-NAME="SkimMC2018PbPb_Version20241201_InputForest_20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL"
+NAME="test"
+#"SkimMC2018PbPb_Version20241201_InputForest_20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL"
 OUTPUT="output"
 counter=0
 filelist="/data/NewSkims_gtoccbar/InputList/20241201_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_PARTIAL.txt"

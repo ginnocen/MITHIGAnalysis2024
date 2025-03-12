@@ -788,10 +788,13 @@ public:
    std::vector<float> *Ddtheta;
    std::vector<bool> *DpassCut23PAS;
    std::vector<bool> *DpassCut23LowPt;
+<<<<<<< Updated upstream
    std::vector<bool> *DpassCut23PASSystDsvpvSig;
    std::vector<bool> *DpassCut23PASSystDtrkPt;
    std::vector<bool> *DpassCut23PASSystDalpha;
    std::vector<bool> *DpassCut23PASSystDchi2cl;
+=======
+>>>>>>> Stashed changes
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;
@@ -865,12 +868,20 @@ public:
    float hiHF;
    int NVertex;
    float VX, VY, VZ, VXError, VYError, VZError;
+   float NCollWeight;
+   float ExtraMuWeight[12];
    int NPU;
    //std::vectors
    std::vector<float> *JetPT;
    std::vector<float> *JetEta;
    std::vector<float> *JetPhi;
    std::vector<bool> *IsMuMuTagged;
+   //gen-level jet info
+   std::vector<float> *genJetPT;
+   std::vector<float> *genJetEta;
+   std::vector<float> *genJetPhi;
+   std::vector<bool> *genIsMuMuTagged;
+   //muon info
    std::vector<float> *muPt1;
    std::vector<float> *muPt2;
    std::vector<float> *muEta1;
@@ -897,6 +908,24 @@ public:
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
+
+   //gen-level muons
+   std::vector<float> *genMuPt1;
+   std::vector<float> *genMuPt2;
+   std::vector<float> *genMuEta1;
+   std::vector<float> *genMuEta2;
+   std::vector<float> *genMuPhi1;
+   std::vector<float> *genMuPhi2;
+   std::vector<float> *genMuMuMass;
+   std::vector<float> *genMuMuEta;
+   std::vector<float> *genMuMuY;
+   std::vector<float> *genMuMuPhi;
+   std::vector<float> *genMuMuPt;
+   std::vector<float> *genMuDeta;
+   std::vector<float> *genMuDphi;
+   std::vector<float> *genMuDR;
+
+   //gen-level counting of charm/beauty hadrons in jet
    std::vector<int> *MJTHadronFlavor;
    std::vector<int> *MJTNcHad;
    std::vector<int> *MJTNbHad;
