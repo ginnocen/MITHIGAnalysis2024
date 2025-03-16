@@ -1,5 +1,8 @@
 #!/bin/bash
 
+make
+wait
+
 CONFIG_LIST=(
   "pt2-5_fitSettings/fullAnalysis_useGammaNForNgammaForFitFunc.json"
   "pt2-5_fitSettings/systDalpha_useGammaNForNgammaForFitFunc.json"
@@ -27,3 +30,6 @@ wait
 
 bash plot.sh "pt2-5_plotSettings/fullAnalysis.json"
 wait
+
+root -l -b -q plotCompareDataMCmass.cpp
+root -l -b -q plotMassfitSignalStudy.cpp

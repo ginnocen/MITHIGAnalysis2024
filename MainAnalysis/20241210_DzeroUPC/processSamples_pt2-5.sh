@@ -1,5 +1,8 @@
 #!/bin/bash
 
+make
+wait
+
 CONFIG_LIST=(
   "pt2-5_sampleSettings/fullAnalysis_skimV4.json"
   "pt2-5_sampleSettings/systDalpha_skimV4.json"
