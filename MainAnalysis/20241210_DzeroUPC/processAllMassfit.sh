@@ -4,7 +4,7 @@
 # optional flag: -d <config_dir> , uses different config directory from default
 # optional flag: -c , runs clean.sh before processing configs
 
-DEFAULT_CONFIG_DIR="pt2-5_fitSettings"
+CONFIG_DIR="pt2-5_fitSettings"
 JSON_VERSION="_useGammaNForNgammaForFitFunc"
 CONFIG_LIST=(
   "fullAnalysis$JSON_VERSION.json"
@@ -35,9 +35,6 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
-if [[ -n $CONFIG_DIR ]]; then
-  CONFIG_DIR=$DEFAULT_CONFIG_DIR
-fi
 if [[ "$DO_CLEAN" -eq "1" ]]; then
   source clean.sh
   wait
@@ -47,6 +44,9 @@ else
 fi
 
 # Process configs
+echo ""
+echo "Config directory: $CONFIG_DIR"
+echo ""
 for CONFIG_JSON in ${CONFIG_LIST[@]}; do
   bash massfit.sh $CONFIG_DIR/$CONFIG_JSON
   wait
