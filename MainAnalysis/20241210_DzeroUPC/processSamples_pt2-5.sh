@@ -1,25 +1,49 @@
 #!/bin/bash
+# To use:
+# bash processAllSamples.sh
+# optional flag: -d <config_dir> , uses different config directory from default
+# optional flag: -c , runs clean.sh before processing configs
 
-make
-wait
-
+DEFAULT_CONFIG_DIR="pt2-5_fitSettings"
+JSON_VERSION="_skimV4"
 CONFIG_LIST=(
-  "pt2-5_sampleSettings/fullAnalysis_skimV4.json"
-  "pt2-5_sampleSettings/systDalpha_skimV4.json"
-  "pt2-5_sampleSettings/systDchi2cl_skimV4.json"
-  "pt2-5_sampleSettings/systDsvpv_skimV4.json"
-  "pt2-5_sampleSettings/systDtrkPt_skimV4.json"
-  "pt2-5_sampleSettings/systRapGapLoose_skimV4.json"
-  "pt2-5_sampleSettings/systRapGapTight_skimV4.json"
+  "fullAnalysis$JSON_VERSION.json"
+  "systDalpha$JSON_VERSION.json"
+  "systDchi2cl$JSON_VERSION.json"
+  "systDsvpv$JSON_VERSION.json"
+  "systDtrkPt$JSON_VERSION.json"
+  "systRapGapLoose$JSON_VERSION.json"
+  "systRapGapTight$JSON_VERSION.json"
 )
+DO_CLEAN=0
 
-if [[ "$1" -eq "1" ]]; then
-    source clean.sh
-    wait
+# Parse args
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -d)
+      CONFIG_DIR="$2"
+      shift 2
+      ;;
+    -c|--clean)
+      DO_CLEAN=1
+      shift
+      ;;
+  esac
+done
+if [[ -n $CONFIG_DIR ]]; then
+  CONFIG_DIR=$DEFAULT_CONFIG_DIR
+fi
+if [[ "$DO_CLEAN" -eq "1" ]]; then
+  source clean.sh
+  wait
+else
+  make
+  wait
 fi
 
-for CONFIG in ${CONFIG_LIST[@]}; do
-    bash makeMicroTree.sh $CONFIG
+# Process configs
+for CONFIG_JSON in ${CONFIG_LIST[@]}; do
+    bash makeMicroTree.sh $CONFIG_DIR/$CONFIG_JSON
     wait
 done
 wait

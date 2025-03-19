@@ -24,6 +24,7 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
 	doPkpp=$(echo $MicroTree | jq -r '.doPkpp')
 	sigMeanRange=$(echo $MicroTree | jq -r '.sigMeanRange')
 	sigAlphaRange=$(echo $MicroTree | jq -r '.sigAlphaRange')
+	systMassWin=$(echo $MicroTree | jq -r '.systMassWin')
 	RstDir=$(dirname "$dataInput")
 	RstDir=${RstDir}/${FitDir}/
 	mkdir -p $RstDir
@@ -48,6 +49,7 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
   [ "$doPkpp" != "null" ] && cmd="$cmd --doPkpp $doPkpp"
   [ "$sigMeanRange" != "null" ] && cmd="$cmd --sigMeanRange $sigMeanRange"
   [ "$sigAlphaRange" != "null" ] && cmd="$cmd --sigAlphaRange $sigAlphaRange"
+  [ "$systMassWin" != "null" ] && cmd="$cmd --systMassWin $systMassWin"
   
   cmd="$cmd --Output fit.root --RstDir $RstDir"
 
