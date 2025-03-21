@@ -10,6 +10,7 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
 	MinDzeroPT=$(echo $Plot | jq -r '.MinDzeroPT')
 	MaxDzeroPT=$(echo $Plot | jq -r '.MaxDzeroPT')
 	IsGammaN=$(echo $Plot | jq -r '.IsGammaN')
+ 	UseMaxFitUncert=$(echo $Plot | jq -r '.UseMaxFitUncert') 
 	InputPoints=$(echo $Plot | jq -r '.InputPoints')
 	wSystLumi=$(echo $Plot | jq -r '.wSystLumi')
 	wSystTrk=$(echo $Plot | jq -r '.wSystTrk')
@@ -20,10 +21,12 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
 	wSystDtrkPt=$(echo $Plot | jq -r '.wSystDtrkPt')
 	wSystFitSig=$(echo $Plot | jq -r '.wSystFitSig')
 	wSystFitComb=$(echo $Plot | jq -r '.wSystFitComb')
+	wSystMassWindow=$(echo $Plot | jq -r '.wSystMassWindow')
 	nominalSampleRST=$(echo $Plot | jq -r '.nominalSampleRST')
 	nominalFitRST=$(echo $Plot | jq -r '.nominalFitRST')
 
   cmd="./PlotCrossSection --PlotDir $PlotDir --MinDzeroPT $MinDzeroPT --MaxDzeroPT $MaxDzeroPT --IsGammaN $IsGammaN --InputPoints $InputPoints"
+      [ "$UseMaxFitUncert" != "null" ] && cmd="$cmd --UseMaxFitUncert $UseMaxFitUncert"
 			[ "$wSystLumi" != "null" ] && cmd="$cmd --wSystLumi $wSystLumi"
 			[ "$wSystTrk" != "null" ] && cmd="$cmd --wSystTrk $wSystTrk"
 			[ "$wSystBR" != "null" ] && cmd="$cmd --wSystBR $wSystBR"
@@ -33,7 +36,9 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
 			[ "$wSystDtrkPt" != "null" ] && cmd="$cmd --wSystDtrkPt $wSystDtrkPt"
 			[ "$wSystFitSig" != "null" ] && cmd="$cmd --wSystFitSig $wSystFitSig"
 			[ "$wSystFitComb" != "null" ] && cmd="$cmd --wSystFitComb $wSystFitComb"
+			[ "$wSystMassWindow" != "null" ] && cmd="$cmd --wSystMassWindow $wSystMassWindow"
 			[ "$nominalSampleRST" != "null" ] && cmd="$cmd --nominalSampleRST $nominalSampleRST"
+			[ "$nominalFitRST" != "null" ] && cmd="$cmd --nominalFitRST $nominalFitRST"
 			[ "$nominalFitRST" != "null" ] && cmd="$cmd --nominalFitRST $nominalFitRST"
 
   echo "Executing >>>>>>"

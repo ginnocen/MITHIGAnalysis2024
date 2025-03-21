@@ -1,0 +1,45 @@
+{
+  "FitDir": "MassFit",
+  "MicroTrees": [
+    {
+      "dataInput": "systRapGapTight/pt2-5_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systRapGapTight/pt2-5_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systRapGapTight/pt2-5_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systRapGapTight/pt2-5_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "systRapGapTight/pt2-5_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systRapGapTight/pt2-5_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systRapGapTight/pt2-5_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "systRapGapTight/pt2-5_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "systRapGapTight/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,systRapGapTight/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "systRapGapTight/pt2-5_y1-2_IsGammaN0/MC.root"
+    }
+  ]
+}

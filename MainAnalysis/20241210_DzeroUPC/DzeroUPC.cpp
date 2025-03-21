@@ -19,9 +19,9 @@ using namespace std;
 #include "utilities.h"   // Yen-Jie's random utility functions
 
 #define DMASS 1.86484
-#define DMASSMIN 1.67
-#define DMASSMAX 2.07
-#define DMASSNBINS 32
+#define DMASSMIN 1.66
+#define DMASSMAX 2.26
+#define DMASSNBINS 48
 
 //============================================================//
 // Function to check for configuration errors
