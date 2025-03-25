@@ -1,15 +1,10 @@
-#include <filesystem>
-namespace fs = std::filesystem;
-
 //============================================================//
 // Define analysis parameters
 //============================================================//
 class Parameters {
 public:
     Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN, int TriggerChoice, bool IsData, float scaleFactor = 1.0,
-                int in_DoSystRapGap = 0, int in_DoSystD = 0,
-                bool in_DoGptGyReweighting = false, string in_GptGyWeightFileName = "",
-                bool in_DoMultReweighting = false, string in_MultWeightFileName = "" )
+                int in_DoSystRapGap = 0, int in_DoSystD = 0)
 	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor)
     {
         if (in_DoSystRapGap > 9) {
@@ -30,24 +25,6 @@ public:
             printf("[Error] Couldn't recognize the option DoSystD=%d (should be 0 = nominal, 1 = Dsvpv variation, 2: DtrkPt variation, 3: Dalpha variation, 4: Dchi2cl variation). Exiting...\n", in_DoSystD);
             exit(1);
         } else { DoSystD = in_DoSystD; }
-
-        if (in_DoGptGyReweighting && fs::exists(in_GptGyWeightFileName))
-        {
-            DoGptGyReweighting  = true;
-            GptGyWeightFileName = in_GptGyWeightFileName;
-        } else {
-            DoGptGyReweighting  = false;
-            GptGyWeightFileName = "";
-        }
-
-        if (in_DoMultReweighting && fs::exists(in_MultWeightFileName))
-        {
-            DoMultReweighting  = true;
-            MultWeightFileName = in_MultWeightFileName;
-        } else {
-            DoMultReweighting  = false;
-            MultWeightFileName = "";
-        }
     }
     Parameters() {}
    string input;          // Input file name
@@ -66,12 +43,6 @@ public:
    int DoSystD;           // Systematic study: apply the alternative D selections
                           // 0 = nominal, 1 = Dsvpv variation, 2: DtrkPt variation
                           // 3 = Dalpha variation, 4: Dchi2cl variation
-   bool DoGptGyReweighting;      // MC reweighting:: Gpt, Gy
-   string GptGyWeightFileName;   // MC reweighting:: Gpt, Gy correction factor
-   bool DoMultReweighting;       // MC reweighting:: Mult
-   string MultWeightFileName;    // MC reweighting:: Mult correction factor 
-
-
 
    int nThread;           // Number of Threads
    int nChunk;            // Process the Nth chunk
@@ -95,10 +66,6 @@ public:
                                     (DoSystD==2)? "DtrkPt variation" :
                                     (DoSystD==3)? "Dalpha variation" : "Dchi2cl variation")
                                 << endl;
-       cout << "DoGptGyReweighting: " << DoGptGyReweighting << endl;
-       cout << "GptGyWeightFileName: " << GptGyWeightFileName << endl;
-       cout << "DoMultReweighting: " << DoMultReweighting << endl;
-       cout << "MultWeightFileName: " << MultWeightFileName << endl;
        cout << "Number of Threads: " << nThread << endl;
        cout << "Process the Nth chunk: " << nChunk << endl;
 
@@ -131,10 +98,6 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hDoSystRapGap->SetBinContent(1, par.DoSystRapGap);
     TH1D* hDoSystD = new TH1D("parDoSystD", "parDoSystD", 1, 0, 1);
     hDoSystD->SetBinContent(1, par.DoSystD);
-    TH1D* hDoGptGyReweighting = new TH1D("parDoGptGyReweighting", "parDoGptGyReweighting", 1, 0, 1);
-    hDoGptGyReweighting->SetBinContent(1, par.DoGptGyReweighting);
-    TH1D* hDoMultReweighting = new TH1D("parDoMultReweighting", "parDoMultReweighting", 1, 0, 1);
-    hDoMultReweighting->SetBinContent(1, par.DoMultReweighting);
 
     // Write histograms to the output file
     hMinDzeroPT->Write();
@@ -147,8 +110,6 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hScaleFactor->Write();
     hDoSystRapGap->Write();
     hDoSystD->Write();
-    hDoGptGyReweighting->Write();
-    hDoMultReweighting->Write();
 
     // Clean up
     delete hMinDzeroPT;
@@ -161,6 +122,4 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     delete hScaleFactor;
     delete hDoSystRapGap;
     delete hDoSystD;
-    delete hDoGptGyReweighting;
-    delete hDoMultReweighting;
 }

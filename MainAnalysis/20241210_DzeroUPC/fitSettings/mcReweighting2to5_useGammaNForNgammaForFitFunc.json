@@ -1,0 +1,145 @@
+{
+  "FitDir": "MassFit",
+  "MicroTrees": [
+    {
+      "dataInput": "mcReweighting2to5/pt1-2_y-1-1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt1-2_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt1-2_y-1-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y-1-1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y-1-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt1-2_y-1-1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt1-2_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt1-2_y-1-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y-1-1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y-1-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y-1-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt2-5_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt2-5_y1-2_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt5-8_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt5-8_y1-2_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y0-1_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "mcReweighting2to5/pt8-12_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "mcReweighting2to5/pt8-12_y1-2_IsGammaN1/MC_inclusive.root,mcReweighting2to5/pt8-12_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "mcReweighting2to5/pt8-12_y1-2_IsGammaN0/MC.root"
+    }
+  ]
+}
