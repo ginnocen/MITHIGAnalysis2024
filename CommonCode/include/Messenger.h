@@ -879,6 +879,7 @@ public:
 
    // inclusive jet quantites
    int JetCount;
+   std::vector<float> *RawJetPt; 
    std::vector<float> *JetPt;
    std::vector<float> *JetEta;
    std::vector<float> *JetY;
@@ -896,10 +897,14 @@ public:
    std::vector<float> *GenJetEta;
    std::vector<float> *GenJetY;
    std::vector<float> *GenJetPhi;
+   std::vector<bool>  *isD0TaggedGeomGenJet;
+   std::vector<int>   *TaggedLeadingD0GeomInGenJetIndex;
    std::vector<float> *RefJetPt;
    std::vector<float> *RefJetEta;
    std::vector<float> *RefJetY;
    std::vector<float> *RefJetPhi;
+   std::vector<bool>  *isD0TaggedGeomRefJet;
+   std::vector<int>   *TaggedLeadingD0GeomInRefJetIndex;
 
 private:
    bool WriteMode;
