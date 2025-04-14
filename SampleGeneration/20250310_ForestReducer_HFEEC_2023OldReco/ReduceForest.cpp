@@ -205,15 +205,15 @@ int main(int argc, char *argv[]) {
       for (int iTrack = 0; iTrack < MTrackPbPbUPC.nTrk; iTrack++) {
         // quality criteria
         if (MTrackPbPbUPC.highPurity->at(iTrack) == false)continue;
-        // position resolution
-        double XYVertexSignificance = fabs(MTrackPbPbUPC.trkDxyErrFirstVtx->at(iTrack) / MTrackPbPbUPC.trkDxyFirstVtx->at(iTrack));
-        if(XYVertexSignificance >= 3)continue; 
-        double ZVertexSignificance = fabs(MTrackPbPbUPC.trkDzErrFirstVtx->at(iTrack) / MTrackPbPbUPC.trkDzFirstVtx->at(iTrack));
-        if(ZVertexSignificance >= 3)continue; 
+        // position resolution - remove this over concerns of biasing the distribution
+        // double XYVertexSignificance = fabs(MTrackPbPbUPC.trkDxyErrFirstVtx->at(iTrack) / MTrackPbPbUPC.trkDxyFirstVtx->at(iTrack));
+        // if(XYVertexSignificance >= 3)continue; 
+        // double ZVertexSignificance = fabs(MTrackPbPbUPC.trkDzErrFirstVtx->at(iTrack) / MTrackPbPbUPC.trkDzFirstVtx->at(iTrack));
+        // if(ZVertexSignificance >= 3)continue; 
         // Nhits
-        if(MTrackPbPbUPC.trkNHits->at(iTrack) < 0) continue; 
+        //if(MTrackPbPbUPC.trkNHits->at(iTrack) < 0) continue; 
         // chi2/ndf/nlayers
-        if(MTrackPbPbUPC.trkNormChi2->at(iTrack)/ MTrackPbPbUPC.trkNLayers->at(iTrack) < 0)continue; 
+        //if(MTrackPbPbUPC.trkNormChi2->at(iTrack)/ MTrackPbPbUPC.trkNLayers->at(iTrack) < 0)continue; 
         // eta acceptance
         if(fabs(MTrackPbPbUPC.trkEta->at(iTrack)) > 2.4) continue; 
         //momentum resolution

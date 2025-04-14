@@ -10,8 +10,8 @@ TRIGGER=0 # no trigger selection
 ISGAMMAN=0
 ISDATA=0
 SCALEFACTOR=1.0
-INPUT=/data/HFJetUPCanalysis/MCSkims23/20250310_ForestHFJetMC23_D0Tagged_v8_pthat5_BeamAandBCombined.root
-OUTPUTANALYSIS=output_MC_v11_pthat5_BeamAandBcombined.root
+INPUT=/data/HFJetUPCanalysis/MCSkims23/20250310_ForestHFJetMC23_D0Tagged_v9_ModTrackCuts_pthat5_BeamAabdBCombined.root
+OUTPUTANALYSIS=output_MC_v12_ModTrackCuts_pthat5_BeamAandBcombined.root
 
 
 ./ExecuteHFUPCEEC --Input $INPUT --MinDzeroPT $DZEROPTMIN --MaxDzeroPT $DZEROPTMAX --MinDzeroY $DZEROYMIN --MaxDzeroY $DZEROYMAX --MinJetPT $JETPTMIN --MaxJetPT $JETPTMAX --MinJetY $JETYMIN --MaxJetY $JETYMAX --IsGammaN $ISGAMMAN --TriggerChoice $TRIGGER --IsData $ISDATA --Output $OUTPUTANALYSIS --scaleFactor $SCALEFACTOR

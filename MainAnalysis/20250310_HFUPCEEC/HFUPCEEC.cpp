@@ -52,7 +52,12 @@ public:
 
   // EEC histograms
   TH1D* hEECInclusive; // inclusive EEC for gamma N UPC events
-  TH1D* hEEC_D0Tagged; // EEC in inclusive 
+  TH1D* hEECInclusiveDijet; // inclusive EEC for dijet gammaN UPC events
+  TH1D* hEEC_D0Tagged; // EEC in D0 tagged dijet events 
+  TH1D* hEEC_D0TaggedDijet; // inclusive EEC in dijet events
+  TH1D* hJetPt; 
+  TH1D* hD0JetPt; 
+  TH1D* hEventSel; // histogram to keep track of the different types of events
 
 
 
@@ -74,7 +79,6 @@ public:
 
   void analyze(Parameters &par) {
     outf->cd();
-    
     int numBins = 25;  // Number of bins
     double start = 0.005, stop = 5.0;
 
@@ -89,7 +93,16 @@ public:
     hNev = new TH1D("hNev", "", 1, 0, 1);
     hEECInclusive = new TH1D("hEECInclusive", "", EECBins.size()-1, EECBins.data()); 
     hEEC_D0Tagged = new TH1D("hEEC_D0Tagged", "", EECBins.size()-1, EECBins.data()); 
-
+    hEECInclusiveDijet = new TH1D("hEECInclusiveDijet", "", EECBins.size()-1, EECBins.data()); 
+    hEEC_D0TaggedDijet = new TH1D("hEEC_D0TaggedDijet", "", EECBins.size()-1, EECBins.data()); 
+    hD0JetPt = new TH1D("hDOJetPt", "", 100, 0, 100); 
+    hJetPt = new TH1D("hJetPt", "", 100, 0, 100);
+    hEventSel = new TH1D("hEventSel", "", 5, 0, 5); 
+    // Fill with 0.5 for all events
+    // Fill with 1.5 for events with a jet within selections
+    // Fill with 2.5 for events with a jet within selections passing dijet selection
+    // Fill with 3.5 for events with a D0jet within selections
+    // Fill with 4.5 for events with a D0 jet withing selection passing dijet selections
 
     par.printParameters();
     unsigned long nEntry = MDzeroJetUPC->GetEntries() * par.scaleFactor;
@@ -102,7 +115,80 @@ public:
       MDzeroJetUPC->GetEntry(i);
 
       if(i % 1000 == 0) std::cout << "On entry " << i << std::endl;
+      
+      // only difference in the data part is the trigger
+      if (par.IsData && triggerSelection(MDzeroJetUPC, par)) {
+         numberAccEvents++; // increment the number of events
+        // reco jet loop
+        // for now we only use the jets to tag the event
+        // create flags for whether or not the event is tagged
+        bool fillEEC = false; 
+        bool fillEECDijet = false; 
+        bool fillD0EEC = false; 
+        bool fillD0EECDijet = false; 
+        for (unsigned long j = 0; j < MDzeroJetUPC->JetPt->size(); j++) {
+          // jet acceptance cuts
+          if(MDzeroJetUPC->JetPt->at(j) < par.MinJetPT || MDzeroJetUPC->JetPt->at(j) > par.MaxJetPT) continue;
+          if(MDzeroJetUPC->JetY->at(j) < par.MinJetY || MDzeroJetUPC->JetY->at(j) > par.MaxJetY) continue;
+          double deltaPhi = -1.0; 
+          // require we have at least a jet to calculate the delta phi between
+          if(MDzeroJetUPC->JetPt->size() > 1){
+            deltaPhi = MDzeroJetUPC->JetPhi->at(0) - MDzeroJetUPC->JetPhi->at(1); 
+          }
+          fillEEC = true; 
+          hJetPt->Fill(MDzeroJetUPC->JetPt->at(j)); 
+          if(deltaPhi > 2.5 && deltaPhi < 3.5 && fillEEC){
+            fillEECDijet = true; 
+            hEventSel->Fill(2.5); 
+          }
+          // if after looping over all of the D0s we found one within the cone, fill the jet pt
+          if(MDzeroJetUPC->isD0TaggedGeomJet->at(j)){
+            double DPt =  MDzeroJetUPC->Dpt->at(MDzeroJetUPC->TaggedLeadingD0GeomInJetIndex->at(j));
+            double Dy  = MDzeroJetUPC->Dy->at(MDzeroJetUPC->TaggedLeadingD0GeomInJetIndex->at(j));
+            // make the D0 acceptance cuts
+            if(DPt < par.MinDzeroPT || DPt > par.MaxDzeroPT) continue;
+            if(Dy < par.MinDzeroY || Dy > par.MaxDzeroY) continue;
+            hD0JetPt->Fill(MDzeroJetUPC->JetPt->at(j)); 
+            fillD0EEC = true; 
+            if(fillEECDijet) fillD0EECDijet = true; 
+          }
+        } // end of jet loop
+        
+        // now fill rest of event selection criteria
+        hEventSel->Fill(0.5); 
+        if(fillEEC)hEventSel->Fill(1.5); 
+        if(fillEECDijet)hEventSel->Fill(2.5); 
+        if(fillD0EEC)hEventSel->Fill(3.5); 
+        if(fillD0EECDijet)hEventSel->Fill(4.5);
+        
+        
+        if(fillD0EEC && !fillEEC)std::cout << "Error: Logic to fill the EEC is incorrect" << std::endl; 
 
+        if(fillEEC){
+          //std::cout << "Found a jet meeting requirements, now moving on to EEC - looping over " << MDzeroJetUPC->Nch << " particles " << std::endl;
+          //std::cout << MDzeroJetUPC->trkEta->size() << std::endl;
+          for (unsigned long a = 0; a < MDzeroJetUPC->Nch; a++) {
+            for (unsigned long b = a+1; b < MDzeroJetUPC->Nch; b++) {
+              // skip tracks outside of the barrel
+              if(abs(MDzeroJetUPC->trkEta->at(a)) > 2.4 || abs(MDzeroJetUPC->trkEta->at(b)) > 2.4 ) continue; 
+              //if(MDzeroJetUPC->trkPt->at(a) > 20 || MDzeroJetUPC->trkPt->at(a) > 20  ) continue; 
+              double deltaEta = MDzeroJetUPC->trkEta->at(a) - MDzeroJetUPC->trkEta->at(b); 
+              double deltaPhi = MDzeroJetUPC->trkPhi->at(a) - MDzeroJetUPC->trkPhi->at(b); 
+              double deltaR = sqrt(deltaEta*deltaEta + deltaPhi*deltaPhi); 
+              //std::cout << "Pair " << a << " , " << b << " ) has a delta R of " << deltaR << std::endl;
+              double EEC = MDzeroJetUPC->trkPt->at(a)* MDzeroJetUPC->trkPt->at(b);
+              hEECInclusive->Fill(deltaR, EEC); 
+              if(fillEECDijet)hEECInclusiveDijet->Fill(deltaR, EEC);
+              if(fillD0EEC){
+                hEEC_D0Tagged->Fill(deltaR, EEC); 
+                if(fillEECDijet)hEEC_D0TaggedDijet->Fill(deltaR, EEC); 
+              }
+              
+            } // end of track loop   
+          } // end of track loop
+          ///std::cout << "Done with EEC loop" << std::endl;
+        }
+      }
 
       // -----------------------
 
@@ -122,24 +208,44 @@ public:
         // for now we only use the jets to tag the event
         // create flags for whether or not the event is tagged
         bool fillEEC = false; 
+        bool fillEECDijet = false; 
         bool fillD0EEC = false; 
+        bool fillD0EECDijet = false; 
         for (unsigned long j = 0; j < MDzeroJetUPC->JetPt->size(); j++) {
           // jet acceptance cuts
           if(MDzeroJetUPC->JetPt->at(j) < par.MinJetPT || MDzeroJetUPC->JetPt->at(j) > par.MaxJetPT) continue;
           if(MDzeroJetUPC->JetY->at(j) < par.MinJetY || MDzeroJetUPC->JetY->at(j) > par.MaxJetY) continue;
           fillEEC = true; 
-
+          hJetPt->Fill(MDzeroJetUPC->JetPt->at(j)); 
+          double deltaPhi = -1.0; 
+          // require we have at least a jet to calculate the delta phi between
+          if(MDzeroJetUPC->JetPt->size() > 1){
+            deltaPhi = MDzeroJetUPC->JetPhi->at(0) - MDzeroJetUPC->JetPhi->at(1); 
+          }
+          if(deltaPhi > 2.5 && deltaPhi < 3.5 && fillEEC){
+            fillEECDijet = true; 
+            hEventSel->Fill(2.5); 
+          }
           // if after looping over all of the D0s we found one within the cone, fill the jet pt
           if(MDzeroJetUPC->isD0TaggedGeomJet->at(j)){
             double DPt =  MDzeroJetUPC->Dpt->at(MDzeroJetUPC->TaggedLeadingD0GeomInJetIndex->at(j));
             double Dy  = MDzeroJetUPC->Dy->at(MDzeroJetUPC->TaggedLeadingD0GeomInJetIndex->at(j));
+            hD0JetPt->Fill(MDzeroJetUPC->JetPt->at(j)); 
             // make the D0 acceptance cuts
             if(DPt < par.MinDzeroPT || DPt > par.MaxDzeroPT) continue;
             if(Dy < par.MinDzeroY || Dy > par.MaxDzeroY) continue;
-            fillD0EEC = true; 
+            fillD0EEC = true;             
+            if(fillEECDijet) fillD0EECDijet = true; 
             break; // don't  need to keep looking after we've found one
           }
         } // end of jet loop
+        
+        // fill the event selection histograms
+        hEventSel->Fill(0.5); 
+        if(fillEEC)hEventSel->Fill(1.5); 
+        if(fillEECDijet)hEventSel->Fill(2.5); 
+        if(fillD0EEC)hEventSel->Fill(3.5); 
+        if(fillD0EECDijet)hEventSel->Fill(4.5);
         
         if(fillD0EEC && ! fillEEC)std::cout << "Error: Logic to fill the EEC is incorrect" << std::endl; 
 
@@ -157,7 +263,11 @@ public:
               //std::cout << "Pair " << a << " , " << b << " ) has a delta R of " << deltaR << std::endl;
               double EEC = MDzeroJetUPC->trkPt->at(a)* MDzeroJetUPC->trkPt->at(b);
               hEECInclusive->Fill(deltaR, EEC); 
-              if(fillD0EEC)hEEC_D0Tagged->Fill(deltaR, EEC); 
+              if(fillEECDijet)hEECInclusiveDijet->Fill(deltaR, EEC);
+              if(fillD0EEC){
+                hEEC_D0Tagged->Fill(deltaR, EEC); 
+                if(fillEECDijet)hEEC_D0TaggedDijet->Fill(deltaR, EEC); 
+              }
               
             } // end of track loop   
           } // end of track loop
@@ -182,6 +292,11 @@ public:
     smartWrite(hNev);
     smartWrite(hEECInclusive);
     smartWrite(hEEC_D0Tagged);
+    smartWrite(hEECInclusiveDijet);
+    smartWrite(hEEC_D0TaggedDijet);
+    smartWrite(hJetPt); 
+    smartWrite(hD0JetPt);
+    smartWrite(hEventSel);
 
   }
 
@@ -190,6 +305,8 @@ private:
     delete hNev;
     delete hEECInclusive;
     delete hEEC_D0Tagged;
+    delete hEECInclusiveDijet;
+    delete hEEC_D0TaggedDijet;
 
 
   }
