@@ -29,7 +29,8 @@ int flavorclass(int nch, int nbh){
 
 
 void aodread(){
-    gStyle->SetOptStat(0);
+	cout << "hi" << endl;
+    	gStyle->SetOptStat(0);
     TFile*f = new TFile("HiForestMiniAOD.root");
 
 
