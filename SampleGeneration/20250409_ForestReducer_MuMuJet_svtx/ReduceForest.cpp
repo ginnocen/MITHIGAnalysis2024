@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
   std::vector<int> trkMatchSta_v;
 
   for (string InputFileName : InputFileNames) {
+
+    std::cout << "Processing file: " << InputFileName << std::endl;
     TFile InputFile(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile);
@@ -102,6 +104,7 @@ int main(int argc, char *argv[]) {
         Bar.Update(iE);
         Bar.Print();
       }
+      //std::cout << "Event " << iE << endl;
     
 
       MEvent.GetEntry(iE);
@@ -141,6 +144,7 @@ int main(int argc, char *argv[]) {
 
       MMuMuJet.nsvtx = MJet.nsvtx;
       MMuMuJet.ntrk = MJet.ntrk;
+      //cout << MMuMuJet.nsvtx << " " << MMuMuJet.ntrk << endl;
 
       
           
@@ -210,11 +214,12 @@ int main(int argc, char *argv[]) {
           continue;
         if (fabs(MJet.JetEta[ijet]) > 2)
           continue;
+         cout << MJet.JetPFNHF[ijet] << " " << MJet.JetPFNEF[ijet] << " " << MJet.JetPFMUF[ijet] << " " << MJet.JetPFCHF[ijet] << " " << MJet.JetPFCHM[ijet] << " " << MJet.JetPFCEF[ijet] << endl;
         bool passPurity = MJet.JetPFNHF[ijet] < 0.90 && MJet.JetPFNEF[ijet] < 0.90 && MJet.JetPFMUF[ijet] < 0.80 &&
                           MJet.JetPFCHF[ijet] > 0. && MJet.JetPFCHM[ijet] > 0. && MJet.JetPFCEF[ijet] < 0.80;
         if (!passPurity)
           continue;
-        //std::cout << "event: " << iE << " jet: " << ijet << " nsvtx: " << MJet.jtNsvtx[ijet] << endl;
+        std::cout << "event: " << iE << " jet: " << ijet << " nsvtx: " << MJet.jtNsvtx[ijet] << endl;
         MMuMuJet.MJTHadronFlavor->push_back(MJet.MJTHadronFlavor[ijet]);
         MMuMuJet.MJTNcHad->push_back(MJet.MJTNcHad[ijet]);
         MMuMuJet.MJTNbHad->push_back(MJet.MJTNbHad[ijet]);
@@ -586,7 +591,7 @@ std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, floa
       if(fabs(MJet->trkPt[i] - pt) > 0.1){continue;}
       if(fabs(MJet->trkEta[i] - eta) > 0.1){continue;}
       if(std::abs(std::atan2(std::sin(MJet->trkPhi[i] - phi), std::cos(MJet->trkPhi[i] - phi))) > 0.1){continue;}
-
+      cout << "good" << endl;
       c +=1;
       idx[0] = i;
       idx[1] = MJet->trkSvtxId[i];
