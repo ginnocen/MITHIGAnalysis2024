@@ -73,6 +73,9 @@ int main(int argc, char *argv[]) {
   std::vector<int> trkPdgId_v;
   std::vector<int> trkMatchSta_v;
 
+  std::vector<int> mt2;
+  std::vector<int> mt1; 
+
   for (string InputFileName : InputFileNames) {
 
     std::cout << "Processing file: " << InputFileName << std::endl;
@@ -214,12 +217,11 @@ int main(int argc, char *argv[]) {
           continue;
         if (fabs(MJet.JetEta[ijet]) > 2)
           continue;
-         cout << MJet.JetPFNHF[ijet] << " " << MJet.JetPFNEF[ijet] << " " << MJet.JetPFMUF[ijet] << " " << MJet.JetPFCHF[ijet] << " " << MJet.JetPFCHM[ijet] << " " << MJet.JetPFCEF[ijet] << endl;
         bool passPurity = MJet.JetPFNHF[ijet] < 0.90 && MJet.JetPFNEF[ijet] < 0.90 && MJet.JetPFMUF[ijet] < 0.80 &&
                           MJet.JetPFCHF[ijet] > 0. && MJet.JetPFCHM[ijet] > 0. && MJet.JetPFCEF[ijet] < 0.80;
         if (!passPurity)
           continue;
-        std::cout << "event: " << iE << " jet: " << ijet << " nsvtx: " << MJet.jtNsvtx[ijet] << endl;
+        //std::cout << "event: " << iE << " jet: " << ijet << " nsvtx: " << MJet.jtNsvtx[ijet] << endl;
         MMuMuJet.MJTHadronFlavor->push_back(MJet.MJTHadronFlavor[ijet]);
         MMuMuJet.MJTNcHad->push_back(MJet.MJTNcHad[ijet]);
         MMuMuJet.MJTNbHad->push_back(MJet.MJTNbHad[ijet]);
@@ -367,9 +369,9 @@ int main(int argc, char *argv[]) {
         float maxmumuPt = 0.;
         int maxMu1Index = -1;
         int maxMu2Index = -1;
+
+
         int nSingleMu = MSingleMu.SingleMuPT->size();
-
-
         for (int isinglemu1 = 0; isinglemu1 < nSingleMu; isinglemu1++){
           if (isMuonSelected(&MSingleMu, isinglemu1) == false)
 	    continue;
@@ -411,6 +413,8 @@ int main(int argc, char *argv[]) {
 
         if (maxmumuPt > 0. && maxMu1Index >= 0 && maxMu2Index >= 0) {
           isJetTagged = true;
+          cout << "isJetTagged = true" << endl;
+
           muPt1 = MSingleMu.SingleMuPT->at(maxMu1Index);
           muPt2 = MSingleMu.SingleMuPT->at(maxMu2Index);
           muEta1 = MSingleMu.SingleMuEta->at(maxMu1Index);
@@ -481,13 +485,16 @@ int main(int argc, char *argv[]) {
         MMuMuJet.muDphi->push_back(muDphi);
         MMuMuJet.muDR->push_back(muDR);
 
-        std::vector<int> mt1 = mu_trackmatch(&MJet,ijet,muPt1,muEta1,muPhi1);
-        std::vector<int> mt2 = mu_trackmatch(&MJet,ijet,muPt2,muEta2,muPhi2);
+        mt1 = mu_trackmatch(&MJet,ijet,muPt1,muEta1,muPhi1);
+        mt2 = mu_trackmatch(&MJet,ijet,muPt2,muEta2,muPhi2);
 
         MMuMuJet.mu1trk->push_back(mt1[0]);
         MMuMuJet.mu2trk->push_back(mt2[0]);
         MMuMuJet.mu1svtx->push_back(mt1[1]);
         MMuMuJet.mu2svtx->push_back(mt2[1]);
+
+        mt1.clear();
+        mt2.clear();
 
       } // end loop over jets
       MMuMuJet.FillEntry();
@@ -584,13 +591,17 @@ std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, floa
   if (MJet == nullptr){return bad;}
   if (MJet->Tree == nullptr){return bad;}
 
+  //cout << "truth jet: " << jetno << " pt: " << pt << " eta: " << eta << " phi: " << phi << endl;
+
   int c = 0;
   for(int i = 0; i< MJet->ntrk; i++){
+      //cout << "jet: " << MJet->trkJetId[i] << " pt: " << MJet->trkPt[i] << " eta: " << MJet->trkEta[i] << " phi: " << MJet->trkPhi[i] << endl;
+
       if(MJet->trkJetId[i] != jetno){continue;}
       if(fabs(MJet->trkPdgId[i]) != 13){continue;}
-      if(fabs(MJet->trkPt[i] - pt) > 0.1){continue;}
+      if(fabs(MJet->trkPt[i] - pt) > 2){continue;}
       if(fabs(MJet->trkEta[i] - eta) > 0.1){continue;}
-      if(std::abs(std::atan2(std::sin(MJet->trkPhi[i] - phi), std::cos(MJet->trkPhi[i] - phi))) > 0.1){continue;}
+      //if(std::abs(std::atan2(std::sin(MJet->trkPhi[i] - phi), std::cos(MJet->trkPhi[i] - phi))) > 0.1){continue;}
       cout << "good" << endl;
       c +=1;
       idx[0] = i;
