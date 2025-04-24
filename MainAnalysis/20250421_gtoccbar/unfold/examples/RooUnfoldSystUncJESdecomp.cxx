@@ -80,8 +80,8 @@ Redone:ReadResponseLumiWeightTrackIneffV2pythia8_Run2_ak4.root
  *
  * */
 
-void RooUnfoldSystUncJESdecomp(std::string file_mc="/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/examples/response3.root", 
-std::string file_data="/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/Nc2_v2_jetReco.root", std::string date = "response",int flag=19)
+void RooUnfoldSystUncJESdecomp(std::string file_mc="response.root", 
+std::string file_data="dataReader.root", std::string date = "response",int flag=19)
 {
   RooUnfold::ErrorTreatment errorTreatment = RooUnfold::kCovariance;
   TFile* f_mc=new TFile(file_mc.c_str());
@@ -246,8 +246,8 @@ std::string file_data="/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/Nc2_v2_jet
    char ptbinsRead[100];
    sprintf(ptbinsRead, "_%d", i);
    string histnameRead(ptbinsRead);
-
-   histosTH1F[("jetPtDimuon"+histnameRead).c_str()] = (TH1F*) f_data->Get(("jetPt"+histnameRead).c_str());
+   histosTH1F[("jetPt"+histnameRead).c_str()] = (TH1F*) f_data->Get(("jetPt"+histnameRead).c_str());
+   histosTH1F[("jetPtDimuon"+histnameRead).c_str()] = (TH1F*) f_data->Get(("jetPtDimuon"+histnameRead).c_str());
 
    }
 
@@ -263,7 +263,7 @@ std::string file_data="/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/Nc2_v2_jet
 
       svd->Print();
 
-  TFile* fout = new TFile("output.root", "recreate");
+  TFile* fout = new TFile("unfoldingOutput.root", "recreate");
 //   TMatrixT<double> covariance();
 
      for(int jar=0;jar<1;jar++)
@@ -274,20 +274,36 @@ std::string file_data="/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/Nc2_v2_jet
       char ptbinsRead[100];
       sprintf(ptbinsRead, "_%d", jar);
       string histnameRead(ptbinsRead);
+
+      TH1F* pTjet_smearedIncJet = histosTH1F[("jetPt"+histnameRead).c_str()];
+
+     RooUnfoldBayes   unfoldInvertIncJet(response, pTjet_smearedIncJet, 4); 
+      TH1D* hunfIncJet= (TH1D*) unfoldInvertIncJet.Hreco(errorTreatment);
+      TH1D* hfoldIncJet= (TH1D*)response->ApplyToTruth(hunfIncJet,"");
+      TH1D *htempUnfIncJet=(TH1D*)hunfIncJet->Clone("htempUnf");
+      htempUnfIncJet->SetName(Form("unfoldingSolutionIncJet_%d",iter));
+      htempUnfIncJet->Divide(miss);
+//      htempUnfIncJet->Write();
+
+
+
       TH1F* pTjet_smeared = histosTH1F[("jetPtDimuon"+histnameRead).c_str()];
 //      pTjet_smeared->Multiply(fake);
 
      RooUnfoldBayes   unfoldInvert(response, pTjet_smeared , 4); 
-//      RooUnfoldInvert   unfoldInvert(response, histosTH1F["jetPt_0"] );
       TH1D* hunf= (TH1D*) unfoldInvert.Hreco(errorTreatment);
       TH1D* hfold= (TH1D*)response->ApplyToTruth(hunf,"");
       TH1D *htempUnf=(TH1D*)hunf->Clone("htempUnf");
-      htempUnf->SetName(Form("unfoldingSolution_%d",iter));
+      htempUnf->SetName(Form("unfoldingSolutionMuMuJet_%d",iter));
       htempUnf->Divide(miss);
+      TH1D *ratioMuMuJet=(TH1D*) htempUnf->Clone("ratioMuMuJet");
+      ratioMuMuJet->Divide(htempUnfIncJet);
+      ratioMuMuJet->Write();
       htempUnf->Write();
+      htempUnfIncJet->Write();
       pTjet_smeared->Divide(fake);
 
-      pTjet_smeared->Multiply(fakeJERup);
+/*      pTjet_smeared->Multiply(fakeJERup);
       RooUnfoldBayes   unfoldInvertJERup(responseJERup, pTjet_smeared , 4); 
       TH1D* hunfJERup= (TH1D*) unfoldInvertJERup.Hreco(errorTreatment);
       TH1D *htempUnfJERup=(TH1D*)hunfJERup->Clone("htempUnf");
@@ -547,7 +563,7 @@ std::string file_data="/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/Nc2_v2_jet
       htempUnfJECL3Resdown->SetName(Form("unfoldingSolutionJECL3Resdown_%d", iter));
       htempUnfJECL3Resdown->Divide(missJECL3Resdown);
       htempUnfJECL3Resdown->Write();
-      pTjet_smeared->Divide(fakeJECL3Resdown);
+      pTjet_smeared->Divide(fakeJECL3Resdown); */
 
 /*      pTjet_smeared->Multiply(fakeJECdown);
       RooUnfoldBayes   unfoldInvertJECdown(responseJECdown, pTjet_smeared , 4); 

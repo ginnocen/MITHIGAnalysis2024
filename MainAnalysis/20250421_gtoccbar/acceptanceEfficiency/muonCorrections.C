@@ -117,7 +117,7 @@ void MyClass::Loop()
        for (Long64_t j =0; j < JetPT->size() ; j++)
      { 
       jetPt.push_back(JetPT->at(j)); jetEta.push_back(JetEta->at(j)); jetPhi.push_back(JetPhi->at(j));
-      cout << JetPT->at(j) << endl;
+//      cout << JetPT->at(j) << endl;
        if (genMuMuPt->size() > 0  && JetPT->at(j) > 75. && genMuPt1->at(j) > 4 && genMuPt2->at(j) > 4 )
       {
 
