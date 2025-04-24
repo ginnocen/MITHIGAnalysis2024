@@ -1,0 +1,5 @@
+# Compute paths
+get_filename_component(RooUnfold_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+set(RooUnfold_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+set(RooUnfold_LIBRARIES "@CONF_LIBRARIES@")
+set(RooUnfold_LIBRARY_DIRS "@CONF_LIBRARY_DIRS@")
