@@ -413,7 +413,7 @@ int main(int argc, char *argv[]) {
 
         if (maxmumuPt > 0. && maxMu1Index >= 0 && maxMu2Index >= 0) {
           isJetTagged = true;
-          cout << "isJetTagged = true" << endl;
+          //cout << "isJetTagged = true" << endl;
 
           muPt1 = MSingleMu.SingleMuPT->at(maxMu1Index);
           muPt2 = MSingleMu.SingleMuPT->at(maxMu2Index);
@@ -599,10 +599,9 @@ std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, floa
 
       if(MJet->trkJetId[i] != jetno){continue;}
       if(fabs(MJet->trkPdgId[i]) != 13){continue;}
-      if(fabs(MJet->trkPt[i] - pt) > 2){continue;}
+      if(fabs(MJet->trkPt[i] - pt) > 0.2){continue;}
       if(fabs(MJet->trkEta[i] - eta) > 0.1){continue;}
       //if(std::abs(std::atan2(std::sin(MJet->trkPhi[i] - phi), std::cos(MJet->trkPhi[i] - phi))) > 0.1){continue;}
-      cout << "good" << endl;
       c +=1;
       idx[0] = i;
       idx[1] = MJet->trkSvtxId[i];
