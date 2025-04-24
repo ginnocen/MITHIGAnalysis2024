@@ -31,7 +31,7 @@ void RooUnfoldExample()
 
    JetCorrectionUncertainty *jecUnc;
    vector<JetCorrectionUncertainty*> vsrc;
-   jecUnc = new JetCorrectionUncertainty("/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/examples/JERC2018_HI/Autumn18_HI_V8_MC_Uncertainty_AK4PF.txt");
+   jecUnc = new JetCorrectionUncertainty("/data00/g2ccbar/JERC2018_HI/Autumn18_HI_V8_MC_Uncertainty_AK4PF.txt");
 //MC, Frag, Flavor,AbsStat, AbsScale, AbsMPF, ECAL, HCAL, RelStat, RelPt, RelBal, RelJER, L3Res, Total
 const int nsrc = 14;
 const char* srcnames[nsrc] =
@@ -44,14 +44,14 @@ const char* srcnames[nsrc] =
 for (int isrc = 0; isrc < nsrc; isrc++)
 {
    const char *name = srcnames[isrc];
-   JetCorrectorParameters p("/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/examples/JERC2018_HI/Autumn18_HI_V8_MC_UncertaintySources_AK3PF.txt", name);
+   JetCorrectorParameters p("/data00/g2ccbar/JERC2018_HI/Autumn18_HI_V8_MC_UncertaintySources_AK3PF.txt", name);
    vsrc.push_back(new JetCorrectionUncertainty(p));
 }
 
 
   JME::JetResolution resolution ;
   JME::JetResolutionScaleFactor resolution_sf ;
-  resolution_sf = JME::JetResolutionScaleFactor("/home/cbaldene/Unfolding/RooUnfoldSetupForLuis/examples/JERC2018_HI/Autumn18_RunD_V7b_MC_SF_AK4PF.txt");
+  resolution_sf = JME::JetResolutionScaleFactor("/data00/g2ccbar/JERC2018_HI/Autumn18_RunD_V7b_MC_SF_AK4PF.txt");
 
   TRandom3* rand = new TRandom3(0);
   /*double pTmin = 75; double pTmax  = 200;
