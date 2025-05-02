@@ -53,7 +53,7 @@ bool CheckCut(
       break;
     }
   }
-  return pass
+  return pass;
 }
 
 bool DCutSelection(

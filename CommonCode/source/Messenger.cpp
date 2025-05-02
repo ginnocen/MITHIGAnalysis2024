@@ -1480,10 +1480,14 @@ bool DzeroTreeMessenger::Initialize()
    Tree->SetBranchAddress("Dmass", &Dmass);
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
    Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
+   Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
+   Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
    Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
    Tree->SetBranchAddress("Dtrk1highPurity", &Dtrk1highPurity);
    Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
    Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
+   Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
+   Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
    Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
    Tree->SetBranchAddress("Dtrk2highPurity", &Dtrk2highPurity);
    Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
@@ -1491,6 +1495,8 @@ bool DzeroTreeMessenger::Initialize()
    Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
    Tree->SetBranchAddress("DsvpvDistance_2D", &DsvpvDistance_2D);
    Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
+   Tree->SetBranchAddress("Dip3d", &Dip3d);
+   Tree->SetBranchAddress("Dip3derr", &Dip3derr);
    Tree->SetBranchAddress("Dalpha", &Dalpha);
    Tree->SetBranchAddress("Ddtheta", &Ddtheta);
    Tree->SetBranchAddress("Dgen", &Dgen);
@@ -1515,11 +1521,11 @@ bool DzeroTreeMessenger::PassUPCDzero2023Cut(int index)
    if(index >= Dsize)
       return false;
   //FIXME : need to be cross-checked
-  if(Dalpha[index] > 0.4)
+  if(Dalpha[index] > 0.6) // increased from 0.4
       return false;
-  if(Ddtheta[index] > 0.5)
+  if(Ddtheta[index] > 0.6) // increased from 0.5
       return false;
-  if(Dchi2cl[index] < 0.1)
+  if(Dchi2cl[index] < 0.05)  // decreased from 0.1
       return false;
   if(fabs(Dtrk1PtErr[index] / Dtrk1Pt[index]) > 0.1)
       return false;
@@ -1527,7 +1533,7 @@ bool DzeroTreeMessenger::PassUPCDzero2023Cut(int index)
       return false;
   if (Dtrk1highPurity[index] == 0 || Dtrk2highPurity[index] == 0)
       return false;
-  if (DsvpvDistance[index]/DsvpvDisErr[index] < 2.)
+  if (DsvpvDistance[index]/DsvpvDisErr[index] < 1.) // decreased from 2.
       return false;
    return true;
 }

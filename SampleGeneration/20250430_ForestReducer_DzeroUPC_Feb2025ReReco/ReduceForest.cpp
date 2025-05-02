@@ -286,12 +286,12 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
       int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        bool DpassCut23PAS_             = DpassCut23PAS(MDzero, iD);
-        bool DpassCut23LowPt_           = DpassCut23LowPt(MDzero, iD);
-        bool DpassCut23PASSystDsvpvSig_ = DpassCut23PASSystDsvpvSig(MDzero, iD);
-        bool DpassCut23PASSystDtrkPt_   = DpassCut23PASSystDtrkPt(MDzero, iD);
-        bool DpassCut23PASSystDalpha_   = DpassCut23PASSystDalpha(MDzero, iD);
-        bool DpassCut23PASSystDchi2cl_  = DpassCut23PASSystDchi2cl(MDzero, iD);
+        bool DpassCut23PAS_           = DpassCut23PAS(MDzero, iD);
+        bool DpassCut23LowPt_         = DpassCut23LowPt(MDzero, iD);
+        bool DpassCut23PASSystDsvpvSig_  = DpassCut23PASSystDsvpvSig(MDzero, iD);
+        bool DpassCut23PASSystDtrkPt_    = DpassCut23PASSystDtrkPt(MDzero, iD);
+        bool DpassCut23PASSystDalpha_    = DpassCut23PASSystDalpha(MDzero, iD);
+        bool DpassCut23PASSystDchi2cl_   = DpassCut23PASSystDchi2cl(MDzero, iD);
         if (IsData)
         {
           if (ApplyDRejection=="or")
@@ -310,11 +310,6 @@ int main(int argc, char *argv[]) {
           else if (ApplyDRejection=="passystdalpha" && !DpassCut23PASSystDalpha_) continue;
           else if (ApplyDRejection=="passystdchi2cl" && !DpassCut23PASSystDchi2cl_) continue;
         }
-      int countSelDzero = 0;
-      for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        if (ApplyDRejection == 1 && IsData && DpassCut23PAS(MDzero, iD) == false) continue;
-        // FIXME: Since DmesonSelectionSkimLowPt23() has `return true`, this is never triggered:
-        if (ApplyDRejection == 2 && IsData && DmesonSelectionSkimLowPt23(MDzero, iD) == false) continue;
         countSelDzero++;
         MDzeroUPC.Dpt->push_back(MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
