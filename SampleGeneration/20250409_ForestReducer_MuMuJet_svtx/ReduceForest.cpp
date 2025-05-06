@@ -48,6 +48,7 @@ int main(int argc, char *argv[]) {
   MuMuJetMessenger MMuMuJet;
   MMuMuJet.SetBranch(&Tree);
 
+  std::vector<int> svtxJetId_v;
   std::vector<int> svtxNtrk_v;
   std::vector<float> svtxdl_v;
   std::vector<float> svtxdls_v;
@@ -58,6 +59,9 @@ int main(int argc, char *argv[]) {
   std::vector<float> svtxpt_v;
   std::vector<float> svtxnormchi2_v;
   std::vector<float> svtxchi2_v;
+
+  std::vector<int> trkJetId_v;
+  std::vector<int> trkSvtxId_v;
   std::vector<float> trkPt_v;
   std::vector<float> trkEta_v;
   std::vector<float> trkPhi_v;
@@ -147,7 +151,6 @@ int main(int argc, char *argv[]) {
 
       MMuMuJet.nsvtx = MJet.nsvtx;
       MMuMuJet.ntrk = MJet.ntrk;
-      //cout << MMuMuJet.nsvtx << " " << MMuMuJet.ntrk << endl;
 
       
           
@@ -240,10 +243,10 @@ int main(int argc, char *argv[]) {
           
           for(int isvtx = 0; isvtx < MJet.nsvtx; isvtx++){
               
-            
-              
             if(MJet.svtxJetId[isvtx] == ijet){
                 
+                //cout << MJet.svtxJetId[isvtx] << endl;
+                svtxJetId_v.push_back(MJet.svtxJetId[isvtx]);
                 svtxNtrk_v.push_back(MJet.svtxNtrk[isvtx]);
                 svtxdl_v.push_back(MJet.svtxdl[isvtx]);
                 svtxdls_v.push_back(MJet.svtxdls[isvtx]);
@@ -259,7 +262,7 @@ int main(int argc, char *argv[]) {
               }
           }
 
-          
+          MMuMuJet.svtxJetId->push_back(svtxJetId_v);
           MMuMuJet.svtxNtrk->push_back(svtxNtrk_v);
           MMuMuJet.svtxdl->push_back(svtxdl_v);
           MMuMuJet.svtxdls->push_back(svtxdls_v);
@@ -276,6 +279,9 @@ int main(int argc, char *argv[]) {
           for(int itrk = 0; itrk < MJet.ntrk; itrk++){
             if(MJet.trkJetId[itrk] == ijet){
               
+              //cout << "ping " << MJet.trkJetId[itrk] << " " << MJet.trkSvtxId[itrk] << endl;
+              trkJetId_v.push_back(MJet.trkJetId[itrk]);
+              trkSvtxId_v.push_back(MJet.trkSvtxId[itrk]);
               trkPt_v.push_back(MJet.trkPt[itrk]);
               trkEta_v.push_back(MJet.trkEta[itrk]);
               trkPhi_v.push_back(MJet.trkPhi[itrk]);
@@ -292,8 +298,11 @@ int main(int argc, char *argv[]) {
               trkMatchSta_v.push_back(MJet.trkMatchSta[itrk]);
 
             }
+            
         }
 
+        MMuMuJet.trkJetId->push_back(trkJetId_v);
+        MMuMuJet.trkSvtxId->push_back(trkSvtxId_v);
         MMuMuJet.trkPt->push_back(trkPt_v);
         MMuMuJet.trkEta->push_back(trkEta_v);
         MMuMuJet.trkPhi->push_back(trkPhi_v);
@@ -310,7 +319,7 @@ int main(int argc, char *argv[]) {
         MMuMuJet.trkMatchSta->push_back(trkMatchSta_v);
 
       
-
+        svtxJetId_v.clear();
         svtxNtrk_v.clear();
         svtxdl_v.clear();
         svtxdls_v.clear();
@@ -321,6 +330,9 @@ int main(int argc, char *argv[]) {
         svtxpt_v.clear();
         svtxnormchi2_v.clear();
         svtxchi2_v.clear();
+        
+        trkJetId_v.clear();
+        trkSvtxId_v.clear();
         trkPt_v.clear();
         trkEta_v.clear();
         trkPhi_v.clear();
@@ -583,6 +595,26 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
   return true;
 }
 
+float min_angle(float phi1, float phi2) {
+  constexpr float PI = M_PI;
+
+  // Normalize both angles to (-π, π]
+  auto normalize = [](float phi) {
+      phi = std::fmod(phi + PI, 2 * PI);
+      if (phi < 0) phi += 2 * PI;
+      return phi - PI;
+  };
+
+  float a = normalize(phi1);
+  float b = normalize(phi2);
+
+  float diff = std::fmod(std::abs(a - b), 2 * PI);
+  if (diff > PI)
+      diff = 2 * PI - diff;
+
+  return diff;
+}
+
 std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi){
 
   std::vector<int> idx = {-1,-1};
@@ -595,13 +627,11 @@ std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, floa
 
   int c = 0;
   for(int i = 0; i< MJet->ntrk; i++){
-      //cout << "jet: " << MJet->trkJetId[i] << " pt: " << MJet->trkPt[i] << " eta: " << MJet->trkEta[i] << " phi: " << MJet->trkPhi[i] << endl;
-
-      if(MJet->trkJetId[i] != jetno){continue;}
+      //if(MJet->trkJetId[i] != jetno){continue;}
+      if(fabs(MJet->trkPt[i] - pt) > 5){continue;}
       if(fabs(MJet->trkPdgId[i]) != 13){continue;}
-      if(fabs(MJet->trkPt[i] - pt) > 0.2){continue;}
-      if(fabs(MJet->trkEta[i] - eta) > 0.1){continue;}
-      //if(std::abs(std::atan2(std::sin(MJet->trkPhi[i] - phi), std::cos(MJet->trkPhi[i] - phi))) > 0.1){continue;}
+      if(fabs(MJet->trkEta[i] - eta) > 0.05){continue;}
+      if(min_angle(MJet->trkPhi[i], phi) > 0.05){continue;}
       c +=1;
       idx[0] = i;
       idx[1] = MJet->trkSvtxId[i];
