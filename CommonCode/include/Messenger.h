@@ -1140,6 +1140,7 @@ public:
    // 
 
    int nsvtx;
+   std::vector<std::vector<int>> *svtxJetId;
    std::vector<std::vector<int>> *svtxNtrk;
    std::vector<std::vector<float>> *svtxdl;
    std::vector<std::vector<float>> *svtxdls;
@@ -1157,6 +1158,8 @@ public:
    //
    
    int ntrk;
+   std::vector<std::vector<int>> *trkJetId;
+   std::vector<std::vector<int>> *trkSvtxId;
    std::vector<std::vector<float>> *trkPt;
    std::vector<std::vector<float>> *trkEta;
    std::vector<std::vector<float>> *trkPhi;
