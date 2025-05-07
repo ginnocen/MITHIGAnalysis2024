@@ -110,6 +110,9 @@ int main(int argc, char *argv[]) {
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);
     METFilterTreeMessenger MMETFilter(InputFile);
     
+    if (!MDzero.Tree) continue;
+    if (!IsData && !MDzeroGen.Tree) continue;
+    
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);
     if (!HideProgressBar) {
@@ -316,19 +319,19 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.Dmass->push_back(MDzero.Dmass[iD]);
         MDzeroUPC.Dtrk1Pt->push_back(MDzero.Dtrk1Pt[iD]);
         MDzeroUPC.Dtrk1Eta->push_back(MDzero.Dtrk1Eta[iD]);
-        MDzeroUPC.Dtrk1dedx->push_back(MDzero.Dtrk1dedx[iD]);
-        MDzeroUPC.Dtrk1MassHypo->push_back(MDzero.Dtrk1MassHypo[iD]);
+        if (MDzeroUPC.Dtrk1dedx != nullptr)MDzeroUPC.Dtrk1dedx->push_back(MDzero.Dtrk1dedx[iD]);
+        if (MDzeroUPC.Dtrk1MassHypo != nullptr)MDzeroUPC.Dtrk1MassHypo->push_back(MDzero.Dtrk1MassHypo[iD]);
         MDzeroUPC.Dtrk2Pt->push_back(MDzero.Dtrk2Pt[iD]);
         MDzeroUPC.Dtrk2Eta->push_back(MDzero.Dtrk2Eta[iD]);
-        MDzeroUPC.Dtrk2dedx->push_back(MDzero.Dtrk2dedx[iD]);
-        MDzeroUPC.Dtrk2MassHypo->push_back(MDzero.Dtrk2MassHypo[iD]);
+        if (MDzeroUPC.Dtrk2dedx != nullptr) MDzeroUPC.Dtrk2dedx->push_back(MDzero.Dtrk2dedx[iD]);
+        if (MDzeroUPC.Dtrk2MassHypo != nullptr) MDzeroUPC.Dtrk2MassHypo->push_back(MDzero.Dtrk2MassHypo[iD]);
         MDzeroUPC.Dchi2cl->push_back(MDzero.Dchi2cl[iD]);
         MDzeroUPC.DsvpvDistance->push_back(MDzero.DsvpvDistance[iD]);
         MDzeroUPC.DsvpvDisErr->push_back(MDzero.DsvpvDisErr[iD]);
         MDzeroUPC.DsvpvDistance_2D->push_back(MDzero.DsvpvDistance_2D[iD]);
         MDzeroUPC.DsvpvDisErr_2D->push_back(MDzero.DsvpvDisErr_2D[iD]);
-        MDzeroUPC.Dip3d->push_back(MDzero.Dip3d[iD]);
-        MDzeroUPC.Dip3derr->push_back(MDzero.Dip3derr[iD]);
+        if (MDzeroUPC.Dip3d != nullptr)MDzeroUPC.Dip3d->push_back(MDzero.Dip3d[iD]);
+        if (MDzeroUPC.Dip3derr != nullptr)MDzeroUPC.Dip3derr->push_back(MDzero.Dip3derr[iD]);
         MDzeroUPC.Dalpha->push_back(MDzero.Dalpha[iD]);
         MDzeroUPC.Ddtheta->push_back(MDzero.Ddtheta[iD]);
         MDzeroUPC.DpassCut23PAS->push_back(DpassCut23PAS_);

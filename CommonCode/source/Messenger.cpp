@@ -1473,35 +1473,35 @@ bool DzeroTreeMessenger::Initialize()
 {
    if(Tree == nullptr)
       return false;
-   Tree->SetBranchAddress("Dsize", &Dsize);
-   Tree->SetBranchAddress("Dpt", &Dpt);
-   Tree->SetBranchAddress("Dy", &Dy);
-   Tree->SetBranchAddress("Dphi", &Dphi);
-   Tree->SetBranchAddress("Dmass", &Dmass);
-   Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
-   Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
-   Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
-   Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
-   Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
-   Tree->SetBranchAddress("Dtrk1highPurity", &Dtrk1highPurity);
-   Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
-   Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
-   Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
-   Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
-   Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
-   Tree->SetBranchAddress("Dtrk2highPurity", &Dtrk2highPurity);
-   Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
-   Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
-   Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
-   Tree->SetBranchAddress("DsvpvDistance_2D", &DsvpvDistance_2D);
-   Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
-   Tree->SetBranchAddress("Dip3d", &Dip3d);
-   Tree->SetBranchAddress("Dip3derr", &Dip3derr);
-   Tree->SetBranchAddress("Dalpha", &Dalpha);
-   Tree->SetBranchAddress("Ddtheta", &Ddtheta);
-   Tree->SetBranchAddress("Dgen", &Dgen);
-   Tree->SetBranchAddress("Dgenpt", &Dgenpt);
-   Tree->SetBranchAddress("DgenBAncestorpdgId", &DgenBAncestorpdgId);
+   if(Tree->GetBranch("Dsize")) Tree->SetBranchAddress("Dsize", &Dsize);
+   if(Tree->GetBranch("Dpt")) Tree->SetBranchAddress("Dpt", &Dpt);
+   if(Tree->GetBranch("Dy")) Tree->SetBranchAddress("Dy", &Dy);
+   if(Tree->GetBranch("Dphi")) Tree->SetBranchAddress("Dphi", &Dphi);
+   if(Tree->GetBranch("Dmass")) Tree->SetBranchAddress("Dmass", &Dmass);
+   if(Tree->GetBranch("Dtrk1Pt")) Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
+   if(Tree->GetBranch("Dtrk1Eta")) Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
+   if(Tree->GetBranch("Dtrk1dedx")) Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
+   if(Tree->GetBranch("Dtrk1MassHypo")) Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
+   if(Tree->GetBranch("Dtrk1PtErr")) Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
+   if(Tree->GetBranch("Dtrk1highPurity")) Tree->SetBranchAddress("Dtrk1highPurity", &Dtrk1highPurity);
+   if(Tree->GetBranch("Dtrk2Pt")) Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
+   if(Tree->GetBranch("Dtrk2Eta")) Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
+   if(Tree->GetBranch("Dtrk2dedx")) Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
+   if(Tree->GetBranch("Dtrk2MassHypo")) Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
+   if(Tree->GetBranch("Dtrk2PtErr")) Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
+   if(Tree->GetBranch("Dtrk2highPurity")) Tree->SetBranchAddress("Dtrk2highPurity", &Dtrk2highPurity);
+   if(Tree->GetBranch("Dtrk2highPurity")) Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
+   if(Tree->GetBranch("Dtrk2highPurity")) Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
+   if(Tree->GetBranch("Dtrk2highPurity")) Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
+   if(Tree->GetBranch("Dtrk2highPurity")) Tree->SetBranchAddress("DsvpvDistance_2D", &DsvpvDistance_2D);
+   if(Tree->GetBranch("Dtrk2highPurity")) Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
+   if(Tree->GetBranch("Dip3d")) Tree->SetBranchAddress("Dip3d", &Dip3d);
+   if(Tree->GetBranch("Dip3derr")) Tree->SetBranchAddress("Dip3derr", &Dip3derr);
+   if(Tree->GetBranch("Dalpha")) Tree->SetBranchAddress("Dalpha", &Dalpha);
+   if(Tree->GetBranch("Ddtheta")) Tree->SetBranchAddress("Ddtheta", &Ddtheta);
+   if(Tree->GetBranch("Dgen")) Tree->SetBranchAddress("Dgen", &Dgen);
+   if(Tree->GetBranch("Dgenpt")) Tree->SetBranchAddress("Dgenpt", &Dgenpt);
+   if(Tree->GetBranch("DgenBAncestorpdgId")) Tree->SetBranchAddress("DgenBAncestorpdgId", &DgenBAncestorpdgId);
 
    return true;
 }
@@ -1521,11 +1521,11 @@ bool DzeroTreeMessenger::PassUPCDzero2023Cut(int index)
    if(index >= Dsize)
       return false;
   //FIXME : need to be cross-checked
-  if(Dalpha[index] > 0.6) // increased from 0.4
+  if(Dalpha[index] > 0.4) // increased from 0.4
       return false;
-  if(Ddtheta[index] > 0.6) // increased from 0.5
+  if(Ddtheta[index] > 0.5) // increased from 0.5
       return false;
-  if(Dchi2cl[index] < 0.05)  // decreased from 0.1
+  if(Dchi2cl[index] < 0.1)  // decreased from 0.1
       return false;
   if(fabs(Dtrk1PtErr[index] / Dtrk1Pt[index]) > 0.1)
       return false;
@@ -1533,7 +1533,7 @@ bool DzeroTreeMessenger::PassUPCDzero2023Cut(int index)
       return false;
   if (Dtrk1highPurity[index] == 0 || Dtrk2highPurity[index] == 0)
       return false;
-  if (DsvpvDistance[index]/DsvpvDisErr[index] < 1.) // decreased from 2.
+  if (DsvpvDistance[index]/DsvpvDisErr[index] < 2.) // decreased from 2.
       return false;
    return true;
 }

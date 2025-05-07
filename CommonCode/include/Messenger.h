@@ -386,16 +386,16 @@ public:
    float Dy[DZEROCOUNTMAX];
    float Dmass[DZEROCOUNTMAX];
    float Dtrk1Pt[DZEROCOUNTMAX];
-   float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1PtErr[DZEROCOUNTMAX];
+   float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1dedx[DZEROCOUNTMAX];
    float Dtrk1MassHypo[DZEROCOUNTMAX];
    float Dtrk1highPurity[DZEROCOUNTMAX];
    float Dtrk2Pt[DZEROCOUNTMAX];
+   float Dtrk2PtErr[DZEROCOUNTMAX];
    float Dtrk2Eta[DZEROCOUNTMAX];
    float Dtrk2dedx[DZEROCOUNTMAX];
    float Dtrk2MassHypo[DZEROCOUNTMAX];
-   float Dtrk2PtErr[DZEROCOUNTMAX];
    float Dtrk2highPurity[DZEROCOUNTMAX];
    float Dchi2cl[DZEROCOUNTMAX];
    float DsvpvDistance[DZEROCOUNTMAX];

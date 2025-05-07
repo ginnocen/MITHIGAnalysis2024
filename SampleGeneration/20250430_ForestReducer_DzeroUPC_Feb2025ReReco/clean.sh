@@ -1,5 +1,5 @@
-CMSFOLDER=/home/$USER/CMSSW_13_2_13/src
-CMSSUBMIT=/home/submit/$USER/CMSSW_13_2_13/src
+CMSFOLDER=/home/$USER/CMSSW_13_2_7/src
+CMSSUBMIT=/home/submit/$USER/CMSSW_13_2_7/src
 if [ -d $CMSSUBMIT ]; then
     CMSFOLDER=$CMSSUBMIT
 fi
@@ -19,7 +19,7 @@ rm -rf Output
 rm SkimReco.root
 rm list.txt
 rm -rf output
-rm *.txt*
+#rm *.txt*
 rm SkimReco.root
 rm .DS_Store
 
