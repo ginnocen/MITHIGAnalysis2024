@@ -72,8 +72,7 @@ int main(int argc, char *argv[]) {
   string ApplyDRejection = toLower(CL.Get("ApplyDRejection", "no"));
 
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
-  string DGenTreeName = CL.Get("DGenTree", "Dfinder/ntGen");
-  string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcdigi");
+  string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
@@ -99,16 +98,16 @@ int main(int argc, char *argv[]) {
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
 
-    HiEventTreeMessenger MEvent(InputFile);
-    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile);
-    GenParticleTreeMessenger MGen(InputFile);
-    PFTreeMessenger MPF(InputFile, PFTreeName);
-    SkimTreeMessenger MSkim(InputFile);
-    TriggerTreeMessenger MTrigger(InputFile);
-    DzeroTreeMessenger MDzero(InputFile);
-    DzeroGenTreeMessenger MDzeroGen(InputFile, DGenTreeName);
-    ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);
-    METFilterTreeMessenger MMETFilter(InputFile);
+    HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
+    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile); // ppTracks/trackTree
+    GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
+    PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
+    SkimTreeMessenger MSkim(InputFile); // skimanalysis/HltTree
+    TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
+    DzeroTreeMessenger MDzero(InputFile); // Dfinder/ntDkpi
+    DzeroGenTreeMessenger MDzeroGen(InputFile); // Dfinder/ntGen
+    ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
+    METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
     
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);

@@ -3,10 +3,10 @@ DATE=$(date +%Y%m%d)
 
 MAXCORES=40
 
-NAME="${DATE}_ForestDfinderData23LowPtSkim_NEWSkimConfig"
+NAME="${DATE}_Skim_2023Data_Feb2025ReReco"
 OUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/output_NEW"
 counter=0
-filelist="filelist_2023Data_Jan2024ReReco_HIForward0.txt"
+filelist="filelist_2023Data_Feb2025ReReco_HIForward0.txt"
 MERGEDOUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/$NAME.root"
 #MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT
