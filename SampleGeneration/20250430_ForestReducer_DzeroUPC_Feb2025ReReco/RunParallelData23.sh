@@ -1,11 +1,13 @@
 #!/bin/bash
+DATE=$(date +%Y%m%d)
+
 MAXCORES=40
 
-NAME="20241216_ForestDfinderData23LowPtSkim_v1"
-OUTPUT="output"
+NAME="${DATE}_ForestDfinderData23LowPtSkim_NEWSkimConfig"
+OUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/output_NEW"
 counter=0
-filelist="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/InputListForests/20241106_filelist_SkimOldReco23sample_DataAll.txt"
-MERGEDOUTPUT="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsData/$NAME.root"
+filelist="filelist_2023Data_Jan2024ReReco_HIForward0.txt"
+MERGEDOUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/$NAME.root"
 #MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT
 
@@ -36,11 +38,12 @@ while IFS= read -r file; do
             --ApplyTriggerRejection 2 \
             --ApplyEventRejection true \
             --ApplyZDCGapRejection true \
-            --ApplyDRejection 2 \
+            --ApplyDRejection or \
             --ZDCMinus1nThreshold 1000 \
             --ZDCPlus1nThreshold 1100 \
             --IsData true \
-            --PFTree particleFlowAnalyser/pftree &
+            --PFTree particleFlowAnalyser/pftree \
+            --HideProgressBar true &
  #           --DGenTree Dfinder/ntGen &
     ((counter++))
     wait_for_slot

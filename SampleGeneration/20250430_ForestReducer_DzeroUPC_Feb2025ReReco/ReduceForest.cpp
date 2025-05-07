@@ -110,9 +110,6 @@ int main(int argc, char *argv[]) {
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);
     METFilterTreeMessenger MMETFilter(InputFile);
     
-    if (!MDzero.Tree) continue;
-    if (!IsData && !MDzeroGen.Tree) continue;
-    
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);
     if (!HideProgressBar) {
@@ -273,7 +270,7 @@ int main(int argc, char *argv[]) {
         bool Ngamma_ = MDzeroUPC.ZDCNgamma && gapNgamma_;
         MDzeroUPC.Ngamma->push_back(Ngamma_);
       }
-      // cut on the loosest rapidity gap selection
+      /////// cut on the loosest rapidity gap selection
       if (ApplyZDCGapRejection && IsData && MDzeroUPC.gammaN_EThreshLoose() == false && MDzeroUPC.Ngamma_EThreshLoose() == false) continue;
 
       int nTrackInAcceptanceHP = 0;
@@ -318,11 +315,11 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.Dy->push_back(MDzero.Dy[iD]);
         MDzeroUPC.Dmass->push_back(MDzero.Dmass[iD]);
         MDzeroUPC.Dtrk1Pt->push_back(MDzero.Dtrk1Pt[iD]);
-        MDzeroUPC.Dtrk1Eta->push_back(MDzero.Dtrk1Eta[iD]);
+        if (MDzeroUPC.Dtrk1Eta != nullptr) MDzeroUPC.Dtrk1Eta->push_back(MDzero.Dtrk1Eta[iD]);
         if (MDzeroUPC.Dtrk1dedx != nullptr)MDzeroUPC.Dtrk1dedx->push_back(MDzero.Dtrk1dedx[iD]);
         if (MDzeroUPC.Dtrk1MassHypo != nullptr)MDzeroUPC.Dtrk1MassHypo->push_back(MDzero.Dtrk1MassHypo[iD]);
         MDzeroUPC.Dtrk2Pt->push_back(MDzero.Dtrk2Pt[iD]);
-        MDzeroUPC.Dtrk2Eta->push_back(MDzero.Dtrk2Eta[iD]);
+        if (MDzeroUPC.Dtrk2Eta != nullptr) MDzeroUPC.Dtrk2Eta->push_back(MDzero.Dtrk2Eta[iD]);
         if (MDzeroUPC.Dtrk2dedx != nullptr) MDzeroUPC.Dtrk2dedx->push_back(MDzero.Dtrk2dedx[iD]);
         if (MDzeroUPC.Dtrk2MassHypo != nullptr) MDzeroUPC.Dtrk2MassHypo->push_back(MDzero.Dtrk2MassHypo[iD]);
         MDzeroUPC.Dchi2cl->push_back(MDzero.Dchi2cl[iD]);
