@@ -4,15 +4,15 @@
 #include <iostream>
 #include <vector>
 
-#include "TTree.h"
 #include "TFile.h"
+#include "TTree.h"
 
 #define JETCOUNTMAX 500
 #define GENCOUNTMAX 250
 #define VERTEXCOUNTMAX 200
-#define DZEROCOUNTMAX 10000 //FIXME: to be fined tuned
+#define DZEROCOUNTMAX 20000 //FIXME: to be fined tuned
 #define DZEROGENCOUNTMAX 300 //FIXME: to be fined tuned
-#define TRACKCOUNTMAX 10000
+#define TRACKCOUNTMAX 20000
 #define PLANEMAX 200
 #define MUMAX 50
 
@@ -807,6 +807,11 @@ public:
    std::vector<bool> *DpassCut23PASSystDtrkPt;
    std::vector<bool> *DpassCut23PASSystDalpha;
    std::vector<bool> *DpassCut23PASSystDchi2cl;
+   std::vector<bool> *DpassCutDefault;
+   std::vector<bool> *DpassCutSystDsvpvSig;
+   std::vector<bool> *DpassCutSystDtrkPt;
+   std::vector<bool> *DpassCutSystDalpha;
+   std::vector<bool> *DpassCutSystDchi2cl;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;

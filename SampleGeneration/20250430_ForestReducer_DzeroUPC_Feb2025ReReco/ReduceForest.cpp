@@ -285,12 +285,17 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
       int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
-        bool DpassCut23PAS_           = DpassCut23PAS(MDzero, iD);
-        bool DpassCut23LowPt_         = DpassCut23LowPt(MDzero, iD);
-        bool DpassCut23PASSystDsvpvSig_  = DpassCut23PASSystDsvpvSig(MDzero, iD);
-        bool DpassCut23PASSystDtrkPt_    = DpassCut23PASSystDtrkPt(MDzero, iD);
-        bool DpassCut23PASSystDalpha_    = DpassCut23PASSystDalpha(MDzero, iD);
-        bool DpassCut23PASSystDchi2cl_   = DpassCut23PASSystDchi2cl(MDzero, iD);
+        bool DpassCut23PAS_             = DpassCut23PAS(MDzero, iD);
+        bool DpassCut23LowPt_           = DpassCut23LowPt(MDzero, iD);
+        bool DpassCut23PASSystDsvpvSig_ = DpassCut23PASSystDsvpvSig(MDzero, iD);
+        bool DpassCut23PASSystDtrkPt_   = DpassCut23PASSystDtrkPt(MDzero, iD);
+        bool DpassCut23PASSystDalpha_   = DpassCut23PASSystDalpha(MDzero, iD);
+        bool DpassCut23PASSystDchi2cl_  = DpassCut23PASSystDchi2cl(MDzero, iD);
+        bool DpassCutDefault_           = DpassCutDefault(MDzero, iD);
+        bool DpassCutSystDsvpvSig_      = DpassCutSystDsvpvSig(MDzero, iD);
+        bool DpassCutSystDtrkPt_        = DpassCutSystDtrkPt(MDzero, iD);
+        bool DpassCutSystDalpha_        = DpassCutSystDalpha(MDzero, iD);
+        bool DpassCutSystDchi2cl_       = DpassCutSystDchi2cl(MDzero, iD);
         if (IsData)
         {
           if (ApplyDRejection=="or")
@@ -300,7 +305,12 @@ int main(int argc, char *argv[]) {
                 !DpassCut23PASSystDsvpvSig_ &&
                 !DpassCut23PASSystDtrkPt_ &&
                 !DpassCut23PASSystDalpha_ &&
-                !DpassCut23PASSystDchi2cl_ ) continue;
+                !DpassCut23PASSystDchi2cl_ &&
+                !DpassCutDefault_ &&
+                !DpassCutSystDsvpvSig_ &&
+                !DpassCutSystDtrkPt_ &&
+                !DpassCutSystDalpha_ &&
+                !DpassCutSystDchi2cl_ ) continue;
           }
           else if (ApplyDRejection=="pas" && !DpassCut23PAS_) continue;
           else if (ApplyDRejection=="lowpt" && !DpassCut23LowPt_) continue;
@@ -326,8 +336,8 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DsvpvDisErr->push_back(MDzero.DsvpvDisErr[iD]);
         MDzeroUPC.DsvpvDistance_2D->push_back(MDzero.DsvpvDistance_2D[iD]);
         MDzeroUPC.DsvpvDisErr_2D->push_back(MDzero.DsvpvDisErr_2D[iD]);
-        if (MDzeroUPC.Dip3d != nullptr)MDzeroUPC.Dip3d->push_back(MDzero.Dip3d[iD]);
-        if (MDzeroUPC.Dip3derr != nullptr)MDzeroUPC.Dip3derr->push_back(MDzero.Dip3derr[iD]);
+        if (MDzeroUPC.Dip3d != nullptr) MDzeroUPC.Dip3d->push_back(MDzero.Dip3d[iD]);
+        if (MDzeroUPC.Dip3derr != nullptr) MDzeroUPC.Dip3derr->push_back(MDzero.Dip3derr[iD]);
         MDzeroUPC.Dalpha->push_back(MDzero.Dalpha[iD]);
         MDzeroUPC.Ddtheta->push_back(MDzero.Ddtheta[iD]);
         MDzeroUPC.DpassCut23PAS->push_back(DpassCut23PAS_);
@@ -336,6 +346,11 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DpassCut23PASSystDtrkPt->push_back(DpassCut23PASSystDtrkPt_);
         MDzeroUPC.DpassCut23PASSystDalpha->push_back(DpassCut23PASSystDalpha_);
         MDzeroUPC.DpassCut23PASSystDchi2cl->push_back(DpassCut23PASSystDchi2cl_);
+        if (MDzeroUPC.DpassCutDefault != nullptr) MDzeroUPC.DpassCutDefault->push_back(DpassCutDefault_);
+        if (MDzeroUPC.DpassCutSystDsvpvSig != nullptr) MDzeroUPC.DpassCutSystDsvpvSig->push_back(DpassCutSystDsvpvSig_);
+        if (MDzeroUPC.DpassCutSystDtrkPt != nullptr) MDzeroUPC.DpassCutSystDtrkPt->push_back(DpassCutSystDtrkPt_);
+        if (MDzeroUPC.DpassCutSystDalpha != nullptr) MDzeroUPC.DpassCutSystDalpha->push_back(DpassCutSystDalpha_);
+        if (MDzeroUPC.DpassCutSystDchi2cl != nullptr) MDzeroUPC.DpassCutSystDchi2cl->push_back(DpassCutSystDchi2cl_);
         if (IsData == false) {
           MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
           bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;
