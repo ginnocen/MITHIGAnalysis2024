@@ -4,15 +4,15 @@
 #include <iostream>
 #include <vector>
 
-#include "TTree.h"
 #include "TFile.h"
+#include "TTree.h"
 
 #define JETCOUNTMAX 500
 #define GENCOUNTMAX 250
 #define VERTEXCOUNTMAX 200
-#define DZEROCOUNTMAX 10000 //FIXME: to be fined tuned
+#define DZEROCOUNTMAX 20000 //FIXME: to be fined tuned
 #define DZEROGENCOUNTMAX 300 //FIXME: to be fined tuned
-#define TRACKCOUNTMAX 10000
+#define TRACKCOUNTMAX 20000
 #define PLANEMAX 200
 #define MUMAX 50
 
@@ -386,18 +386,24 @@ public:
    float Dy[DZEROCOUNTMAX];
    float Dmass[DZEROCOUNTMAX];
    float Dtrk1Pt[DZEROCOUNTMAX];
-   float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1PtErr[DZEROCOUNTMAX];
+   float Dtrk1Eta[DZEROCOUNTMAX];
+   float Dtrk1dedx[DZEROCOUNTMAX];
+   float Dtrk1MassHypo[DZEROCOUNTMAX];
    float Dtrk1highPurity[DZEROCOUNTMAX];
    float Dtrk2Pt[DZEROCOUNTMAX];
-   float Dtrk2Eta[DZEROCOUNTMAX];
    float Dtrk2PtErr[DZEROCOUNTMAX];
+   float Dtrk2Eta[DZEROCOUNTMAX];
+   float Dtrk2dedx[DZEROCOUNTMAX];
+   float Dtrk2MassHypo[DZEROCOUNTMAX];
    float Dtrk2highPurity[DZEROCOUNTMAX];
    float Dchi2cl[DZEROCOUNTMAX];
    float DsvpvDistance[DZEROCOUNTMAX];
    float DsvpvDisErr[DZEROCOUNTMAX];
    float DsvpvDistance_2D[DZEROCOUNTMAX];
    float DsvpvDisErr_2D[DZEROCOUNTMAX];
+   float Dip3d[DZEROCOUNTMAX];
+   float Dip3derr[DZEROCOUNTMAX];
    float Dalpha[DZEROCOUNTMAX];
    float Ddtheta[DZEROCOUNTMAX];
    int Dgen[DZEROCOUNTMAX];
@@ -779,12 +785,20 @@ public:
    std::vector<float> *Dy;
    std::vector<float> *Dmass;
    std::vector<float> *Dtrk1Pt;
+   std::vector<float> *Dtrk1Eta;
+   std::vector<float> *Dtrk1dedx;
+   std::vector<float> *Dtrk1MassHypo;
    std::vector<float> *Dtrk2Pt;
+   std::vector<float> *Dtrk2Eta;
+   std::vector<float> *Dtrk2dedx;
+   std::vector<float> *Dtrk2MassHypo;
    std::vector<float> *Dchi2cl;
    std::vector<float> *DsvpvDistance;
    std::vector<float> *DsvpvDisErr;
    std::vector<float> *DsvpvDistance_2D;
    std::vector<float> *DsvpvDisErr_2D;
+   std::vector<float> *Dip3d;
+   std::vector<float> *Dip3derr;
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
    std::vector<bool> *DpassCut23PAS;
@@ -793,6 +807,11 @@ public:
    std::vector<bool> *DpassCut23PASSystDtrkPt;
    std::vector<bool> *DpassCut23PASSystDalpha;
    std::vector<bool> *DpassCut23PASSystDchi2cl;
+   std::vector<bool> *DpassCutDefault;
+   std::vector<bool> *DpassCutSystDsvpvSig;
+   std::vector<bool> *DpassCutSystDtrkPt;
+   std::vector<bool> *DpassCutSystDalpha;
+   std::vector<bool> *DpassCutSystDchi2cl;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;
