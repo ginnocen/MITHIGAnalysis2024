@@ -2944,9 +2944,9 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
    Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
    Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
-   Tree->SetBranchAddress("Dtrk2Eta", &Dtrk1Eta);
-   Tree->SetBranchAddress("Dtrk2dedx", &Dtrk1dedx);
-   Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk1MassHypo);
+   Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
+   Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
+   Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
    Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
    Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
    Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
@@ -3086,10 +3086,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dtrk1Eta",              &Dtrk1Eta);
    Tree->Branch("Dtrk1dedx",             &Dtrk1dedx);
    Tree->Branch("Dtrk1MassHypo",         &Dtrk1MassHypo);
-   Tree->Branch("Dtrk2Pt",               &Dtrk1Pt);
-   Tree->Branch("Dtrk2Eta",              &Dtrk1Eta);
-   Tree->Branch("Dtrk2dedx",             &Dtrk1dedx);
-   Tree->Branch("Dtrk2MassHypo",         &Dtrk1MassHypo);
+   Tree->Branch("Dtrk2Pt",               &Dtrk2Pt);
+   Tree->Branch("Dtrk2Eta",              &Dtrk2Eta);
+   Tree->Branch("Dtrk2dedx",             &Dtrk2dedx);
+   Tree->Branch("Dtrk2MassHypo",         &Dtrk2MassHypo);
    Tree->Branch("Dchi2cl",               &Dchi2cl);
    Tree->Branch("DsvpvDistance",         &DsvpvDistance);
    Tree->Branch("DsvpvDisErr",           &DsvpvDisErr);

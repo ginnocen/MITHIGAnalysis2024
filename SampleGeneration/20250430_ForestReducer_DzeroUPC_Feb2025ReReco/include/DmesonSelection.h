@@ -212,35 +212,35 @@ bool DpassCutSystDchi2cl(DzeroTreeMessenger &MDzero, int iD) {
 // Selection settings used for HIN-25-002:
 // April 2024 PAS for Quark Matter 2025
 vector<vector<float>> Dchi2clCutValue_PAS = {
-    {0.1, 1,   2, 12,  -2, 2}
-  };
-  vector<vector<float>> DalphaCutValue_PAS = {
-    {0.2,  -1,  2,  5,  -2, -1},
-    {0.4,  -1,  2,  5,  -1,  1},
-    {0.2,  -1,  2,  5,   1,  2},
-    {0.25, -1,  5,  8,  -2, -1},
-    {0.35, -1,  5,  8,  -1,  1},
-    {0.25, -1,  5,  8,   1,  2},
-    {0.25, -1,  8, 12,  -2, -1},
-    {0.4,  -1,  8, 12,  -1,  1},
-    {0.25, -1,  8, 12,   1,  2}
-  };
-  vector<vector<float>> DdthetaCutValue_PAS = {
-    {0.3, -1,  2,  5, -2, -1},
-    {0.5, -1,  2,  5, -1,  1},
-    {0.3, -1,  2,  5,  1,  2},
-    {0.3, -1,  5, 12, -2,  2}
-  };
-  vector<vector<float>> DsvpvSigCutValue_PAS = {
-    {2.5, 1,  2,  5, -2, 2},
-    {3.5, 1,  5, 12, -2, 2}
-  };
-  vector<vector<float>> Dtrk1PtCutValue_PAS = {
-    {1.0, 1,  2, 12, -2, 2}
-  };
-  vector<vector<float>> Dtrk2PtCutValue_PAS = {
-    {1.0, 1,  2, 12, -2, 2}
-  };
+  {0.1, 1,   2, 12,  -2, 2}
+};
+vector<vector<float>> DalphaCutValue_PAS = {
+  {0.2,  -1,  2,  5,  -2, -1},
+  {0.4,  -1,  2,  5,  -1,  1},
+  {0.2,  -1,  2,  5,   1,  2},
+  {0.25, -1,  5,  8,  -2, -1},
+  {0.35, -1,  5,  8,  -1,  1},
+  {0.25, -1,  5,  8,   1,  2},
+  {0.25, -1,  8, 12,  -2, -1},
+  {0.4,  -1,  8, 12,  -1,  1},
+  {0.25, -1,  8, 12,   1,  2}
+};
+vector<vector<float>> DdthetaCutValue_PAS = {
+  {0.3, -1,  2,  5, -2, -1},
+  {0.5, -1,  2,  5, -1,  1},
+  {0.3, -1,  2,  5,  1,  2},
+  {0.3, -1,  5, 12, -2,  2}
+};
+vector<vector<float>> DsvpvSigCutValue_PAS = {
+  {2.5, 1,  2,  5, -2, 2},
+  {3.5, 1,  5, 12, -2, 2}
+};
+vector<vector<float>> Dtrk1PtCutValue_PAS = {
+  {1.0, 1,  2, 12, -2, 2}
+};
+vector<vector<float>> Dtrk2PtCutValue_PAS = {
+  {1.0, 1,  2, 12, -2, 2}
+};
   
 bool DpassCut23PAS(DzeroTreeMessenger &MDzero, int iD) {
   bool pass = DCutSelection(
