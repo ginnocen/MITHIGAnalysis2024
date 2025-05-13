@@ -390,10 +390,10 @@ int main(int argc, char *argv[]) {
             for (int isinglemu2 = isinglemu1 + 1; isinglemu2 < nSingleMu; isinglemu2++){
               if (isMuonSelected(&MSingleMu, isinglemu2) == false)
 		continue;
-              int charge1 = MSingleMu.SingleMuCharge->at(isinglemu1);
-              int charge2 = MSingleMu.SingleMuCharge->at(isinglemu2);
+              //int charge1 = MSingleMu.SingleMuCharge->at(isinglemu1);
+              //int charge2 = MSingleMu.SingleMuCharge->at(isinglemu2);
               //if (charge1 == charge2)
-		continue;
+		//continue;
               float jetEta = MJet.JetEta[ijet];
               float jetPhi = MJet.JetPhi[ijet];
               float muEta1 = MSingleMu.SingleMuEta->at(isinglemu1);
