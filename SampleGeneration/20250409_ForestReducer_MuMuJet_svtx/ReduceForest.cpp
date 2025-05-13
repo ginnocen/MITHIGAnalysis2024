@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   
   int Year = CL.GetInt("Year", 2018);
   double Fraction = CL.GetDouble("Fraction", 1.00);
-  double MinJetPT = CL.GetDouble("MinJetPT", 80);
+  double MinJetPT = CL.GetDouble("MinJetPT", 40);
   string PFJetCollection = CL.Get("PFJetCollection", "akCs3PFJetAnalyzer/t");
   string PFTreeName = IsPP ? "pfcandAnalyzer/pfTree" : "particleFlowAnalyser/pftree";
   PFTreeName = CL.Get("PFTree", PFTreeName);
@@ -392,7 +392,7 @@ int main(int argc, char *argv[]) {
 		continue;
               int charge1 = MSingleMu.SingleMuCharge->at(isinglemu1);
               int charge2 = MSingleMu.SingleMuCharge->at(isinglemu2);
-              if (charge1 == charge2)
+              //if (charge1 == charge2)
 		continue;
               float jetEta = MJet.JetEta[ijet];
               float jetPhi = MJet.JetPhi[ijet];
