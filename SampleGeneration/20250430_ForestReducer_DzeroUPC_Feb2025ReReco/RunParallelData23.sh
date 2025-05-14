@@ -1,7 +1,7 @@
 #!/bin/bash
 DATE=$(date +%Y%m%d)
 
-MAXCORES=60
+MAXCORES=40
 
 NAME="${DATE}_Skim_2023Data_Feb2025ReReco"
 OUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/output"
