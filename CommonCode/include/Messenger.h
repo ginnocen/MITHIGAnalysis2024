@@ -631,7 +631,16 @@ public:
    std::vector<float> *zErrVtx;
    std::vector<float> *trkPt;
    std::vector<float> *trkEta;
+   std::vector<float> *trkPhi;
    std::vector<float> *highPurity;
+   std::vector<float> *trkNormChi2;
+   std::vector<char>  *trkNLayers;
+   std::vector<float> *trkDzFirstVtx;
+   std::vector<float> *trkDzErrFirstVtx; 
+   std::vector<float> *trkDxyFirstVtx;
+   std::vector<float> *trkDxyErrFirstVtx;
+   std::vector<char>  *trkNHits;
+   std::vector<float> *trkPtError;
 
 public:
    PbPbUPCTrackTreeMessenger(TFile &File, std::string TreeName = "ppTracks/trackTree");
@@ -664,7 +673,7 @@ public:
    int Run;
    long long Event;
    int Lumi;
-   
+
    int hiBin;
    int hiBinUp;
    int hiBinDown;
@@ -684,9 +693,9 @@ public:
    float ExtraZWeight[12];
 
    int NVertex;
-   float VX, VY, VZ, VXError, VYError, VZError; 
+   float VX, VY, VZ, VXError, VYError, VZError;
    int NPU;
-   
+
    std::vector<float> *zMass;
    std::vector<float> *zEta;
    std::vector<float> *zY;
@@ -708,7 +717,7 @@ public:
    std::vector<float> *trackResidualWeight;
    std::vector<int> *trackCharge;
    std::vector<int> *subevent;
-   
+
    std::vector<float> *muEta1;
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
@@ -741,7 +750,7 @@ private:
    bool WriteMode;
    bool Initialized;
 
-public:   
+public:
    ZHadronMessenger(TFile &File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TFile *File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TTree *ZHadronTree = nullptr, bool SkipTrack = false);
@@ -885,7 +894,10 @@ public:
    bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
 
    //charged hadron info
-   int Nch; 
+   int Nch;
+   std::vector<float> *trkPt;
+   std::vector<float> *trkEta;
+   std::vector<float> *trkPhi;
 
    //D reco quantities
    int Dsize;
