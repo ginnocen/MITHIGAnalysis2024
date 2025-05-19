@@ -3289,6 +3289,166 @@ bool DzeroUPCTreeMessenger::FillEntry()
    return true;
 }
 
+
+// ChargedHadronRAATreeMessenger
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize(Debug);
+}
+
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize(Debug);
+}
+
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Initialize(ChargedHadRAATree, Debug);
+}
+
+ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
+{
+   if(Initialized == true && WriteMode == true)
+   {
+   }
+}
+
+bool ChargedHadronRAATreeMessenger::Initialize(TTree *ChargedHadRAATree, bool Debug)
+{
+   Tree = ChargedHadRAATree;
+   return Initialize(Debug);
+}
+
+bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Initialized = true;
+
+   Tree->SetBranchAddress("Run", &Run);
+   Tree->SetBranchAddress("Event", &Event);
+   Tree->SetBranchAddress("Lumi", &Lumi);
+   Tree->SetBranchAddress("VX", &VX);
+   Tree->SetBranchAddress("VY", &VY);
+   Tree->SetBranchAddress("VZ", &VZ);
+   Tree->SetBranchAddress("VXError", &VXError);
+   Tree->SetBranchAddress("VYError", &VYError);
+   Tree->SetBranchAddress("VZError", &VZError);
+   Tree->SetBranchAddress("nVtx", &nVtx);
+   Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
+   Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
+   return true;
+}
+
+int ChargedHadronRAATreeMessenger::GetEntries()
+{
+   if(Tree == nullptr)
+      return 0;
+   return Tree->GetEntries();
+}
+
+bool ChargedHadronRAATreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
+bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
+{
+   if(T == nullptr)
+      return false;
+
+   Initialized = true;
+   WriteMode = true;
+
+
+   Tree = T;
+
+   Tree->Branch("Run",                   &Run, "Run/I");
+   Tree->Branch("Event",                 &Event, "Event/L");
+   Tree->Branch("Lumi",                  &Lumi, "Lumi/I");
+   Tree->Branch("VX",                    &VX, "VX/F");
+   Tree->Branch("VY",                    &VY, "VY/F");
+   Tree->Branch("VZ",                    &VZ, "VZ/F");
+   Tree->Branch("VXError",               &VXError, "VXError/F");
+   Tree->Branch("VYError",               &VYError, "VYError/F");
+   Tree->Branch("VZError",               &VZError, "VZError/F");
+   Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
+   Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
+   Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
+   return true;
+}
+
+void ChargedHadronRAATreeMessenger::Clear()
+{
+   if(Initialized == false)
+      return;
+
+   Run = -999;
+   Event = -999;
+   Lumi = -999;
+   VX = 0.;
+   VY = 0.;
+   VZ = 0.;
+   VXError = 0.;
+   VYError = 0.;
+   VZError = 0.;
+   nVtx = 0;
+   HFEMaxPlus = 9999.;
+   HFEMaxMinus = 9999.;
+}
+
+void ChargedHadronRAATreeMessenger::CopyNonTrack(ChargedHadronRAATreeMessenger &M)
+{
+   Run                  = M.Run;
+   Event                = M.Event;
+   Lumi                 = M.Lumi;
+   VX                   = M.VX;
+   VY                   = M.VY;
+   VZ                   = M.VZ;
+   VXError              = M.VXError;
+   VYError              = M.VYError;
+   VZError              = M.VZError;
+   nVtx                 = M.nVtx;
+   HFEMaxPlus           = M.HFEMaxPlus;
+   HFEMaxMinus          = M.HFEMaxMinus;
+}
+
+bool ChargedHadronRAATreeMessenger::FillEntry()
+{
+   if(Initialized == false)
+      return false;
+   if(WriteMode == false)
+      return false;
+
+   if(Tree == nullptr)
+      return false;
+
+   Tree->Fill();
+   Clear();
+
+   return true;
+}
+
+
 DzeroJetUPCTreeMessenger::DzeroJetUPCTreeMessenger(TFile &File, std::string TreeName, bool Debug)
 {
    Initialized = false;

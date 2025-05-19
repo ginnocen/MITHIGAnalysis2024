@@ -35,6 +35,7 @@ class ZDCTreeMessenger;
 class DzeroTreeMessenger;
 class DzeroGenTreeMessenger;
 class HiEventTreeMessenger
+
 {
 public:
    TTree *Tree;
@@ -871,6 +872,42 @@ public:
    bool Ngamma_EThreshSyst5p5() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(1); }
    bool Ngamma_EThreshSyst15()  { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(7); }
    bool Ngamma_EThreshCustom(float threshold)  { return ( this->ZDCNgamma && this->HFEMaxMinus <= threshold ); }
+
+};
+
+
+class ChargedHadronRAATreeMessenger
+{
+public:
+   TTree *Tree;
+   int Run;
+   long long Event;
+   int Lumi;
+   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
+   int nVtx;
+   float HFEMaxPlus;
+   float HFEMaxMinus;
+
+public:   // Derived quantities
+   //bool GoodPhotonuclear; //FIXME: currently not implemented
+
+private:
+   bool WriteMode;
+   bool Initialized;
+
+public:
+   ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree = nullptr, bool Debug = false);
+   ~ChargedHadronRAATreeMessenger();
+   bool Initialize(TTree *ChargedHadRAATree, bool Debug = false);
+   bool Initialize(bool Debug = false);
+   int GetEntries();
+   bool GetEntry(int iEntry);
+   bool SetBranch(TTree *T);
+   void Clear();
+   void CopyNonTrack(ChargedHadronRAATreeMessenger &M);
+   bool FillEntry();
 
 };
 
