@@ -3324,6 +3324,8 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
 {
    if(Initialized == true && WriteMode == true)
    {
+   delete trackPt;
+   delete trackEta;
    }
 }
 
@@ -3339,6 +3341,8 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
       return false;
 
    Initialized = true;
+   trackPt = nullptr;
+   trackEta = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -3352,6 +3356,10 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
+
+   Tree->SetBranchAddress("trackPt", &trackPt);
+   Tree->SetBranchAddress("trackEta", &trackEta);
+
    return true;
 }
 
@@ -3379,6 +3387,8 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Initialized = true;
    WriteMode = true;
 
+   trackPt = new std::vector<float>();
+   trackEta = new std::vector<float>();
 
    Tree = T;
 
@@ -3394,6 +3404,9 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
    Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
+   Tree->Branch("trackPt",               &trackPt);
+   Tree->Branch("trackEta",              &trackEta);
+
    return true;
 }
 
@@ -3414,6 +3427,9 @@ void ChargedHadronRAATreeMessenger::Clear()
    nVtx = 0;
    HFEMaxPlus = 9999.;
    HFEMaxMinus = 9999.;
+
+   trackPt->clear();
+   trackEta->clear();
 }
 
 void ChargedHadronRAATreeMessenger::CopyNonTrack(ChargedHadronRAATreeMessenger &M)

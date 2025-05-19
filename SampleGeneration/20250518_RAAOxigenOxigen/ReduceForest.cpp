@@ -1,12 +1,6 @@
-// ===================================================
-// Script Based on Yi Chen Reducer script
-// Yi Chen (Vanderbilt) Yi.Chen@cern.ch
-// https://github.com/FHead/PhysicsZHadronEEC
-// ===================================================
-
+#include <algorithm>
 #include <iostream>
 #include <set>
-#include <algorithm>
 using namespace std;
 
 #include "TFile.h"
@@ -24,15 +18,15 @@ using namespace std;
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
 
-bool logical_or_vectBool(std::vector<bool>* vec) {
-    return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
+bool logical_or_vectBool(std::vector<bool> *vec) {
+  return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
 }
 
 // Helper function to convert a string to lowercase
-std::string toLower(const std::string& str) {
-    std::string lowerStr = str;
-    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
-    return lowerStr;
+std::string toLower(const std::string &str) {
+  std::string lowerStr = str;
+  std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
+  return lowerStr;
 }
 
 int main(int argc, char *argv[]);
@@ -45,18 +39,19 @@ int main(int argc, char *argv[]) {
   vector<string> InputFileNames = CL.GetStringVector("Input");
   string OutputFileName = CL.Get("Output");
 
-  // bool DoGenLevel                    = CL.GetBool("DoGenLevel", true);
+  bool DoGenLevel = CL.GetBool("DoGenLevel", false);
   bool IsData = CL.GetBool("IsData", false);
-  int Year = CL.GetInt("Year", 2023);
+  int Year = CL.GetInt("Year", 2025);
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
-  //bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
-  
+  // bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
+
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
+
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
@@ -66,15 +61,15 @@ int main(int argc, char *argv[]) {
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
 
-    HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
-    PbPbUPCTrackTreeMessenger MTrack(InputFile); // HiTrackAna/trackTree
-    GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
-    PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
-    SkimTreeMessenger MSkim(InputFile); // skimanalysis/HltTree
-    //TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
-    //ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
-    //METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
-    
+    HiEventTreeMessenger MEvent(InputFile);                            // hiEvtAnalyzer/HiTree
+    PbPbUPCTrackTreeMessenger MTrack(InputFile, "ppTracks/trackTree"); // PbPbTracks/trackTree
+    GenParticleTreeMessenger MGen(InputFile);                          // HiGenParticleAna/hi
+    PFTreeMessenger MPF(InputFile, PFTreeName);                        // particleFlowAnalyser/pftree
+    SkimTreeMessenger MSkim(InputFile);                                // skimanalysis/HltTree
+    // TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
+    // ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
+    // METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
+
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);
     if (!HideProgressBar) {
@@ -86,9 +81,7 @@ int main(int argc, char *argv[]) {
     /////////////////////////////////
 
     for (int iE = 0; iE < EntryCount; iE++) {
-      if (!HideProgressBar &&
-        (EntryCount < 300 || (iE % (EntryCount / 250)) == 0)
-      ) {
+      if (!HideProgressBar && (EntryCount < 300 || (iE % (EntryCount / 250)) == 0)) {
         Bar.Update(iE);
         Bar.Print();
       }
@@ -98,9 +91,9 @@ int main(int argc, char *argv[]) {
       MTrack.GetEntry(iE);
       MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
-      //MTrigger.GetEntry(iE);
-      //MZDC.GetEntry(iE);
-      //MMETFilter.GetEntry(iE);
+      // MTrigger.GetEntry(iE);
+      // MZDC.GetEntry(iE);
+      // MMETFilter.GetEntry(iE);
 
       ////////////////////////////////////////
       ////////// Global event stuff //////////
@@ -115,7 +108,7 @@ int main(int argc, char *argv[]) {
       ////////////////////////////
 
       int BestVertex = -1;
-
+      std::cout << "nVtx = " << MTrack.nVtx << std::endl;
       for (int i = 0; i < MTrack.nVtx; i++) {
         if (BestVertex < 0 || MTrack.ptSumVtx->at(i) > MTrack.ptSumVtx->at(BestVertex))
           BestVertex = i;
@@ -129,46 +122,19 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.VZError = MTrack.zErrVtx->at(BestVertex);
       }
       MChargedHadronRAA.nVtx = MTrack.nVtx;
-      std::cout << "nVtx = " << MChargedHadronRAA.nVtx << std::endl;
       /////////////////////////////////////
       ////////// Event selection //////////
       /////////////////////////////////////
-      /*
+
       if (IsData == true) {
-          if (Year == 2023) {
-          int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000");
-          int HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000");
-          int HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400");
-          int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
-          bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_2023 == 1 ||
-                           HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023 == 1;
-          bool isL1ZDCXORJet8 = HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 == 1 ||
-                                HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 == 1;
-          MChargedHadronRAA.isL1ZDCOr = isL1ZDCOr;
-          MChargedHadronRAA.isL1ZDCXORJet8 = isL1ZDCXORJet8;
-          MChargedHadronRAA.isL1ZDCXORJet12 = false;
-          MChargedHadronRAA.isL1ZDCXORJet16 = false;
-          if (ApplyTriggerRejection == 1 && IsData && (isL1ZDCOr == false && isL1ZDCXORJet8 == false)) continue;
-          if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
-        }
-        else if (Year == 2024){
-          int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
-          int HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
-          int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000");
-          bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 == 1 || HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 == 1;
-          MChargedHadronRAA.isL1ZDCOr = isL1ZDCOr;
-          MChargedHadronRAA.isL1ZDCXORJet8 = false;
-          MChargedHadronRAA.isL1ZDCXORJet12 = false;
-          MChargedHadronRAA.isL1ZDCXORJet16 = false;
-          if (ApplyTriggerRejection == 1 && IsData) std::cout << "Trigger rejection ZDCOR || ZDCXORJet8 not implemented for 2024" << std::endl;
-          if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
+        if (Year == 2025) {
+          std::cout << "Year 2025" << std::endl;
+          // int HLT_HIZB_ = MTrigger.CheckTriggerStartWith("HLT_HIZB");
+          // MChargedHadronRAA.isHLT_HIZB = HLT_HIZB_;
+          // if (ApplyTriggerRejection == 1 && IsData && (HLT_HIZB_ == false)) continue;
+          // if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
         }
       }
-      */
       /*
       if (IsData == true) {
         //MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
@@ -220,17 +186,26 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.Ngamma->push_back(Ngamma_);
       }
       /////// cut on the loosest rapidity gap selection
-      if (ApplyZDCGapRejection && IsData && MChargedHadronRAA.gammaN_EThreshLoose() == false && MChargedHadronRAA.Ngamma_EThreshLoose() == false) continue;
+      if (ApplyZDCGapRejection && IsData && MChargedHadronRAA.gammaN_EThreshLoose() == false &&
+      MChargedHadronRAA.Ngamma_EThreshLoose() == false) continue;
       */
-      int nTrackInAcceptanceHP = 0;
-      for (int iTrack = 0; iTrack < MTrack.nTrk; iTrack++) {
-        if (MTrack.trkPt->at(iTrack) <= 0.5)
-          continue;
-        if (fabs(MTrack.trkEta->at(iTrack)) >= 2.4)
-          continue;
-        if (MTrack.highPurity->at(iTrack) == false)
-          continue;
-        nTrackInAcceptanceHP++;
+      int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
+      for (int iTrack = 0; iTrack < NTrack; iTrack++) {
+        if (DoGenLevel == true) {
+          if (MGen.DaughterCount->at(iTrack) > 0)
+            continue;
+          if (MGen.Charge->at(iTrack) == 0)
+            continue;
+        }
+        if (DoGenLevel == false) {
+          if (MTrack.highPurity->at(iTrack) == false)
+            continue;
+        }
+
+        double trackEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
+        double trackPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
+        MChargedHadronRAA.trackEta->push_back(trackEta);
+        MChargedHadronRAA.trackPt->push_back(trackPt);
       }
       MChargedHadronRAA.FillEntry();
     }
@@ -270,4 +245,3 @@ double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.
   }
   return EMax;
 }
-

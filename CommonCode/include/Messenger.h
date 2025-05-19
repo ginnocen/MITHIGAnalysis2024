@@ -888,6 +888,9 @@ public:
    float HFEMaxPlus;
    float HFEMaxMinus;
 
+   std::vector<float> *trackPt;
+   std::vector<float> *trackEta;
+
 public:   // Derived quantities
    //bool GoodPhotonuclear; //FIXME: currently not implemented
 
