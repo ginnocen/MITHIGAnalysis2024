@@ -35,7 +35,6 @@ class ZDCTreeMessenger;
 class DzeroTreeMessenger;
 class DzeroGenTreeMessenger;
 class HiEventTreeMessenger
-
 {
 public:
    TTree *Tree;
