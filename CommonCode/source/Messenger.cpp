@@ -3995,6 +3995,8 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete muEta2;
       delete muPhi1;
       delete muPhi2;
+      delete muCharge1;
+      delete muCharge2;
       delete muDiDxy1;
       delete muDiDxy1Err;
       delete muDiDxy2;
@@ -4082,6 +4084,8 @@ bool MuMuJetMessenger::Initialize()
    muEta2 = nullptr;
    muPhi1 = nullptr;
    muPhi2 = nullptr;
+   muCharge1 = nullptr;
+   muCharge2 = nullptr;
    muDiDxy1 = nullptr;
    muDiDxy1Err = nullptr;
    muDiDxy2 = nullptr;
@@ -4170,6 +4174,8 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("muEta2", &muEta2);
    Tree->SetBranchAddress("muPhi1", &muPhi1);
    Tree->SetBranchAddress("muPhi2", &muPhi2);
+   Tree->SetBranchAddress("muCharge1", &muCharge1);
+   Tree->SetBranchAddress("muCharge2", &muCharge2);
    Tree->SetBranchAddress("muDiDxy1", &muDiDxy1);
    Tree->SetBranchAddress("muDiDxy1Err", &muDiDxy1Err);
    Tree->SetBranchAddress("muDiDxy2", &muDiDxy2);
@@ -4270,6 +4276,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    muEta2 = new std::vector<float>();
    muPhi1 = new std::vector<float>();
    muPhi2 = new std::vector<float>();
+   muCharge1 = new std::vector<float>();
+   muCharge2 = new std::vector<float>();
    muDiDxy1 = new std::vector<float>();
    muDiDxy1Err = new std::vector<float>();
    muDiDxy2 = new std::vector<float>();
@@ -4362,6 +4370,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("muEta2", &muEta2);
    Tree->Branch("muPhi1", &muPhi1);
    Tree->Branch("muPhi2", &muPhi2);
+   Tree->Branch("muCharge1", &muCharge1);
+   Tree->Branch("muCharge2", &muCharge2);
    Tree->Branch("muDiDxy1", &muDiDxy1);
    Tree->Branch("muDiDxy1Err", &muDiDxy1Err);
    Tree->Branch("muDiDxy2", &muDiDxy2);
@@ -4465,6 +4475,8 @@ void MuMuJetMessenger::Clear()
    muEta2->clear();
    muPhi1->clear();
    muPhi2->clear();
+   muCharge1->clear();
+   muCharge2->clear();
    muDiDxy1->clear();
    muDiDxy1Err->clear();
    muDiDxy2->clear();
@@ -4562,6 +4574,8 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(muEta2 != nullptr && M.muEta2 != nullptr)   *muEta2 = *(M.muEta2);
    if(muPhi1 != nullptr && M.muPhi1 != nullptr)   *muPhi1 = *(M.muPhi1);
    if(muPhi2 != nullptr && M.muPhi2 != nullptr)   *muPhi2 = *(M.muPhi2);
+   if(muCharge1 != nullptr && M.muCharge1 != nullptr)   *muCharge1 = *(M.muCharge1);
+   if(muCharge2 != nullptr && M.muCharge2 != nullptr)   *muCharge2 = *(M.muCharge2);
    if(muDiDxy1 != nullptr && M.muDiDxy1 != nullptr)   *muDiDxy1 = *(M.muDiDxy1);
    if(muDiDxy1Err != nullptr && M.muDiDxy1Err != nullptr)   *muDiDxy1Err = *(M.muDiDxy1Err);
    if(muDiDxy2 != nullptr && M.muDiDxy2 != nullptr)   *muDiDxy2 = *(M.muDiDxy2);
