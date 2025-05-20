@@ -66,6 +66,7 @@ int main(int argc, char *argv[]) {
     GenParticleTreeMessenger MGen(InputFile);                          // HiGenParticleAna/hi
     PFTreeMessenger MPF(InputFile, PFTreeName);                        // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile);                                // skimanalysis/HltTree
+    HFAdcMessenger MHFAdc(InputFile);                                  // HFAdcana/adc
     // TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
     // ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     // METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
@@ -91,6 +92,7 @@ int main(int argc, char *argv[]) {
       MTrack.GetEntry(iE);
       MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
+      MHFAdc.GetEntry(iE);
       // MTrigger.GetEntry(iE);
       // MZDC.GetEntry(iE);
       // MMETFilter.GetEntry(iE);
@@ -102,7 +104,7 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.Run = MEvent.Run;
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;
-
+      MChargedHadronRAA.hiBin = MEvent.hiBin;
       ////////////////////////////
       ////////// Vertex //////////
       ////////////////////////////
@@ -136,12 +138,16 @@ int main(int argc, char *argv[]) {
           // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
           MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
           MChargedHadronRAA.PVFilter = MSkim.PVFilter;
+          MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
+          MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
         }
       } else { // if (IsData == false)
                // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
                // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
         MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
         MChargedHadronRAA.PVFilter = MSkim.PVFilter;
+        MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
+        MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
       } // end of if (IsData == false)
 
       // Loop through the specified ranges for gapgammaN and gapNgamma
@@ -187,10 +193,10 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        double trackEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
-        double trackPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
-        MChargedHadronRAA.trackEta->push_back(trackEta);
-        MChargedHadronRAA.trackPt->push_back(trackPt);
+        double trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
+        double trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
+        MChargedHadronRAA.trkEta->push_back(trkEta);
+        MChargedHadronRAA.trkPt->push_back(trkPt);
       }
       MChargedHadronRAA.FillEntry();
     }

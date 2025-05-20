@@ -2216,6 +2216,53 @@ bool ZDCTreeMessenger::GetEntry(int iEntry)
    return true;
 }
 
+HFAdcMessenger::HFAdcMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+HFAdcMessenger::HFAdcMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+HFAdcMessenger::HFAdcMessenger(TTree *HFAdcTree)
+{
+   Initialize(HFAdcTree);
+}
+
+bool HFAdcMessenger::Initialize(TTree *HFAdcTree)
+{
+   Tree = HFAdcTree;
+   return Initialize();
+}
+
+bool HFAdcMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+   mMaxL1HFAdcPlus = 0;
+   mMaxL1HFAdcMinus = 0;
+   Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
+   Tree->SetBranchAddress("mMaxL1HFAdcMinus", &mMaxL1HFAdcMinus);
+
+   return true;
+}
+
+bool HFAdcMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
 ZHadronMessenger::ZHadronMessenger(TFile &File, std::string TreeName, bool SkipTrack)
 {
    Initialized = false;
@@ -3324,8 +3371,8 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
 {
    if(Initialized == true && WriteMode == true)
    {
-   delete trackPt;
-   delete trackEta;
+   delete trkPt;
+   delete trkEta;
    }
 }
 
@@ -3341,12 +3388,13 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
       return false;
 
    Initialized = true;
-   trackPt = nullptr;
-   trackEta = nullptr;
+   trkPt = nullptr;
+   trkEta = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
    Tree->SetBranchAddress("Lumi", &Lumi);
+   Tree->SetBranchAddress("hiBin", &hiBin);
    Tree->SetBranchAddress("VX", &VX);
    Tree->SetBranchAddress("VY", &VY);
    Tree->SetBranchAddress("VZ", &VZ);
@@ -3358,9 +3406,11 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
    Tree->SetBranchAddress("PVFilter", &PVFilter);
    Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
+   Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
+   Tree->SetBranchAddress("mMaxL1HFAdcMinus", &mMaxL1HFAdcMinus);
 
-   Tree->SetBranchAddress("trackPt", &trackPt);
-   Tree->SetBranchAddress("trackEta", &trackEta);
+   Tree->SetBranchAddress("trkPt", &trkPt);
+   Tree->SetBranchAddress("trkEta", &trkEta);
 
    return true;
 }
@@ -3389,14 +3439,15 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Initialized = true;
    WriteMode = true;
 
-   trackPt = new std::vector<float>();
-   trackEta = new std::vector<float>();
+   trkPt = new std::vector<float>();
+   trkEta = new std::vector<float>();
 
    Tree = T;
 
    Tree->Branch("Run",                   &Run, "Run/I");
    Tree->Branch("Event",                 &Event, "Event/L");
    Tree->Branch("Lumi",                  &Lumi, "Lumi/I");
+   Tree->Branch("hiBin",                 &hiBin, "hiBin/I");
    Tree->Branch("VX",                    &VX, "VX/F");
    Tree->Branch("VY",                    &VY, "VY/F");
    Tree->Branch("VZ",                    &VZ, "VZ/F");
@@ -3408,9 +3459,11 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
    Tree->Branch("PVFilter",              &PVFilter, "PVFilter/I");
    Tree->Branch("ClusterCompatibilityFilter", &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/I");
+   Tree->Branch("mMaxL1HFAdcPlus",     &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
+   Tree->Branch("mMaxL1HFAdcMinus",    &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
 
-   Tree->Branch("trackPt",               &trackPt);
-   Tree->Branch("trackEta",              &trackEta);
+   Tree->Branch("trkPt",               &trkPt);
+   Tree->Branch("trkEta",              &trkEta);
 
    return true;
 }
@@ -3423,6 +3476,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    Run = -999;
    Event = -999;
    Lumi = -999;
+   hiBin = -999;
    VX = 0.;
    VY = 0.;
    VZ = 0.;
@@ -3433,8 +3487,8 @@ void ChargedHadronRAATreeMessenger::Clear()
    HFEMaxPlus = 9999.;
    HFEMaxMinus = 9999.;
 
-   trackPt->clear();
-   trackEta->clear();
+   trkPt->clear();
+   trkEta->clear();
 }
 /*
 void ChargedHadronRAATreeMessenger::CopyNonTrack(ChargedHadronRAATreeMessenger &M)

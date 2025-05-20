@@ -32,6 +32,7 @@ class SingleMuTreeMessenger;
 class PbPbTrackTreeMessenger;
 class PbPbUPCTrackTreeMessenger;
 class ZDCTreeMessenger;
+class HFAdcMessenger;
 class DzeroTreeMessenger;
 class DzeroGenTreeMessenger;
 class HiEventTreeMessenger
@@ -657,6 +658,21 @@ public:
    bool GetEntry(int iEntry);
 };
 
+class HFAdcMessenger
+{
+public:
+   TTree *Tree;
+   int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
+
+public:
+   HFAdcMessenger(TFile &File, std::string TreeName = "HFAdcana/adc");
+   HFAdcMessenger(TFile *File, std::string TreeName = "HFAdcana/adc");
+   HFAdcMessenger(TTree *HFAdcTree);
+   bool Initialize(TTree *HFAdcTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+};
+
 class ZHadronMessenger
 {
 public:
@@ -882,15 +898,17 @@ public:
    int Run;
    long long Event;
    int Lumi;
+   int hiBin;
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    int nVtx;
    float HFEMaxPlus;
    float HFEMaxMinus;
    int ClusterCompatibilityFilter;
    int PVFilter;
+   int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
 
-   std::vector<float> *trackPt;
-   std::vector<float> *trackEta;
+   std::vector<float> *trkPt;
+   std::vector<float> *trkEta;
 
 public:   // Derived quantities
    //bool GoodPhotonuclear; //FIXME: currently not implemented
