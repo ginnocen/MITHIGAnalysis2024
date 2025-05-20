@@ -1,38 +1,48 @@
+USEONMITHI03=false
 CMSFOLDER=/home/$USER/CMSSW_13_2_4/src
 CMSSUBMIT=/home/submit/$USER/CMSSW_14_1_7/src
-if [ -d $CMSSUBMIT ]; then
+export PATHSAMPLE="data00/OOsamples"
+
+if [ -d "$CMSSUBMIT" ]; then
     CMSFOLDER=$CMSSUBMIT
 fi
+
 CURRENTFOLDER=$(pwd)
-if [ ! -d $CMSFOLDER ]; then
-    echo "You need to define the folder where the CMSSW environment is located"
-    kill -INT $$
-else
-    echo "CMSSW environment is located at $CMSFOLDER"
+
+if [ "$USEONMITHI03" = true ]; then
+    if [ ! -d "$CMSFOLDER" ]; then
+        echo "You need to define the folder where the CMSSW environment is located"
+        kill -INT $$
+    else
+        echo "CMSSW environment is located at $CMSFOLDER"
+    fi
 fi
 
-rm Execute
+rm -f Execute
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
-rm MergedOutput.root
+rm -f MergedOutput.root
 rm -rf Output
-rm SkimReco.root
-rm list.txt
+rm -f skim_*.root
+rm -f list.txt
 rm -rf output
-#rm *.txt*
-rm SkimReco.root
-rm .DS_Store
+#rm *.txt*  # You may want to uncomment this or handle separately
+rm -f SkimReco.root
+rm -f .DS_Store
 
-cd $CMSFOLDER
-cmsenv
+if [ "$USEONMITHI03" = true ]; then
+    cd "$CMSFOLDER"
+    cmsenv
+    echo "CMSSW environment is set up"
+fi
 
 cd -
-echo "CMSSW environment is set up"
+
 cd ../../
 source SetupAnalysis.sh
 cd CommonCode/
 make
 cd ..
-cd $CURRENTFOLDER
+cd "$CURRENTFOLDER"
 make
-rm Skim*.root
+rm -f skim_*.root

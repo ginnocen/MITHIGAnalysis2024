@@ -108,7 +108,6 @@ int main(int argc, char *argv[]) {
       ////////////////////////////
 
       int BestVertex = -1;
-      std::cout << "nVtx = " << MTrack.nVtx << std::endl;
       for (int i = 0; i < MTrack.nVtx; i++) {
         if (BestVertex < 0 || MTrack.ptSumVtx->at(i) > MTrack.ptSumVtx->at(BestVertex))
           BestVertex = i;
@@ -164,7 +163,6 @@ int main(int argc, char *argv[]) {
       float EMaxHFMinus = GetMaxEnergyHF(&MPF, -5.2, -3.);
       MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus;
       MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus;
-      std::cout << "EMaxHFPlus = " << EMaxHFPlus << std::endl;
       /*
       bool gapgammaN = EMaxHFPlus < 9.2;
       bool gapNgamma = EMaxHFMinus < 8.6;
