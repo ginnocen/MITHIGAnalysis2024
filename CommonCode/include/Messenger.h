@@ -16,7 +16,6 @@
 #define PLANEMAX 200
 #define MUMAX 50
 
-class HiEventTreeMessenger;
 class METFilterTreeMessenger;
 class GGTreeMessenger;
 class RhoTreeMessenger;
@@ -56,6 +55,9 @@ public:
    float hiHFminusEta4;
    int hiNevtPlane;
    float hiEvtPlanes[PLANEMAX];
+   float hiHF_pf;
+   float Ncoll;
+   float Npart;
 public:
    HiEventTreeMessenger(TFile &File);
    HiEventTreeMessenger(TFile *File);
@@ -906,6 +908,9 @@ public:
    int ClusterCompatibilityFilter;
    int PVFilter;
    int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
+   float hiHF_pf;
+   float Npart;
+   float Ncoll;
 
    std::vector<float> *trkPt;
    std::vector<float> *trkEta;

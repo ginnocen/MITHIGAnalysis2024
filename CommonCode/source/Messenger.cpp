@@ -82,7 +82,12 @@ bool HiEventTreeMessenger::Initialize()
    if(Tree->GetBranch("hiNevtPlane"))   Tree->SetBranchAddress("hiNevtPlane", &hiNevtPlane);
    else                                 hiNevtPlane = 0;
    if(Tree->GetBranch("hiEvtPlanes"))   Tree->SetBranchAddress("hiEvtPlanes", &hiEvtPlanes);
-   
+   if(Tree->GetBranch("hiHF_pf"))       Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
+   else                                 hiHF_pf = 0.;
+   if(Tree->GetBranch("Ncoll"))         Tree->SetBranchAddress("Ncoll", &Ncoll);
+   else                                 Ncoll = 0.;
+   if(Tree->GetBranch("Npart"))         Tree->SetBranchAddress("Npart", &Npart);
+   else                                 Npart = 0.;
    return true;
 }
 
@@ -3408,9 +3413,11 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
    Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
    Tree->SetBranchAddress("mMaxL1HFAdcMinus", &mMaxL1HFAdcMinus);
-
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkEta", &trkEta);
+   Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
+   Tree->SetBranchAddress("Npart", &Npart);
+   Tree->SetBranchAddress("Ncoll", &Ncoll);
 
    return true;
 }
@@ -3459,11 +3466,13 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
    Tree->Branch("PVFilter",              &PVFilter, "PVFilter/I");
    Tree->Branch("ClusterCompatibilityFilter", &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/I");
-   Tree->Branch("mMaxL1HFAdcPlus",     &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
-   Tree->Branch("mMaxL1HFAdcMinus",    &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
-
-   Tree->Branch("trkPt",               &trkPt);
-   Tree->Branch("trkEta",              &trkEta);
+   Tree->Branch("mMaxL1HFAdcPlus",       &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
+   Tree->Branch("mMaxL1HFAdcMinus",      &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
+   Tree->Branch("hiHF_pf",               &hiHF_pf, "hiHF_pf/F");
+   Tree->Branch("Npart",                 &Npart, "Npart/F");
+   Tree->Branch("Ncoll",                 &Ncoll, "Ncoll/F");
+   Tree->Branch("trkPt",                 &trkPt);
+   Tree->Branch("trkEta",                &trkEta);
 
    return true;
 }
@@ -3486,6 +3495,13 @@ void ChargedHadronRAATreeMessenger::Clear()
    nVtx = 0;
    HFEMaxPlus = 9999.;
    HFEMaxMinus = 9999.;
+   PVFilter = 0;
+   ClusterCompatibilityFilter = 0;
+   mMaxL1HFAdcPlus = 0;
+   mMaxL1HFAdcMinus = 0;
+   hiHF_pf = 0.;
+   Npart = 0.;
+   Ncoll = 0.;
 
    trkPt->clear();
    trkEta->clear();

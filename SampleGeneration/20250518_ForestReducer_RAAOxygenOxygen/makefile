@@ -1,7 +1,7 @@
 default: TestRun
 
 TestRun: Execute
-	./Execute --Input ${PATHSAMPLE}/crab_HiForest_250514_Hijing_ppreco_1500pre2_250507.root \
+	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_1.root \
                   --Output skim_testfile.root \
                   --DoGenLevel false \
                   --Year 2025 \
@@ -10,7 +10,7 @@ TestRun: Execute
                   --PFTree particleFlowAnalyser/pftree
 
 TestRunBase: Execute
-	./Execute --Input ${PATHSAMPLE}/crab_HiForest_250514_Hijing_ppreco_1500pre2_250507.root \
+	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_1.root \
                   --Output skim_testfile.root \
                   --DoGenLevel false \
                   --Year 2025 \

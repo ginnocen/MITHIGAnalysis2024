@@ -105,6 +105,9 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;
       MChargedHadronRAA.hiBin = MEvent.hiBin;
+      MChargedHadronRAA.hiHF_pf = MEvent.hiHF_pf;
+      MChargedHadronRAA.Ncoll = MEvent.Ncoll;
+      MChargedHadronRAA.Npart = MEvent.Npart;
       ////////////////////////////
       ////////// Vertex //////////
       ////////////////////////////
