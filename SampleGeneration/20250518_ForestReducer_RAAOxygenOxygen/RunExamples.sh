@@ -3,7 +3,7 @@ source clean.sh
 
 rm -rf Output/
 mkdir -p Output/
-./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_1.root \
+./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_Hijing_merged.root \
    --Output skim_HiForest_Hijing.root \
    --DoGenLevel true \
    --Year 2025 \
