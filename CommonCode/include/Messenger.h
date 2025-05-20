@@ -886,6 +886,8 @@ public:
    int nVtx;
    float HFEMaxPlus;
    float HFEMaxMinus;
+   int ClusterCompatibilityFilter;
+   int PVFilter;
 
    std::vector<float> *trackPt;
    std::vector<float> *trackEta;

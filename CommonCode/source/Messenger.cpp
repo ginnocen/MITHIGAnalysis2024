@@ -3356,6 +3356,8 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
+   Tree->SetBranchAddress("PVFilter", &PVFilter);
+   Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
 
    Tree->SetBranchAddress("trackPt", &trackPt);
    Tree->SetBranchAddress("trackEta", &trackEta);
@@ -3404,6 +3406,9 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
    Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
+   Tree->Branch("PVFilter",              &PVFilter, "PVFilter/I");
+   Tree->Branch("ClusterCompatibilityFilter", &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/I");
+
    Tree->Branch("trackPt",               &trackPt);
    Tree->Branch("trackEta",              &trackEta);
 

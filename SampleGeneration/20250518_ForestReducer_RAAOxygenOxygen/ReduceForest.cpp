@@ -132,31 +132,18 @@ int main(int argc, char *argv[]) {
           // MChargedHadronRAA.isHLT_HIZB = HLT_HIZB_;
           // if (ApplyTriggerRejection == 1 && IsData && (HLT_HIZB_ == false)) continue;
           // if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
+          // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
+          // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+          MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
+          MChargedHadronRAA.PVFilter = MSkim.PVFilter;
         }
-      }
-      /*
-      if (IsData == true) {
-        //MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-        //MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
-        //bool selectedBkgFilter = MSkim.ClusterCompatibilityFilter == 1 && MMETFilter.cscTightHalo2015Filter;
-        //bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrack.zVtx->at(0)) < 15.;
-        //if (ApplyEventRejection && IsData && (selectedBkgFilter == false || selectedVtxFilter == false)) continue;
-        //MChargedHadronRAA.selectedBkgFilter = selectedBkgFilter;
-        //MChargedHadronRAA.selectedVtxFilter = selectedVtxFilter;
-      } // end of if (IsData == true)
-      else { // if (IsData == false)
-        // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-        // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
-        //bool selectedBkgFilter = MSkim.ClusterCompatibilityFilter == 1; // METFilter always true for MC
-        //bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrack.zVtx->at(0)) < 15.;
-        //MChargedHadronRAA.selectedBkgFilter = selectedBkgFilter;
-        //MChargedHadronRAA.selectedVtxFilter = selectedVtxFilter;
-        //bool ZDCgammaN =  IsGammaNMCtype;
-        //bool ZDCNgamma = !IsGammaNMCtype;
-        //MChargedHadronRAA.ZDCgammaN = ZDCgammaN;
-        //MChargedHadronRAA.ZDCNgamma = ZDCNgamma;
+      } else { // if (IsData == false)
+               // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
+               // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+        MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
+        MChargedHadronRAA.PVFilter = MSkim.PVFilter;
       } // end of if (IsData == false)
-      */
+
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
       float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3., 5.2);
