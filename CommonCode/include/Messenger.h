@@ -47,6 +47,7 @@ public:
    float vx;
    float vy;
    float vz;
+   float pthat;
    float weight;
    std::vector<int> *npus;
    std::vector<float> *tnpus;

@@ -595,7 +595,10 @@ int main(int argc, char *argv[]) {
 
 // Ncoll weight
 // pThat
-        MMuMuJet.PTHat = MJet.PTHat;
+        //cout << "pthat: " << MEvent.pthat << endl;
+        //cout << "EventWeight: " << MEvent.weight << endl;
+        MMuMuJet.PTHat = MEvent.pthat;
+        MMuMuJet.EventWeight = MEvent.weight;
         MMuMuJet.NCollWeight = FindNColl(MMuMuJet.hiBin);
 
 
