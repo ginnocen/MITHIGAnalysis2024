@@ -3431,7 +3431,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    trackPt->clear();
    trackEta->clear();
 }
-
+/*
 void ChargedHadronRAATreeMessenger::CopyNonTrack(ChargedHadronRAATreeMessenger &M)
 {
    Run                  = M.Run;
@@ -3447,7 +3447,7 @@ void ChargedHadronRAATreeMessenger::CopyNonTrack(ChargedHadronRAATreeMessenger &
    HFEMaxPlus           = M.HFEMaxPlus;
    HFEMaxMinus          = M.HFEMaxMinus;
 }
-
+*/
 bool ChargedHadronRAATreeMessenger::FillEntry()
 {
    if(Initialized == false)

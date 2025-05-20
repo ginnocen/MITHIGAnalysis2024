@@ -908,7 +908,7 @@ public:
    bool GetEntry(int iEntry);
    bool SetBranch(TTree *T);
    void Clear();
-   void CopyNonTrack(ChargedHadronRAATreeMessenger &M);
+   //void CopyNonTrack(ChargedHadronRAATreeMessenger &M);
    bool FillEntry();
 
 };
