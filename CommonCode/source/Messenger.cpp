@@ -59,6 +59,8 @@ bool HiEventTreeMessenger::Initialize()
    else                                 Event = 1;
    if(Tree->GetBranch("lumi"))          Tree->SetBranchAddress("lumi", &Lumi);
    else                                 Lumi = 1;
+   if(Tree->GetBranch("pthat"))         Tree->SetBranchAddress("pthat", &pthat);
+   else                                 pthat = -999;
    if(Tree->GetBranch("weight"))        Tree->SetBranchAddress("weight", &weight);
    else                                 weight = 1;
    if(Tree->GetBranch("vx"))            Tree->SetBranchAddress("vx", &vx);
