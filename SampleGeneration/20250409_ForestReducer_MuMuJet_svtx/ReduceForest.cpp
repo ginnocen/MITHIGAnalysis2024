@@ -152,6 +152,9 @@ int main(int argc, char *argv[]) {
       MMuMuJet.nsvtx = MJet.nsvtx;
       MMuMuJet.ntrk = MJet.ntrk;
 
+      MMuMuJet.PTHat = MEvent.pthat;
+      MMuMuJet.EventWeight = MEvent.weight;
+      MMuMuJet.NCollWeight = FindNColl(MMuMuJet.hiBin);
       
           
       ////////////////////////////
@@ -597,13 +600,6 @@ int main(int argc, char *argv[]) {
 // pThat
         //cout << "pthat: " << MEvent.pthat << endl;
         //cout << "EventWeight: " << MEvent.weight << endl;
-        MMuMuJet.PTHat = MEvent.pthat;
-        MMuMuJet.EventWeight = MEvent.weight;
-        MMuMuJet.NCollWeight = FindNColl(MMuMuJet.hiBin);
-
-
-
-
 
       } // end loop over jets
       MMuMuJet.FillEntry();
