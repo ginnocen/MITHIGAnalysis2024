@@ -3413,12 +3413,12 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
    Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
    Tree->SetBranchAddress("mMaxL1HFAdcMinus", &mMaxL1HFAdcMinus);
-   Tree->SetBranchAddress("trkPt", &trkPt);
-   Tree->SetBranchAddress("trkEta", &trkEta);
    Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
    Tree->SetBranchAddress("Npart", &Npart);
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
+   Tree->SetBranchAddress("trkPt", &trkPt);
+   Tree->SetBranchAddress("trkEta", &trkEta);
    return true;
 }
 
