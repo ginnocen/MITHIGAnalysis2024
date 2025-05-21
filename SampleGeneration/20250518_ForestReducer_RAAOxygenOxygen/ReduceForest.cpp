@@ -184,6 +184,7 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.Ngamma_EThreshLoose() == false) continue;
       */
       int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
+      float leadingTrackPtEta1p0 = 0.;
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
         if (DoGenLevel == true) {
           if (MGen.DaughterCount->at(iTrack) > 0)
@@ -194,8 +195,11 @@ int main(int argc, char *argv[]) {
         if (DoGenLevel == false) {
           if (MTrack.highPurity->at(iTrack) == false)
             continue;
+          if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0){
+	    leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
+          }
         }
-
+        MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
         double trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
         double trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
         MChargedHadronRAA.trkEta->push_back(trkEta);

@@ -911,6 +911,7 @@ public:
    float hiHF_pf;
    float Npart;
    float Ncoll;
+   float leadingPtEta1p0_sel;
 
    std::vector<float> *trkPt;
    std::vector<float> *trkEta;

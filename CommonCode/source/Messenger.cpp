@@ -3418,7 +3418,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
    Tree->SetBranchAddress("Npart", &Npart);
    Tree->SetBranchAddress("Ncoll", &Ncoll);
-
+   Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
    return true;
 }
 
@@ -3471,6 +3471,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("hiHF_pf",               &hiHF_pf, "hiHF_pf/F");
    Tree->Branch("Npart",                 &Npart, "Npart/F");
    Tree->Branch("Ncoll",                 &Ncoll, "Ncoll/F");
+   Tree->Branch("leadingPtEta1p0_sel",   &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
    Tree->Branch("trkPt",                 &trkPt);
    Tree->Branch("trkEta",                &trkEta);
 
@@ -3502,7 +3503,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    hiHF_pf = 0.;
    Npart = 0.;
    Ncoll = 0.;
-
+   leadingPtEta1p0_sel = 0.;
    trkPt->clear();
    trkEta->clear();
 }
