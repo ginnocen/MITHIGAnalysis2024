@@ -34,9 +34,9 @@ if [ "$USEONMITHI03" = true ]; then
     cd "$CMSFOLDER"
     cmsenv
     echo "CMSSW environment is set up"
+cd -
 fi
 
-cd -
 
 cd ../../
 source SetupAnalysis.sh

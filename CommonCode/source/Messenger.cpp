@@ -3447,6 +3447,7 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
    {
    delete trkPt;
    delete trkEta;
+   delete highPurity;
    }
 }
 
@@ -3464,6 +3465,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Initialized = true;
    trkPt = nullptr;
    trkEta = nullptr;
+   highPurity = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -3488,6 +3490,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkEta", &trkEta);
+   Tree->SetBranchAddress("highPurity", &highPurity);
    return true;
 }
 
@@ -3517,6 +3520,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
 
    trkPt = new std::vector<float>();
    trkEta = new std::vector<float>();
+   highPurity = new std::vector<bool>();
 
    Tree = T;
 
@@ -3543,7 +3547,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("leadingPtEta1p0_sel",   &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
    Tree->Branch("trkPt",                 &trkPt);
    Tree->Branch("trkEta",                &trkEta);
-
+   Tree->Branch("highPurity",            &highPurity);
    return true;
 }
 
@@ -3575,6 +3579,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    leadingPtEta1p0_sel = 0.;
    trkPt->clear();
    trkEta->clear();
+   highPurity->clear();
 }
 /*
 void ChargedHadronRAATreeMessenger::CopyNonTrack(ChargedHadronRAATreeMessenger &M)

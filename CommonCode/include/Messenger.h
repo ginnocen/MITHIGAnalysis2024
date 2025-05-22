@@ -660,7 +660,7 @@ public:
    std::vector<float> *zErrVtx;
    std::vector<float> *trkPt;
    std::vector<float> *trkEta;
-   std::vector<float> *highPurity;
+   std::vector<bool> *highPurity;
 
 public:
    PPTrackTreeMessenger(TFile &File, std::string TreeName = "ppTracks/trackTree");
@@ -941,6 +941,7 @@ public:
 
    std::vector<float> *trkPt;
    std::vector<float> *trkEta;
+   std::vector<bool> *highPurity;
 
 public:   // Derived quantities
    //bool GoodPhotonuclear; //FIXME: currently not implemented
