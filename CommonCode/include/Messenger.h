@@ -993,8 +993,8 @@ public:
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
    std::vector<float> *muPhi2;
-   std::vector<float> *muCharge1;
-   std::vector<float> *muCharge2;
+   std::vector<int> *muCharge1;
+   std::vector<int> *muCharge2;
    std::vector<float> *muDiDxy1;
    std::vector<float> *muDiDxy1Err;
    std::vector<float> *muDiDxy2;

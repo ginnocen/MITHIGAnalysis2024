@@ -360,6 +360,8 @@ int main(int argc, char *argv[]) {
         float muEta2 = -999.;
         float muPhi1 = -999.;
         float muPhi2 = -999.;
+        int muCharge1 = -999;
+        int muCharge2 = -999;
         float muDiDxy1 = -999.;
         float muDiDxy1Err = -999.;
         float muDiDxy2 = -999.;
@@ -403,6 +405,8 @@ int main(int argc, char *argv[]) {
               float muPhi1 = MSingleMu.SingleMuPhi->at(isinglemu1);
               float muEta2 = MSingleMu.SingleMuEta->at(isinglemu2);
               float muPhi2 = MSingleMu.SingleMuPhi->at(isinglemu2);
+              int muCharge1 = MSingleMu.SingleMuCharge->at(isinglemu1);
+              int muCharge2 = MSingleMu.SingleMuCharge->at(isinglemu2);
               float dPhiMu1Jet_ = DeltaPhi(muPhi1, jetPhi);
               float dEtaMu1Jet_ = muEta1 - jetEta;
               float dPhiMu2Jet_ = DeltaPhi(muPhi2, jetPhi);
@@ -436,6 +440,8 @@ int main(int argc, char *argv[]) {
           muEta2 = MSingleMu.SingleMuEta->at(maxMu2Index);
           muPhi1 = MSingleMu.SingleMuPhi->at(maxMu1Index);
           muPhi2 = MSingleMu.SingleMuPhi->at(maxMu2Index);
+          muCharge1 = MSingleMu.SingleMuCharge->at(maxMu1Index);
+          muCharge2 = MSingleMu.SingleMuCharge->at(maxMu2Index);
           muDiDxy1 = MSingleMu.SingleMuDxy->at(maxMu1Index);
           muDiDxy1Err = MSingleMu.SingleMuDxyError->at(maxMu1Index);
           muDiDxy2 = MSingleMu.SingleMuDxy->at(maxMu2Index);
@@ -479,6 +485,8 @@ int main(int argc, char *argv[]) {
         MMuMuJet.muEta2->push_back(muEta2);
         MMuMuJet.muPhi1->push_back(muPhi1);
         MMuMuJet.muPhi2->push_back(muPhi2);
+        MMuMuJet.muCharge1->push_back(muCharge1);
+        MMuMuJet.muCharge2->push_back(muCharge2);
         MMuMuJet.muDiDxy1->push_back(muDiDxy1);
         MMuMuJet.muDiDxy1Err->push_back(muDiDxy1Err);
         MMuMuJet.muDiDxy2->push_back(muDiDxy2);
