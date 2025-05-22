@@ -18,6 +18,8 @@ using namespace std;
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
 
+#include "include/cent_OO_hijing_PF.h"
+
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
 }
@@ -104,8 +106,8 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.Run = MEvent.Run;
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;
-      MChargedHadronRAA.hiBin = MEvent.hiBin;
       MChargedHadronRAA.hiHF_pf = MEvent.hiHF_pf;
+      MChargedHadronRAA.hiBin = getHiBinFromhiHF(MEvent.hiHF_pf);
       MChargedHadronRAA.Ncoll = MEvent.Ncoll;
       MChargedHadronRAA.Npart = MEvent.Npart;
       ////////////////////////////
