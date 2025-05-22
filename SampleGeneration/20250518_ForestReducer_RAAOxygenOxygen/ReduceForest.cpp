@@ -195,8 +195,8 @@ int main(int argc, char *argv[]) {
             continue;
         } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
-          //if (MTrack.highPurity->at(iTrack) == false)
-          //  continue;
+          if (MTrack.highPurity->at(iTrack) == false)
+            continue;
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0){
 	    leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
           }
