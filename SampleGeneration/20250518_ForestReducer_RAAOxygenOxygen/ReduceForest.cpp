@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
     TFile InputFile(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile);                            // hiEvtAnalyzer/HiTree
-    PbPbUPCTrackTreeMessenger MTrack(InputFile, "ppTracks/trackTree"); // PbPbTracks/trackTree
+    PPTrackTreeMessenger MTrack(InputFile, "ppTracks/trackTree");
     GenParticleTreeMessenger MGen(InputFile);                          // HiGenParticleAna/hi
     PFTreeMessenger MPF(InputFile, PFTreeName);                        // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile);                                // skimanalysis/HltTree

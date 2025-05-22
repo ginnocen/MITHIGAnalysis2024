@@ -2173,6 +2173,75 @@ bool PbPbUPCTrackTreeMessenger::GetEntry(int iEntry)
    return true;
 }
 
+PPTrackTreeMessenger::PPTrackTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+PPTrackTreeMessenger::PPTrackTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+PPTrackTreeMessenger::PPTrackTreeMessenger(TTree *PPTrackTree)
+{
+   Initialize(PPTrackTree);
+}
+
+bool PPTrackTreeMessenger::Initialize(TTree *PPTrackTree)
+{
+   Tree = PPTrackTree;
+   return Initialize();
+}
+
+bool PPTrackTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+
+   nVtx = 0;
+   nTrk = 0;
+
+   ptSumVtx = nullptr;
+   xVtx = nullptr;
+   yVtx = nullptr;
+   zVtx = nullptr;
+   xErrVtx = nullptr;
+   yErrVtx = nullptr;
+   zErrVtx = nullptr;
+   trkPt = nullptr;
+   trkEta = nullptr;
+   highPurity = nullptr;
+
+   Tree->SetBranchAddress("nVtx", &nVtx);
+   Tree->SetBranchAddress("nTrk", &nTrk);
+   Tree->SetBranchAddress("ptSumVtx", &ptSumVtx);
+   Tree->SetBranchAddress("xVtx", &xVtx);
+   Tree->SetBranchAddress("yVtx", &yVtx);
+   Tree->SetBranchAddress("zVtx", &zVtx);
+   Tree->SetBranchAddress("xErrVtx", &xErrVtx);
+   Tree->SetBranchAddress("yErrVtx", &yErrVtx);
+   Tree->SetBranchAddress("zErrVtx", &zErrVtx);
+   Tree->SetBranchAddress("trkPt", &trkPt);
+   Tree->SetBranchAddress("trkEta", &trkEta);
+   Tree->SetBranchAddress("highPurity", &highPurity);
+   return true;
+}
+
+bool PPTrackTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
 ZDCTreeMessenger::ZDCTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());

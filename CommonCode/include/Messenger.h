@@ -645,6 +645,32 @@ public:
    bool GetEntry(int iEntry);
 };
 
+class PPTrackTreeMessenger
+{
+public:
+   TTree *Tree;
+   int nVtx;
+   int nTrk;
+   std::vector<float> *ptSumVtx;
+   std::vector<float> *xVtx;
+   std::vector<float> *yVtx;
+   std::vector<float> *zVtx;
+   std::vector<float> *xErrVtx;
+   std::vector<float> *yErrVtx;
+   std::vector<float> *zErrVtx;
+   std::vector<float> *trkPt;
+   std::vector<float> *trkEta;
+   std::vector<float> *highPurity;
+
+public:
+   PPTrackTreeMessenger(TFile &File, std::string TreeName = "ppTracks/trackTree");
+   PPTrackTreeMessenger(TFile *File, std::string TreeName = "ppTracks/trackTree");
+   PPTrackTreeMessenger(TTree *PPTrackTree);
+   bool Initialize(TTree *PPTrackTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+};
+
 class ZDCTreeMessenger
 {
 public:
