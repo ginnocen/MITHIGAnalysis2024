@@ -143,15 +143,15 @@ int main(int argc, char *argv[]) {
           MChargedHadronRAA.PVFilter = MSkim.PVFilter;
           MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
           MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
-        }
-      } else { // if (IsData == false)
+        } // end of year == 2025
+      } else { // if not data
                // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
                // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
         MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
         MChargedHadronRAA.PVFilter = MSkim.PVFilter;
         MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
         MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
-      } // end of if (IsData == false)
+      } // end of if not data
 
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
@@ -191,28 +191,27 @@ int main(int argc, char *argv[]) {
             continue;
           if (MGen.Charge->at(iTrack) == 0)
             continue;
-        }
+        } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
           if (MTrack.highPurity->at(iTrack) == false)
             continue;
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0){
 	    leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
           }
-        }
+        } // end of if on DoGenLevel == false
         MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
         double trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
         double trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
         MChargedHadronRAA.trkEta->push_back(trkEta);
         MChargedHadronRAA.trkPt->push_back(trkPt);
-      }
+      } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.FillEntry();
     }
     if (!HideProgressBar) {
       Bar.Update(EntryCount);
       Bar.Print();
       Bar.PrintLine();
-    }
-
+    } // if (!HideProgressBar)
     InputFile.Close();
   }
 
