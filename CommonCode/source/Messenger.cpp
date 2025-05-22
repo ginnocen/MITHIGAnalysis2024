@@ -4278,8 +4278,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    muEta2 = new std::vector<float>();
    muPhi1 = new std::vector<float>();
    muPhi2 = new std::vector<float>();
-   muCharge1 = new std::vector<float>();
-   muCharge2 = new std::vector<float>();
+   muCharge1 = new std::vector<int>();
+   muCharge2 = new std::vector<int>();
    muDiDxy1 = new std::vector<float>();
    muDiDxy1Err = new std::vector<float>();
    muDiDxy2 = new std::vector<float>();
