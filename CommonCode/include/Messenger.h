@@ -932,7 +932,6 @@ public:
    float HFEMaxPlus;
    float HFEMaxMinus;
    int ClusterCompatibilityFilter;
-   int pphfCoincFilterPF2Th4;
    int PVFilter;
    int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
    float hiHF_pf;
