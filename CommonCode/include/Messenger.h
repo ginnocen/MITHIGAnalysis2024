@@ -658,7 +658,9 @@ public:
    std::vector<float> *xErrVtx;
    std::vector<float> *yErrVtx;
    std::vector<float> *zErrVtx;
+   std::vector<bool> *isFakeVtx;
    std::vector<float> *trkPt;
+   std::vector<float> *trkPtError;
    std::vector<float> *trkEta;
    std::vector<bool> *highPurity;
 
@@ -928,6 +930,7 @@ public:
    int Lumi;
    int hiBin;
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
+   bool isFakeVtx;                              //best vertex from track tree
    int nVtx;
    float HFEMaxPlus;
    float HFEMaxMinus;
@@ -940,6 +943,7 @@ public:
    float leadingPtEta1p0_sel;
 
    std::vector<float> *trkPt;
+   std::vector<float> *trkPtError;
    std::vector<float> *trkEta;
    std::vector<bool> *highPurity;
 

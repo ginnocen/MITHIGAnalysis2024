@@ -2214,7 +2214,9 @@ bool PPTrackTreeMessenger::Initialize()
    xErrVtx = nullptr;
    yErrVtx = nullptr;
    zErrVtx = nullptr;
+   isFakeVtx = nullptr;
    trkPt = nullptr;
+   trkPtError = nullptr;
    trkEta = nullptr;
    highPurity = nullptr;
 
@@ -2227,7 +2229,9 @@ bool PPTrackTreeMessenger::Initialize()
    Tree->SetBranchAddress("xErrVtx", &xErrVtx);
    Tree->SetBranchAddress("yErrVtx", &yErrVtx);
    Tree->SetBranchAddress("zErrVtx", &zErrVtx);
+   Tree->SetBranchAddress("isFakeVtx", &isFakeVtx);
    Tree->SetBranchAddress("trkPt", &trkPt);
+   Tree->SetBranchAddress("trkPtError", &trkPtError);
    Tree->SetBranchAddress("trkEta", &trkEta);
    Tree->SetBranchAddress("highPurity", &highPurity);
    return true;
@@ -3445,9 +3449,10 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
 {
    if(Initialized == true && WriteMode == true)
    {
-   delete trkPt;
-   delete trkEta;
-   delete highPurity;
+      delete trkPt;
+      delete trkPtError;
+      delete trkEta;
+      delete highPurity;
    }
 }
 
@@ -3464,6 +3469,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
 
    Initialized = true;
    trkPt = nullptr;
+   trkPtError = nullptr;
    trkEta = nullptr;
    highPurity = nullptr;
 
@@ -3477,6 +3483,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VXError", &VXError);
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
+   Tree->SetBranchAddress("isFakeVtx", &isFakeVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
@@ -3489,6 +3496,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
    Tree->SetBranchAddress("trkPt", &trkPt);
+   Tree->SetBranchAddress("trkPtError", &trkPtError);
    Tree->SetBranchAddress("trkEta", &trkEta);
    Tree->SetBranchAddress("highPurity", &highPurity);
    return true;
@@ -3519,6 +3527,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    WriteMode = true;
 
    trkPt = new std::vector<float>();
+   trkPtError = new std::vector<float>();
    trkEta = new std::vector<float>();
    highPurity = new std::vector<bool>();
 
@@ -3534,6 +3543,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("VXError",               &VXError, "VXError/F");
    Tree->Branch("VYError",               &VYError, "VYError/F");
    Tree->Branch("VZError",               &VZError, "VZError/F");
+   Tree->Branch("isFakeVtx",             &isFakeVtx, "isFakeVtx/O");
    Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
    Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
@@ -3546,6 +3556,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Ncoll",                 &Ncoll, "Ncoll/F");
    Tree->Branch("leadingPtEta1p0_sel",   &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
    Tree->Branch("trkPt",                 &trkPt);
+   Tree->Branch("trkPtError",            &trkPtError);
    Tree->Branch("trkEta",                &trkEta);
    Tree->Branch("highPurity",            &highPurity);
    return true;
@@ -3566,6 +3577,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    VXError = 0.;
    VYError = 0.;
    VZError = 0.;
+   isFakeVtx = false;
    nVtx = 0;
    HFEMaxPlus = 9999.;
    HFEMaxMinus = 9999.;
@@ -3578,6 +3590,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
    trkPt->clear();
+   trkPtError->clear();
    trkEta->clear();
    highPurity->clear();
 }

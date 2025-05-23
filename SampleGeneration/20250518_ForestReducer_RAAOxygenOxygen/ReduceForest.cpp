@@ -126,6 +126,7 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.VXError = MTrack.xErrVtx->at(BestVertex);
         MChargedHadronRAA.VYError = MTrack.yErrVtx->at(BestVertex);
         MChargedHadronRAA.VZError = MTrack.zErrVtx->at(BestVertex);
+        MChargedHadronRAA.isFakeVtx = MTrack.isFakeVtx->at(BestVertex);
       }
       MChargedHadronRAA.nVtx = MTrack.nVtx;
       /////////////////////////////////////
@@ -198,14 +199,16 @@ int main(int argc, char *argv[]) {
           if (MTrack.highPurity->at(iTrack) == false)
             continue;
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0){
-	    leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
+	          leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
           }
         } // end of if on DoGenLevel == false
         float trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
         float trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
+        float trkPtError = DoGenLevel ? 0 : MTrack.trkPtError->at(iTrack);
         bool highPurity = DoGenLevel ? true : MTrack.highPurity->at(iTrack);
         MChargedHadronRAA.trkEta->push_back(trkEta);
         MChargedHadronRAA.trkPt->push_back(trkPt);
+        MChargedHadronRAA.trkPtError->push_back(trkPtError);
         MChargedHadronRAA.highPurity->push_back(highPurity);
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
