@@ -1,7 +1,8 @@
 USEONMITHI03=false
 CMSFOLDER=/home/$USER/CMSSW_13_2_4/src
 CMSSUBMIT=/home/submit/$USER/CMSSW_14_1_7/src
-export PATHSAMPLE="data00/OOsamples"
+export PATHSAMPLE="data00/OOsamples/Forests"
+export PATHSKIMSAMPLE="data00/OOsamples/Skims"
 
 if [ -d "$CMSSUBMIT" ]; then
     CMSFOLDER=$CMSSUBMIT
