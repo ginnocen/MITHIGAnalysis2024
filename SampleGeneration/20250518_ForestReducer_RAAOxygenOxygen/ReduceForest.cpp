@@ -158,8 +158,8 @@ int main(int argc, char *argv[]) {
 
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
-      float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3.0, 6.0);
-      float EMaxHFMinus = GetMaxEnergyHF(&MPF, -6.0, -3.0);
+      float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3.0, 5.2);
+      float EMaxHFMinus = GetMaxEnergyHF(&MPF, -5.2, -3.0);
       MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus;
       MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus;
       /*
