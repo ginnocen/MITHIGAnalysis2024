@@ -4,20 +4,19 @@
 #include <iostream>
 #include <vector>
 
-#include "TTree.h"
 #include "TFile.h"
+#include "TTree.h"
 
 #define JETCOUNTMAX 500
 #define GENCOUNTMAX 250
 #define VERTEXCOUNTMAX 200
 #define SVTXCOUNTMAX 50
-#define DZEROCOUNTMAX 10000 //FIXME: to be fined tuned
+#define DZEROCOUNTMAX 20000 //FIXME: to be fined tuned
 #define DZEROGENCOUNTMAX 300 //FIXME: to be fined tuned
-#define TRACKCOUNTMAX 10000
+#define TRACKCOUNTMAX 20000
 #define PLANEMAX 200
 #define MUMAX 50
 
-class HiEventTreeMessenger;
 class METFilterTreeMessenger;
 class GGTreeMessenger;
 class RhoTreeMessenger;
@@ -33,6 +32,7 @@ class SingleMuTreeMessenger;
 class PbPbTrackTreeMessenger;
 class PbPbUPCTrackTreeMessenger;
 class ZDCTreeMessenger;
+class HFAdcMessenger;
 class DzeroTreeMessenger;
 class DzeroGenTreeMessenger;
 class HiEventTreeMessenger
@@ -57,6 +57,9 @@ public:
    float hiHFminusEta4;
    int hiNevtPlane;
    float hiEvtPlanes[PLANEMAX];
+   float hiHF_pf;
+   float Ncoll;
+   float Npart;
 public:
    HiEventTreeMessenger(TFile &File);
    HiEventTreeMessenger(TFile *File);
@@ -432,18 +435,24 @@ public:
    float Dy[DZEROCOUNTMAX];
    float Dmass[DZEROCOUNTMAX];
    float Dtrk1Pt[DZEROCOUNTMAX];
-   float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1PtErr[DZEROCOUNTMAX];
+   float Dtrk1Eta[DZEROCOUNTMAX];
+   float Dtrk1dedx[DZEROCOUNTMAX];
+   float Dtrk1MassHypo[DZEROCOUNTMAX];
    float Dtrk1highPurity[DZEROCOUNTMAX];
    float Dtrk2Pt[DZEROCOUNTMAX];
-   float Dtrk2Eta[DZEROCOUNTMAX];
    float Dtrk2PtErr[DZEROCOUNTMAX];
+   float Dtrk2Eta[DZEROCOUNTMAX];
+   float Dtrk2dedx[DZEROCOUNTMAX];
+   float Dtrk2MassHypo[DZEROCOUNTMAX];
    float Dtrk2highPurity[DZEROCOUNTMAX];
    float Dchi2cl[DZEROCOUNTMAX];
    float DsvpvDistance[DZEROCOUNTMAX];
    float DsvpvDisErr[DZEROCOUNTMAX];
    float DsvpvDistance_2D[DZEROCOUNTMAX];
    float DsvpvDisErr_2D[DZEROCOUNTMAX];
+   float Dip3d[DZEROCOUNTMAX];
+   float Dip3derr[DZEROCOUNTMAX];
    float Dalpha[DZEROCOUNTMAX];
    float Ddtheta[DZEROCOUNTMAX];
    int Dgen[DZEROCOUNTMAX];
@@ -682,6 +691,34 @@ public:
    bool GetEntry(int iEntry);
 };
 
+class PPTrackTreeMessenger
+{
+public:
+   TTree *Tree;
+   int nVtx;
+   int nTrk;
+   std::vector<float> *ptSumVtx;
+   std::vector<float> *xVtx;
+   std::vector<float> *yVtx;
+   std::vector<float> *zVtx;
+   std::vector<float> *xErrVtx;
+   std::vector<float> *yErrVtx;
+   std::vector<float> *zErrVtx;
+   std::vector<bool> *isFakeVtx;
+   std::vector<float> *trkPt;
+   std::vector<float> *trkPtError;
+   std::vector<float> *trkEta;
+   std::vector<bool> *highPurity;
+
+public:
+   PPTrackTreeMessenger(TFile &File, std::string TreeName = "ppTracks/trackTree");
+   PPTrackTreeMessenger(TFile *File, std::string TreeName = "ppTracks/trackTree");
+   PPTrackTreeMessenger(TTree *PPTrackTree);
+   bool Initialize(TTree *PPTrackTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+};
+
 class ZDCTreeMessenger
 {
 public:
@@ -693,6 +730,21 @@ public:
    ZDCTreeMessenger(TFile *File, std::string TreeName = "zdcanalyzer/zdcdigi");
    ZDCTreeMessenger(TTree *ZDCTree);
    bool Initialize(TTree *ZDCTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+};
+
+class HFAdcMessenger
+{
+public:
+   TTree *Tree;
+   int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
+
+public:
+   HFAdcMessenger(TFile &File, std::string TreeName = "HFAdcana/adc");
+   HFAdcMessenger(TFile *File, std::string TreeName = "HFAdcana/adc");
+   HFAdcMessenger(TTree *HFAdcTree);
+   bool Initialize(TTree *HFAdcTree);
    bool Initialize();
    bool GetEntry(int iEntry);
 };
@@ -825,12 +877,20 @@ public:
    std::vector<float> *Dy;
    std::vector<float> *Dmass;
    std::vector<float> *Dtrk1Pt;
+   std::vector<float> *Dtrk1Eta;
+   std::vector<float> *Dtrk1dedx;
+   std::vector<float> *Dtrk1MassHypo;
    std::vector<float> *Dtrk2Pt;
+   std::vector<float> *Dtrk2Eta;
+   std::vector<float> *Dtrk2dedx;
+   std::vector<float> *Dtrk2MassHypo;
    std::vector<float> *Dchi2cl;
    std::vector<float> *DsvpvDistance;
    std::vector<float> *DsvpvDisErr;
    std::vector<float> *DsvpvDistance_2D;
    std::vector<float> *DsvpvDisErr_2D;
+   std::vector<float> *Dip3d;
+   std::vector<float> *Dip3derr;
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
    std::vector<bool> *DpassCut23PAS;
@@ -839,6 +899,11 @@ public:
    std::vector<bool> *DpassCut23PASSystDtrkPt;
    std::vector<bool> *DpassCut23PASSystDalpha;
    std::vector<bool> *DpassCut23PASSystDchi2cl;
+   std::vector<bool> *DpassCutDefault;
+   std::vector<bool> *DpassCutSystDsvpvSig;
+   std::vector<bool> *DpassCutSystDtrkPt;
+   std::vector<bool> *DpassCutSystDalpha;
+   std::vector<bool> *DpassCutSystDchi2cl;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
    std::vector<bool> *DisSignalCalcPrompt;
@@ -898,6 +963,56 @@ public:
    bool Ngamma_EThreshSyst5p5() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(1); }
    bool Ngamma_EThreshSyst15()  { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(7); }
    bool Ngamma_EThreshCustom(float threshold)  { return ( this->ZDCNgamma && this->HFEMaxMinus <= threshold ); }
+
+};
+
+
+class ChargedHadronRAATreeMessenger
+{
+public:
+   TTree *Tree;
+   int Run;
+   long long Event;
+   int Lumi;
+   int hiBin;
+   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
+   bool isFakeVtx;                              //best vertex from track tree
+   int nVtx;
+   float HFEMaxPlus;
+   float HFEMaxMinus;
+   int ClusterCompatibilityFilter;
+   int PVFilter;
+   int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
+   float hiHF_pf;
+   float Npart;
+   float Ncoll;
+   float leadingPtEta1p0_sel;
+
+   std::vector<float> *trkPt;
+   std::vector<float> *trkPtError;
+   std::vector<float> *trkEta;
+   std::vector<bool> *highPurity;
+
+public:   // Derived quantities
+   //bool GoodPhotonuclear; //FIXME: currently not implemented
+
+private:
+   bool WriteMode;
+   bool Initialized;
+
+public:
+   ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree = nullptr, bool Debug = false);
+   ~ChargedHadronRAATreeMessenger();
+   bool Initialize(TTree *ChargedHadRAATree, bool Debug = false);
+   bool Initialize(bool Debug = false);
+   int GetEntries();
+   bool GetEntry(int iEntry);
+   bool SetBranch(TTree *T);
+   void Clear();
+   //void CopyNonTrack(ChargedHadronRAATreeMessenger &M);
+   bool FillEntry();
 
 };
 
