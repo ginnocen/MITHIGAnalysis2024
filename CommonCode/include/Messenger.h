@@ -11,6 +11,7 @@
 #define GENCOUNTMAX 250
 #define VERTEXCOUNTMAX 200
 #define DZEROCOUNTMAX 20000 //FIXME: to be fined tuned
+#define SVTXCOUNTMAX 50
 #define DZEROGENCOUNTMAX 300 //FIXME: to be fined tuned
 #define TRACKCOUNTMAX 20000
 #define PLANEMAX 200
@@ -46,6 +47,7 @@ public:
    float vx;
    float vy;
    float vz;
+   float pthat;
    float weight;
    std::vector<int> *npus;
    std::vector<float> *tnpus;
@@ -219,6 +221,50 @@ public:
    int JetPFCEM[JETCOUNTMAX];
    int JetPFNEM[JETCOUNTMAX];
    int JetPFMUM[JETCOUNTMAX];
+
+   // Jet stuff 
+
+   int jtNsvtx[JETCOUNTMAX];
+   int jtNtrk[JETCOUNTMAX];
+   float jtptCh[JETCOUNTMAX];
+   
+   // SVTX
+
+   int nsvtx;
+   int svtxJetId[SVTXCOUNTMAX];
+   int svtxNtrk[SVTXCOUNTMAX];
+   float svtxdl[SVTXCOUNTMAX];
+   float svtxdls[SVTXCOUNTMAX];
+   float svtxdl2d[SVTXCOUNTMAX];
+   float svtxdls2d[SVTXCOUNTMAX];
+   float svtxm[SVTXCOUNTMAX];
+   float svtxmcorr[SVTXCOUNTMAX];
+   float svtxpt[SVTXCOUNTMAX];
+   float svtxnormchi2[SVTXCOUNTMAX];
+   float svtxchi2[SVTXCOUNTMAX];
+
+   // Track
+
+   int ntrk;
+   int trkJetId[TRACKCOUNTMAX];
+   int trkSvtxId[TRACKCOUNTMAX];
+   float trkPt[TRACKCOUNTMAX];
+   float trkEta[TRACKCOUNTMAX];
+   float trkPhi[TRACKCOUNTMAX];
+   float trkIp3d[TRACKCOUNTMAX];
+   float trkIp3dSig[TRACKCOUNTMAX];
+   float trkIp2d[TRACKCOUNTMAX];
+   float trkIp2dSig[TRACKCOUNTMAX];
+   float trkDistToAxis[TRACKCOUNTMAX];
+   float trkDistToAxisSig[TRACKCOUNTMAX];
+   float trkIpProb3d[TRACKCOUNTMAX];
+   float trkIpProb2d[TRACKCOUNTMAX];
+   float trkDz[TRACKCOUNTMAX];
+   int trkPdgId[TRACKCOUNTMAX];
+   int trkMatchSta[TRACKCOUNTMAX];
+   
+
+
 public:
    JetTreeMessenger(TFile &File, std::string TreeName = "akCs4PFJetAnalyzer/t");
    JetTreeMessenger(TFile *File, std::string TreeName = "akCs4PFJetAnalyzer/t");
@@ -1046,6 +1092,10 @@ public:
    float hiHF;
    int NVertex;
    float VX, VY, VZ, VXError, VYError, VZError;
+   float NCollWeight;
+   float ExtraMuWeight[12];
+   float EventWeight;
+   float PTHat;
    int NPU;
    //std::vectors
    std::vector<float> *JetPT;
@@ -1058,6 +1108,8 @@ public:
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
    std::vector<float> *muPhi2;
+   std::vector<int> *muCharge1;
+   std::vector<int> *muCharge2;
    std::vector<float> *muDiDxy1;
    std::vector<float> *muDiDxy1Err;
    std::vector<float> *muDiDxy2;
@@ -1081,6 +1133,56 @@ public:
    std::vector<int> *MJTHadronFlavor;
    std::vector<int> *MJTNcHad;
    std::vector<int> *MJTNbHad;
+
+   //
+
+   std::vector<int> *jtNsvtx;
+   std::vector<int> *jtNtrk;
+   std::vector<float> *jtptCh;
+
+   // 
+
+   int nsvtx;
+   std::vector<std::vector<int>> *svtxJetId;
+   std::vector<std::vector<int>> *svtxNtrk;
+   std::vector<std::vector<float>> *svtxdl;
+   std::vector<std::vector<float>> *svtxdls;
+   std::vector<std::vector<float>> *svtxdl2d;
+   std::vector<std::vector<float>> *svtxdls2d;
+   std::vector<std::vector<float>> *svtxm;
+   std::vector<std::vector<float>> *svtxmcorr;
+   std::vector<std::vector<float>> *svtxpt;
+   std::vector<std::vector<float>> *svtxnormchi2;
+   std::vector<std::vector<float>> *svtxchi2;
+
+   std::vector<int> *mu1svtx;
+   std::vector<int> *mu2svtx;
+
+   //
+   
+   int ntrk;
+   std::vector<std::vector<int>> *trkJetId;
+   std::vector<std::vector<int>> *trkSvtxId;
+   std::vector<std::vector<float>> *trkPt;
+   std::vector<std::vector<float>> *trkEta;
+   std::vector<std::vector<float>> *trkPhi;
+   std::vector<std::vector<float>> *trkIp3d;
+   std::vector<std::vector<float>> *trkIp3dSig;
+   std::vector<std::vector<float>> *trkIp2d;
+   std::vector<std::vector<float>> *trkIp2dSig;
+   std::vector<std::vector<float>> *trkDistToAxis;
+   std::vector<std::vector<float>> *trkDistToAxisSig;
+   std::vector<std::vector<float>> *trkIpProb3d;
+   std::vector<std::vector<float>> *trkIpProb2d;
+   std::vector<std::vector<float>> *trkDz;
+   std::vector<std::vector<int>> *trkPdgId;
+   std::vector<std::vector<int>> *trkMatchSta;
+
+   std::vector<int> *mu1trk;
+   std::vector<int> *mu2trk;
+
+
+
 private:
    bool WriteMode;
    bool Initialized;

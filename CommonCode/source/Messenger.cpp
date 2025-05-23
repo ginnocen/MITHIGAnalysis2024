@@ -59,6 +59,8 @@ bool HiEventTreeMessenger::Initialize()
    else                                 Event = 1;
    if(Tree->GetBranch("lumi"))          Tree->SetBranchAddress("lumi", &Lumi);
    else                                 Lumi = 1;
+   if(Tree->GetBranch("pthat"))         Tree->SetBranchAddress("pthat", &pthat);
+   else                                 pthat = -999;
    if(Tree->GetBranch("weight"))        Tree->SetBranchAddress("weight", &weight);
    else                                 weight = 1;
    if(Tree->GetBranch("vx"))            Tree->SetBranchAddress("vx", &vx);
@@ -573,6 +575,47 @@ bool JetTreeMessenger::Initialize()
    if(Tree->GetBranch("jtPfCEM")) Tree->SetBranchAddress("jtPfCEM", &JetPFCEM);
    if(Tree->GetBranch("jtPfNEM")) Tree->SetBranchAddress("jtPfNEM", &JetPFNEM);
    if(Tree->GetBranch("jtPfMUM")) Tree->SetBranchAddress("jtPfMUM", &JetPFMUM);
+
+   // Jet 
+   
+   if(Tree->GetBranch("jtNsvtx")) Tree->SetBranchAddress("jtNsvtx", &jtNsvtx);
+   if(Tree->GetBranch("jtNtrk")) Tree->SetBranchAddress("jtNtrk", &jtNtrk);
+   if(Tree->GetBranch("jtptCh")) Tree->SetBranchAddress("jtptCh",&jtptCh);
+
+   // Svtx 
+
+   if(Tree->GetBranch("nsvtx")) Tree->SetBranchAddress("nsvtx",&nsvtx);
+   if(Tree->GetBranch("svtxJetId")) Tree->SetBranchAddress("svtxJetId",&svtxJetId);
+   if(Tree->GetBranch("svtxNtrk")) Tree->SetBranchAddress("svtxNtrk",&svtxNtrk);
+   if(Tree->GetBranch("svtxdl")) Tree->SetBranchAddress("svtxdl",&svtxdl);
+   if(Tree->GetBranch("svtxdls")) Tree->SetBranchAddress("svtxdls",&svtxdls);
+   if(Tree->GetBranch("svtxdl2d")) Tree->SetBranchAddress("svtxdl2d",&svtxdl2d);
+   if(Tree->GetBranch("svtxdls2d")) Tree->SetBranchAddress("svtxdls",&svtxdls2d);
+   if(Tree->GetBranch("svtxm")) Tree->SetBranchAddress("svtxm",&svtxm);
+   if(Tree->GetBranch("svtxmcorr")) Tree->SetBranchAddress("svtxmcorr",&svtxmcorr);
+   if(Tree->GetBranch("svtxpt")) Tree->SetBranchAddress("svtxpt",&svtxpt);
+   if(Tree->GetBranch("svtxnormchi2")) Tree->SetBranchAddress("svtxnormchi2",&svtxnormchi2);
+   if(Tree->GetBranch("svtxchi2")) Tree->SetBranchAddress("svtxchi2",&svtxchi2);
+
+   // Tracks
+
+   if(Tree->GetBranch("ntrk")) Tree->SetBranchAddress("ntrk",&ntrk);
+   if(Tree->GetBranch("trkJetId")) Tree->SetBranchAddress("trkJetId",&trkJetId);
+   if(Tree->GetBranch("trkSvtxId")) Tree->SetBranchAddress("trkSvtxId",&trkSvtxId);
+   if(Tree->GetBranch("trkPt")) Tree->SetBranchAddress("trkPt",&trkPt);
+   if(Tree->GetBranch("trkEta")) Tree->SetBranchAddress("trkEta",&trkEta);
+   if(Tree->GetBranch("trkPhi")) Tree->SetBranchAddress("trkPhi",&trkPhi);
+   if(Tree->GetBranch("trkIp3d")) Tree->SetBranchAddress("trkIp3d",&trkIp3d);
+   if(Tree->GetBranch("trkIp3dSig")) Tree->SetBranchAddress("trkIp3dSig",&trkIp3dSig);
+   if(Tree->GetBranch("trkIp2d")) Tree->SetBranchAddress("trkIp2d",&trkIp2d);
+   if(Tree->GetBranch("trkIp2dSig")) Tree->SetBranchAddress("trkIp2dSig",&trkIp2dSig);
+   if(Tree->GetBranch("trkDistToAxis")) Tree->SetBranchAddress("trkDistToAxis",&trkDistToAxis);
+   if(Tree->GetBranch("trkDistToAxisSig")) Tree->SetBranchAddress("trkDistToAxisSig",&trkDistToAxisSig);
+   if(Tree->GetBranch("trkIpProb3d")) Tree->SetBranchAddress("trkIpProb3d",&trkIpProb3d);
+   if(Tree->GetBranch("trkIpProb2d")) Tree->SetBranchAddress("trkIpProb2d",&trkIpProb2d);
+   if(Tree->GetBranch("trkDz")) Tree->SetBranchAddress("trkDz",&trkDz);
+   if(Tree->GetBranch("trkPdgId")) Tree->SetBranchAddress("trkPdgId",&trkPdgId);
+   if(Tree->GetBranch("trkMatchSta")) Tree->SetBranchAddress("trkMatchSta",&trkMatchSta);
 
    return true;
 }
@@ -1903,7 +1946,7 @@ bool PbPbTrackTreeMessenger::Initialize()
    Tree->SetBranchAddress("trkEta", &TrackEta);
    Tree->SetBranchAddress("trkPhi", &TrackPhi);
    Tree->SetBranchAddress("trkCharge", &TrackCharge);
-   Tree->SetBranchAddress("trkPDFId", &TrackPDFID);
+   Tree->SetBranchAddress("trkPDGId", &TrackPDFID);
    Tree->SetBranchAddress("trkNHits", &TrackNHits);
    Tree->SetBranchAddress("trkNPixHits", &TrackNPixHits);
    Tree->SetBranchAddress("trkNLayers", &TrackNLayers);
@@ -3954,6 +3997,8 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete muEta2;
       delete muPhi1;
       delete muPhi2;
+      delete muCharge1;
+      delete muCharge2;
       delete muDiDxy1;
       delete muDiDxy1Err;
       delete muDiDxy2;
@@ -3977,6 +4022,45 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete MJTHadronFlavor;
       delete MJTNcHad;
       delete MJTNbHad;
+
+      delete jtNsvtx;
+      delete jtNtrk;
+      delete jtptCh;
+
+      delete svtxJetId;
+      delete svtxNtrk;
+      delete svtxdl;
+      delete svtxdls;
+      delete svtxdl2d;
+      delete svtxdls2d;
+      delete svtxm;
+      delete svtxmcorr;
+      delete svtxpt;
+      delete svtxnormchi2;
+      delete svtxchi2;
+      delete mu1svtx;
+      delete mu2svtx;
+
+      delete trkJetId;
+      delete trkSvtxId;
+      delete trkPt;
+      delete trkEta;
+      delete trkPhi;
+      delete trkIp3d;
+      delete trkIp3dSig;
+      delete trkIp2d;
+      delete trkIp2dSig;
+      delete trkDistToAxis;
+      delete trkDistToAxisSig;
+      delete trkIpProb3d;
+      delete trkIpProb2d;
+      delete trkDz;
+      delete trkPdgId;
+      delete trkMatchSta;
+      delete mu1trk;
+      delete mu2trk;
+
+
    }
 }
 
@@ -4002,6 +4086,8 @@ bool MuMuJetMessenger::Initialize()
    muEta2 = nullptr;
    muPhi1 = nullptr;
    muPhi2 = nullptr;
+   muCharge1 = nullptr;
+   muCharge2 = nullptr;
    muDiDxy1 = nullptr;
    muDiDxy1Err = nullptr;
    muDiDxy2 = nullptr;
@@ -4026,6 +4112,43 @@ bool MuMuJetMessenger::Initialize()
    MJTNcHad = nullptr;
    MJTNbHad = nullptr;
 
+   jtNsvtx = nullptr;
+   jtNtrk = nullptr;
+   jtptCh = nullptr;
+
+   svtxJetId = nullptr;
+   svtxNtrk = nullptr;
+   svtxdl = nullptr;
+   svtxdls = nullptr;
+   svtxdl2d = nullptr;
+   svtxdls2d = nullptr;
+   svtxm = nullptr;
+   svtxmcorr = nullptr;
+   svtxpt = nullptr;
+   svtxnormchi2 = nullptr;
+   svtxchi2 = nullptr;
+   mu1svtx = nullptr;
+   mu2svtx = nullptr;
+
+   trkJetId = nullptr;
+   trkSvtxId = nullptr;
+   trkPt = nullptr;
+   trkEta = nullptr;
+   trkPhi = nullptr;
+   trkIp3d = nullptr;
+   trkIp3dSig = nullptr;
+   trkIp2d = nullptr;
+   trkIp2dSig = nullptr;
+   trkDistToAxis = nullptr;
+   trkDistToAxisSig = nullptr;
+   trkIpProb3d = nullptr;
+   trkIpProb2d = nullptr;
+   trkDz = nullptr;
+   trkPdgId = nullptr;
+   trkMatchSta = nullptr;
+   mu1trk = nullptr;
+   mu2trk = nullptr;
+
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
    Tree->SetBranchAddress("Lumi", &Lumi);
@@ -4039,6 +4162,10 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
    Tree->SetBranchAddress("NPU", &NPU);
+   Tree->SetBranchAddress("NCollWeight", &NCollWeight);
+   Tree->SetBranchAddress("PTHat", &PTHat);
+   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
+   Tree->SetBranchAddress("EventWeight", &EventWeight);
    Tree->SetBranchAddress("JetPT", &JetPT);
    Tree->SetBranchAddress("JetEta", &JetEta);
    Tree->SetBranchAddress("JetPhi", &JetPhi);
@@ -4049,6 +4176,8 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("muEta2", &muEta2);
    Tree->SetBranchAddress("muPhi1", &muPhi1);
    Tree->SetBranchAddress("muPhi2", &muPhi2);
+   Tree->SetBranchAddress("muCharge1", &muCharge1);
+   Tree->SetBranchAddress("muCharge2", &muCharge2);
    Tree->SetBranchAddress("muDiDxy1", &muDiDxy1);
    Tree->SetBranchAddress("muDiDxy1Err", &muDiDxy1Err);
    Tree->SetBranchAddress("muDiDxy2", &muDiDxy2);
@@ -4072,6 +4201,45 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->SetBranchAddress("MJTNcHad", &MJTNcHad);
    Tree->SetBranchAddress("MJTNbHad", &MJTNbHad);
+
+   Tree->SetBranchAddress("jtNsvtx", &jtNsvtx);
+   Tree->SetBranchAddress("jtNtrk", &jtNtrk);
+   Tree->SetBranchAddress("jtptCh", &jtptCh);
+
+   Tree->SetBranchAddress("svtxJetId", &svtxJetId);
+   Tree->SetBranchAddress("svtxNtrk", &svtxNtrk);
+   Tree->SetBranchAddress("svtxdl", &svtxdl);
+   Tree->SetBranchAddress("svtxdls", &svtxdls);
+   Tree->SetBranchAddress("svtxdl2d", &svtxdl2d);
+   Tree->SetBranchAddress("svtxdls2d", &svtxdls2d);
+   Tree->SetBranchAddress("svtxm", &svtxm);
+   Tree->SetBranchAddress("svtxmcorr", &svtxmcorr);
+   Tree->SetBranchAddress("svtxpt", &svtxpt);
+   Tree->SetBranchAddress("svtxnormchi2", &svtxnormchi2);
+   Tree->SetBranchAddress("svtxchi2", &svtxchi2);
+   Tree->SetBranchAddress("mu1svtx", &mu1svtx);
+   Tree->SetBranchAddress("mu2svtx", &mu2svtx);
+
+   Tree->SetBranchAddress("trkJetId", &trkJetId);
+   Tree->SetBranchAddress("trkSvtxId", &trkSvtxId);
+   Tree->SetBranchAddress("trkPt", &trkPt);
+   Tree->SetBranchAddress("trkEta", &trkEta);
+   Tree->SetBranchAddress("trkPhi", &trkPhi);
+   Tree->SetBranchAddress("trkIp3d", &trkIp3d);
+   Tree->SetBranchAddress("trkIp3dSig", &trkIp3dSig);
+   Tree->SetBranchAddress("trkIp2d", &trkIp2d);
+   Tree->SetBranchAddress("trkIp2dSig", &trkIp2dSig);
+   Tree->SetBranchAddress("trkDistToAxis", &trkDistToAxis);
+   Tree->SetBranchAddress("trkDistToAxisSig", &trkDistToAxisSig);
+   Tree->SetBranchAddress("trkIpProb3d", &trkIpProb3d);
+   Tree->SetBranchAddress("trkIpProb2d", &trkIpProb2d);
+   Tree->SetBranchAddress("trkDz", &trkDz);
+   Tree->SetBranchAddress("trkPdgId", &trkPdgId);
+   Tree->SetBranchAddress("trkMatchSta", &trkMatchSta);
+   Tree->SetBranchAddress("mu1trk", &mu1trk);
+   Tree->SetBranchAddress("mu2trk", &mu2trk);
+
+   
    return true;
 }
 
@@ -4110,6 +4278,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    muEta2 = new std::vector<float>();
    muPhi1 = new std::vector<float>();
    muPhi2 = new std::vector<float>();
+   muCharge1 = new std::vector<int>();
+   muCharge2 = new std::vector<int>();
    muDiDxy1 = new std::vector<float>();
    muDiDxy1Err = new std::vector<float>();
    muDiDxy2 = new std::vector<float>();
@@ -4134,6 +4304,45 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    MJTNcHad = new std::vector<int>();
    MJTNbHad = new std::vector<int>();
 
+   jtNsvtx = new std::vector<int>();
+   jtNtrk = new std::vector<int>();
+   jtptCh = new std::vector<float>();
+
+   svtxJetId = new std::vector<std::vector<int>>();
+   svtxNtrk = new std::vector<std::vector<int>>();
+   svtxdl = new std::vector<std::vector<float>>();
+   svtxdls = new std::vector<std::vector<float>>();
+   svtxdl2d = new std::vector<std::vector<float>>();
+   svtxdls2d = new std::vector<std::vector<float>>();
+   svtxm = new std::vector<std::vector<float>>();
+   svtxmcorr = new std::vector<std::vector<float>>();
+   svtxpt = new std::vector<std::vector<float>>();
+   svtxnormchi2 = new std::vector<std::vector<float>>();
+   svtxchi2 = new std::vector<std::vector<float>>();
+   mu1svtx = new std::vector<int>();
+   mu2svtx = new std::vector<int>();
+
+   trkJetId = new std::vector<std::vector<int>>();
+   trkSvtxId = new std::vector<std::vector<int>>();
+   trkPt = new std::vector<std::vector<float>>();
+   trkEta = new std::vector<std::vector<float>>();
+   trkPhi = new std::vector<std::vector<float>>();
+   trkIp3d = new std::vector<std::vector<float>>();
+   trkIp3dSig = new std::vector<std::vector<float>>();
+   trkIp2d = new std::vector<std::vector<float>>();
+   trkIp2dSig = new std::vector<std::vector<float>>();
+   trkDistToAxis = new std::vector<std::vector<float>>();
+   trkDistToAxisSig = new std::vector<std::vector<float>>();
+   trkIpProb3d = new std::vector<std::vector<float>>();
+   trkIpProb2d = new std::vector<std::vector<float>>();
+   trkDz = new std::vector<std::vector<float>>();
+   trkPdgId = new std::vector<std::vector<int>>();
+   trkMatchSta = new std::vector<std::vector<int>>();
+   mu1trk = new std::vector<int>();
+   mu2trk = new std::vector<int>();
+
+
+
    Tree = T;
 
    Tree->Branch("Run", &Run, "Run/I");
@@ -4149,6 +4358,10 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("VYError", &VYError, "VYError/F");
    Tree->Branch("VZError", &VZError, "VZError/F");
    Tree->Branch("NPU", &NPU, "NPU/I");
+   Tree->Branch("NCollWeight", &NCollWeight,  "NCollWeight/F");
+   Tree->Branch("PTHat", &PTHat,  "PTHat/F");
+   Tree->Branch("ExtraMuWeight", &ExtraMuWeight, "ExtraMuWeight[12]/F");
+   Tree->Branch("EventWeight",            &EventWeight,  "EventWeight/F");
    Tree->Branch("JetPT", &JetPT);
    Tree->Branch("JetEta", &JetEta);
    Tree->Branch("JetPhi", &JetPhi);
@@ -4159,6 +4372,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("muEta2", &muEta2);
    Tree->Branch("muPhi1", &muPhi1);
    Tree->Branch("muPhi2", &muPhi2);
+   Tree->Branch("muCharge1", &muCharge1);
+   Tree->Branch("muCharge2", &muCharge2);
    Tree->Branch("muDiDxy1", &muDiDxy1);
    Tree->Branch("muDiDxy1Err", &muDiDxy1Err);
    Tree->Branch("muDiDxy2", &muDiDxy2);
@@ -4182,6 +4397,46 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->Branch("MJTNcHad", &MJTNcHad);
    Tree->Branch("MJTNbHad", &MJTNbHad);
+
+   
+   Tree->Branch("jtNsvtx", &jtNsvtx);
+   Tree->Branch("jtNtrk", &jtNtrk);
+   Tree->Branch("jtptCh", &jtptCh);
+
+   Tree->Branch("svtxJetId", &svtxJetId);
+   Tree->Branch("svtxNtrk", &svtxNtrk);
+   Tree->Branch("svtxdl", &svtxdl);
+   Tree->Branch("svtxdls", &svtxdls);
+   Tree->Branch("svtxdl2d", &svtxdl2d);
+   Tree->Branch("svtxdls2d", &svtxdls2d);
+   Tree->Branch("svtxm", &svtxm);
+   Tree->Branch("svtxmcorr", &svtxmcorr);
+   Tree->Branch("svtxpt", &svtxpt);
+   Tree->Branch("svtxnormchi2", &svtxnormchi2);
+   Tree->Branch("svtxchi2", &svtxchi2);
+   Tree->Branch("mu1svtx", &mu1svtx);
+   Tree->Branch("mu2svtx", &mu2svtx);
+
+   Tree->Branch("trkJetId", &trkJetId);
+   Tree->Branch("trkSvtxId", &trkSvtxId);
+   Tree->Branch("trkPt", &trkPt);
+   Tree->Branch("trkEta", &trkEta);
+   Tree->Branch("trkPhi", &trkPhi);
+   Tree->Branch("trkIp3d", &trkIp3d);
+   Tree->Branch("trkIp3dSig", &trkIp3dSig);
+   Tree->Branch("trkIp2d", &trkIp2d);
+   Tree->Branch("trkIp2dSig", &trkIp2dSig);
+   Tree->Branch("trkDistToAxis", &trkDistToAxis);
+   Tree->Branch("trkDistToAxisSig", &trkDistToAxisSig);
+   Tree->Branch("trkIpProb3d", &trkIpProb3d);
+   Tree->Branch("trkIpProb2d", &trkIpProb2d);
+   Tree->Branch("trkDz", &trkDz);
+   Tree->Branch("trkPdgId", &trkPdgId);
+   Tree->Branch("trkMatchSta", &trkMatchSta);
+   Tree->Branch("mu1trk", &mu1trk);
+   Tree->Branch("mu2trk", &mu2trk);
+
+
    return true;
 }
 
@@ -4203,6 +4458,15 @@ void MuMuJetMessenger::Clear()
    VYError = 0;
    VZError = 0;
    NPU = 0;
+   NCollWeight = 1;
+   PTHat = -999;
+   EventWeight = 1;
+   nsvtx = 0;
+   ntrk = 0;
+
+   for(int i = 0; i < 12; i++)
+      ExtraMuWeight[i] = 1;
+
    JetPT->clear();
    JetEta->clear();
    JetPhi->clear();
@@ -4213,6 +4477,8 @@ void MuMuJetMessenger::Clear()
    muEta2->clear();
    muPhi1->clear();
    muPhi2->clear();
+   muCharge1->clear();
+   muCharge2->clear();
    muDiDxy1->clear();
    muDiDxy1Err->clear();
    muDiDxy2->clear();
@@ -4236,6 +4502,43 @@ void MuMuJetMessenger::Clear()
    MJTHadronFlavor->clear();
    MJTNcHad->clear();
    MJTNbHad->clear();
+
+   jtNsvtx->clear();
+   jtNtrk->clear();
+   jtptCh->clear();
+
+   svtxJetId->clear();
+   svtxNtrk->clear();
+   svtxdl->clear();
+   svtxdls->clear();
+   svtxdl2d->clear();
+   svtxdls2d->clear();
+   svtxm->clear();
+   svtxmcorr->clear();
+   svtxpt->clear();
+   svtxnormchi2->clear();
+   svtxchi2->clear();
+   mu1svtx->clear();
+   mu2svtx->clear();
+
+   trkJetId->clear();
+   trkSvtxId->clear();
+   trkPt->clear();
+   trkEta->clear();
+   trkPhi->clear();
+   trkIp3d->clear();
+   trkIp3dSig->clear();
+   trkIp2d->clear();
+   trkIp2dSig->clear();
+   trkDistToAxis->clear();
+   trkDistToAxisSig->clear();
+   trkIpProb3d->clear();
+   trkIpProb2d->clear();
+   trkDz->clear();
+   trkPdgId->clear();
+   trkMatchSta->clear();
+   mu1trk->clear();
+   mu2trk->clear();
 }
 
 void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
@@ -4252,7 +4555,15 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    VXError      = M.VXError;
    VYError      = M.VYError;
    VZError      = M.VZError;
+   EventWeight  = M.EventWeight;
    NPU          = M.NPU;
+   NCollWeight  = M.NCollWeight;
+   PTHat        = M.PTHat;
+   nsvtx        = M.nsvtx;
+   ntrk         = M.ntrk;
+
+   for(int i = 0; i < 12; i++)
+      ExtraMuWeight[i] = M.ExtraMuWeight[i];
 
 
    if(JetPT != nullptr && M.JetPT != nullptr)   *JetPT = *(M.JetPT);
@@ -4265,6 +4576,8 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(muEta2 != nullptr && M.muEta2 != nullptr)   *muEta2 = *(M.muEta2);
    if(muPhi1 != nullptr && M.muPhi1 != nullptr)   *muPhi1 = *(M.muPhi1);
    if(muPhi2 != nullptr && M.muPhi2 != nullptr)   *muPhi2 = *(M.muPhi2);
+   if(muCharge1 != nullptr && M.muCharge1 != nullptr)   *muCharge1 = *(M.muCharge1);
+   if(muCharge2 != nullptr && M.muCharge2 != nullptr)   *muCharge2 = *(M.muCharge2);
    if(muDiDxy1 != nullptr && M.muDiDxy1 != nullptr)   *muDiDxy1 = *(M.muDiDxy1);
    if(muDiDxy1Err != nullptr && M.muDiDxy1Err != nullptr)   *muDiDxy1Err = *(M.muDiDxy1Err);
    if(muDiDxy2 != nullptr && M.muDiDxy2 != nullptr)   *muDiDxy2 = *(M.muDiDxy2);
@@ -4288,6 +4601,44 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(MJTHadronFlavor != nullptr && M.MJTHadronFlavor != nullptr)   *MJTHadronFlavor = *(M.MJTHadronFlavor);
    if(MJTNcHad != nullptr && M.MJTNcHad != nullptr)   *MJTNcHad = *(M.MJTNcHad);
    if(MJTNbHad != nullptr && M.MJTNbHad != nullptr)   *MJTNbHad = *(M.MJTNbHad);
+
+   if(jtNsvtx != nullptr && M.jtNsvtx != nullptr) *jtNsvtx = *(jtNsvtx);
+   if(jtNtrk != nullptr && M.jtNtrk != nullptr) *jtNtrk = *(jtNtrk);
+   if(jtptCh != nullptr && M.jtptCh != nullptr) *jtptCh = *(jtptCh);
+
+   if(svtxJetId != nullptr && M.svtxJetId != nullptr) *svtxJetId = *(svtxJetId);
+   if(svtxNtrk != nullptr && M.svtxNtrk != nullptr) *svtxNtrk = *(svtxNtrk);
+   if(svtxdl != nullptr && M.svtxdl != nullptr) *svtxdl = *(svtxdl);
+   if(svtxdls != nullptr && M.svtxdls != nullptr) *svtxdls = *(svtxdls);
+   if(svtxdl2d != nullptr && M.svtxdl2d != nullptr) *svtxdl2d = *(svtxdl2d);
+   if(svtxdls2d != nullptr && M.svtxdls2d != nullptr) *svtxdls2d = *(svtxdls2d);
+   if(svtxm != nullptr && M.svtxm != nullptr) *svtxm = *(svtxm);
+   if(svtxmcorr != nullptr && M.svtxmcorr != nullptr) *svtxmcorr = *(svtxmcorr);
+   if(svtxpt != nullptr && M.svtxpt != nullptr) *svtxpt = *(svtxpt);
+   if(svtxnormchi2 != nullptr && M.svtxnormchi2 != nullptr) *svtxnormchi2 = *(svtxnormchi2);
+   if(svtxchi2 != nullptr && M.svtxchi2 != nullptr) *svtxchi2 = *(svtxchi2);
+   if(mu1svtx != nullptr && M.mu1svtx != nullptr) *mu1svtx = *(mu1svtx);
+   if(mu2svtx != nullptr && M.mu2svtx != nullptr) *mu2svtx = *(mu2svtx);
+
+   if(trkJetId != nullptr && M.trkJetId != nullptr) *trkJetId = *(trkJetId);
+   if(trkSvtxId != nullptr && M.trkSvtxId != nullptr) *trkSvtxId = *(trkSvtxId);
+   if(trkPt != nullptr && M.trkPt != nullptr) *trkPt = *(trkPt);
+   if(trkEta != nullptr && M.trkEta != nullptr) *trkEta = *(trkEta);
+   if(trkPhi != nullptr && M.trkPhi != nullptr) *trkPhi = *(trkPhi);
+   if(trkIp3d != nullptr && M.trkIp3d != nullptr) *trkIp3d = *(trkIp3d);
+   if(trkIp3dSig != nullptr && M.trkIp3dSig != nullptr) *trkIp3dSig = *(trkIp3dSig);
+   if(trkIp2d != nullptr && M.trkIp2d != nullptr) *trkIp2d = *(trkIp2d);
+   if(trkIp2dSig != nullptr && M.trkIp2dSig != nullptr) *trkIp2dSig = *(trkIp2dSig);
+   if(trkDistToAxis != nullptr && M.trkDistToAxis != nullptr) *trkDistToAxis = *(trkDistToAxis);
+   if(trkDistToAxisSig != nullptr && M.trkDistToAxisSig != nullptr) *trkDistToAxisSig = *(trkDistToAxisSig);
+   if(trkIpProb3d != nullptr && M.trkIpProb3d != nullptr) *trkIpProb3d = *(trkIpProb3d);
+   if(trkIpProb2d != nullptr && M.trkIpProb2d != nullptr) *trkIpProb2d = *(trkIpProb2d);
+   if(trkDz != nullptr && M.trkDz != nullptr) *trkDz = *(trkDz);
+   if(trkPdgId != nullptr && M.trkPdgId != nullptr) *trkPdgId = *(trkPdgId);
+   if(trkMatchSta != nullptr && M.trkMatchSta != nullptr) *trkMatchSta = *(trkMatchSta);
+   if(mu1trk != nullptr && M.mu1trk != nullptr) *mu1trk = *(mu1trk);
+   if(mu2trk != nullptr && M.mu2trk != nullptr) *mu2trk = *(mu2trk);
+
 }
 
 bool MuMuJetMessenger::FillEntry()
