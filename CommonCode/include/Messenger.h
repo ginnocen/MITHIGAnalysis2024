@@ -1094,9 +1094,10 @@ public:
    int NVertex;
    float VX, VY, VZ, VXError, VYError, VZError;
    float NCollWeight;
-   float ExtraMuWeight[13];
    float EventWeight;
    float PTHat;
+   float ExtraMuWeight[12];
+   float MuMuWeight;
    int NPU;
    //std::vectors
    std::vector<float> *JetPT;
