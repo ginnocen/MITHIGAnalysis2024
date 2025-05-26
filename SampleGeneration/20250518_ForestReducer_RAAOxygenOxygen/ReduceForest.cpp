@@ -22,9 +22,6 @@ using namespace std;
 
 // weights for hadronic, Starlight SD, and Starlight DD samples in barns
 // weight for DD still unknown --> set to 0 for now
-const int Nsamples = 3; // Number of samples
-double weightXsecRef_barn[Nsamples] = {1.08, 0.3, 0.0};
-
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
 }
@@ -112,7 +109,6 @@ int main(int argc, char *argv[]) {
       ////////// Global event stuff //////////
       ////////////////////////////////////////
       MChargedHadronRAA.sampleType = sampleType;
-      MChargedHadronRAA.weightXsec = weightXsecRef_barn[sampleType]/EntryCount;
       MChargedHadronRAA.Run = MEvent.Run;
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;

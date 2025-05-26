@@ -943,7 +943,6 @@ public:
    float Ncoll;
    float leadingPtEta1p0_sel;
    int sampleType;
-   float weightXsec;
 
    std::vector<float> *trkPt;
    std::vector<float> *trkPtError;
