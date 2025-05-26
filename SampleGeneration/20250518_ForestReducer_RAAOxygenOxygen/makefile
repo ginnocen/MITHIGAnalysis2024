@@ -7,8 +7,8 @@ TestRun: Execute
                   --Year 2025 \
                   --IsData false \
                   --Fraction 0.1 \
-                  --PFTree particleFlowAnalyser/pftree
-
+                  --PFTree particleFlowAnalyser/pftree \
+                  --sampleType 0
 TestRunBase: Execute
 	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_Hijing_merged.root \
                   --Output skim_testfile.root \
@@ -16,8 +16,8 @@ TestRunBase: Execute
                   --Year 2025 \
                   --IsData false \
                   --Fraction 0.1 \
-                  --PFTree particleFlowAnalyser/pftree
-
+                  --PFTree particleFlowAnalyser/pftree \
+                  --sampleType 0
 Execute: ReduceForest.cpp
 	g++ ReduceForest.cpp -o Execute \
 		`root-config --cflags --glibs` \

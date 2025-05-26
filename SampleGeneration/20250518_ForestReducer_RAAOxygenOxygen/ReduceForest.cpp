@@ -20,6 +20,11 @@ using namespace std;
 
 #include "include/cent_OO_hijing_PF.h"
 
+// weights for hadronic, Starlight SD, and Starlight DD samples in barns
+// weight for DD still unknown --> set to 0 for now
+const int Nsamples = 3; // Number of samples
+double weightXsecRef_barn[Nsamples] = {1.08, 0.3, 0.0};
+
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
 }
@@ -49,7 +54,7 @@ int main(int argc, char *argv[]) {
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   // bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
-
+  int sampleType = CL.GetInteger("sampleType", 0); // 0 for Hadronic, 1 for Starlight SD, 2 for Starlight DD
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
@@ -82,7 +87,11 @@ int main(int argc, char *argv[]) {
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
-
+    if (sampleType < 0 || sampleType >= Nsamples) {
+      std::cout << "Error: Invalid sampleType " << sampleType << ". Valid range is 0 to ";
+      std::cout<< Nsamples - 1 << "." << endl;
+      return 1;
+    }
     for (int iE = 0; iE < EntryCount; iE++) {
       if (!HideProgressBar && (EntryCount < 300 || (iE % (EntryCount / 250)) == 0)) {
         Bar.Update(iE);
@@ -102,7 +111,8 @@ int main(int argc, char *argv[]) {
       ////////////////////////////////////////
       ////////// Global event stuff //////////
       ////////////////////////////////////////
-
+      MChargedHadronRAA.sampleType = sampleType;
+      MChargedHadronRAA.weightXsec = weightXsecRef_barn[sampleType]/EntryCount;
       MChargedHadronRAA.Run = MEvent.Run;
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;

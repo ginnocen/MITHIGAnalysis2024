@@ -3495,6 +3495,8 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Npart", &Npart);
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
+   Tree->SetBranchAddress("sampleType", &sampleType);
+   Tree->SetBranchAddress("weightXsec", &weightXsec);
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPtError", &trkPtError);
    Tree->SetBranchAddress("trkEta", &trkEta);
@@ -3555,6 +3557,8 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Npart",                 &Npart, "Npart/F");
    Tree->Branch("Ncoll",                 &Ncoll, "Ncoll/F");
    Tree->Branch("leadingPtEta1p0_sel",   &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
+   Tree->Branch("sampleType",            &sampleType, "sampleType/I");
+   Tree->Branch("weightXsec",            &weightXsec, "weightXsec/F");
    Tree->Branch("trkPt",                 &trkPt);
    Tree->Branch("trkPtError",            &trkPtError);
    Tree->Branch("trkEta",                &trkEta);
@@ -3589,6 +3593,8 @@ void ChargedHadronRAATreeMessenger::Clear()
    Npart = 0.;
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
+   sampleType = -1;
+   weightXsec = 0.;
    trkPt->clear();
    trkPtError->clear();
    trkEta->clear();
