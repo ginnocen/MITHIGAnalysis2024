@@ -148,7 +148,6 @@ int main(int argc, char *argv[]) {
       MMuMuJet.PTHat = MEvent.pthat;
       MMuMuJet.EventWeight = MEvent.weight;
       MMuMuJet.NCollWeight = FindNColl(MMuMuJet.hiBin);
-
       ////////////////////////////
       ////////// Vertex //////////
       ////////////////////////////
