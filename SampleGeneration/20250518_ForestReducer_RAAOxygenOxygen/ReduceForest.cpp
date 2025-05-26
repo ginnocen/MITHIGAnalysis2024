@@ -137,6 +137,7 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.VYError = MTrack.yErrVtx->at(BestVertex);
         MChargedHadronRAA.VZError = MTrack.zErrVtx->at(BestVertex);
         MChargedHadronRAA.isFakeVtx = MTrack.isFakeVtx->at(BestVertex);
+        MChargedHadronRAA.ptSumVtx = MTrack.ptSumVtx->at(BestVertex);
       }
       MChargedHadronRAA.nVtx = MTrack.nVtx;
       /////////////////////////////////////

@@ -3484,6 +3484,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
    Tree->SetBranchAddress("isFakeVtx", &isFakeVtx);
+   Tree->SetBranchAddress("ptSumVtx", &ptSumVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
@@ -3546,6 +3547,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("VYError",               &VYError, "VYError/F");
    Tree->Branch("VZError",               &VZError, "VZError/F");
    Tree->Branch("isFakeVtx",             &isFakeVtx, "isFakeVtx/O");
+   Tree->Branch("ptSumVtx",              &ptSumVtx, "ptSumVtx/F");
    Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
    Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
@@ -3582,6 +3584,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    VYError = 0.;
    VZError = 0.;
    isFakeVtx = false;
+   ptSumVtx = 0.;
    nVtx = 0;
    HFEMaxPlus = 9999.;
    HFEMaxMinus = 9999.;
