@@ -3527,6 +3527,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
    Tree->SetBranchAddress("isFakeVtx", &isFakeVtx);
+   Tree->SetBranchAddress("ptSumVtx", &ptSumVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
@@ -3538,6 +3539,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Npart", &Npart);
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
+   Tree->SetBranchAddress("sampleType", &sampleType);
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPtError", &trkPtError);
    Tree->SetBranchAddress("trkEta", &trkEta);
@@ -3576,32 +3578,34 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
 
    Tree = T;
 
-   Tree->Branch("Run",                   &Run, "Run/I");
-   Tree->Branch("Event",                 &Event, "Event/L");
-   Tree->Branch("Lumi",                  &Lumi, "Lumi/I");
-   Tree->Branch("hiBin",                 &hiBin, "hiBin/I");
-   Tree->Branch("VX",                    &VX, "VX/F");
-   Tree->Branch("VY",                    &VY, "VY/F");
-   Tree->Branch("VZ",                    &VZ, "VZ/F");
-   Tree->Branch("VXError",               &VXError, "VXError/F");
-   Tree->Branch("VYError",               &VYError, "VYError/F");
-   Tree->Branch("VZError",               &VZError, "VZError/F");
-   Tree->Branch("isFakeVtx",             &isFakeVtx, "isFakeVtx/O");
-   Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
-   Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
-   Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
-   Tree->Branch("PVFilter",              &PVFilter, "PVFilter/I");
+   Tree->Branch("Run",                        &Run, "Run/I");
+   Tree->Branch("Event",                      &Event, "Event/L");
+   Tree->Branch("Lumi",                       &Lumi, "Lumi/I");
+   Tree->Branch("hiBin",                      &hiBin, "hiBin/I");
+   Tree->Branch("VX",                         &VX, "VX/F");
+   Tree->Branch("VY",                         &VY, "VY/F");
+   Tree->Branch("VZ",                         &VZ, "VZ/F");
+   Tree->Branch("VXError",                    &VXError, "VXError/F");
+   Tree->Branch("VYError",                    &VYError, "VYError/F");
+   Tree->Branch("VZError",                    &VZError, "VZError/F");
+   Tree->Branch("isFakeVtx",                  &isFakeVtx, "isFakeVtx/O");
+   Tree->Branch("ptSumVtx",                   &ptSumVtx, "ptSumVtx/F");
+   Tree->Branch("nVtx",                       &nVtx, "nVtx/I");
+   Tree->Branch("HFEMaxPlus",                 &HFEMaxPlus, "HFEMaxPlus/F");
+   Tree->Branch("HFEMaxMinus",                &HFEMaxMinus, "HFEMaxMinus/F");
+   Tree->Branch("PVFilter",                   &PVFilter, "PVFilter/I");
    Tree->Branch("ClusterCompatibilityFilter", &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/I");
-   Tree->Branch("mMaxL1HFAdcPlus",       &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
-   Tree->Branch("mMaxL1HFAdcMinus",      &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
-   Tree->Branch("hiHF_pf",               &hiHF_pf, "hiHF_pf/F");
-   Tree->Branch("Npart",                 &Npart, "Npart/F");
-   Tree->Branch("Ncoll",                 &Ncoll, "Ncoll/F");
-   Tree->Branch("leadingPtEta1p0_sel",   &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
-   Tree->Branch("trkPt",                 &trkPt);
-   Tree->Branch("trkPtError",            &trkPtError);
-   Tree->Branch("trkEta",                &trkEta);
-   Tree->Branch("highPurity",            &highPurity);
+   Tree->Branch("mMaxL1HFAdcPlus",            &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
+   Tree->Branch("mMaxL1HFAdcMinus",           &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
+   Tree->Branch("hiHF_pf",                    &hiHF_pf, "hiHF_pf/F");
+   Tree->Branch("Npart",                      &Npart, "Npart/F");
+   Tree->Branch("Ncoll",                      &Ncoll, "Ncoll/F");
+   Tree->Branch("leadingPtEta1p0_sel",        &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
+   Tree->Branch("sampleType",                 &sampleType, "sampleType/I");
+   Tree->Branch("trkPt",                      &trkPt);
+   Tree->Branch("trkPtError",                 &trkPtError);
+   Tree->Branch("trkEta",                     &trkEta);
+   Tree->Branch("highPurity",                 &highPurity);
    return true;
 }
 
@@ -3621,6 +3625,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    VYError = 0.;
    VZError = 0.;
    isFakeVtx = false;
+   ptSumVtx = 0.;
    nVtx = 0;
    HFEMaxPlus = 9999.;
    HFEMaxMinus = 9999.;
@@ -3632,6 +3637,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    Npart = 0.;
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
+   sampleType = -1;
    trkPt->clear();
    trkPtError->clear();
    trkEta->clear();

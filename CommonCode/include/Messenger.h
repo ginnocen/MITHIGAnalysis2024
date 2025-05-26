@@ -976,6 +976,7 @@ public:
    int hiBin;
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    bool isFakeVtx;                              //best vertex from track tree
+   float ptSumVtx;
    int nVtx;
    float HFEMaxPlus;
    float HFEMaxMinus;
@@ -986,6 +987,7 @@ public:
    float Npart;
    float Ncoll;
    float leadingPtEta1p0_sel;
+   int sampleType;
 
    std::vector<float> *trkPt;
    std::vector<float> *trkPtError;

@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   // bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
-
+  int sampleType = CL.GetInteger("sampleType", 0); // 0 for Hadronic, 1 for Starlight SD, 2 for Starlight DD
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
@@ -82,7 +82,6 @@ int main(int argc, char *argv[]) {
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
-
     for (int iE = 0; iE < EntryCount; iE++) {
       if (!HideProgressBar && (EntryCount < 300 || (iE % (EntryCount / 250)) == 0)) {
         Bar.Update(iE);
@@ -102,7 +101,7 @@ int main(int argc, char *argv[]) {
       ////////////////////////////////////////
       ////////// Global event stuff //////////
       ////////////////////////////////////////
-
+      MChargedHadronRAA.sampleType = sampleType;
       MChargedHadronRAA.Run = MEvent.Run;
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;
@@ -127,6 +126,7 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.VYError = MTrack.yErrVtx->at(BestVertex);
         MChargedHadronRAA.VZError = MTrack.zErrVtx->at(BestVertex);
         MChargedHadronRAA.isFakeVtx = MTrack.isFakeVtx->at(BestVertex);
+        MChargedHadronRAA.ptSumVtx = MTrack.ptSumVtx->at(BestVertex);
       }
       MChargedHadronRAA.nVtx = MTrack.nVtx;
       /////////////////////////////////////
