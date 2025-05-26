@@ -20,8 +20,6 @@ using namespace std;
 
 #include "include/cent_OO_hijing_PF.h"
 
-// weights for hadronic, Starlight SD, and Starlight DD samples in barns
-// weight for DD still unknown --> set to 0 for now
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
 }
