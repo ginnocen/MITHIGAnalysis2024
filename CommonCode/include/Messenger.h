@@ -1052,6 +1052,8 @@ public:
    float hiHF;
    int NVertex;
    float VX, VY, VZ, VXError, VYError, VZError;
+   float NCollWeight;
+   float ExtraMuWeight[12];
    int NPU;
    //std::vectors
    std::vector<float> *JetPT;
