@@ -84,11 +84,6 @@ int main(int argc, char *argv[]) {
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
-    if (sampleType < 0 || sampleType >= Nsamples) {
-      std::cout << "Error: Invalid sampleType " << sampleType << ". Valid range is 0 to ";
-      std::cout<< Nsamples - 1 << "." << endl;
-      return 1;
-    }
     for (int iE = 0; iE < EntryCount; iE++) {
       if (!HideProgressBar && (EntryCount < 300 || (iE % (EntryCount / 250)) == 0)) {
         Bar.Update(iE);
