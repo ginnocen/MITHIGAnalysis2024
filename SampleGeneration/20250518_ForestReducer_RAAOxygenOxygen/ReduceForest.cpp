@@ -32,7 +32,7 @@ std::string toLower(const std::string &str) {
 }
 
 int main(int argc, char *argv[]);
-double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
+std::vector<float> GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
@@ -158,10 +158,14 @@ int main(int argc, char *argv[]) {
 
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
-      float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3.0, 5.2);
-      float EMaxHFMinus = GetMaxEnergyHF(&MPF, -5.2, -3.0);
-      MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus;
-      MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus;
+      std::vector<float> EMaxHFPlus_top3 = GetMaxEnergyHF(&MPF, 3.0, 5.2);
+      std::vector<float> EMaxHFMinus_top3 = GetMaxEnergyHF(&MPF, -5.2, -3.0);
+      MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus_top3[0];
+      MChargedHadronRAA.HFEMaxPlus2 = EMaxHFPlus_top3[1];
+      MChargedHadronRAA.HFEMaxPlus3 = EMaxHFPlus_top3[2];
+      MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus_top3[0];
+      MChargedHadronRAA.HFEMaxMinus2 = EMaxHFMinus_top3[1];
+      MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
       /*
       bool gapgammaN = EMaxHFPlus < 9.2;
       bool gapNgamma = EMaxHFMinus < 8.6;
@@ -234,18 +238,30 @@ int main(int argc, char *argv[]) {
 // ============================================================================ //
 // Function to Retrieve Maximum Energy in HF Region within Specified Eta Range
 // ============================================================================ //
-double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.) {
+std::vector<float> GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.) {
   if (M == nullptr)
-    return -1;
+    return {-9999.,-9999.,-9999.};
   if (M->Tree == nullptr)
-    return -1;
+    return {-9999.,-9999.,-9999.};
 
-  double EMax = 0;
+  std::vector<float> EMax_vec = {-1, -1, -1};
+
   for (int iPF = 0; iPF < M->ID->size(); iPF++) {
     if ((M->ID->at(iPF) == 6 || M->ID->at(iPF) == 7) && M->Eta->at(iPF) > etaMin && M->Eta->at(iPF) < etaMax) {
-      if (M->E->at(iPF) > EMax)
-        EMax = M->E->at(iPF);
+      float currentE = M->E->at(iPF);
+      
+      if (currentE > EMax_vec[0]) {
+        EMax_vec[2] = EMax_vec[1];
+        EMax_vec[1] = EMax_vec[0];
+        EMax_vec[0] = currentE;
+      } else if (currentE > EMax_vec[1]) {
+        EMax_vec[2] = EMax_vec[1];
+        EMax_vec[1] = currentE;
+      } else if (currentE > EMax_vec[2]) {
+        EMax_vec[2] = currentE;
+      }
     }
   }
-  return EMax;
+
+  return EMax_vec;
 }

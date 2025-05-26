@@ -3486,7 +3486,11 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("isFakeVtx", &isFakeVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
+   Tree->SetBranchAddress("HFEMaxPlus2", &HFEMaxPlus2);
+   Tree->SetBranchAddress("HFEMaxPlus3", &HFEMaxPlus3);
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
+   Tree->SetBranchAddress("HFEMaxMinus2", &HFEMaxMinus2);
+   Tree->SetBranchAddress("HFEMaxMinus3", &HFEMaxMinus3);
    Tree->SetBranchAddress("PVFilter", &PVFilter);
    Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
    Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
@@ -3546,7 +3550,11 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("isFakeVtx",             &isFakeVtx, "isFakeVtx/O");
    Tree->Branch("nVtx",                  &nVtx, "nVtx/I");
    Tree->Branch("HFEMaxPlus",            &HFEMaxPlus, "HFEMaxPlus/F");
+   Tree->Branch("HFEMaxPlus2",           &HFEMaxPlus2, "HFEMaxPlus2/F");
+   Tree->Branch("HFEMaxPlus3",           &HFEMaxPlus3, "HFEMaxPlus3/F");
    Tree->Branch("HFEMaxMinus",           &HFEMaxMinus, "HFEMaxMinus/F");
+   Tree->Branch("HFEMaxMinus2",          &HFEMaxMinus2, "HFEMaxMinus2/F");
+   Tree->Branch("HFEMaxMinus3",          &HFEMaxMinus3, "HFEMaxMinus3/F");
    Tree->Branch("PVFilter",              &PVFilter, "PVFilter/I");
    Tree->Branch("ClusterCompatibilityFilter", &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/I");
    Tree->Branch("mMaxL1HFAdcPlus",       &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
@@ -3579,8 +3587,12 @@ void ChargedHadronRAATreeMessenger::Clear()
    VZError = 0.;
    isFakeVtx = false;
    nVtx = 0;
-   HFEMaxPlus = 9999.;
-   HFEMaxMinus = 9999.;
+   HFEMaxPlus = -9999.;
+   HFEMaxPlus2 = -9999.;
+   HFEMaxPlus3 = -9999.;
+   HFEMaxMinus = -9999.;
+   HFEMaxMinus2 = -9999.;
+   HFEMaxMinus3 = -9999.;
    PVFilter = 0;
    ClusterCompatibilityFilter = 0;
    mMaxL1HFAdcPlus = 0;

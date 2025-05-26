@@ -933,7 +933,11 @@ public:
    bool isFakeVtx;                              //best vertex from track tree
    int nVtx;
    float HFEMaxPlus;
+   float HFEMaxPlus2;
+   float HFEMaxPlus3;
    float HFEMaxMinus;
+   float HFEMaxMinus2;
+   float HFEMaxMinus3;
    int ClusterCompatibilityFilter;
    int PVFilter;
    int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
