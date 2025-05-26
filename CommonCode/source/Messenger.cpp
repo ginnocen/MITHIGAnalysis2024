@@ -590,7 +590,7 @@ bool JetTreeMessenger::Initialize()
    if(Tree->GetBranch("svtxdl")) Tree->SetBranchAddress("svtxdl",&svtxdl);
    if(Tree->GetBranch("svtxdls")) Tree->SetBranchAddress("svtxdls",&svtxdls);
    if(Tree->GetBranch("svtxdl2d")) Tree->SetBranchAddress("svtxdl2d",&svtxdl2d);
-   if(Tree->GetBranch("svtxdls2d")) Tree->SetBranchAddress("svtxdls",&svtxdls2d);
+   if(Tree->GetBranch("svtxdls2d")) Tree->SetBranchAddress("svtxdls2d",&svtxdls2d);
    if(Tree->GetBranch("svtxm")) Tree->SetBranchAddress("svtxm",&svtxm);
    if(Tree->GetBranch("svtxmcorr")) Tree->SetBranchAddress("svtxmcorr",&svtxmcorr);
    if(Tree->GetBranch("svtxpt")) Tree->SetBranchAddress("svtxpt",&svtxpt);
