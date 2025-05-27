@@ -4143,6 +4143,7 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete mumuY;
       delete mumuPhi;
       delete mumuPt;
+      delete mumuisOnia;
       delete DRJetmu1;
       delete DRJetmu2;
       delete muDeta;
@@ -4230,6 +4231,7 @@ bool MuMuJetMessenger::Initialize()
    mumuY = nullptr;
    mumuPhi = nullptr;
    mumuPt = nullptr;
+   mumuisOnia = nullptr;
    DRJetmu1 = nullptr;
    DRJetmu2 = nullptr;
    muDeta = nullptr;
@@ -4321,6 +4323,7 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("mumuY", &mumuY);
    Tree->SetBranchAddress("mumuPhi", &mumuPhi);
    Tree->SetBranchAddress("mumuPt", &mumuPt);
+   Tree->SetBranchAddress("mumuisOnia", &mumuisOnia);
    Tree->SetBranchAddress("DRJetmu1", &DRJetmu1);
    Tree->SetBranchAddress("DRJetmu2", &DRJetmu2);
    Tree->SetBranchAddress("muDeta", &muDeta);
@@ -4422,6 +4425,7 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    mumuY = new std::vector<float>();
    mumuPhi = new std::vector<float>();
    mumuPt = new std::vector<float>();
+   mumuisOnia = new std::vector<int>();
    DRJetmu1 = new std::vector<float>();
    DRJetmu2 = new std::vector<float>();
    muDeta = new std::vector<float>();
@@ -4515,6 +4519,7 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("mumuY", &mumuY);
    Tree->Branch("mumuPhi", &mumuPhi);
    Tree->Branch("mumuPt", &mumuPt);
+   Tree->Branch("mumuisOnia", &mumuisOnia);
    Tree->Branch("DRJetmu1", &DRJetmu1);
    Tree->Branch("DRJetmu2", &DRJetmu2);
    Tree->Branch("muDeta", &muDeta);
@@ -4620,6 +4625,7 @@ void MuMuJetMessenger::Clear()
    mumuY->clear();
    mumuPhi->clear();
    mumuPt->clear();
+   mumuisOnia->clear();
    DRJetmu1->clear();
    DRJetmu2->clear();
    muDeta->clear();
@@ -4720,6 +4726,7 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(mumuY != nullptr && M.mumuY != nullptr)   *mumuY = *(M.mumuY);
    if(mumuPhi != nullptr && M.mumuPhi != nullptr)   *mumuPhi = *(M.mumuPhi);
    if(mumuPt != nullptr && M.mumuPt != nullptr)   *mumuPt = *(M.mumuPt);
+   if(mumuisOnia != nullptr && M.mumuisOnia != nullptr)   *mumuisOnia = *(M.mumuisOnia);
    if(DRJetmu1 != nullptr && M.DRJetmu1 != nullptr)   *DRJetmu1 = *(M.DRJetmu1);
    if(DRJetmu2 != nullptr && M.DRJetmu2 != nullptr)   *DRJetmu2 = *(M.DRJetmu2);
    if(muDeta != nullptr && M.muDeta != nullptr)   *muDeta = *(M.muDeta);

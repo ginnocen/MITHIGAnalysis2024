@@ -183,8 +183,8 @@ int main(int argc, char *argv[]) {
           int beamScrapingFilter = MSkim.BeamScrapingFilter;
           if (pprimaryVertexFilter == 0 || beamScrapingFilter == 0)
             continue;
-          int HLT_HIL3DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL3DoubleMu");
-          if (HLT_HIL3DoubleMuOpen_2018 == 0)
+          int minbiastrigger = MTrigger.CheckTriggerStartWith("HLT_HIMinimumBias_v*");
+          if (minbiastrigger == 0)
             continue;
         } // end if pp data
       } else { // if PbPb
@@ -200,8 +200,8 @@ int main(int argc, char *argv[]) {
 
           // HLT trigger to select dimuon events, see Kaya's note: AN2019_143_v12, p.5
           //  FIXME: need to be replaced with the actual PbPb triggers
-          int HLT_HIL3DoubleMuOpen_2018 = MTrigger.CheckTriggerStartWith("HLT_HIL3DoubleMu");
-          if (HLT_HIL3DoubleMuOpen_2018 == 0)
+          int minbiastrigger = MTrigger.CheckTriggerStartWith("HLT_HIMinimumBias_v*");
+          if (minbiastrigger == 0)
             continue;
         }
       }
@@ -215,7 +215,7 @@ int main(int argc, char *argv[]) {
                           MJet.JetPFCHF[ijet] > 0. && MJet.JetPFCHM[ijet] > 0. && MJet.JetPFCEF[ijet] < 0.80;
         if (!passPurity)
           continue;
-        // std::cout << "event: " << iE << " jet: " << ijet << " nsvtx: " << MJet.jtNsvtx[ijet] << endl;
+        
         MMuMuJet.MJTHadronFlavor->push_back(MJet.MJTHadronFlavor[ijet]);
         MMuMuJet.MJTNcHad->push_back(MJet.MJTNcHad[ijet]);
         MMuMuJet.MJTNbHad->push_back(MJet.MJTNbHad[ijet]);
@@ -354,6 +354,7 @@ int main(int argc, char *argv[]) {
         float mumuY = -999.;
         float mumuPhi = -999.;
         float mumuPt = -999.;
+        int mumuisOnia = -999;
         float DRJetmu1 = -999.;
         float DRJetmu2 = -999.;
         float muDeta = -999.;
@@ -442,6 +443,7 @@ int main(int argc, char *argv[]) {
           mumuY = MuMu.Rapidity();
           mumuPhi = MuMu.Phi();
           mumuPt = MuMu.Pt();
+          mumuisOnia = isOnia(mumuMass);
           float jetEta = MJet.JetEta[ijet];
           float jetPhi = MJet.JetPhi[ijet];
           float muEta1 = MSingleMu.SingleMuEta->at(maxMu1Index);
@@ -483,6 +485,7 @@ int main(int argc, char *argv[]) {
         MMuMuJet.mumuY->push_back(mumuY);
         MMuMuJet.mumuPhi->push_back(mumuPhi);
         MMuMuJet.mumuPt->push_back(mumuPt);
+        MMuMuJet.mumuisOnia->push_back(mumuisOnia);
         MMuMuJet.DRJetmu1->push_back(DRJetmu1);
         MMuMuJet.DRJetmu2->push_back(DRJetmu2);
         MMuMuJet.muDeta->push_back(muDeta);
@@ -607,7 +610,7 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
     return false;
   if (M->Tree == nullptr)
     return false;
-  if (M->SingleMuPT->at(i) < 3.)
+  if (M->SingleMuPT->at(i) < 3.5)
     return false;
   if (fabs(M->SingleMuEta->at(i)) > 2.3)
     return false;
@@ -639,7 +642,35 @@ float min_angle(float phi1, float phi2) {
   return diff;
 }
 
-std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi) {
+int isOnia(float mass){
+
+
+    // J/psi mass window
+    float mjpsi = 3.0969
+    float mjpsi_width = .0002778;
+    if(fabs(mass - mjpsi) < mjpsi_width){
+        return 1; // J/psi
+    }
+
+    // Psi(2S) mass window
+    float mpsi2s = 3.686097; 
+    float mpsi2s_width = 0.000879; // 0.67 MeV
+    if(fabs(mass - mpsi2s) < mpsi2s_width){
+        return 2; // Psi(2S)
+    }
+
+    // Upsilon
+    float mupsilon = 9.46040;
+    float mupsilon_width = 0.00016206; // 260 keV
+    if(fabs(mass - mupsilon) < mupsilon_width){
+        return 3; // Upsilon
+    }
+    
+    return 0;
+
+}
+
+std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi){
 
   std::vector<int> idx = {-1, -1};
   std::vector<int> bad = {-1, -1};
