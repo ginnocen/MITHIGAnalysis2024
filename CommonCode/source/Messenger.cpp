@@ -3536,6 +3536,17 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
 
    if (DebugMode) {
       // initialize debug quantities
+      AllxVtx = nullptr;
+      AllyVtx = nullptr;
+      AllzVtx = nullptr;
+      AllxVtxError = nullptr;
+      AllyVtxError = nullptr;
+      AllzVtxError = nullptr;
+      AllisFakeVtx = nullptr;
+      AllnTracksVtx = nullptr;
+      Allchi2Vtx = nullptr;
+      AllndofVtx = nullptr;
+      AllptSumVtx = nullptr;
 
       Tree->SetBranchAddress("AllxVtx", &AllxVtx);
       Tree->SetBranchAddress("AllyVtx", &AllyVtx);
