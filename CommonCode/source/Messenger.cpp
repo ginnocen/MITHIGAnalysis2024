@@ -2215,6 +2215,9 @@ bool PPTrackTreeMessenger::Initialize()
    yErrVtx = nullptr;
    zErrVtx = nullptr;
    isFakeVtx = nullptr;
+   nTracksVtx = nullptr;
+   chi2Vtx = nullptr;
+   ndofVtx = nullptr;
    trkPt = nullptr;
    trkPtError = nullptr;
    trkEta = nullptr;
@@ -2230,6 +2233,9 @@ bool PPTrackTreeMessenger::Initialize()
    Tree->SetBranchAddress("yErrVtx", &yErrVtx);
    Tree->SetBranchAddress("zErrVtx", &zErrVtx);
    Tree->SetBranchAddress("isFakeVtx", &isFakeVtx);
+   Tree->SetBranchAddress("nTracksVtx", &nTracksVtx);
+   Tree->SetBranchAddress("chi2Vtx", &chi2Vtx);
+   Tree->SetBranchAddress("ndofVtx", &ndofVtx);
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPtError", &trkPtError);
    Tree->SetBranchAddress("trkEta", &trkEta);
@@ -3453,6 +3459,22 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
       delete trkPtError;
       delete trkEta;
       delete highPurity;
+
+      if (DebugMode == true) {
+         // delete debug related vectors
+
+         delete AllxVtx;
+         delete AllyVtx;
+         delete AllzVtx;
+         delete AllxVtxError;
+         delete AllyVtxError;
+         delete AllzVtxError;
+         delete AllisFakeVtx;
+         delete AllnTracksVtx;
+         delete Allchi2Vtx;
+         delete AllndofVtx;
+         delete AllptSumVtx;
+      }
    }
 }
 
@@ -3468,6 +3490,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
       return false;
 
    Initialized = true;
+   DebugMode = Debug;
    trkPt = nullptr;
    trkPtError = nullptr;
    trkEta = nullptr;
@@ -3485,6 +3508,9 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VZError", &VZError);
    Tree->SetBranchAddress("isFakeVtx", &isFakeVtx);
    Tree->SetBranchAddress("ptSumVtx", &ptSumVtx);
+   Tree->SetBranchAddress("nTracksVtx", &nTracksVtx);
+   Tree->SetBranchAddress("chi2Vtx", &chi2Vtx);
+   Tree->SetBranchAddress("ndofVtx", &ndofVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxPlus2", &HFEMaxPlus2);
@@ -3492,6 +3518,8 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
    Tree->SetBranchAddress("HFEMaxMinus2", &HFEMaxMinus2);
    Tree->SetBranchAddress("HFEMaxMinus3", &HFEMaxMinus3);
+   Tree->SetBranchAddress("ZDCsumPlus", &ZDCsumPlus);
+   Tree->SetBranchAddress("ZDCsumMinus", &ZDCsumMinus);
    Tree->SetBranchAddress("PVFilter", &PVFilter);
    Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
    Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
@@ -3505,6 +3533,23 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("trkPtError", &trkPtError);
    Tree->SetBranchAddress("trkEta", &trkEta);
    Tree->SetBranchAddress("highPurity", &highPurity);
+
+   if (DebugMode) {
+      // initialize debug quantities
+
+      Tree->SetBranchAddress("AllxVtx", &AllxVtx);
+      Tree->SetBranchAddress("AllyVtx", &AllyVtx);
+      Tree->SetBranchAddress("AllzVtx", &AllzVtx);
+      Tree->SetBranchAddress("AllxVtxError", &AllxVtxError);
+      Tree->SetBranchAddress("AllyVtxError", &AllyVtxError);
+      Tree->SetBranchAddress("AllzVtxError", &AllzVtxError);
+      Tree->SetBranchAddress("AllisFakeVtx", &AllisFakeVtx);
+      Tree->SetBranchAddress("AllnTracksVtx", &AllnTracksVtx);
+      Tree->SetBranchAddress("Allchi2Vtx", &Allchi2Vtx);
+      Tree->SetBranchAddress("AllndofVtx", &AllndofVtx);
+      Tree->SetBranchAddress("AllptSumVtx", &AllptSumVtx);
+   }
+
    return true;
 }
 
@@ -3524,13 +3569,14 @@ bool ChargedHadronRAATreeMessenger::GetEntry(int iEntry)
    return true;
 }
 
-bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
+bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
 {
    if(T == nullptr)
       return false;
 
    Initialized = true;
    WriteMode = true;
+   DebugMode = Debug;
 
    trkPt = new std::vector<float>();
    trkPtError = new std::vector<float>();
@@ -3551,6 +3597,9 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("VZError",                    &VZError, "VZError/F");
    Tree->Branch("isFakeVtx",                  &isFakeVtx, "isFakeVtx/O");
    Tree->Branch("ptSumVtx",                   &ptSumVtx, "ptSumVtx/F");
+   Tree->Branch("nTracksVtx",                 &nTracksVtx, "nTracksVtx/I");
+   Tree->Branch("chi2Vtx",                    &chi2Vtx, "chi2Vtx/F");
+   Tree->Branch("ndofVtx",                    &ndofVtx, "ndofVtx/F");
    Tree->Branch("nVtx",                       &nVtx, "nVtx/I");
    Tree->Branch("HFEMaxPlus",                 &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxPlus2",                &HFEMaxPlus2, "HFEMaxPlus2/F");
@@ -3559,6 +3608,8 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("HFEMaxMinus2",               &HFEMaxMinus2, "HFEMaxMinus2/F");
    Tree->Branch("HFEMaxMinus3",               &HFEMaxMinus3, "HFEMaxMinus3/F");
    Tree->Branch("PVFilter",                   &PVFilter, "PVFilter/I");
+   Tree->Branch("ZDCsumPlus",                 &ZDCsumPlus, "ZDCsumPlus/F");
+   Tree->Branch("ZDCsumMinus",                &ZDCsumMinus, "ZDCsumMinus/F");
    Tree->Branch("ClusterCompatibilityFilter", &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/I");
    Tree->Branch("mMaxL1HFAdcPlus",            &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
    Tree->Branch("mMaxL1HFAdcMinus",           &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
@@ -3571,6 +3622,34 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T)
    Tree->Branch("trkPtError",                 &trkPtError);
    Tree->Branch("trkEta",                     &trkEta);
    Tree->Branch("highPurity",                 &highPurity);
+
+   if (DebugMode) {
+      // set debug related branches
+      AllxVtx = new std::vector<float>();
+      AllyVtx = new std::vector<float>();
+      AllzVtx = new std::vector<float>();
+      AllxVtxError = new std::vector<float>();
+      AllyVtxError = new std::vector<float>();
+      AllzVtxError = new std::vector<float>();
+      AllisFakeVtx = new std::vector<bool>();
+      AllnTracksVtx = new std::vector<int>();
+      Allchi2Vtx = new std::vector<float>();
+      AllndofVtx = new std::vector<float>();
+      AllptSumVtx = new std::vector<float>();
+
+      Tree->Branch("AllxVtx",                 &AllxVtx);
+      Tree->Branch("AllyVtx",                 &AllyVtx);
+      Tree->Branch("AllzVtx",                 &AllzVtx);
+      Tree->Branch("AllxVtxError",            &AllxVtxError);
+      Tree->Branch("AllyVtxError",            &AllyVtxError);
+      Tree->Branch("AllzVtxError",            &AllzVtxError);
+      Tree->Branch("AllisFakeVtx",            &AllisFakeVtx);
+      Tree->Branch("AllnTracksVtx",           &AllnTracksVtx);
+      Tree->Branch("Allchi2Vtx",              &Allchi2Vtx);
+      Tree->Branch("AllndofVtx",              &AllndofVtx);
+      Tree->Branch("AllptSumVtx",             &AllptSumVtx);
+   }
+
    return true;
 }
 
@@ -3591,6 +3670,9 @@ void ChargedHadronRAATreeMessenger::Clear()
    VZError = 0.;
    isFakeVtx = false;
    ptSumVtx = 0.;
+   nTracksVtx = 0.;
+   chi2Vtx = 0.;
+   ndofVtx = 0.;
    nVtx = 0;
    HFEMaxPlus = -9999.;
    HFEMaxPlus2 = -9999.;
@@ -3598,6 +3680,8 @@ void ChargedHadronRAATreeMessenger::Clear()
    HFEMaxMinus = -9999.;
    HFEMaxMinus2 = -9999.;
    HFEMaxMinus3 = -9999.;
+   ZDCsumPlus = -9999.;
+   ZDCsumMinus = -9999.;
    PVFilter = 0;
    ClusterCompatibilityFilter = 0;
    mMaxL1HFAdcPlus = 0;
@@ -3611,6 +3695,22 @@ void ChargedHadronRAATreeMessenger::Clear()
    trkPtError->clear();
    trkEta->clear();
    highPurity->clear();
+
+   if (DebugMode) {
+      // clear debug related branches
+
+      AllxVtx->clear();
+      AllyVtx->clear();
+      AllzVtx->clear();
+      AllxVtxError->clear();
+      AllyVtxError->clear();
+      AllzVtxError->clear();
+      AllisFakeVtx->clear();
+      AllnTracksVtx->clear();
+      Allchi2Vtx->clear();
+      AllndofVtx->clear();
+      AllptSumVtx->clear();
+   }
 }
 /*
 void ChargedHadronRAATreeMessenger::CopyNonTrack(ChargedHadronRAATreeMessenger &M)

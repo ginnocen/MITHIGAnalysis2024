@@ -53,12 +53,13 @@ int main(int argc, char *argv[]) {
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
+  bool DebugMode = CL.GetBool("DebugMode", false);
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
-  MChargedHadronRAA.SetBranch(&Tree);
+  MChargedHadronRAA.SetBranch(&Tree, DebugMode);
 
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
@@ -69,8 +70,8 @@ int main(int argc, char *argv[]) {
     PFTreeMessenger MPF(InputFile, PFTreeName);                        // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile);                                // skimanalysis/HltTree
     HFAdcMessenger MHFAdc(InputFile);                                  // HFAdcana/adc
+    ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);                     // zdcanalyzer/zdcrechit
     // TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
-    // ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     // METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
 
     int EntryCount = MEvent.GetEntries() * Fraction;
@@ -94,8 +95,8 @@ int main(int argc, char *argv[]) {
       MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
       MHFAdc.GetEntry(iE);
+      MZDC.GetEntry(iE);
       // MTrigger.GetEntry(iE);
-      // MZDC.GetEntry(iE);
       // MMETFilter.GetEntry(iE);
 
       ////////////////////////////////////////
@@ -127,6 +128,9 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.VZError = MTrack.zErrVtx->at(BestVertex);
         MChargedHadronRAA.isFakeVtx = MTrack.isFakeVtx->at(BestVertex);
         MChargedHadronRAA.ptSumVtx = MTrack.ptSumVtx->at(BestVertex);
+        MChargedHadronRAA.nTracksVtx = MTrack.nTracksVtx->at(BestVertex);
+        MChargedHadronRAA.chi2Vtx = MTrack.chi2Vtx->at(BestVertex);
+        MChargedHadronRAA.ndofVtx = MTrack.ndofVtx->at(BestVertex);
       }
       MChargedHadronRAA.nVtx = MTrack.nVtx;
       /////////////////////////////////////
@@ -140,16 +144,16 @@ int main(int argc, char *argv[]) {
           // MChargedHadronRAA.isHLT_HIZB = HLT_HIZB_;
           // if (ApplyTriggerRejection == 1 && IsData && (HLT_HIZB_ == false)) continue;
           // if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
-          // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-          // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+          MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
+          MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
           MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
           MChargedHadronRAA.PVFilter = MSkim.PVFilter;
           MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
           MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
         } // end of year == 2025
       } else { // if not data
-               // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-               // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+        MChargedHadronRAA.ZDCsumPlus = 0;
+        MChargedHadronRAA.ZDCsumMinus = 0;
         MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
         MChargedHadronRAA.PVFilter = MSkim.PVFilter;
         MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
@@ -216,6 +220,27 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.highPurity->push_back(highPurity);
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
+
+      ////////////////////////////
+      ///// Debug variables //////
+      ////////////////////////////
+
+      if (DebugMode) {
+        for (int iDebVtx = 0; iDebVtx < MTrack.nVtx; iDebVtx++) {
+          MChargedHadronRAA.AllxVtx->push_back(MTrack.xVtx->at(iDebVtx));
+          MChargedHadronRAA.AllyVtx->push_back(MTrack.yVtx->at(iDebVtx));
+          MChargedHadronRAA.AllzVtx->push_back(MTrack.zVtx->at(iDebVtx));
+          MChargedHadronRAA.AllxVtxError->push_back(MTrack.xErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllyVtxError->push_back(MTrack.yErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllzVtxError->push_back(MTrack.zErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllisFakeVtx->push_back(MTrack.isFakeVtx->at(iDebVtx));
+          MChargedHadronRAA.AllnTracksVtx->push_back(MTrack.nTracksVtx->at(iDebVtx));
+          MChargedHadronRAA.Allchi2Vtx->push_back(MTrack.chi2Vtx->at(iDebVtx));
+          MChargedHadronRAA.AllndofVtx->push_back(MTrack.ndofVtx->at(iDebVtx));
+          MChargedHadronRAA.AllptSumVtx->push_back(MTrack.ptSumVtx->at(iDebVtx));
+        }
+      }
+
       MChargedHadronRAA.FillEntry();
     }
     if (!HideProgressBar) {
