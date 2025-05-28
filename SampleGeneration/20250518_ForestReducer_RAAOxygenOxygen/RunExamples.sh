@@ -8,24 +8,27 @@ mkdir -p Output/
    --DoGenLevel false \
    --Year 2025 \
    --IsData false \
-   --Fraction 1 \
+   --Fraction 1. \
    --PFTree particleFlowAnalyser/pftree \
-   --sampleType 0
+   --sampleType 0 \
+   --DebugMode true
 
 ./Execute --Input ${PATHSAMPLE}/crab_HiForest_250514_Starlight_SingleDiffraction_OO_5362GeV_1505PR47944.root \
    --Output ${PATHSKIMSAMPLE}/skim_HiForest_250514_Starlight_SingleDiffraction_OO_5362GeV_1505PR47944.root \
    --DoGenLevel false \
    --Year 2025 \
-   --Fraction 1 \
+   --Fraction 1. \
    --IsData false \
    --PFTree particleFlowAnalyser/pftree \
-   --sampleType 1
+   --sampleType 1 \
+   --DebugMode true
 
 ./Execute --Input ${PATHSAMPLE}/crab_HiForest_250514_Starlight_DoubleDiffraction_OO_5362GeV_1505PR47944.root \
    --Output ${PATHSKIMSAMPLE}/skim_HiForest_250514_Starlight_DoubleDiffraction_OO_5362GeV_1505PR47944.root \
    --DoGenLevel false \
    --Year 2025 \
-   --Fraction 1 \
+   --Fraction 1. \
    --IsData false \
    --PFTree particleFlowAnalyser/pftree \
-   --sampleType 2
+   --sampleType 2 \
+   --DebugMode true
