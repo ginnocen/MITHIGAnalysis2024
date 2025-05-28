@@ -1,0 +1,30 @@
+/data00/OOsamples/skims/skim_crab_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root
+
+------- Drawing Histogram of: trkEta -------
+HFEMaxPlusCut: 0
+HFEMaxMinusCut: 0
+Total number of events: 979421
+Total number of subevents: 215433393
+
+------- Draw Complete -------
+------- Drawing Histogram of: trkEta -------
+HFEMaxPlusCut: 20
+HFEMaxMinusCut: 0
+Total number of events: 979421
+Total number of subevents: 215433393
+
+------- Draw Complete -------
+------- Drawing Histogram of: trkEta -------
+HFEMaxPlusCut: 0
+HFEMaxMinusCut: 20
+Total number of events: 979421
+Total number of subevents: 215433393
+
+------- Draw Complete -------
+------- Drawing Histogram of: trkEta -------
+HFEMaxPlusCut: 20
+HFEMaxMinusCut: 20
+Total number of events: 925172
+Total number of subevents: 214651998
+
+------- Draw Complete -------
