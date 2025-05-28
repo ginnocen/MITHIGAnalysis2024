@@ -27,6 +27,7 @@ class DataAnalyzer {
 public:
   TFile *inf, *outf;
   TH1D *hTrkPt;
+  TH2D *hTrkPtEta;
   ChargedHadronRAATreeMessenger *MChargedHadronRAA;
   TNtuple *nt;
   string title;
@@ -48,6 +49,8 @@ public:
     outf->cd();
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", 100, 0, 10);
     hTrkPt->Sumw2();
+    hTrkPtEta = new TH2D(Form("hTrkPtEta%s", title.c_str()), "", 40, 0, 20, 50, -4.0, 4.0);
+    hTrkPtEta->Sumw2();
     par.printParameters();
     unsigned long nEntry = MChargedHadronRAA->GetEntries() * par.scaleFactor;
     ProgressBar Bar(cout, nEntry);
@@ -60,6 +63,7 @@ public:
         Bar.Print();
         for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
           hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j));
+          hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j));
         }
       }
     } // end of event loop
@@ -68,6 +72,7 @@ public:
   void writeHistograms(TFile *outf) {
     outf->cd();
     smartWrite(hTrkPt);
+    smartWrite(hTrkPtEta);
     smartWrite(nt);
   }
 
@@ -82,8 +87,8 @@ int main(int argc, char *argv[]) {
   if (printHelpMessage(argc, argv))
     return 0;
   CommandLine CL(argc, argv);
-  float MinTrackPt = CL.GetDouble("MinTrackPt", 1.0);   // Minimum track pT selection
-  bool IsData = CL.GetBool("IsData", 0); // Data or MC
+  float MinTrackPt = CL.GetDouble("MinTrackPt", 1.0); // Minimum track pT selection
+  bool IsData = CL.GetBool("IsData", 0);              // Data or MC
   float scaleFactor = CL.GetDouble("ScaleFactor", 1.0);
   int TriggerChoice = CL.GetInt("TriggerChoice", 0);
   Parameters par(MinTrackPt, TriggerChoice, IsData, scaleFactor);
