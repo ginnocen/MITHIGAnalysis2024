@@ -32,7 +32,7 @@ std::string toLower(const std::string &str) {
 }
 
 int main(int argc, char *argv[]);
-double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
+std::vector<float> GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
@@ -53,12 +53,13 @@ int main(int argc, char *argv[]) {
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
+  bool DebugMode = CL.GetBool("DebugMode", false);
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
-  MChargedHadronRAA.SetBranch(&Tree);
+  MChargedHadronRAA.SetBranch(&Tree, DebugMode);
 
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
@@ -69,8 +70,8 @@ int main(int argc, char *argv[]) {
     PFTreeMessenger MPF(InputFile, PFTreeName);                        // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile);                                // skimanalysis/HltTree
     HFAdcMessenger MHFAdc(InputFile);                                  // HFAdcana/adc
+    ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);                     // zdcanalyzer/zdcrechit
     // TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
-    // ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     // METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
 
     int EntryCount = MEvent.GetEntries() * Fraction;
@@ -94,8 +95,8 @@ int main(int argc, char *argv[]) {
       MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
       MHFAdc.GetEntry(iE);
+      MZDC.GetEntry(iE);
       // MTrigger.GetEntry(iE);
-      // MZDC.GetEntry(iE);
       // MMETFilter.GetEntry(iE);
 
       ////////////////////////////////////////
@@ -127,6 +128,9 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.VZError = MTrack.zErrVtx->at(BestVertex);
         MChargedHadronRAA.isFakeVtx = MTrack.isFakeVtx->at(BestVertex);
         MChargedHadronRAA.ptSumVtx = MTrack.ptSumVtx->at(BestVertex);
+        MChargedHadronRAA.nTracksVtx = MTrack.nTracksVtx->at(BestVertex);
+        MChargedHadronRAA.chi2Vtx = MTrack.chi2Vtx->at(BestVertex);
+        MChargedHadronRAA.ndofVtx = MTrack.ndofVtx->at(BestVertex);
       }
       MChargedHadronRAA.nVtx = MTrack.nVtx;
       /////////////////////////////////////
@@ -140,16 +144,16 @@ int main(int argc, char *argv[]) {
           // MChargedHadronRAA.isHLT_HIZB = HLT_HIZB_;
           // if (ApplyTriggerRejection == 1 && IsData && (HLT_HIZB_ == false)) continue;
           // if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
-          // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-          // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+          MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
+          MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
           MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
           MChargedHadronRAA.PVFilter = MSkim.PVFilter;
           MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
           MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
         } // end of year == 2025
       } else { // if not data
-               // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-               // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+        MChargedHadronRAA.ZDCsumPlus = 0;
+        MChargedHadronRAA.ZDCsumMinus = 0;
         MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
         MChargedHadronRAA.PVFilter = MSkim.PVFilter;
         MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
@@ -158,10 +162,14 @@ int main(int argc, char *argv[]) {
 
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
-      float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3.0, 5.2);
-      float EMaxHFMinus = GetMaxEnergyHF(&MPF, -5.2, -3.0);
-      MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus;
-      MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus;
+      std::vector<float> EMaxHFPlus_top3 = GetMaxEnergyHF(&MPF, 3.0, 5.2);
+      std::vector<float> EMaxHFMinus_top3 = GetMaxEnergyHF(&MPF, -5.2, -3.0);
+      MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus_top3[0];
+      MChargedHadronRAA.HFEMaxPlus2 = EMaxHFPlus_top3[1];
+      MChargedHadronRAA.HFEMaxPlus3 = EMaxHFPlus_top3[2];
+      MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus_top3[0];
+      MChargedHadronRAA.HFEMaxMinus2 = EMaxHFMinus_top3[1];
+      MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
       /*
       bool gapgammaN = EMaxHFPlus < 9.2;
       bool gapNgamma = EMaxHFMinus < 8.6;
@@ -212,6 +220,27 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.highPurity->push_back(highPurity);
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
+
+      ////////////////////////////
+      ///// Debug variables //////
+      ////////////////////////////
+
+      if (DebugMode) {
+        for (int iDebVtx = 0; iDebVtx < MTrack.nVtx; iDebVtx++) {
+          MChargedHadronRAA.AllxVtx->push_back(MTrack.xVtx->at(iDebVtx));
+          MChargedHadronRAA.AllyVtx->push_back(MTrack.yVtx->at(iDebVtx));
+          MChargedHadronRAA.AllzVtx->push_back(MTrack.zVtx->at(iDebVtx));
+          MChargedHadronRAA.AllxVtxError->push_back(MTrack.xErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllyVtxError->push_back(MTrack.yErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllzVtxError->push_back(MTrack.zErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllisFakeVtx->push_back(MTrack.isFakeVtx->at(iDebVtx));
+          MChargedHadronRAA.AllnTracksVtx->push_back(MTrack.nTracksVtx->at(iDebVtx));
+          MChargedHadronRAA.Allchi2Vtx->push_back(MTrack.chi2Vtx->at(iDebVtx));
+          MChargedHadronRAA.AllndofVtx->push_back(MTrack.ndofVtx->at(iDebVtx));
+          MChargedHadronRAA.AllptSumVtx->push_back(MTrack.ptSumVtx->at(iDebVtx));
+        }
+      }
+
       MChargedHadronRAA.FillEntry();
     }
     if (!HideProgressBar) {
@@ -234,18 +263,30 @@ int main(int argc, char *argv[]) {
 // ============================================================================ //
 // Function to Retrieve Maximum Energy in HF Region within Specified Eta Range
 // ============================================================================ //
-double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.) {
+std::vector<float> GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.) {
   if (M == nullptr)
-    return -1;
+    return {-9999.,-9999.,-9999.};
   if (M->Tree == nullptr)
-    return -1;
+    return {-9999.,-9999.,-9999.};
 
-  double EMax = 0;
+  std::vector<float> EMax_vec = {-1, -1, -1};
+
   for (int iPF = 0; iPF < M->ID->size(); iPF++) {
     if ((M->ID->at(iPF) == 6 || M->ID->at(iPF) == 7) && M->Eta->at(iPF) > etaMin && M->Eta->at(iPF) < etaMax) {
-      if (M->E->at(iPF) > EMax)
-        EMax = M->E->at(iPF);
+      float currentE = M->E->at(iPF);
+      
+      if (currentE > EMax_vec[0]) {
+        EMax_vec[2] = EMax_vec[1];
+        EMax_vec[1] = EMax_vec[0];
+        EMax_vec[0] = currentE;
+      } else if (currentE > EMax_vec[1]) {
+        EMax_vec[2] = EMax_vec[1];
+        EMax_vec[1] = currentE;
+      } else if (currentE > EMax_vec[2]) {
+        EMax_vec[2] = currentE;
+      }
     }
   }
-  return EMax;
+
+  return EMax_vec;
 }

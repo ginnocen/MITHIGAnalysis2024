@@ -704,6 +704,9 @@ public:
    std::vector<float> *yErrVtx;
    std::vector<float> *zErrVtx;
    std::vector<bool> *isFakeVtx;
+   std::vector<int> *nTracksVtx;
+   std::vector<float> *chi2Vtx;
+   std::vector<float> *ndofVtx;
    std::vector<float> *trkPt;
    std::vector<float> *trkPtError;
    std::vector<float> *trkEta;
@@ -976,10 +979,18 @@ public:
    int hiBin;
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    bool isFakeVtx;                              //best vertex from track tree
+   int nTracksVtx;                              //best vertex from track tree
+   float chi2Vtx, ndofVtx;                      //best vertex from track tree
    float ptSumVtx;
    int nVtx;
    float HFEMaxPlus;
+   float HFEMaxPlus2;
+   float HFEMaxPlus3;
    float HFEMaxMinus;
+   float HFEMaxMinus2;
+   float HFEMaxMinus3;
+   float ZDCsumPlus;
+   float ZDCsumMinus;
    int ClusterCompatibilityFilter;
    int PVFilter;
    int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
@@ -994,12 +1005,26 @@ public:
    std::vector<float> *trkEta;
    std::vector<bool> *highPurity;
 
+   // Debug mode quantities
+   std::vector<float> *AllxVtx;
+   std::vector<float> *AllyVtx;
+   std::vector<float> *AllzVtx;
+   std::vector<float> *AllxVtxError;
+   std::vector<float> *AllyVtxError;
+   std::vector<float> *AllzVtxError;
+   std::vector<bool> *AllisFakeVtx;
+   std::vector<int> *AllnTracksVtx;
+   std::vector<float> *Allchi2Vtx;
+   std::vector<float> *AllndofVtx;
+   std::vector<float> *AllptSumVtx;
+
 public:   // Derived quantities
    //bool GoodPhotonuclear; //FIXME: currently not implemented
 
 private:
    bool WriteMode;
    bool Initialized;
+   bool DebugMode;
 
 public:
    ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
@@ -1010,7 +1035,7 @@ public:
    bool Initialize(bool Debug = false);
    int GetEntries();
    bool GetEntry(int iEntry);
-   bool SetBranch(TTree *T);
+   bool SetBranch(TTree *T, bool Debug = false);
    void Clear();
    //void CopyNonTrack(ChargedHadronRAATreeMessenger &M);
    bool FillEntry();
