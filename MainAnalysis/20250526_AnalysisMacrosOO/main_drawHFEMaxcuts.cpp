@@ -94,6 +94,7 @@ void run(const char* inFileName) {
     gStyle->SetOptStat(0);
     ratio_both->Draw("HIST");
     c_ratio_both->SaveAs((foldername + varLabel + "_RatioBoth" + to_string(HFEcut) + ".png").c_str());
+    
     /*
     // --- Save h_Baseline ---
     TCanvas* c_baseline = new TCanvas("c_baseline", "Baseline", 800, 800);
