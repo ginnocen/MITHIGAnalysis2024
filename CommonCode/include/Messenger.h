@@ -17,6 +17,7 @@
 #define PLANEMAX 200
 #define MUMAX 50
 
+class HiEventTreeMessenger;
 class METFilterTreeMessenger;
 class GGTreeMessenger;
 class RhoTreeMessenger;
@@ -438,12 +439,16 @@ public:
    float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1dedx[DZEROCOUNTMAX];
    float Dtrk1MassHypo[DZEROCOUNTMAX];
+   float Dtrk1PixelHit[DZEROCOUNTMAX];
+   float Dtrk1StripHit[DZEROCOUNTMAX];
    float Dtrk1highPurity[DZEROCOUNTMAX];
    float Dtrk2Pt[DZEROCOUNTMAX];
    float Dtrk2PtErr[DZEROCOUNTMAX];
    float Dtrk2Eta[DZEROCOUNTMAX];
    float Dtrk2dedx[DZEROCOUNTMAX];
    float Dtrk2MassHypo[DZEROCOUNTMAX];
+   float Dtrk2PixelHit[DZEROCOUNTMAX];
+   float Dtrk2StripHit[DZEROCOUNTMAX];
    float Dtrk2highPurity[DZEROCOUNTMAX];
    float Dchi2cl[DZEROCOUNTMAX];
    float DsvpvDistance[DZEROCOUNTMAX];
@@ -879,13 +884,19 @@ public:
    std::vector<float> *Dy;
    std::vector<float> *Dmass;
    std::vector<float> *Dtrk1Pt;
+   std::vector<float> *Dtrk1PtErr;
    std::vector<float> *Dtrk1Eta;
    std::vector<float> *Dtrk1dedx;
    std::vector<float> *Dtrk1MassHypo;
+   std::vector<float> *Dtrk1PixelHit;
+   std::vector<float> *Dtrk1StripHit;
    std::vector<float> *Dtrk2Pt;
+   std::vector<float> *Dtrk2PtErr;
    std::vector<float> *Dtrk2Eta;
    std::vector<float> *Dtrk2dedx;
    std::vector<float> *Dtrk2MassHypo;
+   std::vector<float> *Dtrk2PixelHit;
+   std::vector<float> *Dtrk2StripHit;
    std::vector<float> *Dchi2cl;
    std::vector<float> *DsvpvDistance;
    std::vector<float> *DsvpvDisErr;
