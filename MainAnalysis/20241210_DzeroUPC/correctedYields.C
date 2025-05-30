@@ -118,6 +118,7 @@ int getCorrectedYields(string rawYieldInput, string effInput, string outputMD)
   float lumitrigger = (parTriggerChoice==1)? lumipathinvnbZDCOR : // ZDCOR
                       (parTriggerChoice==2)? lumipathinvnbZDC   : // ZDCXORJet8
                       -999; // [WARN] Check this
+  lumitrigger = lumitrigger * 8/20; // FIXME: Factor is only for partial stats!
   float triggereff = 1.; // [WARN] Change this
   double cross = yield / (eff * lumitrigger * triggereff *
                           particle_antiparticlefactor * BR *
