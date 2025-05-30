@@ -18,7 +18,7 @@ double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
 bool isMuonSelected(SingleMuTreeMessenger *M, int i);
 //int isOnia(float mass);
-std::vector<int> mu_trackmatch(float dr, JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
+std::vector<int> mu_trackmatch(float dr_cut, JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
