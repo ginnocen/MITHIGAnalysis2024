@@ -10,18 +10,15 @@ using namespace std;
 #include "Messenger.h"
 #include "ProgressBar.h"
 
-#include "TrackResidualCorrector.h"
 #include "tnp_weight_lowptPbPb.h"
-#include "trackingEfficiency2017pp.h"
-#include "trackingEfficiency2018PbPb.h"
-#include "trackingEfficiency2023PbPb.h"
+
 
 int main(int argc, char *argv[]);
 double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
 bool isMuonSelected(SingleMuTreeMessenger *M, int i);
-int isOnia(float mass);
-std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
+//int isOnia(float mass);
+std::vector<int> mu_trackmatch(float dr, JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
@@ -34,6 +31,9 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   bool IsPP = CL.GetBool("IsPP", false);
   bool svtx = CL.GetBool("svtx", false);
+  float dr_cut = CL.GetDouble("dr_cut", 0.0004);
+  //int cent_high  = CL.GetInt("cent_high", 100);
+  //int cent_low = CL.GetInt("cent_low", 0);
 
   int Year = CL.GetInt("Year", 2018);
   double Fraction = CL.GetDouble("Fraction", 1.00);
@@ -134,6 +134,7 @@ int main(int argc, char *argv[]) {
       MMuMuJet.Lumi = MEvent.Lumi;
       MMuMuJet.Event = MEvent.Event;
       MMuMuJet.hiBin = MEvent.hiBin;
+      //if(hiBin/2.0 > cent_high || hiBin/2.0 < cent_low) {continue;}
       MMuMuJet.hiHF = MEvent.hiHF;
       MMuMuJet.NPU = 0;
       if (MEvent.npus->size() == 9)
@@ -361,7 +362,7 @@ int main(int argc, char *argv[]) {
         float mumuY = -999.;
         float mumuPhi = -999.;
         float mumuPt = -999.;
-        int mumuisOnia = -999;
+        //int mumuisOnia = -999;
         float dRJetMu1 = -999.;
         float dRJetMu2 = -999.;
         float muDeta = -999.;
@@ -403,8 +404,6 @@ int main(int argc, char *argv[]) {
             Mu1.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu1), muEta1, muPhi1, M_MU);
             Mu2.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu2), muEta2, muPhi2, M_MU);
             TLorentzVector MuMu = Mu1 + Mu2;
-            if (MuMu.M() > 130)
-              continue;
             //if (fabs(MuMu.Eta()) > 2.4)
             // continue;
             if (MuMu.Pt() > maxmumuPt) {
@@ -447,13 +446,9 @@ int main(int argc, char *argv[]) {
           mumuY = MuMu.Rapidity();
           mumuPhi = MuMu.Phi();
           mumuPt = MuMu.Pt();
-          mumuisOnia = isOnia(mumuMass);
+          //mumuisOnia = isOnia(mumuMass);
           float jetEta = MJet.JetEta[ijet];
           float jetPhi = MJet.JetPhi[ijet];
-          float muEta1 = MSingleMu.SingleMuEta->at(maxMu1Index);
-          float muPhi1 = MSingleMu.SingleMuPhi->at(maxMu1Index);
-          float muEta2 = MSingleMu.SingleMuEta->at(maxMu2Index);
-          float muPhi2 = MSingleMu.SingleMuPhi->at(maxMu2Index);
           float dPhiMu1Jet_ = DeltaPhi(muPhi1, jetPhi);
           float dEtaMu1Jet_ = muEta1 - jetEta;
           float dPhiMu2Jet_ = DeltaPhi(muPhi2, jetPhi);
@@ -489,20 +484,20 @@ int main(int argc, char *argv[]) {
         MMuMuJet.mumuY->push_back(mumuY);
         MMuMuJet.mumuPhi->push_back(mumuPhi);
         MMuMuJet.mumuPt->push_back(mumuPt);
-        MMuMuJet.mumuisOnia->push_back(mumuisOnia);
+        //MMuMuJet.mumuisOnia->push_back(mumuisOnia);
         MMuMuJet.DRJetmu1->push_back(dRJetMu1);
         MMuMuJet.DRJetmu2->push_back(dRJetMu2);
         MMuMuJet.muDeta->push_back(muDeta);
         MMuMuJet.muDphi->push_back(muDphi);
         MMuMuJet.muDR->push_back(muDR);
 
-        mt1 = mu_trackmatch(&MJet, ijet, muPt1, muEta1, muPhi1);
-        mt2 = mu_trackmatch(&MJet, ijet, muPt2, muEta2, muPhi2);
+        mt1 = mu_trackmatch(dr_cut, &MJet, ijet, muPt1, muEta1, muPhi1);
+        mt2 = mu_trackmatch(dr_cut, &MJet, ijet, muPt2, muEta2, muPhi2);
 
-        MMuMuJet.mu1trk->push_back(mt1[0]);
-        MMuMuJet.mu2trk->push_back(mt2[0]);
-        MMuMuJet.mu1svtx->push_back(mt1[1]);
-        MMuMuJet.mu2svtx->push_back(mt2[1]);
+        MMuMuJet.trkIdx_mu1->push_back(mt1[0]);
+        MMuMuJet.trkIdx_mu2->push_back(mt2[0]);
+        MMuMuJet.svtxIdx_mu1->push_back(mt1[1]);
+        MMuMuJet.svtxIdx_mu2->push_back(mt2[1]);
 
         mt1.clear();
         mt2.clear();
@@ -625,7 +620,7 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
   return true;
 }
 
-int isOnia(float mass){
+/*int isOnia(float mass){
 
 
     // J/psi mass window
@@ -651,9 +646,9 @@ int isOnia(float mass){
     
     return 0;
 
-}
+}*/
 
-std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi){
+std::vector<int> mu_trackmatch(float dr_cut, JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi){
 
   std::vector<int> idx = {-1, -1};
   std::vector<int> bad = {-1, -1};
@@ -674,11 +669,11 @@ std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, floa
     if (fabs(MJet->trkPdgId[i]) != 13) {
       continue;
     }
-    float dE = MJet->trkEta[i] - eta;
+    float dEta = MJet->trkEta[i] - eta;
     float dPhi = DeltaPhi(MJet->trkPhi[i], phi);
 
-    float dR = sqrt(dE * dE + dPhi * dPhi);
-    if(dR > 0.0004){continue;}
+    float dR = sqrt(dEta * dEta + dPhi * dPhi);
+    if(dR > dr_cut){continue;}
 
     c += 1;
     idx[0] = i;

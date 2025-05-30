@@ -2,6 +2,8 @@
 #define tnp_weight_lowptPbPb_h
 #include "TMath.h"
 
+// DERIVED FROM: https://icms.cern.ch/tools-api/restplus/relay/piggyback/notes/AN/2018/316/files/5/download
+
 // IN THIS FILE YOU WILL FIND:
 // +++++++++++++++++++++++++++++++++++++++
 // - Trigger: (tnp_weight_trg_pbpb)

@@ -4143,7 +4143,7 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete mumuY;
       delete mumuPhi;
       delete mumuPt;
-      delete mumuisOnia;
+      //delete mumuisOnia;
       delete DRJetmu1;
       delete DRJetmu2;
       delete muDeta;
@@ -4168,8 +4168,8 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete svtxpt;
       delete svtxnormchi2;
       delete svtxchi2;
-      delete mu1svtx;
-      delete mu2svtx;
+      delete svtxIdx_mu1;
+      delete svtxIdx_mu2;
 
       delete trkJetId;
       delete trkSvtxId;
@@ -4187,8 +4187,8 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete trkDz;
       delete trkPdgId;
       delete trkMatchSta;
-      delete mu1trk;
-      delete mu2trk;
+      delete trkIdx_mu1;
+      delete trkIdx_mu2;
    }
 }
 
@@ -4231,7 +4231,7 @@ bool MuMuJetMessenger::Initialize()
    mumuY = nullptr;
    mumuPhi = nullptr;
    mumuPt = nullptr;
-   mumuisOnia = nullptr;
+   //mumuisOnia = nullptr;
    DRJetmu1 = nullptr;
    DRJetmu2 = nullptr;
    muDeta = nullptr;
@@ -4256,8 +4256,8 @@ bool MuMuJetMessenger::Initialize()
    svtxpt = nullptr;
    svtxnormchi2 = nullptr;
    svtxchi2 = nullptr;
-   mu1svtx = nullptr;
-   mu2svtx = nullptr;
+   svtxIdx_mu1 = nullptr;
+   svtxIdx_mu2 = nullptr;
 
    trkJetId = nullptr;
    trkSvtxId = nullptr;
@@ -4275,8 +4275,8 @@ bool MuMuJetMessenger::Initialize()
    trkDz = nullptr;
    trkPdgId = nullptr;
    trkMatchSta = nullptr;
-   mu1trk = nullptr;
-   mu2trk = nullptr;
+   trkIdx_mu1 = nullptr;
+   trkIdx_mu2 = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -4323,7 +4323,7 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("mumuY", &mumuY);
    Tree->SetBranchAddress("mumuPhi", &mumuPhi);
    Tree->SetBranchAddress("mumuPt", &mumuPt);
-   Tree->SetBranchAddress("mumuisOnia", &mumuisOnia);
+   //Tree->SetBranchAddress("mumuisOnia", &mumuisOnia);
    Tree->SetBranchAddress("DRJetmu1", &DRJetmu1);
    Tree->SetBranchAddress("DRJetmu2", &DRJetmu2);
    Tree->SetBranchAddress("muDeta", &muDeta);
@@ -4348,8 +4348,8 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("svtxpt", &svtxpt);
    Tree->SetBranchAddress("svtxnormchi2", &svtxnormchi2);
    Tree->SetBranchAddress("svtxchi2", &svtxchi2);
-   Tree->SetBranchAddress("mu1svtx", &mu1svtx);
-   Tree->SetBranchAddress("mu2svtx", &mu2svtx);
+   Tree->SetBranchAddress("svtxIdx_mu1", &svtxIdx_mu1);
+   Tree->SetBranchAddress("svtxIdx_mu2", &svtxIdx_mu2);
 
    Tree->SetBranchAddress("trkJetId", &trkJetId);
    Tree->SetBranchAddress("trkSvtxId", &trkSvtxId);
@@ -4367,8 +4367,8 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("trkDz", &trkDz);
    Tree->SetBranchAddress("trkPdgId", &trkPdgId);
    Tree->SetBranchAddress("trkMatchSta", &trkMatchSta);
-   Tree->SetBranchAddress("mu1trk", &mu1trk);
-   Tree->SetBranchAddress("mu2trk", &mu2trk);
+   Tree->SetBranchAddress("trkIdx_mu1", &trkIdx_mu1);
+   Tree->SetBranchAddress("trkIdx_mu2", &trkIdx_mu2);
 
    return true;
 }
@@ -4425,7 +4425,7 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    mumuY = new std::vector<float>();
    mumuPhi = new std::vector<float>();
    mumuPt = new std::vector<float>();
-   mumuisOnia = new std::vector<int>();
+   //mumuisOnia = new std::vector<int>();
    DRJetmu1 = new std::vector<float>();
    DRJetmu2 = new std::vector<float>();
    muDeta = new std::vector<float>();
@@ -4450,8 +4450,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    svtxpt = new std::vector<std::vector<float>>();
    svtxnormchi2 = new std::vector<std::vector<float>>();
    svtxchi2 = new std::vector<std::vector<float>>();
-   mu1svtx = new std::vector<int>();
-   mu2svtx = new std::vector<int>();
+   svtxIdx_mu1 = new std::vector<int>();
+   svtxIdx_mu2 = new std::vector<int>();
 
    trkJetId = new std::vector<std::vector<int>>();
    trkSvtxId = new std::vector<std::vector<int>>();
@@ -4469,8 +4469,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    trkDz = new std::vector<std::vector<float>>();
    trkPdgId = new std::vector<std::vector<int>>();
    trkMatchSta = new std::vector<std::vector<int>>();
-   mu1trk = new std::vector<int>();
-   mu2trk = new std::vector<int>();
+   trkIdx_mu1 = new std::vector<int>();
+   trkIdx_mu2 = new std::vector<int>();
 
    Tree = T;
 
@@ -4487,7 +4487,7 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("VYError", &VYError, "VYError/F");
    Tree->Branch("VZError", &VZError, "VZError/F");
    Tree->Branch("NCollWeight", &NCollWeight,  "NCollWeight/F");
-   Tree->Branch("EventWeight",            &EventWeight,  "EventWeight/F");
+   Tree->Branch("EventWeight", &EventWeight,  "EventWeight/F");
    Tree->Branch("PTHat", &PTHat,  "PTHat/F");
    Tree->Branch("ExtraMuWeight", &ExtraMuWeight, "ExtraMuWeight[12]/F");
    Tree->Branch("MuMuWeight", &MuMuWeight, "MuMuWeight/F");
@@ -4519,7 +4519,7 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("mumuY", &mumuY);
    Tree->Branch("mumuPhi", &mumuPhi);
    Tree->Branch("mumuPt", &mumuPt);
-   Tree->Branch("mumuisOnia", &mumuisOnia);
+   //Tree->Branch("mumuisOnia", &mumuisOnia);
    Tree->Branch("DRJetmu1", &DRJetmu1);
    Tree->Branch("DRJetmu2", &DRJetmu2);
    Tree->Branch("muDeta", &muDeta);
@@ -4544,8 +4544,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("svtxpt", &svtxpt);
    Tree->Branch("svtxnormchi2", &svtxnormchi2);
    Tree->Branch("svtxchi2", &svtxchi2);
-   Tree->Branch("mu1svtx", &mu1svtx);
-   Tree->Branch("mu2svtx", &mu2svtx);
+   Tree->Branch("svtxIdx_mu1", &svtxIdx_mu1);
+   Tree->Branch("svtxIdx_mu2", &svtxIdx_mu2);
 
    Tree->Branch("trkJetId", &trkJetId);
    Tree->Branch("trkSvtxId", &trkSvtxId);
@@ -4563,8 +4563,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("trkDz", &trkDz);
    Tree->Branch("trkPdgId", &trkPdgId);
    Tree->Branch("trkMatchSta", &trkMatchSta);
-   Tree->Branch("mu1trk", &mu1trk);
-   Tree->Branch("mu2trk", &mu2trk);
+   Tree->Branch("trkIdx_mu1", &trkIdx_mu1);
+   Tree->Branch("trkIdx_mu2", &trkIdx_mu2);
 
    return true;
 }
@@ -4625,7 +4625,7 @@ void MuMuJetMessenger::Clear()
    mumuY->clear();
    mumuPhi->clear();
    mumuPt->clear();
-   mumuisOnia->clear();
+   //mumuisOnia->clear();
    DRJetmu1->clear();
    DRJetmu2->clear();
    muDeta->clear();
@@ -4650,8 +4650,8 @@ void MuMuJetMessenger::Clear()
    svtxpt->clear();
    svtxnormchi2->clear();
    svtxchi2->clear();
-   mu1svtx->clear();
-   mu2svtx->clear();
+   svtxIdx_mu1->clear();
+   svtxIdx_mu2->clear();
 
    trkJetId->clear();
    trkSvtxId->clear();
@@ -4669,8 +4669,8 @@ void MuMuJetMessenger::Clear()
    trkDz->clear();
    trkPdgId->clear();
    trkMatchSta->clear();
-   mu1trk->clear();
-   mu2trk->clear();
+   trkIdx_mu1->clear();
+   trkIdx_mu2->clear();
 }
 
 void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
@@ -4726,7 +4726,7 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(mumuY != nullptr && M.mumuY != nullptr)   *mumuY = *(M.mumuY);
    if(mumuPhi != nullptr && M.mumuPhi != nullptr)   *mumuPhi = *(M.mumuPhi);
    if(mumuPt != nullptr && M.mumuPt != nullptr)   *mumuPt = *(M.mumuPt);
-   if(mumuisOnia != nullptr && M.mumuisOnia != nullptr)   *mumuisOnia = *(M.mumuisOnia);
+   //if(mumuisOnia != nullptr && M.mumuisOnia != nullptr)   *mumuisOnia = *(M.mumuisOnia);
    if(DRJetmu1 != nullptr && M.DRJetmu1 != nullptr)   *DRJetmu1 = *(M.DRJetmu1);
    if(DRJetmu2 != nullptr && M.DRJetmu2 != nullptr)   *DRJetmu2 = *(M.DRJetmu2);
    if(muDeta != nullptr && M.muDeta != nullptr)   *muDeta = *(M.muDeta);
@@ -4751,8 +4751,8 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(svtxpt != nullptr && M.svtxpt != nullptr) *svtxpt = *(svtxpt);
    if(svtxnormchi2 != nullptr && M.svtxnormchi2 != nullptr) *svtxnormchi2 = *(svtxnormchi2);
    if(svtxchi2 != nullptr && M.svtxchi2 != nullptr) *svtxchi2 = *(svtxchi2);
-   if(mu1svtx != nullptr && M.mu1svtx != nullptr) *mu1svtx = *(mu1svtx);
-   if(mu2svtx != nullptr && M.mu2svtx != nullptr) *mu2svtx = *(mu2svtx);
+   if(svtxIdx_mu1 != nullptr && M.svtxIdx_mu1 != nullptr) *svtxIdx_mu1 = *(svtxIdx_mu1);
+   if(svtxIdx_mu2 != nullptr && M.svtxIdx_mu2 != nullptr) *svtxIdx_mu2 = *(svtxIdx_mu2);
 
    if(trkJetId != nullptr && M.trkJetId != nullptr) *trkJetId = *(trkJetId);
    if(trkSvtxId != nullptr && M.trkSvtxId != nullptr) *trkSvtxId = *(trkSvtxId);
@@ -4770,8 +4770,8 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(trkDz != nullptr && M.trkDz != nullptr) *trkDz = *(trkDz);
    if(trkPdgId != nullptr && M.trkPdgId != nullptr) *trkPdgId = *(trkPdgId);
    if(trkMatchSta != nullptr && M.trkMatchSta != nullptr) *trkMatchSta = *(trkMatchSta);
-   if(mu1trk != nullptr && M.mu1trk != nullptr) *mu1trk = *(mu1trk);
-   if(mu2trk != nullptr && M.mu2trk != nullptr) *mu2trk = *(mu2trk);
+   if(trkIdx_mu1 != nullptr && M.trkIdx_mu1 != nullptr) *trkIdx_mu1 = *(trkIdx_mu1);
+   if(trkIdx_mu2 != nullptr && M.trkIdx_mu2 != nullptr) *trkIdx_mu2 = *(trkIdx_mu2);
 }
 
 bool MuMuJetMessenger::FillEntry()

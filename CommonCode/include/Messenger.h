@@ -1152,7 +1152,7 @@ public:
    std::vector<float> *mumuY;
    std::vector<float> *mumuPhi;
    std::vector<float> *mumuPt;
-   std::vector<int> *mumuisOnia;
+   //std::vector<int> *mumuisOnia;
    std::vector<float> *DRJetmu1;
    std::vector<float> *DRJetmu2;
    std::vector<float> *muDeta;
@@ -1183,8 +1183,8 @@ public:
    std::vector<std::vector<float>> *svtxnormchi2;
    std::vector<std::vector<float>> *svtxchi2;
 
-   std::vector<int> *mu1svtx;
-   std::vector<int> *mu2svtx;
+   std::vector<int> *svtxIdx_mu1;
+   std::vector<int> *svtxIdx_mu2;
 
    //
 
@@ -1206,8 +1206,8 @@ public:
    std::vector<std::vector<int>> *trkPdgId;
    std::vector<std::vector<int>> *trkMatchSta;
 
-   std::vector<int> *mu1trk;
-   std::vector<int> *mu2trk;
+   std::vector<int> *trkIdx_mu1;
+   std::vector<int> *trkIdx_mu2;
 
    
 private:
