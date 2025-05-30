@@ -679,7 +679,18 @@ public:
    std::vector<float> *zErrVtx;
    std::vector<float> *trkPt;
    std::vector<float> *trkEta;
+   std::vector<float> *trkPhi;
    std::vector<float> *highPurity;
+   std::vector<float> *trkNormChi2;
+   std::vector<char>  *trkNLayers;
+   std::vector<float> *trkDzFirstVtx;
+   std::vector<float> *trkDzErrFirstVtx; 
+   std::vector<float> *trkDxyFirstVtx;
+   std::vector<float> *trkDxyErrFirstVtx;
+   std::vector<char>  *trkNHits;
+   std::vector<float> *trkPtError;
+   std::vector<float> *PFEnergy;
+
 
 public:
    PbPbUPCTrackTreeMessenger(TFile &File, std::string TreeName = "ppTracks/trackTree");
@@ -758,7 +769,7 @@ public:
    int Run;
    long long Event;
    int Lumi;
-   
+
    int hiBin;
    int hiBinUp;
    int hiBinDown;
@@ -778,9 +789,9 @@ public:
    float ExtraZWeight[12];
 
    int NVertex;
-   float VX, VY, VZ, VXError, VYError, VZError; 
+   float VX, VY, VZ, VXError, VYError, VZError;
    int NPU;
-   
+
    std::vector<float> *zMass;
    std::vector<float> *zEta;
    std::vector<float> *zY;
@@ -802,7 +813,7 @@ public:
    std::vector<float> *trackResidualWeight;
    std::vector<int> *trackCharge;
    std::vector<int> *subevent;
-   
+
    std::vector<float> *muEta1;
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
@@ -835,7 +846,7 @@ private:
    bool WriteMode;
    bool Initialized;
 
-public:   
+public:
    ZHadronMessenger(TFile &File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TFile *File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TTree *ZHadronTree = nullptr, bool SkipTrack = false);
@@ -1051,18 +1062,20 @@ public:
    long long Event;
    int Lumi;
    bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+   
+   // particle flow info
+   std::vector<float> *PT;
+   std::vector<float> *E;
+   std::vector<float> *Eta;
+   std::vector<float> *Phi;
+   std::vector<float> *M;
 
    //charged hadron info
-   int Nch; 
-
-   //D reco quantities
-   int Dsize;
-   std::vector<float> *Dpt;
-   std::vector<float> *Dphi;
-   std::vector<float> *Dy;
-   std::vector<float> *Dmass;
-   std::vector<bool>  *DpassCutD0inJet;
-   std::vector<int>   *Dgen;
+   int Nch;
+   std::vector<float> *trkPt;
+   std::vector<float> *trkEta;
+   std::vector<float> *trkPhi;
+   std::vector<float> *PFEnergy; 
 
    // inclusive jet quantites
    int JetCount;
@@ -1070,15 +1083,9 @@ public:
    std::vector<float> *JetEta;
    std::vector<float> *JetY;
    std::vector<float> *JetPhi;
-   std::vector<bool>  *isD0TaggedGeomJet;
-   std::vector<int>   *TaggedLeadingD0GeomInJetIndex;
 
    //MC only quantities
-   int Gsize;
    float pthat;
-   std::vector<float> *Gpt;
-   std::vector<float> *Gy;
-   std::vector<float> *Gphi;
    std::vector<float> *GenJetPt;
    std::vector<float> *GenJetEta;
    std::vector<float> *GenJetY;
@@ -1093,10 +1100,10 @@ private:
    bool Initialized;
 
 public:
-   DzeroJetUPCTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
-   DzeroJetUPCTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
-   DzeroJetUPCTreeMessenger(TTree *HFJetUPCTree = nullptr, bool Debug = false);
-   ~DzeroJetUPCTreeMessenger();
+   UPCEECTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   UPCEECTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   UPCEECTreeMessenger(TTree *HFJetUPCTree = nullptr, bool Debug = false);
+   ~UPCEECTreeMessenger();
    bool Initialize(TTree *HFJetUPCTree, bool Debug = false);
    bool Initialize(bool Debug = false);
    int GetEntries();
