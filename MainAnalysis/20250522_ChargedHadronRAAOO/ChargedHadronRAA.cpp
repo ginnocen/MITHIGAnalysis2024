@@ -5,7 +5,6 @@
 #include <TH2D.h>
 #include <TH3D.h>
 #include <TLegend.h>
-#include <TNtuple.h>
 #include <TTree.h>
 
 #include <iostream>
@@ -29,7 +28,6 @@ public:
   TH1D *hTrkPt;
   TH2D *hTrkPtEta;
   ChargedHadronRAATreeMessenger *MChargedHadronRAA;
-  TNtuple *nt;
   string title;
 
   DataAnalyzer(const char *filename, const char *outFilename, const char *mytitle = "")
@@ -61,10 +59,10 @@ public:
       if (i % 1000 == 0) {
         Bar.Update(i);
         Bar.Print();
-        for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
-          hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j));
-          hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j));
-        }
+      }
+      for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
+        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j));
+        hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j));
       }
     } // end of event loop
   } // end of analyze
@@ -73,11 +71,13 @@ public:
     outf->cd();
     smartWrite(hTrkPt);
     smartWrite(hTrkPtEta);
-    smartWrite(nt);
   }
 
 private:
-  void deleteHistograms() { delete hTrkPt; }
+  void deleteHistograms() { 
+    delete hTrkPt; 
+    delete hTrkPtEta;
+  }
 };
 
 //============================================================//
