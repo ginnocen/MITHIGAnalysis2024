@@ -84,8 +84,8 @@ private:
 // Main analysis
 //============================================================//
 int main(int argc, char *argv[]) {
-  if (printHelpMessage(argc, argv))
-    return 0;
+  // if (printHelpMessage(argc, argv))
+  //   return 0;
   CommandLine CL(argc, argv);
   float MinTrackPt = CL.GetDouble("MinTrackPt", 1.0); // Minimum track pT selection
   bool IsData = CL.GetBool("IsData", 0);              // Data or MC
