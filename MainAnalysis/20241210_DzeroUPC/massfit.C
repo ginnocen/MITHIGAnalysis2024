@@ -408,11 +408,11 @@ struct EventParams {
   EventParams& operator=(const EventParams& other) {
     if (this != &other) {
       // Copy RooRealVars
-      nsig = other.nsig;
-      nbkg = other.nbkg;
-      fswp = other.fswp;
-      fpkkk = other.fpkkk;
-      fpkpp = other.fpkpp;
+      nsig.setVal(other.nsig.getValV());
+      nbkg.setVal(other.nbkg.getValV());
+      fswp.setVal(other.fswp.getValV());
+      fpkkk.setVal(other.fpkkk.getValV());
+      fpkpp.setVal(other.fpkpp.getValV());
 
       // No reassignment of pointers and references is needed, since they're bounded as how they should be
     }

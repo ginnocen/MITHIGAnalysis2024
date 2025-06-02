@@ -10,11 +10,12 @@ rm -rf Output
 rm SkimReco.root
 rm list.txt
 rm -rf output
-rm *.txt*
+#rm *.txt*
 rm SkimReco.root
 rm .DS_Store
 
-cd /home/$USER/CMSSW_13_2_4/src
+#cd /home/$USER/CMSSW_13_2_13/src
+cd /home/$USER/CMSSW_14_1_7/src
 cmsenv
 
 cd -
