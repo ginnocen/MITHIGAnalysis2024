@@ -4,7 +4,6 @@
 #include <limits>
 
 using namespace std;
-
 int FindMaxInt(const char* inFileName, const char* branch) {
     TFile file(inFileName, "READ");
     TTree* tree = (TTree*)file.Get("Tree");

@@ -29,8 +29,6 @@ pair<double, int> counting(const char* inFileName,
         cout << "Error: Could not find the tree!" << endl;
         return std::make_pair(0.0, 0);
     }
-
-    // Set up the branches
     
     int CCFilter, PVFilter, nVtx;
     float VZ;
@@ -76,11 +74,10 @@ pair<double, int> counting(const char* inFileName,
 }
 
 
-void run() {
-    const char* inFileName = "/data00/OOsamples/SkimDebug22May2025/skim_HiForest_Hijing_merged_DEBUG.root";
+void run(const char* inFileName) {
     // Create a histogram with 4 bins
-    TH1F* h = new TH1F("h", "Number of Events with each Filter", 5, 0.5, 5.5);
-    TH1F* h2 = new TH1F("h2", "Percent of Events with each Filter", 5, 0.5, 5.5);
+    TH1F* h = new TH1F("h", "Percent of Events with each Filter", 5, 0.5, 5.5);
+    TH1F* h2 = new TH1F("h2", "Number of Events with each Filter", 5, 0.5, 5.5);
 
     // Call counting and fill each bin
 
@@ -118,23 +115,22 @@ void run() {
     h2->GetXaxis()->SetBinLabel(4, "nVtx > 0");
     h2->GetXaxis()->SetBinLabel(5, "abs(VZ) < 15");
 
-
-
     // Draw the histogram
-    TCanvas* c1 = new TCanvas("c1", "Number of Events with each Filter", 800, 600);
+    TCanvas* c1 = new TCanvas("c1", "Percent of Events with each Filter (SD)", 800, 600);
     c1->SetBottomMargin(0.18); // Increase bottom margin for axis labels
     c1->SetRightMargin(0.18); // Increase right margin
-
     h->Draw("HIST TEXT0");
+    h->GetYaxis()->SetRangeUser(0, 1);
     gStyle->SetOptStat(0);
-    c1->SaveAs("counting_results_new_allcuts_perfilter.png");
+    c1->SaveAs("counting_results_DD_ratio.png");
 
-    TCanvas* c2 = new TCanvas("c2", "Percent of Events with each Filter", 800, 600);
+    TCanvas* c2 = new TCanvas("c2", "Percent of Events with each Filter (SD)", 800, 600);
     c2->SetBottomMargin(0.18); // Increase bottom margin for axis labels
     c2->SetRightMargin(0.18); // Increase right margin
     h2->Draw("HIST TEXT0");
     gStyle->SetOptStat(0);
-    c2->SaveAs("counting_results_new_allcuts_percentage_perfilter.png");
+    c2->SaveAs("counting_results_DD_counts.png");
+
 
 }
 

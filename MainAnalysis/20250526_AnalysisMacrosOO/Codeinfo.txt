@@ -1,4 +1,8 @@
+EfficiencyCalcEFE.cpp: 
+    Calculate Efficiency of different
+    pair<double, int> counting
+
+
+
+
 Count.cpp: Can run on its own, counts the number of events for each counts. Histogram and for true and false cuts
-Count_HFEcuts: Cut efficiency but just for numerical cuts. Can also run on its own.
-Draw2.cpp: DrawHistFVector: Inputs file and branch and draws histogram if branch is vector
-DrawEventLevel.cpp: Draw int and float at event levels. No vectors or arrays.
