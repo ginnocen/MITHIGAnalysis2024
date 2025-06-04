@@ -19,6 +19,7 @@ pair<double, int> countingTrkptcuts(const char* inFileName, float cut = 0, bool 
 pair<double, int> countingJingcuts(const char* inFileName, float cut = 0, bool cutBool = false, int coincidence = 0);
 //Write Efficiency, Purity, and BKG Rejection to a file
 pair<double, int> countingLeadingptcuts(const char* inFileName, float cut = 0, bool cutBool = false, int leadingPtSelection = 0) {
+    cout << "File Name: " << inFileName << endl;
     cout << Form("------- Counting for HFEMax cut %f and ptcut %d -------",cut,leadingPtSelection) << endl;
 
     TFile* inFile = new TFile(inFileName,"READ");
@@ -152,6 +153,70 @@ pair<double, int> countingTrkptcuts(const char* inFileName,
 }
 
 
+pair<double, int> counting_clean(const char* inFileName, 
+    float cut = 0, 
+    bool cutBool = false) {
+    cout << Form("------- Counting for HFEMax cut %f -------",cut) << endl;
+
+    TFile* inFile = new TFile(inFileName,"READ");
+    if (!inFile || inFile->IsZombie()) {
+        cout << "Error: Could not open the file!" << endl;
+        return make_pair(0.0, 0);
+    }
+
+    TTree* tree = (TTree*)inFile->Get("Tree");
+    if (!tree) {
+        cout << "Error: Could not find the tree!" << endl;
+        return make_pair(0.0, 0);
+    }
+    
+    int CCFilter, PVFilter, nVtx;
+    float HFEMaxPlus, HFEMaxMinus;
+    float VZ, leadingPtEta1p0_sel;
+    vector<float>* trkPt = nullptr;
+    const Long64_t nEvt = tree->GetEntries();
+    int eventCounter = 0, subeventCounter = 0;
+    int denominator = 0;
+
+    tree->SetBranchAddress("ClusterCompatibilityFilter", &CCFilter);
+    tree->SetBranchAddress("PVFilter", &PVFilter);
+    tree->SetBranchAddress("nVtx", &nVtx);
+    tree->SetBranchAddress("VZ", &VZ);
+    tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
+    tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
+    tree->SetBranchAddress("leadingPtEta1p0_sel",&leadingPtEta1p0_sel);
+    tree->SetBranchAddress("trkPt",&trkPt); 
+
+    for (int i = 0; i < nEvt; i++) {
+        tree->GetEntry(i);
+        denominator++;
+        if (CCFilter == 1 && PVFilter == 1 && nVtx > 0 && abs(VZ) < 15) {
+            if (cutBool == false){
+                if (HFEMaxPlus > cut || HFEMaxMinus > cut){
+                    eventCounter++;
+                }
+            }
+            else if (cutBool == true){
+                if (HFEMaxPlus > cut && HFEMaxMinus > cut){
+                    eventCounter++;
+                }
+            }
+        }
+    }
+
+    double ratio = static_cast<double>(eventCounter) / denominator;
+    cout << "Ratio between Original and Filtered: " << ratio << endl;
+    cout << "Total number of events: " << nEvt << endl;
+    cout << "Total number of events after HFEcut "<< cut << ": " <<eventCounter << endl;
+    cout << endl;
+    cout << "------- Count Complete -------" << endl;
+    inFile->Close();
+    delete inFile;
+    return make_pair(ratio, eventCounter);
+}
+
+
+
 // Counting function with cuts same as Jing's setup
 // Can implement coincidence
 pair<double, int> countingJingcuts(const char* inFileName,
@@ -237,3 +302,5 @@ pair<double, int> countingJingcuts(const char* inFileName,
     delete inFile;
     return make_pair(ratio, eventCounter);
 }
+
+

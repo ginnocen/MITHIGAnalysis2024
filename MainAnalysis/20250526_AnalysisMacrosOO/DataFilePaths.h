@@ -19,3 +19,6 @@ constexpr const char* N30trkpt15 = "/home/xirong/MITHIGAnalysis2024/MainAnalysis
 constexpr const char* SD1p08 = "/home/xirong/MITHIGAnalysis2024/MainAnalysis/20250526_AnalysisMacrosOO/DataFiles/EfficiencyPurityData_N10_coinc1_SD_new_1p08.txt";
 
 constexpr const char* DDOnly = "/home/xirong/MITHIGAnalysis2024/MainAnalysis/20250526_AnalysisMacrosOO/EfficiencyPurityData_N30_trkpt0_CrossCheck_DDOnly.txt";
+
+constexpr const char* SD_Crosscheck_1bkg = "/home/xirong/MITHIGAnalysis2024/MainAnalysis/20250526_AnalysisMacrosOO/DataFiles/EfficiencyPurityData_N10_coinc1_SD_Crosscheck_1bkg.txt";
+constexpr const char* SD_Crosscheck_2bkg = "/home/xirong/MITHIGAnalysis2024/MainAnalysis/20250526_AnalysisMacrosOO/DataFiles/EfficiencyPurityData_N10_coinc1_SD_Crosscheck_2bkgfunc.txt";
