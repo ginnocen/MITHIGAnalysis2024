@@ -18,7 +18,8 @@ struct EfficiencyResults {
 
     vector<double> PurityAND;
     vector<double> PurityOR;
-    float xsec_EM;
+    float xsec_SD;
+    float xsec_DD;
     float xsec_had;
     int N;
     float xMax;

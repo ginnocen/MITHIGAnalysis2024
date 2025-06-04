@@ -55,40 +55,23 @@ TH1F* DrawHistFVector(const char* inFileName,
 
     eventCounter = 0;
     subeventCounter = 0;
-    int CC0Counter = 0;
-    int CC1Counter = 0;
-    int PV0Counter = 0;
-    int PV1Counter = 0;
 
     cout << "HFEMaxPlusCut: " << HFEMaxPlusCut << endl;
     cout << "HFEMaxMinusCut: " << HFEMaxMinusCut << endl;
     for (int i = 0; i < nEvt; i++) {
         tree->GetEntry(i);
-        if (CCFilter == 1) CC1Counter++;
-        if (PVFilter == 1) PV1Counter++;
-        if (CCFilter == 0) CC0Counter++;
-        if (PVFilter == 0) PV0Counter++;
-
-        if (!CCFilterBool) CCFilter = 1;
-        if (!PVFilterBool) PVFilter = 1;
-        if (!CCFilter || !PVFilter) continue;
-        if (HFEMaxMinus < HFEMaxMinusCut && HFEMaxPlus < HFEMaxPlusCut) continue;
-        eventCounter++;
-
-        if (branch && branch->size() != 0 ) {
-            for (size_t j = 0; j < branch->size(); j++) {
-                //if (trkPt->at(j) > 10) continue; // Skip if trkPt is greater than 10
-                h1->Fill(branch->at(j));
-                subeventCounter++;
+        if (CCFilter == 1 && PVFilter == 1 && nVtx > 0 && abs(VZ) < 15){
+            if (HFEMaxMinus < HFEMaxMinusCut && HFEMaxPlus < HFEMaxPlusCut) continue;
+                eventCounter++;
+            if (branch && branch->size() != 0 ) {
+                for (size_t j = 0; j < branch->size(); j++) {
+                    //if (trkPt->at(j) > 10) continue; // Skip if trkPt is greater than 10
+                    h1->Fill(branch->at(j));
+                    subeventCounter++;
+                }
             }
         }
     }
-    cout << "CCFilter 0: " << CC0Counter << endl;
-    cout << "CCFilter 1: " << CC1Counter << endl;
-
-    cout << "PVFilter 0: " << PV0Counter << endl;
-    cout << "PVFilter 1: " << PV1Counter << endl;
-
     cout << "Total nEvt" << nEvt << endl;
     cout << "Total number of events: " << eventCounter << endl;
     cout << "Total number of subevents: " << subeventCounter << endl;

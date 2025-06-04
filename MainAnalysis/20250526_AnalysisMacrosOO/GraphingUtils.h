@@ -11,7 +11,7 @@ namespace PlotUtils {
     const float margin_pad_top = 0.1;
 
     inline void GraphLegend(const std::vector<std::pair<TObject*, std::string>>& entries, 
-                            double x1=0.6, double y1=0.23, double x2=0.97, double y2=0.33) {
+                            double x1=0.6, double y1=0.13, double x2=0.97, double y2=0.33) {
         TLegend* legend = new TLegend(x1, y1, x2, y2);
         legend->SetBorderSize(0);
         legend->SetFillStyle(0);
