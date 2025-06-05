@@ -54,29 +54,19 @@ void drawROC7OR(
     const EfficiencyResults& res7, const std::string& label7,
     const HistVar1D& hvar);
 
-// Run example that draws two ROC curves on same plot using drawsame
+// Run example that draws two ROC curves on same plot using drawsame.
+//.L this file and then runexample() to draw the example file with only 4 datapoints
 // Commonly used files are included in Include/DataFilePaths.h
-// 1bkg means using function named 1bkg, doesn't mean it has 1bkg (but in this case it does too). All bkg means it has all bkg.
 void runexample(){
-    EfficiencyResults results_SD_1bkg = ReturnEfficiency1bkg(SD_1bkg);
-    EfficiencyResults results_DD_1bkg = ReturnEfficiency1bkg(DD_1bkg);
-    EfficiencyResults results_allbkg = ReturnEfficiency(allbkg);
+    const char* exampleFile = "DataFilesExample/EfficiencyPurityData_N3_trkpt-1_SampleWrite.txt";
+    EfficiencyResults r = ReturnEfficiency(exampleFile);
+    HistVar1D hvar1 {"Purity vs Efficiency Curve", "Efficiency", "Purity", 0, 0.6, 1, 0.8, 1.25, "","example"};
 
-    HistVar1D hvar1 {"Purity vs Efficiency Curve", "Efficiency", "Purity", 0, 0.94, 1, 0, 1.25, "HJSD"};
-
-    hvar1.xmin = 0.6;
-    hvar1.xmax = 1.0;
-    hvar1.ymin = 0.8;
-    hvar1.ymax = 1.05; 
-
-    hvar1.histTitle = "ROC curve Hijing using SD+DD backgrounds";
-    hvar1.outFileName = "";
-    drawROCsame(results_allbkg.EfficiencyHijingAND, results_allbkg.PurityAND, 
-        results_allbkg.EfficiencyHijingOR, results_allbkg.PurityOR,
-        results_allbkg, hvar1);
-
+    drawROCsame(r.EfficiencyHijingAND, r.PurityAND, 
+        r.EfficiencyHijingOR, r.PurityOR,
+        r, hvar1);
 }
-
+// This run would not work because all datafiles are on my local computer, but this is how I've been running the cuts with trkpt
 void run(){
     EfficiencyResults results_allbkg = ReturnEfficiency(allbkg);
     EfficiencyResults results_trkpt0 = ReturnEfficiency(trkpt0);
@@ -121,11 +111,8 @@ void run(){
 
 EfficiencyResults ReturnEfficiency(const char* inFilename){
 
-    ifstream infile(inFilename);
-    string line, dummy;
     float xsec_SD, xsec_DD, xsec_had, xMax;
     int N,coincidence = 0; // Default to 0, can be changed if needed
-
     EfficiencyResults results;
 
     vector<double> x, EfficiencyHijingAND, EfficiencyHijingOR;
@@ -133,6 +120,14 @@ EfficiencyResults ReturnEfficiency(const char* inFilename){
     vector<double> BKGRejectionAND, BKGRejectionOR;
     vector<double> PurityAND, PurityOR;
     string signalFile, backgroundFile;
+
+    ifstream infile(inFilename);
+    string line, dummy;
+    if (!infile.is_open()) {
+        cerr << "Error: Could not open file " << inFilename << endl;
+        return results; // Return empty results
+    }
+
 
     getline(infile, line);
     istringstream iss1(line);
@@ -290,7 +285,7 @@ void drawROCsame(vector<double> x1, vector<double> y1, vector<double> x2, vector
     EfficiencyResults results,
     HistVar1D hvar) {
 
-    string outputDir = "/home/xirong/MITHIGAnalysis2024/MainAnalysis/20250526_AnalysisMacrosOO/Plots/FilterEfficiencyNewest/";
+    string outputDir = hvar.outFolderName;
 
     PlotUtils::setgstyle();
 

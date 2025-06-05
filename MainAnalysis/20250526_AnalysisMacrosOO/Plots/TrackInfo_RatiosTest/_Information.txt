@@ -1,1 +1,0 @@
-/data00/OOsamples/skims/skim_crab_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root
