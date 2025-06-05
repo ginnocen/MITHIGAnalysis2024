@@ -1,6 +1,6 @@
 default: all
 
-all: Setup library/Messenger.o binary/Reformat binary/DHAdd binary/DHRemove binary/DHQuery binary/DHSet binary/DumpDHFile
+all: Setup library/DrawRandom.o library/TauHelperFunctions3.o library/Messenger.o binary/Reformat binary/DHAdd binary/DHRemove binary/DHQuery binary/DHSet binary/DumpDHFile
 
 Setup:
 	mkdir -p library
@@ -8,6 +8,13 @@ Setup:
 
 library/Messenger.o: source/Messenger.cpp include/Messenger.h
 	g++ source/Messenger.cpp -Iinclude -c -o library/Messenger.o `root-config --cflags`
+
+library/TauHelperFunctions3.o: source/TauHelperFunctions3.cpp include/TauHelperFunctions3.h
+	g++ source/TauHelperFunctions3.cpp -Iinclude -c -o library/TauHelperFunctions3.o -I${RootMacrosBase}/ -std=c++11
+
+library/DrawRandom.o: source/DrawRandom.cpp include/DrawRandom.h
+	g++ source/DrawRandom.cpp -Iinclude -c -fpic -o library/DrawRandom.o -I${RootMacrosBase}/ -std=c++11
+
 
 binary/Reformat: source/Reformat.cpp
 	g++ source/Reformat.cpp -o binary/Reformat

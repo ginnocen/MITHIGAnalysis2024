@@ -53,12 +53,13 @@ int main(int argc, char *argv[]) {
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
+  bool DebugMode = CL.GetBool("DebugMode", false);
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
-  MChargedHadronRAA.SetBranch(&Tree);
+  MChargedHadronRAA.SetBranch(&Tree, DebugMode);
 
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
@@ -69,8 +70,8 @@ int main(int argc, char *argv[]) {
     PFTreeMessenger MPF(InputFile, PFTreeName);                        // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile);                                // skimanalysis/HltTree
     HFAdcMessenger MHFAdc(InputFile);                                  // HFAdcana/adc
+    ZDCTreeMessenger MZDC(InputFile, ZDCTreeName);                     // zdcanalyzer/zdcrechit
     // TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
-    // ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     // METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
 
     int EntryCount = MEvent.GetEntries() * Fraction;
@@ -94,8 +95,8 @@ int main(int argc, char *argv[]) {
       MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
       MHFAdc.GetEntry(iE);
+      MZDC.GetEntry(iE);
       // MTrigger.GetEntry(iE);
-      // MZDC.GetEntry(iE);
       // MMETFilter.GetEntry(iE);
 
       ////////////////////////////////////////
@@ -127,6 +128,10 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.VZError = MTrack.zErrVtx->at(BestVertex);
         MChargedHadronRAA.isFakeVtx = MTrack.isFakeVtx->at(BestVertex);
         MChargedHadronRAA.ptSumVtx = MTrack.ptSumVtx->at(BestVertex);
+        MChargedHadronRAA.nTracksVtx = MTrack.nTracksVtx->at(BestVertex);
+        MChargedHadronRAA.chi2Vtx = MTrack.chi2Vtx->at(BestVertex);
+        MChargedHadronRAA.ndofVtx = MTrack.ndofVtx->at(BestVertex);
+        MChargedHadronRAA.bestVtxIndx = BestVertex;
       }
       MChargedHadronRAA.nVtx = MTrack.nVtx;
       /////////////////////////////////////
@@ -140,16 +145,16 @@ int main(int argc, char *argv[]) {
           // MChargedHadronRAA.isHLT_HIZB = HLT_HIZB_;
           // if (ApplyTriggerRejection == 1 && IsData && (HLT_HIZB_ == false)) continue;
           // if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
-          // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-          // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+          MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
+          MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
           MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
           MChargedHadronRAA.PVFilter = MSkim.PVFilter;
           MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
           MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
         } // end of year == 2025
       } else { // if not data
-               // MChargedHadronRAA.ZDCsumPlus = MZDC.sumPlus;
-               // MChargedHadronRAA.ZDCsumMinus = MZDC.sumMinus;
+        MChargedHadronRAA.ZDCsumPlus = 0;
+        MChargedHadronRAA.ZDCsumMinus = 0;
         MChargedHadronRAA.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
         MChargedHadronRAA.PVFilter = MSkim.PVFilter;
         MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
@@ -208,14 +213,72 @@ int main(int argc, char *argv[]) {
         } // end of if on DoGenLevel == false
         float trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
         float trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
+        float trkPhi = DoGenLevel ? MGen.Phi->at(iTrack) : MTrack.trkPhi->at(iTrack);
         float trkPtError = DoGenLevel ? 0 : MTrack.trkPtError->at(iTrack);
         bool highPurity = DoGenLevel ? true : MTrack.highPurity->at(iTrack);
+        float trkDxyAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDxyAssociatedVtx->at(iTrack);
+        float trkDzAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDzAssociatedVtx->at(iTrack);
+        float trkDxyErrAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDxyErrAssociatedVtx->at(iTrack);
+        float trkDzErrAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDzErrAssociatedVtx->at(iTrack);
+        int trkAssociatedVtxIndx = DoGenLevel ? -1 : MTrack.trkAssociatedVtxIndx->at(iTrack);
         MChargedHadronRAA.trkEta->push_back(trkEta);
         MChargedHadronRAA.trkPt->push_back(trkPt);
+        MChargedHadronRAA.trkPhi->push_back(trkPhi);
         MChargedHadronRAA.trkPtError->push_back(trkPtError);
         MChargedHadronRAA.highPurity->push_back(highPurity);
+        MChargedHadronRAA.trkDxyAssociatedVtx->push_back(trkDxyAssociatedVtx);
+        MChargedHadronRAA.trkDzAssociatedVtx->push_back(trkDzAssociatedVtx);
+        MChargedHadronRAA.trkDxyErrAssociatedVtx->push_back(trkDxyErrAssociatedVtx);
+        MChargedHadronRAA.trkDzErrAssociatedVtx->push_back(trkDzErrAssociatedVtx);
+        MChargedHadronRAA.trkAssociatedVtxIndx->push_back(trkAssociatedVtxIndx);
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
+
+      ////////////////////////////
+      ///// Debug variables //////
+      ////////////////////////////
+
+      if (DebugMode) {
+        for (int iDebVtx = 0; iDebVtx < MTrack.nVtx; iDebVtx++) {
+          MChargedHadronRAA.AllxVtx->push_back(MTrack.xVtx->at(iDebVtx));
+          MChargedHadronRAA.AllyVtx->push_back(MTrack.yVtx->at(iDebVtx));
+          MChargedHadronRAA.AllzVtx->push_back(MTrack.zVtx->at(iDebVtx));
+          MChargedHadronRAA.AllxVtxError->push_back(MTrack.xErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllyVtxError->push_back(MTrack.yErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllzVtxError->push_back(MTrack.zErrVtx->at(iDebVtx));
+          MChargedHadronRAA.AllisFakeVtx->push_back(MTrack.isFakeVtx->at(iDebVtx));
+          MChargedHadronRAA.AllnTracksVtx->push_back(MTrack.nTracksVtx->at(iDebVtx));
+          MChargedHadronRAA.Allchi2Vtx->push_back(MTrack.chi2Vtx->at(iDebVtx));
+          MChargedHadronRAA.AllndofVtx->push_back(MTrack.ndofVtx->at(iDebVtx));
+          MChargedHadronRAA.AllptSumVtx->push_back(MTrack.ptSumVtx->at(iDebVtx));
+        }
+
+        for (int iTrackDeb = 0; iTrackDeb < NTrack; iTrackDeb++) {
+          if (DoGenLevel == true) {
+            if (MGen.DaughterCount->at(iTrackDeb) > 0)
+              continue;
+            if (MGen.Charge->at(iTrackDeb) == 0)
+              continue;
+          } // end of if on DoGenLevel == true
+          if (DoGenLevel == false) {
+            if (MTrack.highPurity->at(iTrackDeb) == false)
+              continue;
+          } // end of if on DoGenLevel == false
+          char trkCharge = DoGenLevel ? char(MGen.Charge->at(iTrackDeb)) : MTrack.trkCharge->at(iTrackDeb);
+          char trkNHits = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNHits->at(iTrackDeb);
+          char trkNPixHits = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNPixHits->at(iTrackDeb);
+          char trkNLayers = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNLayers->at(iTrackDeb);
+          float trkNormChi2 = DoGenLevel ? -1 : MTrack.trkNormChi2->at(iTrackDeb);
+          float pfEnergy = DoGenLevel ? -9999 : MTrack.pfEnergy->at(iTrackDeb);
+          MChargedHadronRAA.trkCharge->push_back(trkCharge);
+          MChargedHadronRAA.trkNHits->push_back(trkNHits);
+          MChargedHadronRAA.trkNPixHits->push_back(trkNPixHits);
+          MChargedHadronRAA.trkNLayers->push_back(trkNLayers);
+          MChargedHadronRAA.trkNormChi2->push_back(trkNormChi2);
+          MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
+        } // end of loop over tracks (gen or reco)
+      }
+
       MChargedHadronRAA.FillEntry();
     }
     if (!HideProgressBar) {

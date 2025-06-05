@@ -12,10 +12,12 @@
 #define VERTEXCOUNTMAX 200
 #define DZEROCOUNTMAX 20000 //FIXME: to be fined tuned
 #define DZEROGENCOUNTMAX 300 //FIXME: to be fined tuned
+#define SVTXCOUNTMAX 50
 #define TRACKCOUNTMAX 20000
 #define PLANEMAX 200
 #define MUMAX 50
 
+class HiEventTreeMessenger;
 class METFilterTreeMessenger;
 class GGTreeMessenger;
 class RhoTreeMessenger;
@@ -34,6 +36,9 @@ class ZDCTreeMessenger;
 class HFAdcMessenger;
 class DzeroTreeMessenger;
 class DzeroGenTreeMessenger;
+class UPCEECTreeMessenger;
+
+
 class HiEventTreeMessenger
 {
 public:
@@ -43,6 +48,7 @@ public:
    unsigned int Run;
    unsigned long long Event;
    unsigned int Lumi;
+   float pthat;
    float vx;
    float vy;
    float vz;
@@ -219,6 +225,49 @@ public:
    int JetPFCEM[JETCOUNTMAX];
    int JetPFNEM[JETCOUNTMAX];
    int JetPFMUM[JETCOUNTMAX];
+
+   // Jet info 
+
+   int jtNsvtx[JETCOUNTMAX];
+   int jtNtrk[JETCOUNTMAX];
+   float jtptCh[JETCOUNTMAX];
+
+   // SVTX
+
+   int nsvtx;
+   int svtxJetId[SVTXCOUNTMAX];
+   int svtxNtrk[SVTXCOUNTMAX];
+   float svtxdl[SVTXCOUNTMAX];
+   float svtxdls[SVTXCOUNTMAX];
+   float svtxdl2d[SVTXCOUNTMAX];
+   float svtxdls2d[SVTXCOUNTMAX];
+   float svtxm[SVTXCOUNTMAX];
+   float svtxmcorr[SVTXCOUNTMAX];
+   float svtxpt[SVTXCOUNTMAX];
+   float svtxnormchi2[SVTXCOUNTMAX];
+   float svtxchi2[SVTXCOUNTMAX];
+
+   // Track
+
+   int ntrk;
+   int trkJetId[TRACKCOUNTMAX];
+   int trkSvtxId[TRACKCOUNTMAX];
+   float trkPt[TRACKCOUNTMAX];
+   float trkEta[TRACKCOUNTMAX];
+   float trkPhi[TRACKCOUNTMAX];
+   float trkIp3d[TRACKCOUNTMAX];
+   float trkIp3dSig[TRACKCOUNTMAX];
+   float trkIp2d[TRACKCOUNTMAX];
+   float trkIp2dSig[TRACKCOUNTMAX];
+   float trkDistToAxis[TRACKCOUNTMAX];
+   float trkDistToAxisSig[TRACKCOUNTMAX];
+   float trkIpProb3d[TRACKCOUNTMAX];
+   float trkIpProb2d[TRACKCOUNTMAX];
+   float trkDz[TRACKCOUNTMAX];
+   int trkPdgId[TRACKCOUNTMAX];
+   int trkMatchSta[TRACKCOUNTMAX];
+ 
+
 public:
    JetTreeMessenger(TFile &File, std::string TreeName = "akCs4PFJetAnalyzer/t");
    JetTreeMessenger(TFile *File, std::string TreeName = "akCs4PFJetAnalyzer/t");
@@ -393,12 +442,16 @@ public:
    float Dtrk1Eta[DZEROCOUNTMAX];
    float Dtrk1dedx[DZEROCOUNTMAX];
    float Dtrk1MassHypo[DZEROCOUNTMAX];
+   float Dtrk1PixelHit[DZEROCOUNTMAX];
+   float Dtrk1StripHit[DZEROCOUNTMAX];
    float Dtrk1highPurity[DZEROCOUNTMAX];
    float Dtrk2Pt[DZEROCOUNTMAX];
    float Dtrk2PtErr[DZEROCOUNTMAX];
    float Dtrk2Eta[DZEROCOUNTMAX];
    float Dtrk2dedx[DZEROCOUNTMAX];
    float Dtrk2MassHypo[DZEROCOUNTMAX];
+   float Dtrk2PixelHit[DZEROCOUNTMAX];
+   float Dtrk2StripHit[DZEROCOUNTMAX];
    float Dtrk2highPurity[DZEROCOUNTMAX];
    float Dchi2cl[DZEROCOUNTMAX];
    float DsvpvDistance[DZEROCOUNTMAX];
@@ -634,7 +687,18 @@ public:
    std::vector<float> *zErrVtx;
    std::vector<float> *trkPt;
    std::vector<float> *trkEta;
+   std::vector<float> *trkPhi;
    std::vector<float> *highPurity;
+   std::vector<float> *trkNormChi2;
+   std::vector<char>  *trkNLayers;
+   std::vector<float> *trkDzFirstVtx;
+   std::vector<float> *trkDzErrFirstVtx; 
+   std::vector<float> *trkDxyFirstVtx;
+   std::vector<float> *trkDxyErrFirstVtx;
+   std::vector<char>  *trkNHits;
+   std::vector<float> *trkPtError;
+   std::vector<float> *PFEnergy;
+
 
 public:
    PbPbUPCTrackTreeMessenger(TFile &File, std::string TreeName = "ppTracks/trackTree");
@@ -659,10 +723,26 @@ public:
    std::vector<float> *yErrVtx;
    std::vector<float> *zErrVtx;
    std::vector<bool> *isFakeVtx;
+   std::vector<int> *nTracksVtx;
+   std::vector<float> *chi2Vtx;
+   std::vector<float> *ndofVtx;
    std::vector<float> *trkPt;
+   std::vector<float> *trkPhi;
    std::vector<float> *trkPtError;
    std::vector<float> *trkEta;
    std::vector<bool> *highPurity;
+   std::vector<float> *trkDxyAssociatedVtx;
+   std::vector<float> *trkDzAssociatedVtx;
+   std::vector<float> *trkDxyErrAssociatedVtx;
+   std::vector<float> *trkDzErrAssociatedVtx;
+   std::vector<int> *trkAssociatedVtxIndx;
+   std::vector<char> *trkCharge;
+   std::vector<char> *trkNHits;
+   std::vector<char> *trkNPixHits;
+   std::vector<char> *trkNLayers;
+   std::vector<float> *trkNormChi2;
+   std::vector<float> *pfEnergy;
+
 
 public:
    PPTrackTreeMessenger(TFile &File, std::string TreeName = "ppTracks/trackTree");
@@ -710,7 +790,7 @@ public:
    int Run;
    long long Event;
    int Lumi;
-   
+
    int hiBin;
    int hiBinUp;
    int hiBinDown;
@@ -730,9 +810,9 @@ public:
    float ExtraZWeight[12];
 
    int NVertex;
-   float VX, VY, VZ, VXError, VYError, VZError; 
+   float VX, VY, VZ, VXError, VYError, VZError;
    int NPU;
-   
+
    std::vector<float> *zMass;
    std::vector<float> *zEta;
    std::vector<float> *zY;
@@ -754,7 +834,7 @@ public:
    std::vector<float> *trackResidualWeight;
    std::vector<int> *trackCharge;
    std::vector<int> *subevent;
-   
+
    std::vector<float> *muEta1;
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
@@ -787,7 +867,7 @@ private:
    bool WriteMode;
    bool Initialized;
 
-public:   
+public:
    ZHadronMessenger(TFile &File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TFile *File, std::string TreeName = "tree", bool SkipTrack = false);
    ZHadronMessenger(TTree *ZHadronTree = nullptr, bool SkipTrack = false);
@@ -831,13 +911,19 @@ public:
    std::vector<float> *Dy;
    std::vector<float> *Dmass;
    std::vector<float> *Dtrk1Pt;
+   std::vector<float> *Dtrk1PtErr;
    std::vector<float> *Dtrk1Eta;
    std::vector<float> *Dtrk1dedx;
    std::vector<float> *Dtrk1MassHypo;
+   std::vector<float> *Dtrk1PixelHit;
+   std::vector<float> *Dtrk1StripHit;
    std::vector<float> *Dtrk2Pt;
+   std::vector<float> *Dtrk2PtErr;
    std::vector<float> *Dtrk2Eta;
    std::vector<float> *Dtrk2dedx;
    std::vector<float> *Dtrk2MassHypo;
+   std::vector<float> *Dtrk2PixelHit;
+   std::vector<float> *Dtrk2StripHit;
    std::vector<float> *Dchi2cl;
    std::vector<float> *DsvpvDistance;
    std::vector<float> *DsvpvDisErr;
@@ -931,6 +1017,8 @@ public:
    int hiBin;
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    bool isFakeVtx;                              //best vertex from track tree
+   int nTracksVtx, bestVtxIndx;                 //best vertex from track tree
+   float chi2Vtx, ndofVtx;                      //best vertex from track tree
    float ptSumVtx;
    int nVtx;
    float HFEMaxPlus;
@@ -939,6 +1027,8 @@ public:
    float HFEMaxMinus;
    float HFEMaxMinus2;
    float HFEMaxMinus3;
+   float ZDCsumPlus;
+   float ZDCsumMinus;
    int ClusterCompatibilityFilter;
    int PVFilter;
    int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
@@ -949,9 +1039,35 @@ public:
    int sampleType;
 
    std::vector<float> *trkPt;
+   std::vector<float> *trkPhi;
    std::vector<float> *trkPtError;
    std::vector<float> *trkEta;
    std::vector<bool> *highPurity;
+   std::vector<float> *trkDxyAssociatedVtx;
+   std::vector<float> *trkDzAssociatedVtx;
+   std::vector<float> *trkDxyErrAssociatedVtx;
+   std::vector<float> *trkDzErrAssociatedVtx;
+   std::vector<int> *trkAssociatedVtxIndx;
+
+   // Debug mode quantities
+   std::vector<float> *AllxVtx;
+   std::vector<float> *AllyVtx;
+   std::vector<float> *AllzVtx;
+   std::vector<float> *AllxVtxError;
+   std::vector<float> *AllyVtxError;
+   std::vector<float> *AllzVtxError;
+   std::vector<bool> *AllisFakeVtx;
+   std::vector<int> *AllnTracksVtx;
+   std::vector<float> *Allchi2Vtx;
+   std::vector<float> *AllndofVtx;
+   std::vector<float> *AllptSumVtx;
+
+   std::vector<char> *trkCharge;
+   std::vector<char> *trkNHits;
+   std::vector<char> *trkNPixHits;
+   std::vector<char> *trkNLayers;
+   std::vector<float> *trkNormChi2;
+   std::vector<float> *pfEnergy;
 
 public:   // Derived quantities
    //bool GoodPhotonuclear; //FIXME: currently not implemented
@@ -959,6 +1075,7 @@ public:   // Derived quantities
 private:
    bool WriteMode;
    bool Initialized;
+   bool DebugMode;
 
 public:
    ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
@@ -969,15 +1086,15 @@ public:
    bool Initialize(bool Debug = false);
    int GetEntries();
    bool GetEntry(int iEntry);
-   bool SetBranch(TTree *T);
+   bool SetBranch(TTree *T, bool Debug = false);
    void Clear();
    //void CopyNonTrack(ChargedHadronRAATreeMessenger &M);
    bool FillEntry();
 
 };
 
-/* Class for the D0 Jet UPC analysis */
-class DzeroJetUPCTreeMessenger
+/* Class for the UPC EEC analysis */
+class UPCEECTreeMessenger
 {
 public:
    TTree *Tree;
@@ -985,18 +1102,20 @@ public:
    long long Event;
    int Lumi;
    bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+   
+   // particle flow info
+   std::vector<float> *PT;
+   std::vector<float> *E;
+   std::vector<float> *Eta;
+   std::vector<float> *Phi;
+   std::vector<float> *M;
 
    //charged hadron info
-   int Nch; 
-
-   //D reco quantities
-   int Dsize;
-   std::vector<float> *Dpt;
-   std::vector<float> *Dphi;
-   std::vector<float> *Dy;
-   std::vector<float> *Dmass;
-   std::vector<bool>  *DpassCutD0inJet;
-   std::vector<int>   *Dgen;
+   int Nch;
+   std::vector<float> *trkPt;
+   std::vector<float> *trkEta;
+   std::vector<float> *trkPhi;
+   std::vector<float> *pfEnergy; 
 
    // inclusive jet quantites
    int JetCount;
@@ -1004,15 +1123,9 @@ public:
    std::vector<float> *JetEta;
    std::vector<float> *JetY;
    std::vector<float> *JetPhi;
-   std::vector<bool>  *isD0TaggedGeomJet;
-   std::vector<int>   *TaggedLeadingD0GeomInJetIndex;
 
    //MC only quantities
-   int Gsize;
    float pthat;
-   std::vector<float> *Gpt;
-   std::vector<float> *Gy;
-   std::vector<float> *Gphi;
    std::vector<float> *GenJetPt;
    std::vector<float> *GenJetEta;
    std::vector<float> *GenJetY;
@@ -1027,10 +1140,10 @@ private:
    bool Initialized;
 
 public:
-   DzeroJetUPCTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
-   DzeroJetUPCTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
-   DzeroJetUPCTreeMessenger(TTree *HFJetUPCTree = nullptr, bool Debug = false);
-   ~DzeroJetUPCTreeMessenger();
+   UPCEECTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   UPCEECTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   UPCEECTreeMessenger(TTree *HFJetUPCTree = nullptr, bool Debug = false);
+   ~UPCEECTreeMessenger();
    bool Initialize(TTree *HFJetUPCTree, bool Debug = false);
    bool Initialize(bool Debug = false);
    int GetEntries();
@@ -1052,6 +1165,11 @@ public:
    float hiHF;
    int NVertex;
    float VX, VY, VZ, VXError, VYError, VZError;
+   float NCollWeight;
+   float EventWeight;
+   float PTHat;
+   float ExtraMuWeight[12];
+   float MuMuWeight;
    int NPU;
    //std::vectors
    std::vector<float> *JetPT;
@@ -1064,6 +1182,8 @@ public:
    std::vector<float> *muEta2;
    std::vector<float> *muPhi1;
    std::vector<float> *muPhi2;
+   std::vector<int> *muCharge1;
+   std::vector<int> *muCharge2;
    std::vector<float> *muDiDxy1;
    std::vector<float> *muDiDxy1Err;
    std::vector<float> *muDiDxy2;
@@ -1079,6 +1199,7 @@ public:
    std::vector<float> *mumuY;
    std::vector<float> *mumuPhi;
    std::vector<float> *mumuPt;
+   //std::vector<int> *mumuisOnia;
    std::vector<float> *DRJetmu1;
    std::vector<float> *DRJetmu2;
    std::vector<float> *muDeta;
@@ -1087,6 +1208,55 @@ public:
    std::vector<int> *MJTHadronFlavor;
    std::vector<int> *MJTNcHad;
    std::vector<int> *MJTNbHad;
+
+   //
+
+   std::vector<int> *jtNsvtx;
+   std::vector<int> *jtNtrk;
+   std::vector<float> *jtptCh;
+
+   // 
+
+   int nsvtx;
+   std::vector<std::vector<int>> *svtxJetId;
+   std::vector<std::vector<int>> *svtxNtrk;
+   std::vector<std::vector<float>> *svtxdl;
+   std::vector<std::vector<float>> *svtxdls;
+   std::vector<std::vector<float>> *svtxdl2d;
+   std::vector<std::vector<float>> *svtxdls2d;
+   std::vector<std::vector<float>> *svtxm;
+   std::vector<std::vector<float>> *svtxmcorr;
+   std::vector<std::vector<float>> *svtxpt;
+   std::vector<std::vector<float>> *svtxnormchi2;
+   std::vector<std::vector<float>> *svtxchi2;
+
+   std::vector<int> *svtxIdx_mu1;
+   std::vector<int> *svtxIdx_mu2;
+
+   //
+
+   int ntrk;
+   std::vector<std::vector<int>> *trkJetId;
+   std::vector<std::vector<int>> *trkSvtxId;
+   std::vector<std::vector<float>> *trkPt;
+   std::vector<std::vector<float>> *trkEta;
+   std::vector<std::vector<float>> *trkPhi;
+   std::vector<std::vector<float>> *trkIp3d;
+   std::vector<std::vector<float>> *trkIp3dSig;
+   std::vector<std::vector<float>> *trkIp2d;
+   std::vector<std::vector<float>> *trkIp2dSig;
+   std::vector<std::vector<float>> *trkDistToAxis;
+   std::vector<std::vector<float>> *trkDistToAxisSig;
+   std::vector<std::vector<float>> *trkIpProb3d;
+   std::vector<std::vector<float>> *trkIpProb2d;
+   std::vector<std::vector<float>> *trkDz;
+   std::vector<std::vector<int>> *trkPdgId;
+   std::vector<std::vector<int>> *trkMatchSta;
+
+   std::vector<int> *trkIdx_mu1;
+   std::vector<int> *trkIdx_mu2;
+
+   
 private:
    bool WriteMode;
    bool Initialized;
