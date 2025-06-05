@@ -1,8 +1,5 @@
-EfficiencyCalcEFE.cpp: 
-    Calculate Efficiency of different
-    pair<double, int> counting
 
 
-
-
-Count.cpp: Can run on its own, counts the number of events for each counts. Histogram and for true and false cuts
+Count.cpp:
+EfficiencyCalcPlot.cpp:
+EfficiencyCalcWrites.cpp:

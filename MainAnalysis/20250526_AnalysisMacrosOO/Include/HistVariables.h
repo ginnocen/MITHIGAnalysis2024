@@ -12,7 +12,8 @@ struct HistVar1D{
     float xmax = TMath::Pi()+0.0001;
     float ymin = 0;
     float ymax = 100;
-    string outFileName = "Plots/Unknown.png";
+    string outFolderName = "Plots/";
+    string outFileName = "Unknown.png";
 };
 
 struct CanvasVar{

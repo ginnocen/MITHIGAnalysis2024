@@ -9,15 +9,18 @@
 #include <utility>
 #include <tuple>
 #include <string>
-#include "GraphingUtils.h"
-#include "HistVariables.h"
-
-#include "EfficiencyResults.h"
-#include "EfficiencyCounting.h"
+#include "Include/GraphingUtils.h"
+#include "Include/HistVariables.h"
+#include "Include/DataFilePaths.h"
+#include "Include/EfficiencyResults.h"
+#include "Include/EfficiencyCounting.h"
 
 using namespace std;
 
-//Contains Run
+//Function Declarations
+
+//ignore this function, this is the test function for using 1 bkg only.
+//the "counting" functions used in counting number of events defined in EfficiencyCounting.h
 void EfficiencyPurityDataWrite_1bkg(const char* inFileNameSignal, 
     const char* inFileNameBKG, 
     float xsec_EM, 
@@ -38,57 +41,29 @@ void EfficiencyPurityDataWrite_withtrkpt(
     int N, 
     float xMax,
     int trkptcut,
+    string outfolder = "DataFilesExample/",
     string outFileAdd = "");
 
-
-
+//Code written in run. Use .L EfficiencyCalcWrites.cpp and then run() to run this code.
 void run(){
-    const char* HIJINGFile = "/data00/OOsamples/Skims/skim_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root";
-    const char* StarlightSD = "/data00/OOsamples/Skims/skim_HiForest_250514_Starlight_SingleDiffraction_OO_5362GeV_1505PR47944.root";
-    const char* StarlightDD = "/data00/OOsamples/Skims/skim_HiForest_250514_Starlight_SingleDiffraction_OO_5362GeV_1505PR47944.root";
-
     float xsec_SD = 0.3;
     float xsec_had = 1.30;
     float xsec_DD = 0.0003;
-    int N = 31;
-    float xMax = 30.0;
-    int coincidence = 1;
-   /* EfficiencyPurityDataWrite_withtrkpt(HIJINGFile, StarlightSD, StarlightDD, 
-            xsec_SD,xsec_DD, xsec_had, 
-            N, xMax, i);*/
+    int N = 4;
+    float xMax = 3.0;
+    float trkptcut = -1;
+    string outFileName = "DataFilesExample/";
 
-    /*EfficiencyPurityDataWrite_1bkg(HIJINGFile, StarlightSD, 
-        xsec_SD, xsec_had, 11, 10,
-    1,"SD_Crosscheck_1bkg");*/
+    //Example that writes Efficiency and Purity Data to File with all backgrounds
+    //When Trkptcut = -1, no cut is applied
+    EfficiencyPurityDataWrite_withtrkpt(HIJINGFile, StarlightSD, StarlightDD, 
+            xsec_SD, xsec_DD, xsec_had, 
+            N, xMax, -1,outFileName, "SampleWrite");
+    //Example that writes Efficiency and Purity Data to File with only SD background
+    EfficiencyPurityDataWrite_withtrkpt(HIJINGFile, StarlightSD, StarlightDD, 
+            0, xsec_DD, xsec_had, 
+            N, xMax, -1,outFileName, "SampleWriteSDbkg");
 
-    EfficiencyPurityDataWrite_withtrkpt(
-    HIJINGFile, StarlightSD, StarlightDD,
-    xsec_SD, 0, xsec_had, 
-    11, 10, 0,
-    "SD_Crosscheck_2bkgfunc");
-
- /*   EfficiencyPurityDataWrite_withtrkpt(
-    HIJINGFile, StarlightSD, StarlightDD,
-    xsec_SD, 0, xsec_had, 
-    N, xMax, 0,
-    "CrossCheck_SDOnly");
-
-    EfficiencyPurityDataWrite_withtrkpt(
-    HIJINGFile, StarlightSD, StarlightDD,
-    xsec_SD, 0, xsec_had, 
-    N, xMax, 0,
-    "CrossCheck_BOTHSDDD");
-
-    for (int i = 0; i <= 2; i += 10) {
-        EfficiencyPurityDataWrite_withtrkpt(HIJINGFile, StarlightSD, StarlightDD, 
-            xsec_SD,xsec_DD, xsec_had, 
-            N, xMax, i);
-    }
-
-    EfficiencyPurityDataWrite(HIJINGFile, StarlightDD, xsec_DD, xsec_had, N, xMax, 1,"_DD");
-    EfficiencyPurityDataWrite(HIJINGFile, StarlightDD, xsec_DD, xsec_had, N, xMax, 2,"_DD");
-    EfficiencyPurityDataWrite(HIJINGFile, StarlightSD, xsec_SD, xsec_had, N, xMax, 2,"_SD");
-*/
 }
 
 //Writing Efficiency and Purity Data to File
@@ -102,7 +77,7 @@ void EfficiencyPurityDataWrite_1bkg(
     int coincidence,
     string outFileAdd = "") {
 
-    string outfolder = "DataFiles/";
+    string outfolder = "DataFilesNew/";
     string filename = outfolder + Form("EfficiencyPurityData_N%d_coinc%d_", N-1, coincidence) + outFileAdd + ".txt";
     cout << "------- Writing Efficiency and Purity Data to File -------" << endl;
     ofstream outfile(filename.c_str());
@@ -110,7 +85,7 @@ void EfficiencyPurityDataWrite_1bkg(
         cerr << "Error: Could not open file " << filename << " for writing." << endl;
         return;
     }
-
+    cout << "Output file: " << filename << endl;
     double x[N], y[N], y2[N];
     double EfficiencyHijingAND[N], EfficiencyHijingOR[N],EfficiencySDAND[N], EfficiencySDOR[N],BKGRejectionAND[N], BKGRejectionOR[N],PurityAND[N], PurityOR[N];
     float leadingPtCut = 0.0;
@@ -159,16 +134,17 @@ void EfficiencyPurityDataWrite_withtrkpt(
     int N, 
     float xMax,
     int trkptcut,
+    string outfolder = "DataFilesExample/",
     string outFileAdd = "") {
-
-    string filename = Form("EfficiencyPurityData_N%d_trkpt%d_", N-1, trkptcut) + outFileAdd + ".txt";
+        
+    string filename = outfolder + Form("EfficiencyPurityData_N%d_trkpt%d_", N-1, trkptcut) + outFileAdd + ".txt";
     cout << "------- Writing Efficiency and Purity Data to File -------" << endl;
     ofstream outfile(filename.c_str());
     if (!outfile.is_open()) {
         cerr << "Error: Could not open file " << filename << " for writing." << endl;
         return;
     }
-
+    cout << "Output file: " << filename << endl;
     double x[N], y[N], y2[N];
     double EfficiencyDDAND[N], EfficiencyDDOR[N];
     double EfficiencyHijingAND[N], EfficiencyHijingOR[N],EfficiencySDAND[N], EfficiencySDOR[N],BKGRejectionAND[N], BKGRejectionOR[N],PurityAND[N], PurityOR[N];
@@ -198,65 +174,8 @@ void EfficiencyPurityDataWrite_withtrkpt(
         BKGRejectionOR[i] = 1.0 - EfficiencySDOR[i];
         PurityAND[i] = 1 - (xsec_SD * EfficiencySDAND[i] + xsec_DD * EfficiencyDDAND[i]) / (xsec_SD * EfficiencySDAND[i] + xsec_DD * EfficiencyDDAND[i] + xsec_had * EfficiencyHijingAND[i]);
         PurityOR[i] = 1 - (xsec_SD * EfficiencySDOR[i] + xsec_DD * EfficiencyDDOR[i]) / (xsec_SD * EfficiencySDOR[i] + xsec_DD * EfficiencyDDOR[i] + xsec_had * EfficiencyHijingOR[i]);
-
-        outfile << x[i] << " "
-                << EfficiencyHijingAND[i] << " "
-                << EfficiencyHijingOR[i] << " "
-                << EfficiencySDAND[i] << " "
-                << EfficiencySDOR[i] << " "
-                << EfficiencyDDAND[i] << " "
-                << EfficiencyDDOR[i] << " "
-                << BKGRejectionAND[i] << " "
-                << BKGRejectionOR[i] << " "
-                << PurityAND[i] << " "
-                << PurityOR[i] << "\n";
-    }
-    outfile.close();
-}
-
-void EfficiencyPurityDataWrite_NewClean(
-    const char* inFileNameSignal, const char* inFileNameBKGSD,  const char* inFileNameBKGDD,
-    float xsec_SD, float xsec_DD, float xsec_had, 
-    int N, float xMax, string outFileAdd = "") {
-
-    string filename = Form("EfficiencyPurityDataCLEAN_N%d", N-1) + outFileAdd + ".txt";
-    cout << "------- Writing Efficiency and Purity Data to File -------" << endl;
-    ofstream outfile(filename.c_str());
-    if (!outfile.is_open()) {
-        cerr << "Error: Could not open file " << filename << " for writing." << endl;
-        return;
-    }
-
-    double x[N], y[N], y2[N];
-    double EfficiencyDDAND[N], EfficiencyDDOR[N];
-    double EfficiencyHijingAND[N], EfficiencyHijingOR[N],EfficiencySDAND[N], EfficiencySDOR[N],BKGRejectionAND[N], BKGRejectionOR[N],PurityAND[N], PurityOR[N];
-    float leadingPtCut = 0.0;
-
-    outfile << "SignalFile: " << inFileNameSignal << "\n";
-    outfile << "BackgroundFileSD: " << inFileNameBKGSD << "\n";
-    outfile << "BackgroundFileDD: " << inFileNameBKGDD << "\n";
-
-    outfile << "xsec_SD: " << xsec_SD << " "
-            << "xsec_DD: " << xsec_DD << " "
-            << "xsec_had: " << xsec_had << " "
-            << "N: " << N << " "
-            << "xMax: " << xMax;
-
-    outfile << "HFEMaxCut Eff_Hijing(AND) Eff_Hijing(OR) Eff_SD(AND) Eff_SD(OR) Eff_DD(AND) Eff_DD(OR) BKGRej(AND) BKGRej(OR) Purity(AND) Purity(OR)\n";
-
-    for (int i = 0; i < N; ++i) {
-        x[i] = xMax * i / (N - 1); // Uniform spacing from 0 to xMax
-        EfficiencyHijingAND[i] = counting_clean(inFileNameSignal, x[i], true).first;
-        EfficiencyHijingOR[i] = counting_clean(inFileNameSignal, x[i], false).first;
-        EfficiencySDAND[i] = counting_clean(inFileNameBKGSD, x[i], true).first;
-        EfficiencySDOR[i] = counting_clean(inFileNameBKGSD, x[i], false).first;
-        EfficiencyDDAND[i] = counting_clean(inFileNameBKGDD, x[i], true).first;
-        EfficiencyDDOR[i] = counting_clean(inFileNameBKGDD, x[i], false).first;
-        BKGRejectionAND[i] = 1.0 - EfficiencySDAND[i];
-        BKGRejectionOR[i] = 1.0 - EfficiencySDOR[i];
-        PurityAND[i] = 1 - (xsec_SD * EfficiencySDAND[i] + xsec_DD * EfficiencyDDAND[i]) / (xsec_SD * EfficiencySDAND[i] + xsec_DD * EfficiencyDDAND[i] + xsec_had * EfficiencyHijingAND[i]);
-        PurityOR[i] = 1 - (xsec_SD * EfficiencySDOR[i] + xsec_DD * EfficiencyDDOR[i]) / (xsec_SD * EfficiencySDOR[i] + xsec_DD * EfficiencyDDOR[i] + xsec_had * EfficiencyHijingOR[i]);
-
+        cout << "PurityAND[" << i << "] = " << PurityAND[i] << endl;
+        cout << "PurityOR[" << i << "] = " << PurityOR[i] << endl;
         outfile << x[i] << " "
                 << EfficiencyHijingAND[i] << " "
                 << EfficiencyHijingOR[i] << " "

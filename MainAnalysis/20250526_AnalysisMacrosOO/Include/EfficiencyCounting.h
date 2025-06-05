@@ -12,8 +12,7 @@
 
 using namespace std;
 
-//CCFilter == 1 && PVFilter == 1 && nVtx > 0 && abs(VZ) < 15 
-//Can implement leadingPtSelection
+//Function declarations
 pair<double, int> countingLeadingptcuts(const char* inFileName, float cut = 0, bool cutBool = false, int leadingPtSelection = 0);
 pair<double, int> countingTrkptcuts(const char* inFileName, float cut = 0, bool cutBool = false, int trkptcut = 0);
 pair<double, int> countingJingcuts(const char* inFileName, float cut = 0, bool cutBool = false, int coincidence = 0);
@@ -118,6 +117,9 @@ pair<double, int> countingTrkptcuts(const char* inFileName,
     for (int i = 0; i < nEvt; i++) {
         tree->GetEntry(i);
         trkPtBool = false;
+        if (trkptcut == -1){
+            trkPtBool = true;
+        }
         for (int j = 0; j < trkPt->size(); j++) {
             if (trkPt->at(j) > trkptcut) {
                 trkPtBool = true;
@@ -143,6 +145,7 @@ pair<double, int> countingTrkptcuts(const char* inFileName,
     double ratio = static_cast<double>(eventCounter) / denominator;
     cout << "Ratio between Original and Filtered: " << ratio << endl;
     cout << "Total number of events: " << nEvt << endl;
+    cout << "Denominator after trkptcuts: " << denominator << ": " << denominator << endl;
     cout << "Total number of events after HFEcut "<< cut << ": " <<eventCounter << endl;
     cout << endl;
     cout << "------- Count Complete -------" << endl;

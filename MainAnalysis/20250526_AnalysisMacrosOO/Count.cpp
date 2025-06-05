@@ -131,6 +131,5 @@ void run(const char* inFileName) {
     gStyle->SetOptStat(0);
     c2->SaveAs("counting_results_DD_counts.png");
 
-
 }
 
