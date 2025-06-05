@@ -1,9 +1,0 @@
-5/26/2025 Monday:
-    IN plots, Filter Efficiency Results:
-        countingHFE_SD_AfterCuts_Hist.png: Efficiency plot of HFEmax cuts in Starlight SD  
-        countingHFE_HIJING_AfterCuts_Hist.png: Efficiency plot of HFEmax cuts in HIJING
-
-6/03/2025 Tuesday
-    EfficiencyCalcPlot.cpp
-    EfficiencyCalcWrites.cpp
-    Pretty complete.
