@@ -9,7 +9,7 @@ mkdir -p Output/
    --Year 2024 \
    --IsData true \
    --IsPP true \
-   --Fraction 0.1 \
+   --Fraction 1.0 \
    --ApplyTriggerRejection true \
    --ApplyEventRejection true \
    --ApplyTrackRejection true \

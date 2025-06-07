@@ -51,7 +51,8 @@ int main(int argc, char *argv[]) {
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", true);
   // bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
-  int sampleType = CL.GetInteger("sampleType", 0); // 0 for Hadronic, 1 for Starlight SD, 2 for Starlight DD
+  // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O
+  int sampleType = CL.GetInteger("sampleType", 0);
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);

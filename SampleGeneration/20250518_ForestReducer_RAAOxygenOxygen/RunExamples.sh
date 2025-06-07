@@ -32,3 +32,13 @@ mkdir -p Output/
    --PFTree particleFlowAnalyser/pftree \
    --sampleType 2 \
    --DebugMode true
+
+./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_alphaO_10k.root\
+   --Output ${PATHSKIMSAMPLE}/skim_20250606_HiForestMiniAOD_alphaO_10k.root \
+   --DoGenLevel false \
+   --Year 2025 \
+   --Fraction 1. \
+   --IsData false \
+   --PFTree particleFlowAnalyser/pftree \
+   --sampleType 4 \
+   --DebugMode true
