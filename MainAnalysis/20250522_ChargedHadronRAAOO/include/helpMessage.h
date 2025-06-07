@@ -21,7 +21,8 @@ int printHelpMessage(int argc, char *argv[]) {
                 << "Example:\n"
                 << "  " << argv[0]
                 << " --Input sample.root --Output output.root --IsData true --MinTrackPt 0.5 --TriggerChoice 0 "
-                   "--ScaleFactor 1.0 --IsPP true \n" return 1;
+                   "--ScaleFactor 1.0 --IsPP true \n";
+      return 1;
     }
   }
   return 0;
