@@ -18,7 +18,6 @@ int printHelpMessage(int argc, char *argv[]) {
                 << "  --Output <path>         Path to the output ROOT file.\n"
                 << "  --TriggerChoice <value> Choice of trigger for event selection.\n"
                 << "  --ScaleFactor <value>   Scale factor for normalization.\n"
-                << "  --IsPP <value>                  Flag for Proton-Proton collision data.\n"
                 << "Example:\n"
                 << "  " << argv[0]
                 << " --Input sample.root --Output output.root --IsData true --MinTrackPt 0.5 --TriggerChoice 0 "

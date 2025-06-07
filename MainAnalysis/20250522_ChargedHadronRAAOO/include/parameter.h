@@ -38,17 +38,17 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   // Create and fill histograms for each parameter
   TH1D *hMinTrackPt = new TH1D("parMinTrackPt", "parMinTrackPt", 1, 0, 1);
   hMinTrackPt->SetBinContent(1, par.MinTrackPt);
-  TH1D *hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
-  hTriggerChoice->SetBinContent(1, par.TriggerChoice);
   TH1D *hIsData = new TH1D("parIsData", "parIsData", 1, 0, 1);
   hIsData->SetBinContent(1, par.IsData);
   TH1D *hScaleFactor = new TH1D("parScaleFactor", "parScaleFactor", 1, 0, 1);
   hScaleFactor->SetBinContent(1, par.scaleFactor);
+  TH1D *hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
+  hTriggerChoice->SetBinContent(1, par.TriggerChoice);
 
   // Write histograms to the output file
   hMinTrackPt->Write();
-  hTriggerChoice->Write();
   hIsData->Write();
+  hTriggerChoice->Write();
   hScaleFactor->Write();
 
   // Clean up
