@@ -74,8 +74,8 @@ public:
   }
 
 private:
-  void deleteHistograms() { 
-    delete hTrkPt; 
+  void deleteHistograms() {
+    delete hTrkPt;
     delete hTrkPtEta;
   }
 };
