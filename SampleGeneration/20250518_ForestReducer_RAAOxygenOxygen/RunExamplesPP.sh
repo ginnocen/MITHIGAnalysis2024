@@ -14,6 +14,6 @@ mkdir -p Output/
    --ApplyEventRejection true \
    --ApplyTrackRejection true \
    --PFTree particleFlowAnalyser/pftree \
-   --sampleType 0 \
+   --sampleType -1 \
    --DebugMode true
 
