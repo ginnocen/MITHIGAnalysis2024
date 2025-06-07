@@ -11,7 +11,8 @@ mkdir -p Output/
    --Fraction 1. \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType 0 \
-   --DebugMode true
+   --DebugMode true \
+   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 
 ./Execute --Input ${PATHSAMPLE}/crab_HiForest_250514_Starlight_SingleDiffraction_OO_5362GeV_1505PR47944.root \
    --Output ${PATHSKIMSAMPLE}/skim_HiForest_250514_Starlight_SingleDiffraction_OO_5362GeV_1505PR47944.root \
@@ -21,7 +22,8 @@ mkdir -p Output/
    --IsData false \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType 1 \
-   --DebugMode true
+   --DebugMode true \
+   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 
 ./Execute --Input ${PATHSAMPLE}/crab_HiForest_250514_Starlight_DoubleDiffraction_OO_5362GeV_1505PR47944.root \
    --Output ${PATHSKIMSAMPLE}/skim_HiForest_250514_Starlight_DoubleDiffraction_OO_5362GeV_1505PR47944.root \
@@ -31,7 +33,8 @@ mkdir -p Output/
    --IsData false \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType 2 \
-   --DebugMode true
+   --DebugMode true \
+   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 
 ./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_alphaO_10k.root\
    --Output ${PATHSKIMSAMPLE}/skim_20250606_HiForestMiniAOD_alphaO_10k.root \
@@ -41,4 +44,5 @@ mkdir -p Output/
    --IsData false \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType 4 \
-   --DebugMode true
+   --DebugMode true \
+   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/

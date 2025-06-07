@@ -9,7 +9,8 @@ TestRun: Execute
                   --Fraction 0.1 \
                   --PFTree particleFlowAnalyser/pftree \
                   --sampleType 0 \
-                  --DebugMode true
+                  --DebugMode true \
+                  --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 TestRunBase: Execute
 	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_Hijing_merged_DEBUG.root \
                   --Output skim_testfile.root \
@@ -19,7 +20,8 @@ TestRunBase: Execute
                   --Fraction 0.1 \
                   --PFTree particleFlowAnalyser/pftree \
                   --sampleType 0 \
-                  --DebugMode true
+                  --DebugMode true \
+                  --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 Execute: ReduceForest.cpp
 	g++ ReduceForest.cpp -o Execute \
 		`root-config --cflags --glibs` \
