@@ -60,18 +60,16 @@ int main(int argc, char *argv[]) {
   bool DebugMode = CL.GetBool("DebugMode", false);
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
-   if(DoGenLevel == false)
-   {
-      if(IsPP == true && (Year == 2017)) // using 2017 pp data corrections
-         TrackEfficiencyPP2017 = new TrkEff2017pp(false, TrackEfficiencyPath);
-      else
-      {
-         cerr << endl;
-         cerr << "Error in track efficiency!" << endl;
-         cerr << "Data/Year combination (IsPP = " << IsPP << ", Year = " << Year << ") does not exist!" << endl;
-         cerr << endl;
-      }
-   }
+  if (DoGenLevel == false) {
+    if (IsPP == true && (Year == 2017)) // using 2017 pp data corrections
+      TrackEfficiencyPP2017 = new TrkEff2017pp(false, TrackEfficiencyPath);
+    else {
+      cerr << endl;
+      cerr << "Error in track efficiency!" << endl;
+      cerr << "Data/Year combination (IsPP = " << IsPP << ", Year = " << Year << ") does not exist!" << endl;
+      cerr << endl;
+    }
+  }
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
@@ -106,7 +104,6 @@ int main(int argc, char *argv[]) {
         Bar.Update(iE);
         Bar.Print();
       }
-
       MEvent.GetEntry(iE);
       MGen.GetEntry(iE);
       MTrack.GetEntry(iE);
@@ -207,7 +204,7 @@ int main(int argc, char *argv[]) {
             continue;
         } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
-          if (ApplyTrackRejection == true && MTrack.highPurity->at(iTrack) == false)
+          if (ApplyTrackRejection == true && MTrack.PassChargedHadronPPStandardCuts(iTrack) == false)
             continue;
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
             leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
@@ -223,7 +220,7 @@ int main(int argc, char *argv[]) {
         float trkDxyErrAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDxyErrAssociatedVtx->at(iTrack);
         float trkDzErrAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDzErrAssociatedVtx->at(iTrack);
         int trkAssociatedVtxIndx = DoGenLevel ? -1 : MTrack.trkAssociatedVtxIndx->at(iTrack);
-        char trkCharge = DoGenLevel ? char(MGen.Charge->at(iTrackDeb)) : MTrack.trkCharge->at(iTrack);
+        char trkCharge = DoGenLevel ? char(MGen.Charge->at(iTrack)) : MTrack.trkCharge->at(iTrack);
         char trkNHits = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNHits->at(iTrack);
         char trkNPixHits = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNPixHits->at(iTrack);
         char trkNLayers = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNLayers->at(iTrack);
@@ -247,10 +244,10 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
 
         double TrackCorrection = 1;
-        if (DoGenLevel == false){
-          if(IsPP == true && (Year == 2017))
+        if (DoGenLevel == false) {
+          if (IsPP == true && (Year == 2017))
             TrackCorrection = TrackEfficiencyPP2017->getCorrection(trkPt, trkEta);
-	} // end of if on DoGenLevel == false
+        } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;

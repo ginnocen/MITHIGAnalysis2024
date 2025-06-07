@@ -751,6 +751,7 @@ public:
    bool Initialize(TTree *PPTrackTree);
    bool Initialize();
    bool GetEntry(int iEntry);
+   bool PassChargedHadronPPStandardCuts(int index);
 };
 
 class ZDCTreeMessenger

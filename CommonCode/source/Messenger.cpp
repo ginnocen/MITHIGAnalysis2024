@@ -2338,12 +2338,41 @@ bool PPTrackTreeMessenger::Initialize()
    return true;
 }
 
+
 bool PPTrackTreeMessenger::GetEntry(int iEntry)
 {
    if(Tree == nullptr)
       return false;
 
    Tree->GetEntry(iEntry);
+   return true;
+}
+
+bool PPTrackTreeMessenger::PassChargedHadronPPStandardCuts(int index)
+{
+   if(index >= nTrk)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+   //FIXME: currently this is not as Vipul analysis, although 
+   // I think this is a better selection
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
    return true;
 }
 

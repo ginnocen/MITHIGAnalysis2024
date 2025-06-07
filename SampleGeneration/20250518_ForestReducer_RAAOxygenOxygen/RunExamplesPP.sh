@@ -6,7 +6,7 @@ mkdir -p Output/
 ./Execute --Input ${PATHSAMPLE}/crab_Forest_20250523_ppref2024output_PPRefZeroBiasPlusForward0.root \
    --Output ${PATHSKIMSAMPLE}/crab_Forest_20250523_ppref2024output_PPRefZeroBiasPlusForward0.root \
    --DoGenLevel false \
-   --Year 2024 \
+   --Year 2017 \ # we are using for the moment 2017 pp track correction, even if the sample is 2024
    --IsData true \
    --IsPP true \
    --Fraction 1.0 \
@@ -15,6 +15,5 @@ mkdir -p Output/
    --ApplyTrackRejection true \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType -1 \
-   --DebugMode true
-   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
-
+   --DebugMode true \
+   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
