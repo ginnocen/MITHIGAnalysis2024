@@ -1,7 +1,8 @@
 
 #!/bin/bash
 ## FIXME: need to use your own path to the skimmed data
-PATHSKIM=/Users/ginnocen/Desktop/MITHIGAnalysis2024/SampleGeneration/20250518_ForestReducer_RAAOxygenOxygen/data00/OOsamples/Skims
+#PATHSKIM=/Users/ginnocen/Desktop/MITHIGAnalysis2024/SampleGeneration/20250518_ForestReducer_RAAOxygenOxygen/data00/OOsamples/Skims
+PATHSKIM=/afs/cern.ch/work/g/ginnocen/public/OOsamples/Skims
 #source clean.sh
 # rm *.root
 TRACKPTMIN=1

@@ -27,6 +27,7 @@ public:
   TFile *inf, *outf;
   TH1D *hTrkPt;
   TH2D *hTrkPtEta;
+  TH1D *hNEvtPassCuts;
   ChargedHadronRAATreeMessenger *MChargedHadronRAA;
   string title;
 
@@ -45,10 +46,20 @@ public:
 
   void analyze(Parameters &par) {
     outf->cd();
+
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", 100, 0, 10);
     hTrkPt->Sumw2();
     hTrkPtEta = new TH2D(Form("hTrkPtEta%s", title.c_str()), "", 40, 0, 20, 50, -4.0, 4.0);
     hTrkPtEta->Sumw2();
+
+    hNEvtPassCuts = new TH1D("hNEvtPassCuts", "Number of events passing cuts", 5, 0.5, 5.5);
+    hNEvtPassCuts->GetXaxis()->SetBinLabel(1, "Total Events");
+    hNEvtPassCuts->GetXaxis()->SetBinLabel(2, "CC Filter");
+    hNEvtPassCuts->GetXaxis()->SetBinLabel(3, "CC+PV Filter");
+    hNEvtPassCuts->GetXaxis()->SetBinLabel(4, "CC+PV+!isFakeVtx Filter");
+    hNEvtPassCuts->GetXaxis()->SetBinLabel(5, "CC+PV+!isFakeVtx+abs(VZ)<15 Filter");
+    hNEvtPassCuts->Sumw2();
+
     par.printParameters();
     unsigned long nEntry = MChargedHadronRAA->GetEntries() * par.scaleFactor;
     ProgressBar Bar(cout, nEntry);
@@ -60,6 +71,19 @@ public:
         Bar.Update(i);
         Bar.Print();
       }
+
+      // event-level
+      // event selection criteria
+      hNEvtPassCuts->Fill(1); // Total events
+      if (MChargedHadronRAA->ClusterCompatibilityFilter) hNEvtPassCuts->Fill(2);
+      if (MChargedHadronRAA->ClusterCompatibilityFilter && MChargedHadronRAA->PVFilter) hNEvtPassCuts->Fill(3);
+      if (MChargedHadronRAA->ClusterCompatibilityFilter && MChargedHadronRAA->PVFilter &&
+            !MChargedHadronRAA->isFakeVtx) hNEvtPassCuts->Fill(4);
+      if (MChargedHadronRAA->ClusterCompatibilityFilter && MChargedHadronRAA->PVFilter &&
+            !MChargedHadronRAA->isFakeVtx && fabs(MChargedHadronRAA->VZ) < 15) hNEvtPassCuts->Fill(5);
+
+
+      // track-level
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
         hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j));
         hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j));
@@ -71,12 +95,14 @@ public:
     outf->cd();
     smartWrite(hTrkPt);
     smartWrite(hTrkPtEta);
+    smartWrite(hNEvtPassCuts);
   }
 
 private:
   void deleteHistograms() {
     delete hTrkPt;
     delete hTrkPtEta;
+    delete hNEvtPassCuts;
   }
 };
 
