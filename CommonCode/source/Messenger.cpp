@@ -868,6 +868,9 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.push_back("HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000_v1");
    Name.push_back("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000_v1");
 
+   // 2024 triggers pp
+   Name.push_back("HLT_PPRefZeroBias_v6");
+
    // 2023 triggers UPCs
    Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_v2");
    Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_v1");
@@ -2346,12 +2349,41 @@ bool PPTrackTreeMessenger::Initialize()
    return true;
 }
 
+
 bool PPTrackTreeMessenger::GetEntry(int iEntry)
 {
    if(Tree == nullptr)
       return false;
 
    Tree->GetEntry(iEntry);
+   return true;
+}
+
+bool PPTrackTreeMessenger::PassChargedHadronPPStandardCuts(int index)
+{
+   if(index >= nTrk)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+   //FIXME: currently this is not as Vipul analysis, although 
+   // I think this is a better selection
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
    return true;
 }
 
@@ -3575,8 +3607,6 @@ bool DzeroUPCTreeMessenger::FillEntry()
    return true;
 }
 
-
-// ChargedHadronRAATreeMessenger
 ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, bool Debug)
 {
    Initialized = false;
@@ -3620,6 +3650,13 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
       delete trkDxyErrAssociatedVtx;
       delete trkDzErrAssociatedVtx;
       delete trkAssociatedVtxIndx;
+      delete trkCharge;
+      delete trkNHits;
+      delete trkNPixHits;
+      delete trkNLayers;
+      delete trkNormChi2;
+      delete pfEnergy;
+      delete trackWeight;
 
       if (DebugMode == true) {
          // delete debug related vectors
@@ -3636,12 +3673,6 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
          delete AllndofVtx;
          delete AllptSumVtx;
 
-         delete trkCharge;
-         delete trkNHits;
-         delete trkNPixHits;
-         delete trkNLayers;
-         delete trkNormChi2;
-         delete pfEnergy;
       }
    }
 }
@@ -3669,6 +3700,13 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    trkDxyErrAssociatedVtx = nullptr;
    trkDzErrAssociatedVtx = nullptr;
    trkAssociatedVtxIndx = nullptr;
+   trkCharge = nullptr;
+   trkNHits = nullptr;
+   trkNPixHits = nullptr;
+   trkNLayers = nullptr;
+   trkNormChi2 = nullptr;
+   pfEnergy = nullptr;
+   trackWeight = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -3714,6 +3752,13 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("trkDxyErrAssociatedVtx", &trkDxyErrAssociatedVtx);
    Tree->SetBranchAddress("trkDzErrAssociatedVtx", &trkDzErrAssociatedVtx);
    Tree->SetBranchAddress("trkAssociatedVtxIndx", &trkAssociatedVtxIndx);
+   Tree->SetBranchAddress("trkCharge", &trkCharge);
+   Tree->SetBranchAddress("trkNHits", &trkNHits);
+   Tree->SetBranchAddress("trkNPixHits", &trkNPixHits);
+   Tree->SetBranchAddress("trkNLayers", &trkNLayers);
+   Tree->SetBranchAddress("trkNormChi2", &trkNormChi2);
+   Tree->SetBranchAddress("pfEnergy", &pfEnergy);
+   Tree->SetBranchAddress("trackWeight", &trackWeight);
 
    if (DebugMode) {
       // initialize debug quantities
@@ -3729,13 +3774,6 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
       AllndofVtx = nullptr;
       AllptSumVtx = nullptr;
 
-      trkCharge = nullptr;
-      trkNHits = nullptr;
-      trkNPixHits = nullptr;
-      trkNLayers = nullptr;
-      trkNormChi2 = nullptr;
-      pfEnergy = nullptr;
-
       Tree->SetBranchAddress("AllxVtx", &AllxVtx);
       Tree->SetBranchAddress("AllyVtx", &AllyVtx);
       Tree->SetBranchAddress("AllzVtx", &AllzVtx);
@@ -3747,12 +3785,6 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
       Tree->SetBranchAddress("Allchi2Vtx", &Allchi2Vtx);
       Tree->SetBranchAddress("AllndofVtx", &AllndofVtx);
       Tree->SetBranchAddress("AllptSumVtx", &AllptSumVtx);
-      Tree->SetBranchAddress("trkCharge", &trkCharge);
-      Tree->SetBranchAddress("trkNHits", &trkNHits);
-      Tree->SetBranchAddress("trkNPixHits", &trkNPixHits);
-      Tree->SetBranchAddress("trkNLayers", &trkNLayers);
-      Tree->SetBranchAddress("trkNormChi2", &trkNormChi2);
-      Tree->SetBranchAddress("pfEnergy", &pfEnergy);
    }
 
    return true;
@@ -3793,6 +3825,13 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    trkDxyErrAssociatedVtx = new std::vector<float>();
    trkDzErrAssociatedVtx = new std::vector<float>();
    trkAssociatedVtxIndx = new std::vector<int>();
+   trkCharge = new std::vector<char>();
+   trkNHits = new std::vector<char>();
+   trkNPixHits = new std::vector<char>();
+   trkNLayers = new std::vector<char>();
+   trkNormChi2 = new std::vector<float>();
+   pfEnergy = new std::vector<float>();
+   trackWeight = new std::vector<float>();
 
    Tree = T;
 
@@ -3840,6 +3879,13 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("trkDxyErrAssociatedVtx",     &trkDxyErrAssociatedVtx);
    Tree->Branch("trkDzErrAssociatedVtx",      &trkDzErrAssociatedVtx);
    Tree->Branch("trkAssociatedVtxIndx",       &trkAssociatedVtxIndx);
+   Tree->Branch("trkCharge",                  &trkCharge);
+   Tree->Branch("trkNHits",                   &trkNHits);
+   Tree->Branch("trkNPixHits",                &trkNPixHits);
+   Tree->Branch("trkNLayers",                 &trkNLayers);
+   Tree->Branch("trkNormChi2",                &trkNormChi2);
+   Tree->Branch("pfEnergy",                   &pfEnergy);
+   Tree->Branch("trackWeight",                &trackWeight);
 
    if (DebugMode) {
       // set debug related branches
@@ -3855,13 +3901,6 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
       AllndofVtx = new std::vector<float>();
       AllptSumVtx = new std::vector<float>();
 
-      trkCharge = new std::vector<char>();
-      trkNHits = new std::vector<char>();
-      trkNPixHits = new std::vector<char>();
-      trkNLayers = new std::vector<char>();
-      trkNormChi2 = new std::vector<float>();
-      pfEnergy = new std::vector<float>();
-
       Tree->Branch("AllxVtx",                 &AllxVtx);
       Tree->Branch("AllyVtx",                 &AllyVtx);
       Tree->Branch("AllzVtx",                 &AllzVtx);
@@ -3873,13 +3912,6 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
       Tree->Branch("Allchi2Vtx",              &Allchi2Vtx);
       Tree->Branch("AllndofVtx",              &AllndofVtx);
       Tree->Branch("AllptSumVtx",             &AllptSumVtx);
-
-      Tree->Branch("trkCharge",               &trkCharge);
-      Tree->Branch("trkNHits",                &trkNHits);
-      Tree->Branch("trkNPixHits",             &trkNPixHits);
-      Tree->Branch("trkNLayers",              &trkNLayers);
-      Tree->Branch("trkNormChi2",             &trkNormChi2);
-      Tree->Branch("pfEnergy",                &pfEnergy);
    }
 
    return true;
@@ -3934,6 +3966,13 @@ void ChargedHadronRAATreeMessenger::Clear()
    trkDxyErrAssociatedVtx->clear();
    trkDzErrAssociatedVtx->clear();
    trkAssociatedVtxIndx->clear();
+   trkCharge->clear();
+   trkNHits->clear();
+   trkNPixHits->clear();
+   trkNLayers->clear();
+   trkNormChi2->clear();
+   pfEnergy->clear();
+   trackWeight->clear();
 
    if (DebugMode) {
       // clear debug related branches
@@ -3950,12 +3989,6 @@ void ChargedHadronRAATreeMessenger::Clear()
       AllndofVtx->clear();
       AllptSumVtx->clear();
 
-      trkCharge->clear();
-      trkNHits->clear();
-      trkNPixHits->clear();
-      trkNLayers->clear();
-      trkNormChi2->clear();
-      pfEnergy->clear();
    }
 }
 /*

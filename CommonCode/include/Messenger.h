@@ -756,6 +756,7 @@ public:
    bool Initialize(TTree *PPTrackTree);
    bool Initialize();
    bool GetEntry(int iEntry);
+   bool PassChargedHadronPPStandardCuts(int index);
 };
 
 class ZDCTreeMessenger
@@ -1053,6 +1054,15 @@ public:
    std::vector<float> *trkDxyErrAssociatedVtx;
    std::vector<float> *trkDzErrAssociatedVtx;
    std::vector<int> *trkAssociatedVtxIndx;
+   std::vector<char> *trkCharge;
+   std::vector<char> *trkNHits;
+   std::vector<char> *trkNPixHits;
+   std::vector<char> *trkNLayers;
+   std::vector<float> *trkNormChi2;
+   std::vector<float> *pfEnergy;
+
+   // weighting properties
+   std::vector<float> *trackWeight;
 
    // Debug mode quantities
    std::vector<float> *AllxVtx;
@@ -1066,13 +1076,6 @@ public:
    std::vector<float> *Allchi2Vtx;
    std::vector<float> *AllndofVtx;
    std::vector<float> *AllptSumVtx;
-
-   std::vector<char> *trkCharge;
-   std::vector<char> *trkNHits;
-   std::vector<char> *trkNPixHits;
-   std::vector<char> *trkNLayers;
-   std::vector<float> *trkNormChi2;
-   std::vector<float> *pfEnergy;
 
 public:   // Derived quantities
    //bool GoodPhotonuclear; //FIXME: currently not implemented
