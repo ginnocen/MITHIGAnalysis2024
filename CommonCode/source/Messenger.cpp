@@ -4113,6 +4113,7 @@ bool UPCEECTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
    Tree->SetBranchAddress("isL1ZDCXORJet12", &isL1ZDCXORJet12);
    Tree->SetBranchAddress("isL1ZDCXORJet16", &isL1ZDCXORJet16);
+   Tree->SetBranchAddress("isGammaN", &isGammaN);
    Tree->SetBranchAddress("trkPt", &trkPt); 
    Tree->SetBranchAddress("trkEta", &trkEta); 
    Tree->SetBranchAddress("trkPhi", &trkPhi);
@@ -4195,6 +4196,7 @@ bool UPCEECTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/O");
    Tree->Branch("isL1ZDCXORJet12",       &isL1ZDCXORJet12, "isL1ZDCXORJet12/O");
    Tree->Branch("isL1ZDCXORJet16",       &isL1ZDCXORJet16, "isL1ZDCXORJet16/O");
+   Tree->Branch("isGammaN",              &isGammaN, "isGammaN/O");
    Tree->Branch("Nch",                   &Nch, "Nch/I");
    Tree->Branch("trkPt",                 &trkPt); 
    Tree->Branch("trkEta",                &trkEta);
@@ -4238,6 +4240,7 @@ void UPCEECTreeMessenger::Clear()
    isL1ZDCXORJet8 = false;
    isL1ZDCXORJet12 = false;
    isL1ZDCXORJet16 = false;
+   isGammaN = false;
    Nch = -999;
    trkPt->clear(); 
    trkEta->clear(); 
