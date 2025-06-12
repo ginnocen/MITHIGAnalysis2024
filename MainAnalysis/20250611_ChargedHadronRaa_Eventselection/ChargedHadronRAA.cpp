@@ -139,7 +139,6 @@ int main(int argc, char *argv[]) {
   // if (printHelpMessage(argc, argv))
   //   return 0;
   CommandLine CL(argc, argv);
-  float MinTrackPt = CL.GetDouble("MinTrackPt", 1.0); // Minimum track pT selection
   bool IsData = CL.GetBool("IsData", 0);              // Data or MC
   float scaleFactor = CL.GetDouble("ScaleFactor", 1.0);
   int TriggerChoice = CL.GetInt("TriggerChoice", 0);
@@ -157,7 +156,7 @@ int main(int argc, char *argv[]) {
   // OR CONDITION:  HFE_min2 = 0.0
   // ASYMMETRIC CONDITION: HFE_min1 != HFE_min2
 
-  Parameters par(MinTrackPt, TriggerChoice, IsData, scaleFactor, VzMax, NVtxMin, CCFilter, PVFilter, IsHijing, HFE_min1, HFE_min2);
+  Parameters par(TriggerChoice, IsData, scaleFactor, VzMax, NVtxMin, CCFilter, PVFilter, IsHijing, HFE_min1, HFE_min2);
   par.input = CL.Get("Input", "input.root");    // Input file
   par.output = CL.Get("Output", "output.root"); // Output file
   if (checkError(par))

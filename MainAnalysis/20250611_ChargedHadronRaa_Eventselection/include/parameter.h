@@ -6,18 +6,14 @@ namespace fs = std::filesystem;
 //============================================================//
 class Parameters {
 public:
-  Parameters(float MinTrackPt, int TriggerChoice, bool IsData, float scaleFactor = 1.0, float VzMax = 15.0, 
+  Parameters(int TriggerChoice, bool IsData, float scaleFactor = 1.0, float VzMax = 15.0, 
              int NVtxMin = 1, int CCFilter = 1, int PVFilter = 1, int IsHijing = 0, float HFE_min1 = 4.0, float HFE_min2 = 4.0)
-      : MinTrackPt(MinTrackPt), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor), 
-        VzMax(VzMax), NVtxMin(NVtxMin), CCFilter(CCFilter), PVFilter(PVFilter), IsHijing(IsHijing), HFE_min1(HFE_min1), HFE_min2(HFE_min2) {
-    if (MinTrackPt < 0.1) {
-      printf("[INFO] attention: you are performing the analysis with a very low pT track selection");
-    }
+      : TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor), VzMax(VzMax), NVtxMin(NVtxMin), 
+      CCFilter(CCFilter), PVFilter(PVFilter), IsHijing(IsHijing), HFE_min1(HFE_min1), HFE_min2(HFE_min2) {
   }
   Parameters() {}
   string input;      // Input file name
   string output;     // Output file name
-  float MinTrackPt;  // Minimum track pt
   int TriggerChoice; // FIXME: option to be defined
   bool IsData;       // Data or MC
   float scaleFactor; // Scale factor
@@ -34,7 +30,6 @@ public:
 
     cout << "Input file: " << input << endl;
     cout << "Output file: " << output << endl;
-    cout << "MinTrackPt: " << MinTrackPt << endl;
     cout << "TriggerChoice: " << TriggerChoice << endl;
     cout << "IsData: " << IsData << endl;
     cout << "Scale factor: " << scaleFactor << endl;
@@ -54,8 +49,6 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   outf->cd("par");    // Change to the "par" directory
 
   // Create and fill histograms for each parameter
-  TH1D *hMinTrackPt = new TH1D("parMinTrackPt", "parMinTrackPt", 1, 0, 1);
-  hMinTrackPt->SetBinContent(1, par.MinTrackPt);
   TH1D *hIsData = new TH1D("parIsData", "parIsData", 1, 0, 1);
   hIsData->SetBinContent(1, par.IsData);
   TH1D *hScaleFactor = new TH1D("parScaleFactor", "parScaleFactor", 1, 0, 1);
@@ -80,7 +73,6 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   
 
   // Write histograms to the output file
-  hMinTrackPt->Write();
   hIsData->Write();
   hTriggerChoice->Write();
   hScaleFactor->Write();
@@ -94,7 +86,6 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   hHFE_min2->Write();
 
   // Clean up
-  delete hMinTrackPt;
   delete hTriggerChoice;
   delete hIsData;
   delete hScaleFactor;
