@@ -46,11 +46,6 @@ bool eventSelection(ChargedHadronRAATreeMessenger *ch, const Parameters &par) {
   if(ch->PVFilter < par.PVFilter) {
     return false;
   }
-
-  // Hijing Npart > 1 
-  if(par.IsHijing && ch->Npart <= 1) {
-    return false;
-  }
   
   // HFE energy cuts
   float hiHF = max(ch->HFEMaxPlus, ch->HFEMaxMinus);
@@ -106,6 +101,7 @@ public:
       }
       MChargedHadronRAA->GetEntry(i);
       if(!eventSelection(MChargedHadronRAA, par)) {continue;}
+      if(par.IsHijing && MChargedHadronRAA->Npart <= 1) {continue;} // MAY BECOME OBSOLETE. IF SO, WILL REMOVE ISHIJIN PARAMETER
       hNcoll->Fill(MChargedHadronRAA->Ncoll);
       hNpart->Fill(MChargedHadronRAA->Npart);
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
