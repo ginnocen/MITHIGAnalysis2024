@@ -1,12 +1,13 @@
 #!/bin/bash
 MAXCORES=40
 SAMPLEID=0
+source clean.sh
 
 echo "Running on sample ID: $SAMPLEID"
 
 if [ "$SAMPLEID" -eq 0 ]; then
     #NAMEMC="SkimMC2018PbPb_Version20241220_InputForest_20241217_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_FIXEDDR"
-    NAMEMC="/data00/g2ccbar/mc2018/skim_5202025/"
+    NAMEMC="/data00/g2ccbar/mc2018/skim_06062025_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8"
     FOLDER="/data00/g2ccbar/mc2018/forest_lowerJetPt_may232025" 
 fi
 echo "Running on sample: $NAMEMC"
