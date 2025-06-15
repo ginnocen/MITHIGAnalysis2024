@@ -172,9 +172,9 @@ vector<double> getAltCorrectedYieldArr(vector<string>& inputPoints,
 
   std::vector<Point> _altPointsArr = getPointArr(MinDzeroPT, MaxDzeroPT, IsGammaN, _altPoints);
 
-  vector<double> retArr = getDoubleArr(_altPointsArr, 
+  std::vector<double> retArr = getDoubleArr(_altPointsArr,
                  [](Point& p) -> double { return p.correctedYield;} );
-
+  
   return retArr;
 }
 
