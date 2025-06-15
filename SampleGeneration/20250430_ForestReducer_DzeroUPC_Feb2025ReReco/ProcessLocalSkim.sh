@@ -1,19 +1,13 @@
 #!/bin/bash
 
-SERVER=${1}
-FILEPATH=${2}
-COUNTER=${3}
-OUTPUT=${4}
-MAXCORES=${5}
+FILEPATH=${1}
+COUNTER=${2}
+OUTPUT=${3}
 
-mkdir -p "${OUTPUT}/temp_inputs/"
-FILE="${OUTPUT}/temp_inputs/job_${COUNTER}.root"
-rm $FILE &> /dev/null
-xrdcp -N --parallel $MAXCORES -t 2 $SERVER$FILEPATH $FILE
-wait
+file="$FILEPATH"
 
-echo "Processing $FILE"
-./Execute --Input "$FILE" \
+echo "Processing $file"
+./Execute --Input "$file" \
     --Output "${OUTPUT}/output_${COUNTER}.root" \
     --Year 2023 \
     --ApplyTriggerRejection 2 \
@@ -26,6 +20,5 @@ echo "Processing $FILE"
     --HideProgressBar true
 wait
 
-sleep 0.2
-rm $FILE
+sleep 0.1
 wait
