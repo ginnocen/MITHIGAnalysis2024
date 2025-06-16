@@ -1,0 +1,43 @@
+{
+  "PlotDir": "plot/mcReweighting2to5/",
+  "Plots": [
+    {
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "IsGammaN": 1,
+      "InputPoints": "mcReweighting2to5/pt2-5_y-2--1_IsGammaN1/MassFit/correctedYields.md,mcReweighting2to5/pt2-5_y-1-0_IsGammaN1/MassFit/correctedYields.md,mcReweighting2to5/pt2-5_y0-1_IsGammaN1/MassFit/correctedYields.md,mcReweighting2to5/pt2-5_y1-2_IsGammaN1/MassFit/correctedYields.md",
+      "wSystLumi": 0,
+      "wSystTrk": 0,
+      "wSystBR": 0,
+      "wSystEvtSel": false,
+      "wSystRapGapSel": "",
+      "wSystDsvpv": "no",
+      "wSystDtrkPt": "no",
+      "wSystDalpha": "no",
+      "wSystDchi2cl": "no",
+      "wSystFitSigMean": "no",
+      "wSystFitSigAlpha": "no",
+      "wSystFitComb": "no",
+      "wSystFitPkBg": "no"
+    },
+    {
+      "MinDzeroPT": 2,
+      "MaxDzeroPT": 5,
+      "IsGammaN": 0,
+      "InputPoints": "mcReweighting2to5/pt2-5_y-2--1_IsGammaN0/MassFit/correctedYields.md,mcReweighting2to5/pt2-5_y-1-0_IsGammaN0/MassFit/correctedYields.md,mcReweighting2to5/pt2-5_y0-1_IsGammaN0/MassFit/correctedYields.md,mcReweighting2to5/pt2-5_y1-2_IsGammaN0/MassFit/correctedYields.md",
+      "wSystLumi": 0,
+      "wSystTrk": 0,
+      "wSystBR": 0,
+      "wSystEvtSel": false,
+      "wSystRapGapSel": "",
+      "wSystDsvpv": "no",
+      "wSystDtrkPt": "no",
+      "wSystDalpha": "no",
+      "wSystDchi2cl": "no",
+      "wSystFitSigMean": "no",
+      "wSystFitSigAlpha": "no",
+      "wSystFitComb": "no",
+      "wSystFitPkBg": "no"
+    }
+  ]
+}
