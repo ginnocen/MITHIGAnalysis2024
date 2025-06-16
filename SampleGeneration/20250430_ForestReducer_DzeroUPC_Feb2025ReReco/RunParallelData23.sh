@@ -2,12 +2,13 @@
 DATE=$(date +%Y%m%d)
 
 MAXCORES=40
-
-NAME="${DATE}_Skim_2023Data_Feb2025ReReco"
-OUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/output"
-counter=1
-filelist="filelist_2023Data_Feb2025ReReco_HIForward0.txt"
+INPUT_ON_XRD=1
 XRDSERV="root://xrootd.cmsaf.mit.edu/"
+
+TAG="Skim_2023Data_Feb2025ReReco_HIForward0"
+NAME="${DATE}_${TAG}"
+FILELIST="filelist_${TAG}.txt"
+OUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/output_$NAME"
 MERGEDOUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/$NAME.root"
 #MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT &> /dev/null
@@ -20,36 +21,26 @@ wait_for_slot() {
     done
 }
 
-
 # Check if the filelist is empty
-if [[ ! -s "$filelist" ]]; then
+if [[ ! -s "$FILELIST" ]]; then
     echo "No matching files found in Samples directory."
     exit 1
 fi
 
-echo "File list created successfully: $filelist"
+echo "File list: $FILELIST"
 rm -rf $OUTPUT &> /dev/null
-mkdir $OUTPUT
+mkdir -p $OUTPUT
 # Loop through each file in the file list
-while IFS= read -r file; do
-    ./ProcessXRDSkim.sh $XRDSERV $file $counter $OUTPUT $MAXCORES &
-#            echo "Processing $file"
-#            ./Execute --Input "$file" \
-#            --Output "$OUTPUT/output_$counter.root" \
-#            --Year 2023 \
-#            --ApplyTriggerRejection 2 \
-#            --ApplyEventRejection true \
-#            --ApplyZDCGapRejection true \
-#            --ApplyDRejection or \
-#            --ZDCMinus1nThreshold 1000 \
-#            --ZDCPlus1nThreshold 1100 \
-#            --IsData true \
-#            --PFTree particleFlowAnalyser/pftree \
-#            --HideProgressBar true &
-# #           --DGenTree Dfinder/ntGen &
-    ((counter++))
+COUNTER=1
+while IFS= read -r FILEPATH; do
+    if (( $INPUT_ON_XRD == 1 )); then
+        ./ProcessXRDSkim.sh $XRDSERV $FILEPATH $COUNTER $OUTPUT $MAXCORES &
+    else
+        ./ProcessLocalSkim.sh $FILEPATH $COUNTER $OUTPUT &
+    fi
+    ((COUNTER++))
     wait_for_slot
-done < "$filelist"
+done < "$FILELIST"
 wait 
 
 hadd $MERGEDOUTPUT $OUTPUT/output_*.root

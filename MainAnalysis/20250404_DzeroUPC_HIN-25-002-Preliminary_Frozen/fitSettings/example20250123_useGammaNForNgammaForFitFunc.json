@@ -1,0 +1,10 @@
+{
+  "FitDir": "MassFit",
+  "MicroTrees": [
+    {
+      "dataInput": "example20250123/pt2-5_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "example20250123/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,example20250123/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "example20250123/pt2-5_y-1-0_IsGammaN1/MC.root"
+    }
+  ]
+}
