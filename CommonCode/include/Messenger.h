@@ -608,6 +608,11 @@ public:
    std::vector<bool> *SingleMuIsTracker;
    std::vector<bool> *SingleMuHybridSoft;
 
+   std::vector<float> *GenSingleMuPT;
+   std::vector<float> *GenSingleMuEta;
+   std::vector<float> *GenSingleMuPhi;
+   std::vector<int> *GenSingleMuPID;
+
 public:
    SingleMuTreeMessenger(TFile &File, std::string TreeName = "muonAnalyzer/MuonTree");
    SingleMuTreeMessenger(TFile *File, std::string TreeName = "muonAnalyzer/MuonTree");
@@ -639,7 +644,7 @@ public:
    std::vector<float> *TrackEta;
    std::vector<float> *TrackPhi;
    std::vector<char>  *TrackCharge;
-   std::vector<int>   *TrackPDFID;
+   std::vector<int>   *TrackPDGId;
    std::vector<char>  *TrackNHits;
    std::vector<char>  *TrackNPixHits;
    std::vector<char>  *TrackNLayers;
@@ -1174,11 +1179,15 @@ public:
    float ExtraMuWeight[12];
    float MuMuWeight;
    int NPU;
-   //std::vectors
    std::vector<float> *JetPT;
    std::vector<float> *JetEta;
    std::vector<float> *JetPhi;
    std::vector<bool> *IsMuMuTagged;
+   std::vector<float> *GenJetPT;
+   std::vector<float> *GenJetEta;
+   std::vector<float> *GenJetPhi;
+   std::vector<int> *GenJetMatchIdx;
+   std::vector<bool> *GenIsMuMuTagged;
    std::vector<float> *muPt1;
    std::vector<float> *muPt2;
    std::vector<float> *muEta1;
@@ -1202,12 +1211,33 @@ public:
    std::vector<float> *mumuY;
    std::vector<float> *mumuPhi;
    std::vector<float> *mumuPt;
+   std::vector<bool> *mumuIsGenMatched;
    //std::vector<int> *mumuisOnia;
    std::vector<float> *DRJetmu1;
    std::vector<float> *DRJetmu2;
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
+
+   //
+
+   std::vector<float> *GenMuPt1;
+   std::vector<float> *GenMuPt2;
+   std::vector<float> *GenMuEta1;
+   std::vector<float> *GenMuEta2;
+   std::vector<float> *GenMuPhi1;
+   std::vector<float> *GenMuPhi2;
+   std::vector<float> *GenMuMuMass;
+   std::vector<float> *GenMuMuEta;
+   std::vector<float> *GenMuMuY;
+   std::vector<float> *GenMuMuPhi;
+   std::vector<float> *GenMuMuPt;
+   std::vector<float> *GenMuDeta;
+   std::vector<float> *GenMuDphi;
+   std::vector<float> *GenMuDR;
+
+   //
+
    std::vector<int> *MJTHadronFlavor;
    std::vector<int> *MJTNcHad;
    std::vector<int> *MJTNbHad;

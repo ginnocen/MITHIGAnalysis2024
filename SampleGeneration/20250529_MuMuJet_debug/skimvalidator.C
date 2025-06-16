@@ -23,6 +23,17 @@ bool isMuonSelected(vector<float> *pT, vector<float> *eta, vector<bool> *isTrack
   return true;
 }
 
+bool isGenMuonSelected(vector<float> *pT, vector<float> *eta, int i) {
+  if (pT->at(i) < 3.5) {
+    return false;
+  }
+  if (fabs(eta->at(i)) > 2.3) {
+    return false;
+  }
+
+  return true;
+}
+
 void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
 
   // gSystem->Load("../20250409_ForestReducer_MuMuJet_svtx/libMyDict.so");
@@ -202,6 +213,26 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
   Int_t ntrk_forest[max];
   T_akCs3PFJetAnalyzer->SetBranchAddress("jtNtrk", ntrk_forest);
 
+  // Gen Jet parameters
+
+  vector<float> *GenJetPt_skim = nullptr;
+  Tskim->SetBranchAddress("GenJetPT", &GenJetPt_skim);
+  vector<float> *GenJetEta_skim = nullptr;
+  Tskim->SetBranchAddress("GenJetEta", &GenJetEta_skim);
+  vector<float> *GenJetPhi_skim = nullptr;
+  Tskim->SetBranchAddress("GenJetPhi", &GenJetPhi_skim);
+  vector<int> *GenJetMatchIdx_skim = nullptr;
+  Tskim->SetBranchAddress("GenJetMatchIdx", &GenJetMatchIdx_skim);
+
+  Float_t GenJetPt_forest[max];
+  T_akCs3PFJetAnalyzer->SetBranchAddress("genpt", GenJetPt_forest);
+  Float_t GenJetEta_forest[max];
+  T_akCs3PFJetAnalyzer->SetBranchAddress("geneta", GenJetEta_forest);
+  Float_t GenJetPhi_forest[max];
+  T_akCs3PFJetAnalyzer->SetBranchAddress("genphi", GenJetPhi_forest);
+  int GenJetMatchIdx_forest[max];
+  T_akCs3PFJetAnalyzer->SetBranchAddress("genmatchindex", GenJetMatchIdx_forest);
+
   // SVTX parameters
 
   Int_t svtxJetId_forest[max];
@@ -330,8 +361,8 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
 
   // Muon entries
 
-  vector<bool> *isMuMuTagged_skim = nullptr;
-  Tskim->SetBranchAddress("IsMuMuTagged", &isMuMuTagged_skim);
+  vector<bool> *ismumutagged_skim = nullptr;
+  Tskim->SetBranchAddress("IsMuMuTagged", &ismumutagged_skim);
 
   vector<float> *mupt_forest = nullptr;
   vector<float> *mueta_forest = nullptr;
@@ -420,6 +451,57 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
   float mumuY_forest = 0;
   float mudR_forest = 0;
 
+  // Gen Muon entries
+
+  vector<bool> *Genismumutagged_skim = nullptr;
+  Tskim->SetBranchAddress("GenIsMuMuTagged", &Genismumutagged_skim);
+
+  vector<float> *GenMuPt1_skim = nullptr;
+  vector<float> *GenMuPt2_skim = nullptr;
+  vector<float> *GenMuEta1_skim = nullptr;
+  vector<float> *GenMuEta2_skim = nullptr;
+  vector<float> *GenMuPhi1_skim = nullptr;
+  vector<float> *GenMuPhi2_skim = nullptr;
+  vector<float> *GenMuMuMass_skim = nullptr;
+  vector<float> *GenMuMuEta_skim = nullptr;
+  vector<float> *GenMuMuY_skim = nullptr;
+  vector<float> *GenMuMuPhi_skim = nullptr;
+  vector<float> *GenMuMuPt_skim = nullptr;
+  vector<float> *GenMuDeta_skim = nullptr;
+  vector<float> *GenMuDphi_skim = nullptr;
+  vector<float> *GenMudR_skim = nullptr;
+  Tskim->SetBranchAddress("GenMuPt1", &GenMuPt1_skim);
+  Tskim->SetBranchAddress("GenMuPt2", &GenMuPt2_skim);   
+  Tskim->SetBranchAddress("GenMuEta1", &GenMuEta1_skim);
+  Tskim->SetBranchAddress("GenMuEta2", &GenMuEta2_skim);
+  Tskim->SetBranchAddress("GenMuPhi1", &GenMuPhi1_skim);
+  Tskim->SetBranchAddress("GenMuPhi2", &GenMuPhi2_skim);
+  Tskim->SetBranchAddress("GenMuMuMass", &GenMuMuMass_skim);
+  Tskim->SetBranchAddress("GenMuMuEta", &GenMuMuEta_skim);
+  Tskim->SetBranchAddress("GenMuMuY", &GenMuMuY_skim);
+  Tskim->SetBranchAddress("GenMuMuPhi", &GenMuMuPhi_skim);
+  Tskim->SetBranchAddress("GenMuMuPt", &GenMuMuPt_skim);
+  Tskim->SetBranchAddress("GenMuDeta", &GenMuDeta_skim);
+  Tskim->SetBranchAddress("GenMuDphi", &GenMuDphi_skim);
+  Tskim->SetBranchAddress("GenMuDR", &GenMudR_skim);
+
+  vector<float> *GenMuPt_forest = nullptr;
+  vector<float> *GenMuEta_forest = nullptr;
+  vector<float> *GenMuPhi_forest = nullptr;
+
+  T_muonAnalyzer->SetBranchAddress("genPt", &GenMuPt_forest);
+  T_muonAnalyzer->SetBranchAddress("genEta", &GenMuEta_forest);
+  T_muonAnalyzer->SetBranchAddress("genPhi", &GenMuPhi_forest);
+
+  float GenMuMuMass_forest = 0;
+  float GenMuMuPt_forest = 0;
+  float GenMuMuEta_forest = 0;
+  float GenMuMuPhi_forest = 0;
+  float GenMuMuY_forest = 0;
+  float GenMudR_forest = 0;
+  
+
+
   // BEGIN
 
   cout << "skim entries: " << Tskim->GetEntries() << endl;
@@ -442,6 +524,12 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
   int maxMu1Index = -1;
   int maxMu2Index = -1;
   bool ismumutagged = false;
+
+  float maxGenmumuPt = 0;
+  int maxGenMu1Index = -1;
+  int maxGenMu2Index = -1;
+  bool Genismumutagged = false;
+  int ngenmuons = 0;
 
   ProgressBar Bar(cout, Tskim->GetEntries());
   Bar.SetStyle(-1);
@@ -622,6 +710,9 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
             cout << "ntrk mismatch at entry " << i << ", jet " << j << ": Skim ntrk = " << ntrk_skim->at(skim_idx)
                  << ", Forest ntrk = " << ntrk_forest[j] << endl;
           }
+
+          ////////////////
+
         }
 
         // Check SVTX properties
@@ -860,10 +951,10 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
             ismumutagged = true;
           }
 
-          if (isMuMuTagged_skim->at(skim_idx) != ismumutagged) {
-            cout << "isMuMuTagged mismatch at entry " << i << ", jet " << j
-                 << ": Skim isMuMuTagged = " << isMuMuTagged_skim->at(skim_idx)
-                 << ", Forest isMuMuTagged = " << ismumutagged << endl;
+          if (ismumutagged_skim->at(skim_idx) != ismumutagged) {
+            cout << "ismumutagged mismatch at entry " << i << ", jet " << j
+                 << ": Skim ismumutagged = " << ismumutagged_skim->at(skim_idx)
+                 << ", Forest ismumutagged = " << ismumutagged << endl;
           }
 
           if (ismumutagged) {
@@ -882,16 +973,19 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
                    << ": Skim muEta1 = " << muEta1_skim->at(skim_idx)
                    << ", Forest muEta1 = " << mueta_forest->at(maxMu1Index) << endl;
             }
+
             if (mueta_forest->at(maxMu2Index) != muEta2_skim->at(skim_idx)) {
               cout << "muEta2 mismatch at entry " << i << ", jet " << j
                    << ": Skim muEta2 = " << muEta2_skim->at(skim_idx)
                    << ", Forest muEta2 = " << mueta_forest->at(maxMu2Index) << endl;
             }
+
             if (muphi_forest->at(maxMu1Index) != muPhi1_skim->at(skim_idx)) {
               cout << "muPhi1 mismatch at entry " << i << ", jet " << j
                    << ": Skim muPhi1 = " << muPhi1_skim->at(skim_idx)
                    << ", Forest muPhi1 = " << muphi_forest->at(maxMu1Index) << endl;
             }
+
             if (muphi_forest->at(maxMu2Index) != muPhi2_skim->at(skim_idx)) {
               cout << "muPhi2 mismatch at entry " << i << ", jet " << j
                    << ": Skim muPhi2 = " << muPhi2_skim->at(skim_idx)
@@ -1030,8 +1124,180 @@ void validate(int Event, int Vertex, int Jet, int SVTX, int Track, int Muon) {
               cout << fabs(mudR_forest - mudR_skim->at(skim_idx)) << endl;
             }
           }
+        
+          maxGenmumuPt = 0;
+          maxGenMu1Index = -1;
+          maxGenMu2Index = -1;
+          Genismumutagged = false;
+          ngenmuons = GenMuPt_forest->size();
+          for (int genmu1idx = 0; genmu1idx < ngenmuons; genmu1idx++) {
+            if (!isGenMuonSelected(GenMuPt_forest, GenMuEta_forest, genmu1idx)) {
+              continue;
+            }
+            for (int genmu2idx = genmu1idx + 1; genmu2idx < ngenmuons; genmu2idx++) {
+              if (!isGenMuonSelected(GenMuPt_forest, GenMuEta_forest, genmu2idx)) {
+                continue;
+              }
+
+              float GenMuPt1_forest = GenMuPt_forest->at(genmu1idx);
+              float GenMuEta1_forest = GenMuEta_forest->at(genmu1idx);
+              float GenMuPhi1_forest = GenMuPhi_forest->at(genmu1idx);
+              float GenMuPt2_forest = GenMuPt_forest->at(genmu2idx);
+              float GenMuEta2_forest = GenMuEta_forest->at(genmu2idx);
+              float GenMuPhi2_forest = GenMuPhi_forest->at(genmu2idx);
+              float drjetmu1 = sqrt(DeltaPhi(JetPhi_forest[j], GenMuPhi1_forest) * DeltaPhi(JetPhi_forest[j], GenMuPhi1_forest) +
+                                    (GenMuEta1_forest - JetEta_forest[j]) * (GenMuEta1_forest - JetEta_forest[j]));
+              float drjetmu2 = sqrt(DeltaPhi(JetPhi_forest[j], GenMuPhi2_forest) * DeltaPhi(JetPhi_forest[j], GenMuPhi2_forest) +
+                                    (GenMuEta2_forest - JetEta_forest[j]) * (GenMuEta2_forest - JetEta_forest[j]));
+
+              if (drjetmu1 > 0.3 || drjetmu2 > 0.3) {
+                continue;
+              }
+              TLorentzVector Mu1, Mu2;
+              Mu1.SetPtEtaPhiM(GenMuPt1_forest, GenMuEta1_forest, GenMuPhi1_forest, M_MU);
+              Mu2.SetPtEtaPhiM(GenMuPt2_forest, GenMuEta2_forest, GenMuPhi2_forest, M_MU);
+              TLorentzVector MuMu = Mu1 + Mu2;
+          
+              if (MuMu.Pt() > maxGenmumuPt) {
+                maxGenmumuPt = MuMu.Pt();
+                maxGenMu1Index = genmu1idx;
+                maxGenMu2Index = genmu2idx;
+              }            
         }
+          }
+
+          if (maxGenmumuPt > 0. && maxGenMu1Index >= 0 && maxGenMu2Index >= 0) {
+            Genismumutagged = true;
+          }
+
+          if (Genismumutagged_skim->at(skim_idx) != Genismumutagged) {
+            cout << "GenismumutaggedTagged mismatch at entry " << i << ", jet " << j
+                 << ": Skim GenismumutaggedTagged = " << Genismumutagged_skim->at(skim_idx)
+                 << ", Forest Genismumutagged = " << Genismumutagged << endl;
+          }
+
+          if (Genismumutagged) {
+
+            if (GenMuPt_forest->at(maxGenMu1Index) != GenMuPt1_skim->at(skim_idx)) {
+              cout << "GenMuPt1 mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuPt1 = " << GenMuPt1_skim->at(skim_idx)
+                   << ", Forest GenMuPt1 = " << GenMuPt_forest->at(maxGenMu1Index) << endl;
+            }
+            if (GenMuPt_forest->at(maxGenMu2Index) != GenMuPt2_skim->at(skim_idx)) {
+              cout << "GenMuPt2 mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuPt2 = " << GenMuPt2_skim->at(skim_idx)
+                   << ", Forest GenMuPt2 = " << GenMuPt_forest->at(maxGenMu2Index) << endl;
+            }
+
+            if (GenMuEta_forest->at(maxGenMu1Index) != GenMuEta1_skim->at(skim_idx)) {
+              cout << "GenMuEta1 mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuEta1 = " << GenMuEta1_skim->at(skim_idx)
+                   << ", Forest GenMuEta1 = " << GenMuEta_forest->at(maxGenMu1Index) << endl;
+            }
+
+            if (GenMuEta_forest->at(maxGenMu2Index) != GenMuEta2_skim->at(skim_idx)) {
+              cout << "GenMuEta2 mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuEta2 = " << GenMuEta2_skim->at(skim_idx)
+                   << ", Forest GenMuEta2 = " << GenMuEta_forest->at(maxGenMu2Index) << endl;
+            }
+
+            if (GenMuPhi_forest->at(maxGenMu1Index) != GenMuPhi1_skim->at(skim_idx)) {
+              cout << "GenMuPhi1 mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuPhi1 = " << GenMuPhi1_skim->at(skim_idx)
+                   << ", Forest GenMuPhi1 = " << GenMuPhi_forest->at(maxGenMu1Index) << endl;
+            }
+            if (GenMuPhi_forest->at(maxGenMu2Index) != GenMuPhi2_skim->at(skim_idx)) {
+              cout << "GenMuPhi2 mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuPhi2 = " << GenMuPhi2_skim->at(skim_idx)
+                   << ", Forest GenMuPhi2 = " << GenMuPhi_forest->at(maxGenMu2Index) << endl;
+            }
+
+            TLorentzVector gMu1, gMu2;
+            gMu1.SetPtEtaPhiM(GenMuPt_forest->at(maxGenMu1Index), GenMuEta_forest->at(maxGenMu1Index),
+                              GenMuPhi_forest->at(maxGenMu1Index), M_MU);
+            gMu2.SetPtEtaPhiM(GenMuPt_forest->at(maxGenMu2Index), GenMuEta_forest->at(maxGenMu2Index),
+                              GenMuPhi_forest->at(maxGenMu2Index), M_MU);
+            TLorentzVector gMuMu = gMu1 + gMu2;
+            GenMuMuMass_forest = gMuMu.M();
+            GenMuMuPt_forest = gMuMu.Pt();
+            GenMuMuEta_forest = gMuMu.Eta();
+            GenMuMuPhi_forest = gMuMu.Phi();
+            GenMuMuY_forest = gMuMu.Rapidity();
+            GenMudR_forest = sqrt(DeltaPhi(GenMuPhi_forest->at(maxGenMu2Index), GenMuPhi_forest->at(maxGenMu1Index)) *
+                                   DeltaPhi(GenMuPhi_forest->at(maxGenMu2Index), GenMuPhi_forest->at(maxGenMu1Index)) +
+                               (GenMuEta_forest->at(maxGenMu1Index) - GenMuEta_forest->at(maxGenMu2Index)) *
+                                   (GenMuEta_forest->at(maxGenMu1Index) - GenMuEta_forest->at(maxGenMu2Index)));
+
+            if (GenMuMuMass_forest != GenMuMuMass_skim->at(skim_idx)) {
+              cout << "GenMuMuMass mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuMuMass = " << GenMuMuMass_skim->at(skim_idx)
+                   << ", Forest GenMuMuMass = " << GenMuMuMass_forest << endl;
+            }
+            if (GenMuMuPt_forest != GenMuMuPt_skim->at(skim_idx)) {
+              cout << "GenmumuPt mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenmumuPt = " << GenMuMuPt_skim->at(skim_idx)
+                   << ", Forest GenMuMuPt = " << GenMuMuPt_forest << endl;
+            }
+            if (GenMuMuEta_forest != GenMuMuEta_skim->at(skim_idx)) {
+              cout << "GenMuMuEta mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuMuEta = " << GenMuMuEta_skim->at(skim_idx)
+                   << ", Forest GenMuMuEta = " << GenMuMuEta_forest << endl;
+            }
+            if (GenMuMuPhi_forest != GenMuMuPhi_skim->at(skim_idx)) {
+              cout << "GenMuMuPhi mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuMuPhi = " << GenMuMuPhi_skim->at(skim_idx)
+                   << ", Forest GenMuMuPhi = " << GenMuMuPhi_forest << endl;
+            }
+            if (GenMuMuY_forest != GenMuMuY_skim->at(skim_idx)) {
+              cout << "GenMuMuY mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMuMuY = " << GenMuMuY_skim->at(skim_idx)
+                   << ", Forest GenMuMuY = " << GenMuMuY_forest << endl;
+            }
+            if (fabs(GenMudR_forest - GenMudR_skim->at(skim_idx)) > 1.0e-6) {
+              cout << "GenMudR mismatch at entry " << i << ", jet " << j
+                   << ": Skim GenMudR = " << GenMudR_skim->at(skim_idx)
+                   << ", Forest GenMudR = " << GenMudR_forest << endl;
+            }
+
+          }
+        }
+
       }
+          
+      if(Jet > 0){
+
+        for(int j = 0; j < GenJetPt_skim->size(); j++){
+
+          if (GenJetPt_skim->at(j) != GenJetPt_forest[j]) {
+            cout << "GenJetPt mismatch at entry " << i << ", jet " << j
+                 << ": Skim GenJetPt = " << GenJetPt_skim->at(i) << ", Forest GenJetPt = " << GenJetPt_forest[j]
+                 << endl;
+          }
+
+          if (GenJetEta_skim->at(j) != GenJetEta_forest[j]) {
+            cout << "GenJetEta mismatch at entry " << i << ", jet " << j
+                 << ": Skim GenJetEta = " << GenJetEta_skim->at(i) << ", Forest GenJetEta = " << GenJetEta_forest[j]
+                 << endl;
+          }
+
+          if (GenJetPhi_skim->at(j) != GenJetPhi_forest[j]) {
+            cout << "GenJetPhi mismatch at entry " << i << ", jet " << j
+                 << ": Skim GenJetPhi = " << GenJetPhi_skim->at(i) << ", Forest GenJetPhi = " << GenJetPhi_forest[j]
+                 << endl;
+          }
+
+          if(GenJetMatchIdx_skim->at(j) != GenJetMatchIdx_forest[j]){
+            cout << "GenJetMatchIdx mismatch at entry " << i << ", jet " << j
+                 << ": Skim GenJetMatchIdx = " << GenJetMatchIdx_skim->at(i) << ", Forest GenJetMatchIdx = "
+                 << GenJetMatchIdx_forest[j] << endl;
+          }
+
+
+        }
+
+      }
+
+
     }
   }
 }
