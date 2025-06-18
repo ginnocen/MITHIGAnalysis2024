@@ -23,6 +23,14 @@
 #)
 
 PT_Y_BINS=(
+  0   1   -2   -1
+  0   1   -1    0
+  0   1    0    1
+  0   1    1    2
+  1   2   -2   -1
+  1   2   -1    0
+  1   2    0    1
+  1   2    1    2
   2   5   -2   -1
   2   5   -1    0
   2   5    0    1
@@ -36,11 +44,9 @@ DO_REWEIGHTING=0
 USE_GAMMAN_FOR_NGAMMA=1
 MERGER_MIRROR_YBINS=1
 
-SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250528_Skim_2023Data_Feb2025ReReco_NEW_HIForward01235679.root"
-#SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250528_Skim_2023Data_Feb2025ReReco_OLD_HIForward01235679.root"
-#SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250508_Skim_2023Data_Jan2024ReReco_HIForward0.root"
-#SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250527_Skim_2023Data_Jan2024ReReco_HIForward0_Unfiltered.root"
-#SKIM_DATA="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsData/20250312_ForestDfinderData23Skim_v4.root"
+LUMI_FRACTION=$((10/20))
+
+SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250616_Skim_2023Data_Feb2025ReReco_NEW_HIForward0-9.root"
 SKIM_MC_FORCED_D0_A="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250306_v4_Pthat0_ForceD0DecayD0Filtered_MassWindow040_BeamA/mergedfile.root"
 SKIM_MC_FORCED_D0_B="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250306_v4_Pthat0_ForceD0DecayD0Filtered_MassWindow040_BeamB/mergedfile.root"
 SKIM_MC_INCLUSIVE_A="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root"
@@ -179,6 +185,7 @@ make_massfit_config() {
   local doSystSiglAlpha=${11}
   local doSystSiglMean=${12}
   local doSystMassWindow=${13}
+  local sampleLumiFraction=${14}
   
   fileString="pt${ptmin}-${ptmax}_y${ymin}-${ymax}_IsGammaN${isGammaN}"
   yminMirror=$(( -1 * $ymax ))
@@ -225,6 +232,7 @@ cat >> $configOutput <<EOF
       "sigAlphaRange": $sigAlphaRange,
       "sigMeanRange": $sigMeanRange,
       "systMassWin": "$massWindow"
+      "sampleLumiFraction": $sampleLumiFraction
 EOF
   # Close brackets:
   if (( $isLastEntry == 1 )); then

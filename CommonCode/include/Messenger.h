@@ -918,6 +918,10 @@ public:
    std::vector<float> *Dtrk1MassHypo;
    std::vector<float> *Dtrk1PixelHit;
    std::vector<float> *Dtrk1StripHit;
+   std::vector<float> *Dtrk1P;
+   std::vector<float> *Dtrk1PionScore;
+   std::vector<float> *Dtrk1KaonScore;
+   std::vector<float> *Dtrk1ProtScore;
    std::vector<float> *Dtrk2Pt;
    std::vector<float> *Dtrk2PtErr;
    std::vector<float> *Dtrk2Eta;
@@ -925,6 +929,10 @@ public:
    std::vector<float> *Dtrk2MassHypo;
    std::vector<float> *Dtrk2PixelHit;
    std::vector<float> *Dtrk2StripHit;
+   std::vector<float> *Dtrk2P;
+   std::vector<float> *Dtrk2PionScore;
+   std::vector<float> *Dtrk2KaonScore;
+   std::vector<float> *Dtrk2ProtScore;
    std::vector<float> *Dchi2cl;
    std::vector<float> *DsvpvDistance;
    std::vector<float> *DsvpvDisErr;

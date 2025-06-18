@@ -3096,6 +3096,10 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dtrk1MassHypo;
       delete Dtrk1PixelHit;
       delete Dtrk1StripHit;
+      delete Dtrk1P;
+      delete Dtrk1PionScore;
+      delete Dtrk1KaonScore;
+      delete Dtrk1ProtScore;
       delete Dtrk2Pt;
       delete Dtrk2PtErr;
       delete Dtrk2Eta;
@@ -3103,6 +3107,10 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dtrk2MassHypo;
       delete Dtrk2PixelHit;
       delete Dtrk2StripHit;
+      delete Dtrk2P;
+      delete Dtrk2PionScore;
+      delete Dtrk2KaonScore;
+      delete Dtrk2ProtScore;
       delete Dchi2cl;
       delete DsvpvDistance;
       delete DsvpvDisErr;
@@ -3159,6 +3167,10 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dtrk1MassHypo = nullptr;
    Dtrk1PixelHit = nullptr;
    Dtrk1StripHit = nullptr;
+   Dtrk1P = nullptr;
+   Dtrk1PionScore = nullptr;
+   Dtrk1KaonScore = nullptr;
+   Dtrk1ProtScore = nullptr;
    Dtrk2Pt = nullptr;
    Dtrk2PtErr = nullptr;
    Dtrk2Eta = nullptr;
@@ -3166,6 +3178,10 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dtrk2MassHypo = nullptr;
    Dtrk2PixelHit = nullptr;
    Dtrk2StripHit = nullptr;
+   Dtrk2P = nullptr;
+   Dtrk2PionScore = nullptr;
+   Dtrk2KaonScore = nullptr;
+   Dtrk2ProtScore = nullptr;
    Dchi2cl = nullptr;
    DsvpvDistance = nullptr;
    DsvpvDisErr = nullptr;
@@ -3223,6 +3239,11 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    if(Tree->GetBranch("Dtrk1MassHypo")) Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
    if(Tree->GetBranch("Dtrk1PixelHit")) Tree->SetBranchAddress("Dtrk1PixelHit", &Dtrk1PixelHit);
    if(Tree->GetBranch("Dtrk1StripHit")) Tree->SetBranchAddress("Dtrk1StripHit", &Dtrk1StripHit);
+   if(Tree->GetBranch("Dtrk1P")) Tree->SetBranchAddress("Dtrk1P", &Dtrk1P);
+   if(Tree->GetBranch("Dtrk1PionScore")) Tree->SetBranchAddress("Dtrk1PionScore", &Dtrk1PionScore);
+   if(Tree->GetBranch("Dtrk1KaonScore")) Tree->SetBranchAddress("Dtrk1KaonScore", &Dtrk1KaonScore);
+   if(Tree->GetBranch("Dtrk1ProtScore")) Tree->SetBranchAddress("Dtrk1ProtScore", &Dtrk1ProtScore);
+   
    Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
    if(Tree->GetBranch("Dtrk2PtErr")) Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
    if(Tree->GetBranch("Dtrk2Eta")) Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
@@ -3230,6 +3251,10 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    if(Tree->GetBranch("Dtrk2MassHypo")) Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
    if(Tree->GetBranch("Dtrk2PixelHit")) Tree->SetBranchAddress("Dtrk2PixelHit", &Dtrk2PixelHit);
    if(Tree->GetBranch("Dtrk2StripHit")) Tree->SetBranchAddress("Dtrk2StripHit", &Dtrk2StripHit);
+   if(Tree->GetBranch("Dtrk2P")) Tree->SetBranchAddress("Dtrk2P", &Dtrk2P);
+   if(Tree->GetBranch("Dtrk2PionScore")) Tree->SetBranchAddress("Dtrk2PionScore", &Dtrk2PionScore);
+   if(Tree->GetBranch("Dtrk2KaonScore")) Tree->SetBranchAddress("Dtrk2KaonScore", &Dtrk2KaonScore);
+   if(Tree->GetBranch("Dtrk2ProtScore")) Tree->SetBranchAddress("Dtrk2ProtScore", &Dtrk2ProtScore);
    Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
    Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
    Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
@@ -3310,6 +3335,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Dtrk1MassHypo = new std::vector<float>();
    Dtrk1PixelHit = new std::vector<float>();
    Dtrk1StripHit = new std::vector<float>();
+   Dtrk1P = new std::vector<float>();
+   Dtrk1PionScore = new std::vector<float>();
+   Dtrk1KaonScore = new std::vector<float>();
+   Dtrk1ProtScore = new std::vector<float>();
    Dtrk2Pt = new std::vector<float>();
    Dtrk2PtErr = new std::vector<float>();
    Dtrk2Eta = new std::vector<float>();
@@ -3317,6 +3346,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Dtrk2MassHypo = new std::vector<float>();
    Dtrk2PixelHit = new std::vector<float>();
    Dtrk2StripHit = new std::vector<float>();
+   Dtrk2P = new std::vector<float>();
+   Dtrk2PionScore = new std::vector<float>();
+   Dtrk2KaonScore = new std::vector<float>();
+   Dtrk2ProtScore = new std::vector<float>();
    Dchi2cl = new std::vector<float>();
    DsvpvDistance = new std::vector<float>();
    DsvpvDisErr = new std::vector<float>();
@@ -3378,6 +3411,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dtrk1MassHypo",         &Dtrk1MassHypo);
    Tree->Branch("Dtrk1PixelHit",         &Dtrk1PixelHit);
    Tree->Branch("Dtrk1StripHit",         &Dtrk1StripHit);
+   Tree->Branch("Dtrk1P",                &Dtrk1P);
+   Tree->Branch("Dtrk1PionScore",        &Dtrk1PionScore);
+   Tree->Branch("Dtrk1KaonScore",        &Dtrk1KaonScore);
+   Tree->Branch("Dtrk1ProtScore",        &Dtrk1ProtScore);
    Tree->Branch("Dtrk2Pt",               &Dtrk2Pt);
    Tree->Branch("Dtrk2PtErr",            &Dtrk2PtErr);
    Tree->Branch("Dtrk2Eta",              &Dtrk2Eta);
@@ -3385,6 +3422,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dtrk2MassHypo",         &Dtrk2MassHypo);
    Tree->Branch("Dtrk2PixelHit",         &Dtrk2PixelHit);
    Tree->Branch("Dtrk2StripHit",         &Dtrk2StripHit);
+   Tree->Branch("Dtrk2P",                &Dtrk2P);
+   Tree->Branch("Dtrk2PionScore",        &Dtrk2PionScore);
+   Tree->Branch("Dtrk2KaonScore",        &Dtrk2KaonScore);
+   Tree->Branch("Dtrk2ProtScore",        &Dtrk2ProtScore);
    Tree->Branch("Dchi2cl",               &Dchi2cl);
    Tree->Branch("DsvpvDistance",         &DsvpvDistance);
    Tree->Branch("DsvpvDisErr",           &DsvpvDisErr);
@@ -3462,6 +3503,10 @@ void DzeroUPCTreeMessenger::Clear()
    Dtrk1MassHypo->clear();
    Dtrk1PixelHit->clear();
    Dtrk1StripHit->clear();
+   Dtrk1P->clear();
+   Dtrk1PionScore->clear();
+   Dtrk1KaonScore->clear();
+   Dtrk1ProtScore->clear();
    Dtrk2Pt->clear();
    Dtrk2PtErr->clear();
    Dtrk2Eta->clear();
@@ -3469,6 +3514,10 @@ void DzeroUPCTreeMessenger::Clear()
    Dtrk2MassHypo->clear();
    Dtrk2PixelHit->clear();
    Dtrk2StripHit->clear();
+   Dtrk2P->clear();
+   Dtrk2PionScore->clear();
+   Dtrk2KaonScore->clear();
+   Dtrk2ProtScore->clear();
    Dchi2cl->clear();
    DsvpvDistance->clear();
    DsvpvDisErr->clear();
@@ -3541,6 +3590,10 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(Dtrk1MassHypo != nullptr && M.Dtrk1MassHypo != nullptr)   *Dtrk1MassHypo = *(M.Dtrk1MassHypo);
    if(Dtrk1PixelHit != nullptr && M.Dtrk1PixelHit != nullptr)   *Dtrk1PixelHit = *(M.Dtrk1PixelHit);
    if(Dtrk1StripHit != nullptr && M.Dtrk1StripHit != nullptr)   *Dtrk1StripHit = *(M.Dtrk1StripHit);
+   if(Dtrk1P != nullptr && M.Dtrk1P != nullptr)   *Dtrk1P = *(M.Dtrk1P);
+   if(Dtrk1PionScore != nullptr && M.Dtrk1PionScore != nullptr)   *Dtrk1PionScore = *(M.Dtrk1PionScore);
+   if(Dtrk1KaonScore != nullptr && M.Dtrk1KaonScore != nullptr)   *Dtrk1KaonScore = *(M.Dtrk1KaonScore);
+   if(Dtrk1ProtScore != nullptr && M.Dtrk1ProtScore != nullptr)   *Dtrk1ProtScore = *(M.Dtrk1ProtScore);
    if(Dtrk2Pt != nullptr && M.Dtrk2Pt != nullptr)   *Dtrk2Pt = *(M.Dtrk2Pt);
    if(Dtrk2PtErr != nullptr && M.Dtrk2PtErr != nullptr)   *Dtrk2PtErr = *(M.Dtrk2PtErr);
    if(Dtrk2Eta != nullptr && M.Dtrk2Eta != nullptr)   *Dtrk2Eta = *(M.Dtrk2Eta);
@@ -3548,6 +3601,10 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(Dtrk2MassHypo != nullptr && M.Dtrk2MassHypo != nullptr)   *Dtrk2MassHypo = *(M.Dtrk2MassHypo);
    if(Dtrk2PixelHit != nullptr && M.Dtrk2PixelHit != nullptr)   *Dtrk2PixelHit = *(M.Dtrk2PixelHit);
    if(Dtrk2StripHit != nullptr && M.Dtrk2StripHit != nullptr)   *Dtrk2StripHit = *(M.Dtrk2StripHit);
+   if(Dtrk2P != nullptr && M.Dtrk2P != nullptr)   *Dtrk2P = *(M.Dtrk2P);
+   if(Dtrk2PionScore != nullptr && M.Dtrk2PionScore != nullptr)   *Dtrk2PionScore = *(M.Dtrk2PionScore);
+   if(Dtrk2KaonScore != nullptr && M.Dtrk2KaonScore != nullptr)   *Dtrk2KaonScore = *(M.Dtrk2KaonScore);
+   if(Dtrk2ProtScore != nullptr && M.Dtrk2ProtScore != nullptr)   *Dtrk2ProtScore = *(M.Dtrk2ProtScore);
    if(Dchi2cl != nullptr && M.Dchi2cl != nullptr)   *Dchi2cl = *(M.Dchi2cl);
    if(DsvpvDistance != nullptr && M.DsvpvDistance != nullptr)   *DsvpvDistance = *(M.DsvpvDistance);
    if(DsvpvDisErr != nullptr && M.DsvpvDisErr != nullptr)   *DsvpvDisErr = *(M.DsvpvDisErr);

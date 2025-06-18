@@ -7,6 +7,7 @@
 #include <iostream>
 #include <set>
 #include <algorithm>
+#include <vector>
 using namespace std;
 
 #include "TFile.h"
@@ -25,6 +26,7 @@ using namespace std;
 #include "trackingEfficiency2023PbPb.h"
 
 #include "include/DmesonSelection.h"
+#include "include/PIDScoring.h"
 
 bool logical_or_vectBool(std::vector<bool>* vec) {
     return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -52,6 +54,7 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   bool IsGammaNMCtype = CL.GetBool("IsGammaNMCtype", true); // This is only meaningful when IsData==false. gammaN: BeamA, Ngamma: BeamB
   int Year = CL.GetInt("Year", 2023);
+  bool DoPID = CL.GetBool("DoPID", true);
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   float ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
@@ -114,7 +117,18 @@ int main(int argc, char *argv[]) {
     if (!HideProgressBar) {
       Bar.SetStyle(-1);
     }
-
+    
+    vector<TF1*> dedxFunctions = ImportPIDRoot("../../CommonCode/root/DzeroUPC_dedxMap.root");
+    TF1* fdedxPionCenter  = dedxFunctions[0];
+    TF1* fdedxPionSigmaLo = dedxFunctions[1];
+    TF1* fdedxPionSigmaHi = dedxFunctions[2];
+    TF1* fdedxKaonCenter  = dedxFunctions[3];
+    TF1* fdedxKaonSigmaLo = dedxFunctions[4];
+    TF1* fdedxKaonSigmaHi = dedxFunctions[5];
+    TF1* fdedxProtCenter  = dedxFunctions[6];
+    TF1* fdedxProtSigmaLo = dedxFunctions[7];
+    TF1* fdedxProtSigmaHi = dedxFunctions[8];
+    
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
@@ -325,15 +339,51 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.Dmass->push_back(MDzero.Dmass[iD]);
         MDzeroUPC.Dtrk1Pt->push_back(MDzero.Dtrk1Pt[iD]);
         if (MDzeroUPC.Dtrk1PtErr != nullptr) MDzeroUPC.Dtrk1PtErr->push_back(MDzero.Dtrk1PtErr[iD]);
-        if (MDzeroUPC.Dtrk1Eta != nullptr) MDzeroUPC.Dtrk1Eta->push_back(MDzero.Dtrk1Eta[iD]);
-        if (MDzeroUPC.Dtrk1dedx != nullptr) MDzeroUPC.Dtrk1dedx->push_back(MDzero.Dtrk1dedx[iD]);
+        if (MDzeroUPC.Dtrk1Eta != nullptr && MDzeroUPC.Dtrk1dedx != nullptr) {
+          float trk1Pt = MDzero.Dpt[iD];
+          float trk1Eta = MDzero.Dtrk1Eta[iD];
+          float trk1dedx = MDzero.Dtrk1dedx[iD];
+          float trk1P = TMath::Abs(trk1Pt/(1 - TMath::TanH(trk1Eta)));
+          MDzeroUPC.Dtrk1Eta->push_back(trk1Eta);
+          MDzeroUPC.Dtrk1dedx->push_back(trk1dedx);
+          MDzeroUPC.Dtrk1P->push_back(trk1P);
+          if (DoPID && trk1P < 2.) {
+            MDzeroUPC.Dtrk1PionScore->push_back(GetPIDScore(
+              trk1P, trk1dedx,
+              fdedxPionCenter, fdedxPionSigmaLo, fdedxPionSigmaHi));
+            MDzeroUPC.Dtrk1KaonScore->push_back(GetPIDScore(
+              trk1P, trk1dedx,
+              fdedxKaonCenter, fdedxKaonSigmaLo, fdedxKaonSigmaHi));
+            MDzeroUPC.Dtrk1ProtScore->push_back(GetPIDScore(
+              trk1P, trk1dedx,
+              fdedxProtCenter, fdedxProtSigmaLo, fdedxProtSigmaHi));
+          }
+        }
         if (MDzeroUPC.Dtrk1MassHypo != nullptr) MDzeroUPC.Dtrk1MassHypo->push_back(MDzero.Dtrk1MassHypo[iD]);
         if (MDzeroUPC.Dtrk1PixelHit != nullptr) MDzeroUPC.Dtrk1PixelHit->push_back(MDzero.Dtrk1PixelHit[iD]);
         if (MDzeroUPC.Dtrk1StripHit != nullptr) MDzeroUPC.Dtrk1StripHit->push_back(MDzero.Dtrk1StripHit[iD]);
         MDzeroUPC.Dtrk2Pt->push_back(MDzero.Dtrk2Pt[iD]);
         if (MDzeroUPC.Dtrk2PtErr != nullptr) MDzeroUPC.Dtrk2PtErr->push_back(MDzero.Dtrk2PtErr[iD]);
-        if (MDzeroUPC.Dtrk2Eta != nullptr) MDzeroUPC.Dtrk2Eta->push_back(MDzero.Dtrk2Eta[iD]);
-        if (MDzeroUPC.Dtrk2dedx != nullptr) MDzeroUPC.Dtrk2dedx->push_back(MDzero.Dtrk2dedx[iD]);
+        if (MDzeroUPC.Dtrk2Eta != nullptr && MDzeroUPC.Dtrk2dedx != nullptr) {
+          float trk2Pt = MDzero.Dpt[iD];
+          float trk2Eta = MDzero.Dtrk2Eta[iD];
+          float trk2dedx = MDzero.Dtrk2dedx[iD];
+          float trk2P = TMath::Abs(trk2Pt/(1 - TMath::TanH(trk2Eta)));
+          MDzeroUPC.Dtrk2Eta->push_back(trk2Eta);
+          MDzeroUPC.Dtrk2dedx->push_back(trk2dedx);
+          MDzeroUPC.Dtrk2P->push_back(trk2P);
+          if (DoPID && trk2P < 2.) {
+            MDzeroUPC.Dtrk2PionScore->push_back(GetPIDScore(
+              trk2P, trk2dedx,
+              fdedxPionCenter, fdedxPionSigmaLo, fdedxPionSigmaHi));
+            MDzeroUPC.Dtrk2KaonScore->push_back(GetPIDScore(
+              trk2P, trk2dedx,
+              fdedxKaonCenter, fdedxKaonSigmaLo, fdedxKaonSigmaHi));
+            MDzeroUPC.Dtrk2ProtScore->push_back(GetPIDScore(
+              trk2P, trk2dedx,
+              fdedxProtCenter, fdedxProtSigmaLo, fdedxProtSigmaHi));
+          }
+        }
         if (MDzeroUPC.Dtrk2MassHypo != nullptr) MDzeroUPC.Dtrk2MassHypo->push_back(MDzero.Dtrk2MassHypo[iD]);
         if (MDzeroUPC.Dtrk2PixelHit != nullptr) MDzeroUPC.Dtrk2PixelHit->push_back(MDzero.Dtrk2PixelHit[iD]);
         if (MDzeroUPC.Dtrk2StripHit != nullptr) MDzeroUPC.Dtrk2StripHit->push_back(MDzero.Dtrk2StripHit[iD]);
@@ -352,11 +402,11 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DpassCut23PASSystDtrkPt->push_back(DpassCut23PASSystDtrkPt_);
         MDzeroUPC.DpassCut23PASSystDalpha->push_back(DpassCut23PASSystDalpha_);
         MDzeroUPC.DpassCut23PASSystDchi2cl->push_back(DpassCut23PASSystDchi2cl_);
-        if (MDzeroUPC.DpassCutDefault != nullptr) MDzeroUPC.DpassCutDefault->push_back(DpassCutDefault_);
-        if (MDzeroUPC.DpassCutSystDsvpvSig != nullptr) MDzeroUPC.DpassCutSystDsvpvSig->push_back(DpassCutSystDsvpvSig_);
-        if (MDzeroUPC.DpassCutSystDtrkPt != nullptr) MDzeroUPC.DpassCutSystDtrkPt->push_back(DpassCutSystDtrkPt_);
-        if (MDzeroUPC.DpassCutSystDalpha != nullptr) MDzeroUPC.DpassCutSystDalpha->push_back(DpassCutSystDalpha_);
-        if (MDzeroUPC.DpassCutSystDchi2cl != nullptr) MDzeroUPC.DpassCutSystDchi2cl->push_back(DpassCutSystDchi2cl_);
+        MDzeroUPC.DpassCutDefault->push_back(DpassCutDefault_);
+        MDzeroUPC.DpassCutSystDsvpvSig->push_back(DpassCutSystDsvpvSig_);
+        MDzeroUPC.DpassCutSystDtrkPt->push_back(DpassCutSystDtrkPt_);
+        MDzeroUPC.DpassCutSystDalpha->push_back(DpassCutSystDalpha_);
+        MDzeroUPC.DpassCutSystDchi2cl->push_back(DpassCutSystDchi2cl_);
         if (IsData == false) {
           MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
           bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;

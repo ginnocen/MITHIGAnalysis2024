@@ -7,10 +7,11 @@ namespace fs = std::filesystem;
 class Parameters {
 public:
     Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN, int TriggerChoice, bool IsData, float scaleFactor = 1.0,
+                int DoPID = 1, int DoTrackFilter = 1,
                 int in_DoSystRapGap = 0, int in_DoSystD = 0,
                 bool in_DoGptGyReweighting = false, string in_GptGyWeightFileName = "",
-                bool in_DoMultReweighting = false, string in_MultWeightFileName = "" )
-	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor)
+                bool in_DoMultReweighting = false, string in_MultWeightFileName = "")
+	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor), DoPID(DoPID), DoTrackFilter(DoTrackFilter)
     {
         if (in_DoSystRapGap > 9) {
             // Custom HF energy threshold will be set to in_DoSystRapGap/10.
@@ -58,6 +59,10 @@ public:
    float MaxDzeroY;       // Upper limit of Dzero rapidity
    bool IsGammaN;         // GammaN analysis (or NGamma)
    int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
+   int DoPID;             // 0 = no PID selection
+                          // 1 = PID only for Dpt<2, PID if good for 2<Dpt<5
+   int DoTrackFilter;     // 0 = no track filter, 1 = cut on track ptErr/pt,
+                          // 2 = cut on track nHits, 3 = cut on ptErr/pt + nHits
    bool IsData;           // Data or MC
    float scaleFactor;     // Scale factor
    int DoSystRapGap;      // Systematic study: apply the alternative event selections
@@ -69,37 +74,40 @@ public:
    bool DoGptGyReweighting;      // MC reweighting:: Gpt, Gy
    string GptGyWeightFileName;   // MC reweighting:: Gpt, Gy correction factor
    bool DoMultReweighting;       // MC reweighting:: Mult
-   string MultWeightFileName;    // MC reweighting:: Mult correction factor 
+   string MultWeightFileName;    // MC reweighting:: Mult correction factor
 
 
 
    int nThread;           // Number of Threads
    int nChunk;            // Process the Nth chunk
+   
    void printParameters() const {
-       cout << "Input file: " << input << endl;
-       cout << "Output file: " << output << endl;
-       cout << "MinDzeroPT: " << MinDzeroPT << endl;
-       cout << "MaxDzeroPT: " << MaxDzeroPT << endl;
-       cout << "MinDzeroY: " << MinDzeroY << endl;
-       cout << "MaxDzeroY: " << MaxDzeroY << endl;
-       cout << "IsGammaN: " << IsGammaN << endl; 
+       cout << "Input file:    " << input << endl;
+       cout << "Output file:   " << output << endl;
+       cout << "MinDzeroPT:    " << MinDzeroPT << endl;
+       cout << "MaxDzeroPT:    " << MaxDzeroPT << endl;
+       cout << "MinDzeroY:     " << MinDzeroY << endl;
+       cout << "MaxDzeroY:     " << MaxDzeroY << endl;
+       cout << "IsGammaN:      " << IsGammaN << endl;
        cout << "TriggerChoice: " << TriggerChoice << endl;
-       cout << "IsData: " << IsData << endl;
-       cout << "Scale factor: " << scaleFactor << endl;
-       cout << "DoSystRapGap: " << ((DoSystRapGap==0)? "No" :
+       cout << "DoPID:         " << DoPID << endl;
+       cout << "DoTrackFilter: " << DoTrackFilter << endl;
+       cout << "IsData:        " << IsData << endl;
+       cout << "Scale factor:  " << scaleFactor << endl;
+       cout << "DoSystRapGap:  " << ((DoSystRapGap==0)? "No" :
                                     (DoSystRapGap==1)? "Tight" :
                                     (DoSystRapGap > 9)? Form("Custom threshold (%.1f)", ((float) DoSystRapGap)/10.) : "Loose")
                                 << endl;
-       cout << "DoSystD: "      << ((DoSystD==0)? "No" :
+       cout << "DoSystD:       " << ((DoSystD==0)? "No" :
                                     (DoSystD==1)? "Dsvpv variation" :
                                     (DoSystD==2)? "DtrkPt variation" :
                                     (DoSystD==3)? "Dalpha variation" : "Dchi2cl variation")
                                 << endl;
-       cout << "DoGptGyReweighting: " << DoGptGyReweighting << endl;
-       cout << "GptGyWeightFileName: " << GptGyWeightFileName << endl;
-       cout << "DoMultReweighting: " << DoMultReweighting << endl;
-       cout << "MultWeightFileName: " << MultWeightFileName << endl;
-       cout << "Number of Threads: " << nThread << endl;
+       cout << "DoGptGyReweighting:    " << DoGptGyReweighting << endl;
+       cout << "GptGyWeightFileName:   " << GptGyWeightFileName << endl;
+       cout << "DoMultReweighting:     " << DoMultReweighting << endl;
+       cout << "MultWeightFileName:    " << MultWeightFileName << endl;
+       cout << "Number of Threads:     " << nThread << endl;
        cout << "Process the Nth chunk: " << nChunk << endl;
 
    }
@@ -123,6 +131,10 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hIsGammaN->SetBinContent(1, par.IsGammaN);
     TH1D* hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
     hTriggerChoice->SetBinContent(1, par.TriggerChoice);
+    TH1D* hDoPID = new TH1D("parDoPID", "parDoPID", 1, 0, 1);
+    hDoPID->SetBinContent(1, par.DoPID);
+    TH1D* hDoTrackFilter = new TH1D("parDoTrackFilter", "parDoTrackFilter", 1, 0, 1);
+    hDoTrackFilter->SetBinContent(1, par.DoTrackFilter);
     TH1D* hIsData = new TH1D("parIsData", "parIsData", 1, 0, 1);
     hIsData->SetBinContent(1, par.IsData);
     TH1D* hScaleFactor = new TH1D("parScaleFactor", "parScaleFactor", 1, 0, 1);
@@ -143,6 +155,8 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hMaxDzeroY->Write();
     hIsGammaN->Write();
     hTriggerChoice->Write();
+    hDoPID->Write();
+    hDoTrackFilter->Write();
     hIsData->Write();
     hScaleFactor->Write();
     hDoSystRapGap->Write();
@@ -157,10 +171,14 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     delete hMaxDzeroY;
     delete hIsGammaN;
     delete hTriggerChoice;
+    delete hDoPID;
+    delete hDoTrackFilter;
     delete hIsData;
     delete hScaleFactor;
     delete hDoSystRapGap;
     delete hDoSystD;
     delete hDoGptGyReweighting;
     delete hDoMultReweighting;
+    
+    outf->cd(); // Navigate back to outf top directory
 }

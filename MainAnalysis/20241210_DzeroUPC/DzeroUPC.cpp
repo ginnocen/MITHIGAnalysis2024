@@ -26,15 +26,98 @@ using namespace std;
 #define DMASSMAX 2.26
 #define DMASSNBINS 48
 
+#define PIMASS 0.1395701
+#define KMASS 0.4936769
+#define PIDMINP 0.3
+#define PIONMAXP 1.0
+#define KAONMAXP 1.0
+#define PROTMAXP 1.5
+
 //============================================================//
 // Function to check for configuration errors
 //============================================================//
 bool checkError(const Parameters &par) { return false; }
 
 //======= trackSelection =====================================//
-// Check if the track pass selection criteria
+// Check if the track passes selection criteria
 //============================================================//
-bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) { return true; }
+bool checkPID(
+  DzeroUPCTreeMessenger *MDzeroUPC,
+  Parameters par,
+  int j,
+  bool rejectProton = false
+) {
+  bool passPID = false;
+  // Check if either track is kaon-matched
+  if (MDzeroUPC->Dtrk1P->at(j) < KAONMAXP &&
+      TMath::Abs(MDzeroUPC->Dtrk1MassHypo->at(j) - KMASS) < 0.01 &&
+      TMath::Abs(MDzeroUPC->Dtrk1KaonScore->at(j)) < 1.) passPID = true;
+  else if (MDzeroUPC->Dtrk2P->at(j) < KAONMAXP &&
+      TMath::Abs(MDzeroUPC->Dtrk2MassHypo->at(j) - KMASS) < 0.01 &&
+      TMath::Abs(MDzeroUPC->Dtrk2KaonScore->at(j)) < 1.) passPID = true;
+  // Reject if either track is in or above the dedx proton band
+  if (rejectProton && (
+      (MDzeroUPC->Dtrk1P->at(j) < PROTMAXP &&
+      MDzeroUPC->Dtrk1ProtScore->at(j) > -1.) ||
+      (MDzeroUPC->Dtrk2P->at(j) < PROTMAXP &&
+      MDzeroUPC->Dtrk2ProtScore->at(j) > -1.)
+      )) passPID = false;
+  return passPID;
+}
+
+bool checkTopology(
+  DzeroUPCTreeMessenger *MDzeroUPC,
+  Parameters par,
+  int j,
+  bool useCut23PAS = false
+) {
+  bool passTopology = true;
+  if (useCut23PAS) {
+    if (par.DoSystD==0 && MDzeroUPC->DpassCut23PAS->at(j) == false) passTopology = false;
+    if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpvSig->at(j) == false) passTopology = false;
+    if (par.DoSystD==2 && MDzeroUPC->DpassCut23PASSystDtrkPt->at(j) == false) passTopology = false;
+    if (par.DoSystD==3 && MDzeroUPC->DpassCut23PASSystDalpha->at(j) == false) passTopology = false;
+    if (par.DoSystD==4 && MDzeroUPC->DpassCut23PASSystDchi2cl->at(j) == false) passTopology = false;
+  }
+  else {
+    if (par.DoSystD==0 && MDzeroUPC->DpassCutDefault->at(j) == false) passTopology = false;
+    if (par.DoSystD==1 && MDzeroUPC->DpassCutSystDsvpvSig->at(j) == false) passTopology = false;
+    if (par.DoSystD==2 && MDzeroUPC->DpassCutSystDtrkPt->at(j) == false) passTopology = false;
+    if (par.DoSystD==3 && MDzeroUPC->DpassCutSystDalpha->at(j) == false) passTopology = false;
+    if (par.DoSystD==4 && MDzeroUPC->DpassCutSystDchi2cl->at(j) == false) passTopology = false;
+  }
+  return passTopology;
+}
+
+bool dzeroSelection(DzeroUPCTreeMessenger *MDzeroUPC, Parameters par, int j) {
+  // Check kinematics
+  if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT ||
+      MDzeroUPC->Dpt->at(j) > par.MaxDzeroPT ||
+      MDzeroUPC->Dy->at(j) < par.MinDzeroY ||
+      MDzeroUPC->Dy->at(j) > par.MaxDzeroY
+      ) return false;
+  // Check track quality
+  if ((par.DoTrackFilter == 1 || par.DoTrackFilter == 3) &&
+      (MDzeroUPC->Dtrk1PtErr->at(j) / MDzeroUPC->Dtrk1Pt->at(j) > 0.1 ||
+      MDzeroUPC->Dtrk2PtErr->at(j) / MDzeroUPC->Dtrk2Pt->at(j) > 0.1)
+      ) return false;
+  if ((par.DoTrackFilter == 2 || par.DoTrackFilter == 3) &&
+      (MDzeroUPC->Dtrk1PixelHit->at(j) + MDzeroUPC->Dtrk1StripHit->at(j) < 11 ||
+      MDzeroUPC->Dtrk2PixelHit->at(j) + MDzeroUPC->Dtrk2StripHit->at(j) < 11)
+      ) return false;
+  // Check PID and/or track topology
+  bool passDfilter = false;
+  float PIDOnlyMaxDpt = 2.; // Threshold for cutting on only PID [GeV]
+  float PIDOrTopoMaxDpt = 5.; // Threshold for cutting on PID or topology [GeV]
+  if (par.DoPID == 0 || MDzeroUPC->Dpt->at(j) > PIDOrTopoMaxDpt)
+    passDfilter = checkTopology(MDzeroUPC, par, j);
+  else if (par.DoPID == 1 && MDzeroUPC->Dpt->at(j) < PIDOnlyMaxDpt)
+    passDfilter = checkPID(MDzeroUPC, par, j, false);
+  else if (par.DoPID == 1 && MDzeroUPC->Dpt->at(j) < PIDOrTopoMaxDpt)
+    passDfilter = checkPID(MDzeroUPC, par, j, true) || checkTopology(MDzeroUPC, par, j);
+  // Return final result
+  return passDfilter;
+}
 
 //======= eventSelection =====================================//
 // Check if the event pass eventSelection criteria
@@ -206,83 +289,46 @@ public:
       if (!par.IsData && isSigMCEvt) hDenEvtEff->Fill(1, GptGyWeight*MultWeight);
 
       // Check if the event passes the selection criteria
-      if (eventSelection(MDzeroUPC, par)) {
-        if (!par.IsData && isSigMCEvt) hNumEvtEff->Fill(1, GptGyWeight*MultWeight);
-        bool doTrkFilter = false;
-        if (MDzeroUPC->Dtrk1PtErr != nullptr &&
-            MDzeroUPC->Dtrk2PtErr != nullptr &&
-            MDzeroUPC->Dtrk1PixelHit != nullptr &&
-            MDzeroUPC->Dtrk1StripHit != nullptr &&
-            MDzeroUPC->Dtrk2PixelHit != nullptr &&
-            MDzeroUPC->Dtrk2StripHit != nullptr) doTrkFilter = true;
-        for (unsigned long j = 0; j < MDzeroUPC->Dalpha->size(); j++) {
-          if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT)
-            continue;
-          if (MDzeroUPC->Dpt->at(j) > par.MaxDzeroPT)
-            continue;
-          if (MDzeroUPC->Dy->at(j) < par.MinDzeroY)
-            continue;
-          if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY)
-            continue;
-          if (par.DoSystD==0 && MDzeroUPC->DpassCut23PAS->at(j) == false) continue;
-          // if (par.DoSystD==0 && MDzeroUPC->DpassCut23LowPt->at(j) == false) continue;
-          if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpvSig->at(j) == false) continue;
-          if (par.DoSystD==2 && MDzeroUPC->DpassCut23PASSystDtrkPt->at(j) == false) continue;
-          if (par.DoSystD==3 && MDzeroUPC->DpassCut23PASSystDalpha->at(j) == false) continue;
-          if (par.DoSystD==4 && MDzeroUPC->DpassCut23PASSystDchi2cl->at(j) == false) continue;
-//          if (par.DoSystD==0 && MDzeroUPC->DpassCutDefault->at(j) == false) continue;
-//          if (par.DoSystD==1 && MDzeroUPC->DpassCutSystDsvpvSig->at(j) == false) continue;
-//          if (par.DoSystD==2 && MDzeroUPC->DpassCutSystDtrkPt->at(j) == false) continue;
-//          if (par.DoSystD==3 && MDzeroUPC->DpassCutSystDalpha->at(j) == false) continue;
-//          if (par.DoSystD==4 && MDzeroUPC->DpassCutSystDchi2cl->at(j) == false) continue;
-          if (doTrkFilter) {
-            if (
-              (MDzeroUPC->Dtrk1PtErr->at(j) / MDzeroUPC->Dtrk1Pt->at(j)) > 0.1 ||
-              (MDzeroUPC->Dtrk2PtErr->at(j) / MDzeroUPC->Dtrk2Pt->at(j)) > 0.1
-            ) continue;
-//            if (
-//              (MDzeroUPC->Dtrk1PixelHit->at(j) + MDzeroUPC->Dtrk1StripHit->at(j)) < 11 ||
-//              (MDzeroUPC->Dtrk2PixelHit->at(j) + MDzeroUPC->Dtrk2StripHit->at(j)) < 11
-//            ) continue;
+      if (!eventSelection(MDzeroUPC, par)) continue;
+      if (!par.IsData && isSigMCEvt) hNumEvtEff->Fill(1, GptGyWeight*MultWeight);
+      for (unsigned long j = 0; j < MDzeroUPC->Dalpha->size(); j++) {
+        if (!dzeroSelection(MDzeroUPC, par, j)) continue;
+        hDmass->Fill((*MDzeroUPC->Dmass)[j]);
+        if (!par.IsData) {
+          nt->Fill((*MDzeroUPC->Dmass)[j], (*MDzeroUPC->Dgen)[j]);
+          if (MDzeroUPC->Dgen->at(j) == 23333) {
+            hNumDEff->Fill(1, GptGyWeight*MultWeight);
           }
+        } else
+          nt->Fill((*MDzeroUPC->Dmass)[j], 0);
 
-          hDmass->Fill((*MDzeroUPC->Dmass)[j]);
-          if (!par.IsData) {
-            nt->Fill((*MDzeroUPC->Dmass)[j], (*MDzeroUPC->Dgen)[j]);
-            if (MDzeroUPC->Dgen->at(j) == 23333) {
-              hNumDEff->Fill(1, GptGyWeight*MultWeight);
-            }
-          } else
-            nt->Fill((*MDzeroUPC->Dmass)[j], 0);
+        // Fill HF E_max distributions for data
+        if(doHFEmaxDistributions && par.IsData) {
+          hHFEmaxMinus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxMinus, MDzeroUPC->nTrackInAcceptanceHP);
+          hHFEmaxPlus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxPlus, MDzeroUPC->nTrackInAcceptanceHP);
+        }
+      } // end of reco-level Dzero loop
 
-          // Fill HF E_max distributions for data
-          if(doHFEmaxDistributions && par.IsData) {
+      if (!par.IsData && isSigMCEvt) {
+        for (unsigned long j = 0; j < MDzeroUPC->Gpt->size(); j++) {
+          if (MDzeroUPC->Gpt->at(j) < par.MinDzeroPT)
+            continue;
+          if (MDzeroUPC->Gpt->at(j) > par.MaxDzeroPT)
+            continue;
+          if (MDzeroUPC->Gy->at(j) < par.MinDzeroY)
+            continue;
+          if (MDzeroUPC->Gy->at(j) > par.MaxDzeroY)
+            continue;
+          if (MDzeroUPC->GisSignalCalc->at(j) == false)
+            continue;
+          hDenDEff->Fill(1, GptGyWeight*MultWeight);
+          // Fill HF E_max distributions for MC
+          if(doHFEmaxDistributions) {
             hHFEmaxMinus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxMinus, MDzeroUPC->nTrackInAcceptanceHP);
             hHFEmaxPlus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxPlus, MDzeroUPC->nTrackInAcceptanceHP);
           }
-        } // end of reco-level Dzero loop
-
-        if (!par.IsData && isSigMCEvt) {
-          for (unsigned long j = 0; j < MDzeroUPC->Gpt->size(); j++) {
-            if (MDzeroUPC->Gpt->at(j) < par.MinDzeroPT)
-              continue;
-            if (MDzeroUPC->Gpt->at(j) > par.MaxDzeroPT)
-              continue;
-            if (MDzeroUPC->Gy->at(j) < par.MinDzeroY)
-              continue;
-            if (MDzeroUPC->Gy->at(j) > par.MaxDzeroY)
-              continue;
-            if (MDzeroUPC->GisSignalCalc->at(j) == false)
-              continue;
-            hDenDEff->Fill(1, GptGyWeight*MultWeight);
-            // Fill HF E_max distributions for MC
-            if(doHFEmaxDistributions) {
-              hHFEmaxMinus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxMinus, MDzeroUPC->nTrackInAcceptanceHP);
-              hHFEmaxPlus_vs_EvtMult->Fill(MDzeroUPC->HFEMaxPlus, MDzeroUPC->nTrackInAcceptanceHP);
-            }
-          } // end of gen-level Dzero loop
-        }   // end of gen-level Dzero loop
-      }   // end of event selection
+        } // end of gen-level Dzero loop
+      }   // end of gen-level Dzero loop
     }     // end of event loop
   }       // end of analyze
 
@@ -333,7 +379,11 @@ int main(int argc, char *argv[]) {
   float MaxDzeroY = CL.GetDouble("MaxDzeroY", +2);   // Maximum Dzero rapidity threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
   int TriggerChoice = CL.GetInt("TriggerChoice", 2); // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
-  float scaleFactor = CL.GetDouble("scaleFactor", 1); // Scale factor for the number of events to be processed.
+  float scaleFactor = CL.GetDouble("scaleFactor", 1);// Scale factor for the number of events to be processed.
+  int DoPID = CL.GetInt("DoPID", 1);                 // 0 = no PID selection
+                                                     // 1 = PID only for Dpt<2, PID else topo for 2<Dpt<5
+  int DoTrackFilter = CL.GetInt("DoTrackFilter", 1); // 0 = no track filter, 1 = cut on track ptErr/pt,
+                                                     // 2 = cut on track nHits, 3 = cut on ptErr/pt + nHits
   int DoSystRapGap = CL.GetInt("DoSystRapGap", 0);   // Systematic study: apply the alternative event selections
                                                      // 0 = nominal, 1 = tight, -1: loose
                                                      // 9 < DoSystRapGap: use custom HF energy threshold, the threshold value will be DoSystRapGap/10.
@@ -347,6 +397,7 @@ int main(int argc, char *argv[]) {
 
   bool IsData = CL.GetBool("IsData", 0);              // Data or MC
   Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, IsData, scaleFactor,
+                 DoPID, DoTrackFilter,
                  DoSystRapGap, DoSystD,
                  DoGptGyReweighting, GptGyWeightFileName,
                  DoMultReweighting, MultWeightFileName);
