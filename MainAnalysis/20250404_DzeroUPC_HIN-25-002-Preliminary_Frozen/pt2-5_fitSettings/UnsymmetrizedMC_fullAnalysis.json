@@ -1,0 +1,45 @@
+{
+  "FitDir": "UnsymmMC_MassFit",
+  "MicroTrees": [
+    {
+      "dataInput": "fullAnalysis/pt2-5_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt2-5_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt2-5_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y0-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt2-5_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y1-2_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt2-5_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y1-2_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt2-5_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y0-1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt2-5_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt2-5_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt2-5_y1-2_IsGammaN0/MC.root"
+    }
+  ]
+}

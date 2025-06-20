@@ -1,0 +1,265 @@
+{
+    "PlotDir": "rapGapScanPlotter/hFDistPlotsData_MC",
+    "Plots": [
+        {
+            "MinDzeroPT": 1,
+            "MaxDzeroPT": 2,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 1,
+            "MaxDzeroPT": 2,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 2,
+            "MaxDzeroPT": 5,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 5,
+            "MaxDzeroPT": 8,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -2,
+            "MaxDzeroY": -1,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": -1,
+            "MaxDzeroY": 0,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 0,
+            "MaxDzeroY": 1,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 1,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        },
+        {
+            "MinDzeroPT": 8,
+            "MaxDzeroPT": 12,
+            "MinDzeroY": 1,
+            "MaxDzeroY": 2,
+            "IsGammaN": 0,
+            "fileType": "Data",
+            "fileType2": "MC",
+            "HFEMax": 200
+        }
+    ]
+}
