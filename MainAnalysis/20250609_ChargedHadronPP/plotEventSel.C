@@ -259,10 +259,15 @@ void plotEventSel(const char* input =   "output.root", const char* output =  "pl
     }
 
     TH1D* hNEvtPassCuts = (TH1D*)fin->Get("hNEvtPassCuts");
+    TH1D* hNTrkPassCuts = (TH1D*)fin->Get("hNTrkPassCuts");
+
+    TH2D* hTrkPtEta = (TH2D*)fin->Get("hTrkPtEta");
+    TH1D* hTrkPt = (TH1D*) hTrkPtEta->ProjectionX("hTrkPt");
+    TH1D* hTrkEta = (TH1D*) hTrkPtEta->ProjectionY("hTrkEta");
 
     // make canvas
-    TCanvas* c1 = new TCanvas("c1", "c1", 2400, 600);
-    c1->Divide(3, 1);
+    TCanvas* c1 = new TCanvas("c1", "c1", 1600, 1200);
+    c1->Divide(2, 2);
 
     c1->cd(1);
     plotSimple(
@@ -271,6 +276,36 @@ void plotEventSel(const char* input =   "output.root", const char* output =  "pl
         "Counts", 89000, 91000,
         false, false,
         true
+    );
+
+    c1->cd(2);
+    plotSimple(
+        {hNTrkPassCuts}, "NTrkPassCuts", {"NTrkPassCuts"},
+        "", -1, -1,
+        "Counts", 2000e3, 9000e3,
+        false, false,
+        true
+    );
+    // print bin contents
+    for (int i = 1; i <= hNTrkPassCuts->GetNbinsX(); ++i) {
+        std::cout << "Bin " << i << ": " << hNTrkPassCuts->GetBinContent(i);
+    }
+    std::cout << std::endl;
+
+    c1->cd(3);
+    plotSimple(
+        {hTrkPt}, "hTrkPt", {"hTrkPt"},
+        "Track pT [GeV/c]", -1, -1,
+        "Counts", 1, 1e7,
+        false, true
+    );
+    
+    c1->cd(4);
+    plotSimple(
+        {hTrkEta}, "hTrkEta", {"hTrkEta"},
+        "Track #eta", -3, 3,
+        "Counts", 1, 1e7,
+        false, true
     );
 
     // Save as png
