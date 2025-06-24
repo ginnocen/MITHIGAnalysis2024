@@ -18,6 +18,7 @@ using namespace std;
 #include "utilities.h" // Utility functions for the analysis
 #include "QAMessenger.h"
 
+
 //============================================================//
 // Function to check for configuration errors
 //============================================================//
@@ -33,11 +34,6 @@ bool eventSelection(ChargedHadronRAATreeMessenger *ch, const Parameters &par) {
     return false;
   }
 
-  // NVtx cut
-  if(ch->nVtx < par.NVtxMin) {
-    return false;
-  }
-
   // Cluster Compatibility Filter
   if(ch->ClusterCompatibilityFilter < par.CCFilter) {
     return false;
@@ -49,11 +45,21 @@ bool eventSelection(ChargedHadronRAATreeMessenger *ch, const Parameters &par) {
   }
   
   // HFE energy cuts
-  float hiHF = max(ch->HFEMaxPlus, ch->HFEMaxMinus);
-  float loHF = min(ch->HFEMaxPlus, ch->HFEMaxMinus);
-  if(hiHF < par.HFE_min1 || loHF < par.HFE_min2) {
-    return false;
+  if(par.useOnlineHFE){
+    int ohiHF = max(ch->mMaxL1HFAdcPlus, ch->mMaxL1HFAdcMinus);
+    int oloHF = min(ch->mMaxL1HFAdcPlus, ch->mMaxL1HFAdcMinus);
+    if(ohiHF <= par.HFE_min1 || oloHF <= par.HFE_min2) {
+      return false;
+    }
   }
+  else{
+    float hiHF = max(ch->HFEMaxPlus, ch->HFEMaxMinus);
+    float loHF = min(ch->HFEMaxPlus, ch->HFEMaxMinus);
+    if(hiHF <= par.HFE_min1 || loHF <= par.HFE_min2) {
+      return false;
+    }
+  }
+  
 
   return true;
 }
@@ -63,16 +69,17 @@ public:
   TFile *inf, *outf;
   TH1D *hNcoll; 
   TH1D *hNpart;
+  TH1D *hTrkMult;
   TH1D *hTrkPt;
   TH1D *hTrkEta;
   TH2D *hTrkPtEta;
   ChargedHadronRAATreeMessenger *MChargedHadronRAA;
-  QAMessenger *QA;
   string title;
+  QAMessenger *QA;
 
   DataAnalyzer(const char *filename, const char *outFilename, const char *mytitle = "")
       : inf(new TFile(filename)), MChargedHadronRAA(new ChargedHadronRAATreeMessenger(*inf, string("Tree"))),
-        title(mytitle), outf(new TFile(outFilename, "recreate")) {
+        title(mytitle), outf(new TFile(outFilename, "recreate")), QA(new QAMessenger(mytitle)) {
     outf->cd();
   }
 
@@ -81,22 +88,28 @@ public:
     inf->Close();
     outf->Close();
     delete MChargedHadronRAA;
+    delete QA;
   }
 
   void analyze(Parameters &par) {
     outf->cd();
     hNcoll = new TH1D(Form("hNColl%s", title.c_str()), "", 61, -0.5, 60.5);
-    hNcoll->Sumw2();
     hNpart = new TH1D(Form("hNpart%s", title.c_str()), "", 100, 0, 100);
-    hNpart->Sumw2();
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", 100, 0, 10);
-    hTrkPt->Sumw2();
     hTrkEta = new TH1D(Form("hTrkEta%s", title.c_str()), "", 50, -3.0, 3.0);
-    hTrkEta->Sumw2();
     hTrkPtEta = new TH2D(Form("hTrkPtEta%s", title.c_str()), "", 40, 0, 20, 50, -4.0, 4.0);
+    hTrkMult = new TH1D(Form("hTrkMult%s", title.c_str()), "", 501, -0.5, 500.5);
+
+    hNcoll->Sumw2();
+    hNpart->Sumw2();
+    hTrkPt->Sumw2();
+    hTrkEta->Sumw2();
     hTrkPtEta->Sumw2();
-    if(doQA){QA->Initialize();}
+    hTrkMult->Sumw2();
+  
+    int mult = 0;
     par.printParameters();
+    if(par.doQA){QA->Initialize(title);}
     unsigned long nEntry = MChargedHadronRAA->GetEntries() * par.scaleFactor;
     float weight = par.xSection / nEntry; 
     ProgressBar Bar(cout, nEntry);
@@ -109,37 +122,42 @@ public:
       }
       MChargedHadronRAA->GetEntry(i);
       if(!eventSelection(MChargedHadronRAA, par)) {continue;}
-      if(par.IsHijing && MChargedHadronRAA->Npart <= 1) {continue;} // MAY BECOME OBSOLETE. IF SO, WILL REMOVE ISHIJING PARAMETER
-      if(doQA){QA->AnalyzeEvent(MChargedHadronRAA, weight)};
+      //if(par.IsHijing && MChargedHadronRAA->Npart <= 1) {continue;} // MAY BECOME OBSOLETE. IF SO, WILL REMOVE ISHIJING PARAMETER
+      if(par.doQA){QA->AnalyzeEvent(MChargedHadronRAA, weight);}
       hNcoll->Fill(MChargedHadronRAA->Ncoll, weight);
       hNpart->Fill(MChargedHadronRAA->Npart, weight);
+      mult = 0;
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
+        if(fabs(MChargedHadronRAA->trkEta->at(j)) > 1.0) {continue;}
+        if(MChargedHadronRAA->trkPt->at(j) > 0.5) {mult +=1;} // Minimum pT cut
         hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j), weight);
         hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), weight);
         hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j), weight);
       }
+      hTrkMult->Fill(mult, weight);
     } // end of event loop
   } // end of analyze
 
-  void writeHistograms(TFile *outf) {
+  void writeHistograms(TFile *outf, Parameters &par) {
     outf->cd();
     smartWrite(hNcoll);
     smartWrite(hNpart);
+    smartWrite(hTrkMult);
     smartWrite(hTrkPt);
     smartWrite(hTrkEta);
     smartWrite(hTrkPtEta);
-    if(doQA) {QA->WriteHistograms(outf);}
+    if(par.doQA){QA->WriteHistograms(outf);}
     
   }
 
 private:
   void deleteHistograms() {
     delete hNcoll;
+    delete hTrkMult;
     delete hNpart;
     delete hTrkPt;
     delete hTrkEta;
     delete hTrkPtEta;
-    if(doQA){QA->DeleteHistograms();}
   }
 };
 
@@ -157,20 +175,20 @@ int main(int argc, char *argv[]) {
   // EVENT SELECTION Parameters
   float xSection = CL.GetDouble("Xsection", 1.0); // Cross section in b
   float VzMax = CL.GetDouble("Vzmax", 15.0); // Maximum Z vertex position. Set to very high to disable the cut
-  int NVtxMin = CL.GetInt("NVtxMin", 1); // Minimum number of vertices. Set to 0 to disable the cut
   int CCFilter = CL.GetInt("CCFilter", 1); // Cluster Compatibility Filter. Set to 0 to disable the cut
   int PVFilter = CL.GetInt("PVFilter", 1); // Primary vertex filter. Set to 0 to disable the cut
   int IsHijing = CL.GetInt("IsHijing", 0); // Flags sample as Hijing, and imposes Npart > 1 cut. Set to 0 to disable the cut
 
-  float HFE_min1 = CL.GetDouble("HFE_min1", 4.0); // Minimum energy for HF
-  float HFE_min2 = CL.GetDouble("HFE_min2", 4.0); // Minimum subleading energy for the HF's opposite side. 
+  float HFE_min1 = CL.GetDouble("HFE_min_1", 6.0); // Minimum leading energy for HF
+  float HFE_min2 = CL.GetDouble("HFE_min_2", 6.0); // Minimum subleading energy for the HF's opposite side. 
+  bool useOnlineHFE = CL.GetInt("useOnlineHFE", 0); // Use online HFE cuts. Set to 1 to use online cuts, 0 to use offline cuts
+
   // AND CONDITION: HFE_min1 = HFE_min2
   // OR CONDITION:  HFE_min2 = 0.0
   // ASYMMETRIC CONDITION: HFE_min1 != HFE_min2
   bool doQA = CL.GetBool("doQA", 1); 
-  cout << "doQA: " << doQA << endl;
 
-  Parameters par(TriggerChoice, IsData, scaleFactor, xSection, VzMax, NVtxMin, CCFilter, PVFilter, IsHijing, HFE_min1, HFE_min2, doQA);
+  Parameters par(TriggerChoice, IsData, scaleFactor, xSection, VzMax, CCFilter, PVFilter, IsHijing, HFE_min1, HFE_min2, useOnlineHFE, doQA);
   par.input = CL.Get("Input", "input.root");    // Input file
   par.output = CL.Get("Output", "output.root"); // Output file
   if (checkError(par))
@@ -179,7 +197,7 @@ int main(int argc, char *argv[]) {
   // Analyze Data
   DataAnalyzer analyzer(par.input.c_str(), par.output.c_str(), "");
   analyzer.analyze(par);
-  analyzer.writeHistograms(analyzer.outf);
+  analyzer.writeHistograms(analyzer.outf, par);
   saveParametersToHistograms(par, analyzer.outf);
   cout << "done!" << analyzer.outf->GetName() << endl;
 
