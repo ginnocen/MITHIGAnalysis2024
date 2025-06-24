@@ -21,6 +21,8 @@ QAMessenger::QAMessenger(const std::string &title) {
     hQA_HFEMaxMinus = nullptr;
     hQA_onlineHFEMaxPlus = nullptr;
     hQA_onlineHFEMaxMinus = nullptr;
+    hQA_onlineHFEMax_hi = nullptr;
+    hQA_onlineHFEMax_lo = nullptr;
     hQA_HFETot = nullptr;
 
     hQA_ZDCPlus = nullptr;
@@ -43,6 +45,7 @@ QAMessenger::QAMessenger(const std::string &title) {
     hQA_TrkDzSig = nullptr;
 
     hQA_TrkPtEta = nullptr;
+    hQA_CentEsum = nullptr;
 
     Initialize(title);
 
@@ -60,6 +63,8 @@ bool QAMessenger::Initialize(const std::string &title){
     if (hQA_HFEMaxMinus){ delete hQA_HFEMaxMinus;hQA_HFEMaxMinus = nullptr; }
     if (hQA_onlineHFEMaxPlus) { delete hQA_onlineHFEMaxPlus; hQA_onlineHFEMaxPlus = nullptr; }
     if (hQA_onlineHFEMaxMinus) { delete hQA_onlineHFEMaxMinus; hQA_onlineHFEMaxMinus = nullptr; }
+    if (hQA_onlineHFEMax_hi) { delete hQA_onlineHFEMax_hi; hQA_onlineHFEMax_hi = nullptr; }
+    if (hQA_onlineHFEMax_lo) { delete hQA_onlineHFEMax_lo; hQA_onlineHFEMax_lo = nullptr; }
     if (hQA_HFETot)     { delete hQA_HFETot;     hQA_HFETot = nullptr; }
     if (hQA_ZDCPlus)    { delete hQA_ZDCPlus;    hQA_ZDCPlus = nullptr; }
     if (hQA_ZDCMinus)   { delete hQA_ZDCMinus;   hQA_ZDCMinus = nullptr; }
@@ -77,6 +82,7 @@ bool QAMessenger::Initialize(const std::string &title){
     if (hQA_TrkDxySig)  { delete hQA_TrkDxySig;  hQA_TrkDxySig = nullptr; }
     if (hQA_TrkDzSig)   { delete hQA_TrkDzSig;   hQA_TrkDzSig = nullptr; }
     if (hQA_TrkPtEta)   { delete hQA_TrkPtEta;   hQA_TrkPtEta = nullptr; }
+    if (hQA_CentEsum)   { delete hQA_CentEsum;   hQA_CentEsum = nullptr; }
 
     hQA_hiBin = new TH1D(Form("QA_hiBin%s", title.c_str()), "hiBin;Centrality %; Events", 101, -0.5, 100.5);
     hQA_VZ = new TH1D(Form("QA_VZ%s", title.c_str()), " VZ Distribution; VZ; Events", 50, -20.0, 20.0);
@@ -89,13 +95,15 @@ bool QAMessenger::Initialize(const std::string &title){
     hQA_HFEMaxMinus = new TH1D(Form("QA_HFEMaxMinus%s", title.c_str()), "Max HFE Energy Minus;HFE Energy Minus;Events", 100, 0, 1000);
     hQA_onlineHFEMaxPlus = new TH1D(Form("QA_onlineHFEMaxPlus%s", title.c_str()), "Online Max HFE Energy Plus;Online HFE Energy Plus (GeV);Events", 100, 0, 1000);
     hQA_onlineHFEMaxMinus = new TH1D(Form("QA_onlineHFEMaxMinus%s", title.c_str()), "Online Max HFE Energy Minus;Online HFE Energy Minus (GeV);Events", 100, 0, 1000);
+    hQA_onlineHFEMax_hi = new TH1D(Form("QA_onlineHFEMax_hi%s", title.c_str()), "Online Max HFE Energy High;Online HFE Energy High (GeV);Events", 100, -0.5, 200.5);
+    hQA_onlineHFEMax_lo = new TH1D(Form("QA_onlineHFEMax_lo%s", title.c_str()), "Online Max HFE Energy Low;Online HFE Energy Low (GeV);Events", 100, -0.5, 200.5);
     hQA_HFETot = new TH1D(Form("QA_HFETot%s", title.c_str()), "Total HFE Energy;Total HFE Energy;Events", 100, 0, 2000);
 
     hQA_ZDCPlus = new TH1D(Form("QA_ZDCPlus%s", title.c_str()), "ZDC Plus Energy;ZDC Plus Energy;Events", 100, 0, 1000);
     hQA_ZDCMinus = new TH1D(Form("QA_ZDCMinus%s", title.c_str()), "ZDC Minus Energy;ZDC Minus Energy;Events", 100, 0, 1000);
     hQA_ZDCMax = new TH1D(Form("QA_ZDCMax%s", title.c_str()), "Total ZDC Energy;Total ZDC Energy;Events", 100, 0, 2000);
     hQA_Ncoll = new TH1D(Form("QA_Ncoll%s", title.c_str()), "Number of Collisions;Ncoll;Events", 61, -0.5, 60.5);
-    hQA_Npart = new TH1D(Form("QA_Npart%s", title.c_str()), "Number of Participants;Npart;Events", -0.5, 50, 49.5);
+    hQA_Npart = new TH1D(Form("QA_Npart%s", title.c_str()), "Number of Participants;Npart;Events", 50, -0.5, 49.5);
 
     hQA_TrkMult = new TH1D(Form("QA_TrkMult%s", title.c_str()), "Track Multiplicity;Track Multiplicity;Events", 100, 0, 500);
     hQA_TrkPt = new TH1D(Form("QA_TrkPt%s", title.c_str()), "Track pT;Track pT (GeV/c);Tracks", 100, 0, 10);
@@ -110,6 +118,7 @@ bool QAMessenger::Initialize(const std::string &title){
     hQA_TrkDzSig = new TH1D(Form("QA_TrkDzSig%s", title.c_str()), "Track DCA z significance;DCA z significance;Tracks", 100, -5, 5);
 
     hQA_TrkPtEta = new TH2D(Form("QA_TrkPtEta%s", title.c_str()), "Track pT vs Eta;Track pT (GeV/c);Track Eta", 40, 0, 20, 50, -4.0, 4.0);
+    hQA_CentEsum = new TH2D(Form("QA_CentEsum%s", title.c_str()), "Centrality vs Energy Sum;Centrality;Energy Sum", 101, -0.5, 100.5, 200, 0, 1000);
 
     // Set sumw2 for histograms 
     hQA_hiBin->Sumw2();
@@ -122,6 +131,8 @@ bool QAMessenger::Initialize(const std::string &title){
     hQA_HFEMaxMinus->Sumw2();
     hQA_onlineHFEMaxPlus->Sumw2();
     hQA_onlineHFEMaxMinus->Sumw2();
+    hQA_onlineHFEMax_hi->Sumw2();
+    hQA_onlineHFEMax_lo->Sumw2();
     hQA_HFETot->Sumw2();
     hQA_ZDCPlus->Sumw2();
     hQA_ZDCMinus->Sumw2();
@@ -139,6 +150,7 @@ bool QAMessenger::Initialize(const std::string &title){
     hQA_TrkDxySig->Sumw2();   
     hQA_TrkDzSig->Sumw2();
     hQA_TrkPtEta->Sumw2();
+    hQA_CentEsum->Sumw2();
 
     return true;
 
@@ -164,6 +176,8 @@ bool QAMessenger::AnalyzeEvent(ChargedHadronRAATreeMessenger *ch, float weight) 
     hQA_HFEMaxMinus->Fill(ch->HFEMaxMinus,weight);
     hQA_onlineHFEMaxPlus->Fill(ch->mMaxL1HFAdcPlus, weight);
     hQA_onlineHFEMaxMinus->Fill(ch->mMaxL1HFAdcMinus, weight);
+    hQA_onlineHFEMax_hi->Fill(std::max(ch->mMaxL1HFAdcPlus, ch->mMaxL1HFAdcMinus), weight);
+    hQA_onlineHFEMax_lo->Fill(std::min(ch->mMaxL1HFAdcPlus, ch->mMaxL1HFAdcMinus), weight);
     hQA_HFETot->Fill(ch->hiHF_pf, weight);
 
     hQA_ZDCPlus->Fill(ch->ZDCsumPlus, weight);
@@ -180,7 +194,7 @@ bool QAMessenger::AnalyzeEvent(ChargedHadronRAATreeMessenger *ch, float weight) 
         // TRACKWEIGHTS NOT IMPLEMENTED YET
         //float trueweight = ch->trackWeight->at(i);
         float trueweight = weight;
-        if(ch->trkPt->at(i) < 0.5) {mult +=1;} // Minimum pT cut
+        if(ch->trkPt->at(i) > 0.5) {mult +=1;} // Minimum pT cut
         hQA_TrkPt->Fill(ch->trkPt->at(i), weight);
         hQA_TrkEta->Fill(ch->trkEta->at(i), weight);
         hQA_TrkDxy->Fill(ch->trkDxyAssociatedVtx->at(i), weight);
@@ -192,7 +206,8 @@ bool QAMessenger::AnalyzeEvent(ChargedHadronRAATreeMessenger *ch, float weight) 
     }
 
     hQA_TrkMult->Fill(mult, weight);
-    
+    hQA_CentEsum->Fill(ch->hiBin/2.0, ch->hiHF_pf, weight);    
+
     //////  TO BE IMPLEMENTED //////
     //hSphericity->Fill(ch->Sphericity, weight);
     //hQvec->Fill(ch->Qvec, weight);
@@ -223,6 +238,8 @@ bool QAMessenger::WriteHistograms(TFile *outf) {
     if (hQA_HFEMaxMinus)    { hQA_HFEMaxMinus->Write();    hQA_HFEMaxMinus->SetDirectory(nullptr); }
     if (hQA_onlineHFEMaxPlus) { hQA_onlineHFEMaxPlus->Write(); hQA_onlineHFEMaxPlus->SetDirectory(nullptr); }
     if (hQA_onlineHFEMaxMinus) { hQA_onlineHFEMaxMinus->Write(); hQA_onlineHFEMaxMinus->SetDirectory(nullptr); }
+    if (hQA_onlineHFEMax_hi) { hQA_onlineHFEMax_hi->Write(); hQA_onlineHFEMax_hi->SetDirectory(nullptr); }
+    if (hQA_onlineHFEMax_lo) { hQA_onlineHFEMax_lo->Write(); hQA_onlineHFEMax_lo->SetDirectory(nullptr); }
     if (hQA_HFETot)         { hQA_HFETot->Write();         hQA_HFETot->SetDirectory(nullptr); }
 
     if (hQA_ZDCPlus)    { hQA_ZDCPlus->Write();    hQA_ZDCPlus->SetDirectory(nullptr); }
@@ -245,6 +262,7 @@ bool QAMessenger::WriteHistograms(TFile *outf) {
     if (hQA_TrkDzSig)   { hQA_TrkDzSig->Write();   hQA_TrkDzSig->SetDirectory(nullptr); }
 
     if (hQA_TrkPtEta)   { hQA_TrkPtEta->Write();   hQA_TrkPtEta->SetDirectory(nullptr); }
+    if (hQA_CentEsum)   { hQA_CentEsum->Write();   hQA_CentEsum->SetDirectory(nullptr); }
 
     outf->cd();
     return true;
@@ -261,6 +279,8 @@ bool QAMessenger::DeleteHistograms() {
     delete hQA_HFEMaxMinus;hQA_HFEMaxMinus = nullptr;
     delete hQA_onlineHFEMaxPlus; hQA_onlineHFEMaxPlus = nullptr;
     delete hQA_onlineHFEMaxMinus; hQA_onlineHFEMaxMinus = nullptr;
+    delete hQA_onlineHFEMax_hi; hQA_onlineHFEMax_hi = nullptr;
+    delete hQA_onlineHFEMax_lo; hQA_onlineHFEMax_lo = nullptr;
     delete hQA_HFETot;     hQA_HFETot = nullptr;
     delete hQA_ZDCPlus;    hQA_ZDCPlus = nullptr;
     delete hQA_ZDCMinus;   hQA_ZDCMinus = nullptr;
@@ -278,6 +298,7 @@ bool QAMessenger::DeleteHistograms() {
     delete hQA_TrkDxySig;  hQA_TrkDxySig = nullptr;
     delete hQA_TrkDzSig;   hQA_TrkDzSig = nullptr;
     delete hQA_TrkPtEta;   hQA_TrkPtEta = nullptr;
+    delete hQA_CentEsum;   hQA_CentEsum = nullptr;
 
     return true;
 }

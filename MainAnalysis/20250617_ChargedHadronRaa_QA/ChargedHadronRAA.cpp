@@ -48,14 +48,14 @@ bool eventSelection(ChargedHadronRAATreeMessenger *ch, const Parameters &par) {
   if(par.useOnlineHFE){
     int ohiHF = max(ch->mMaxL1HFAdcPlus, ch->mMaxL1HFAdcMinus);
     int oloHF = min(ch->mMaxL1HFAdcPlus, ch->mMaxL1HFAdcMinus);
-    if(ohiHF < par.HFE_min1 || oloHF < par.HFE_min2) {
+    if(ohiHF <= par.HFE_min1 || oloHF <= par.HFE_min2) {
       return false;
     }
   }
   else{
     float hiHF = max(ch->HFEMaxPlus, ch->HFEMaxMinus);
     float loHF = min(ch->HFEMaxPlus, ch->HFEMaxMinus);
-    if(hiHF < par.HFE_min1 || loHF < par.HFE_min2) {
+    if(hiHF <= par.HFE_min1 || loHF <= par.HFE_min2) {
       return false;
     }
   }
@@ -98,7 +98,7 @@ public:
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", 100, 0, 10);
     hTrkEta = new TH1D(Form("hTrkEta%s", title.c_str()), "", 50, -3.0, 3.0);
     hTrkPtEta = new TH2D(Form("hTrkPtEta%s", title.c_str()), "", 40, 0, 20, 50, -4.0, 4.0);
-    hTrkMult = new TH1D(Form("hTrkMult%s", title.c_str()), "", 100, 0, 500);
+    hTrkMult = new TH1D(Form("hTrkMult%s", title.c_str()), "", 501, -0.5, 500.5);
 
     hNcoll->Sumw2();
     hNpart->Sumw2();
@@ -106,7 +106,7 @@ public:
     hTrkEta->Sumw2();
     hTrkPtEta->Sumw2();
     hTrkMult->Sumw2();
-
+  
     int mult = 0;
     par.printParameters();
     if(par.doQA){QA->Initialize(title);}
@@ -122,13 +122,14 @@ public:
       }
       MChargedHadronRAA->GetEntry(i);
       if(!eventSelection(MChargedHadronRAA, par)) {continue;}
-      if(par.IsHijing && MChargedHadronRAA->Npart <= 1) {continue;} // MAY BECOME OBSOLETE. IF SO, WILL REMOVE ISHIJING PARAMETER
+      //if(par.IsHijing && MChargedHadronRAA->Npart <= 1) {continue;} // MAY BECOME OBSOLETE. IF SO, WILL REMOVE ISHIJING PARAMETER
       if(par.doQA){QA->AnalyzeEvent(MChargedHadronRAA, weight);}
       hNcoll->Fill(MChargedHadronRAA->Ncoll, weight);
       hNpart->Fill(MChargedHadronRAA->Npart, weight);
       mult = 0;
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
-        if(MChargedHadronRAA->trkPt->at(j) < 0.5) {mult +=1;} // Minimum pT cut
+        if(fabs(MChargedHadronRAA->trkEta->at(j)) > 1.0) {continue;}
+        if(MChargedHadronRAA->trkPt->at(j) > 0.5) {mult +=1;} // Minimum pT cut
         hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j), weight);
         hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), weight);
         hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j), weight);

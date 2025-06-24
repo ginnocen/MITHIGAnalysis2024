@@ -28,6 +28,8 @@ class QAMessenger
         TH1D *hQA_HFEMaxMinus;
         TH1D *hQA_onlineHFEMaxPlus;
         TH1D *hQA_onlineHFEMaxMinus;
+        TH1D *hQA_onlineHFEMax_hi;
+        TH1D *hQA_onlineHFEMax_lo;
         TH1D *hQA_HFETot;
         
         // ZDC 
@@ -54,7 +56,10 @@ class QAMessenger
         TH1D *hQA_TrkDzSig;
         
         // Ignoring the debug mode variables 
+
         TH2D *hQA_TrkPtEta;
+        TH2D* hQA_CentEsum;
+        
 
     public:
         QAMessenger();
