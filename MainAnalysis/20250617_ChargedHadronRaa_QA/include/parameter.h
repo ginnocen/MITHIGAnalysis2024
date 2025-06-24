@@ -7,9 +7,9 @@ namespace fs = std::filesystem;
 class Parameters {
 public:
   Parameters(int TriggerChoice, bool IsData, float scaleFactor = 1.0, float xSection = 1, float VzMax = 15.0, 
-             int NVtxMin = 1, int CCFilter = 1, int PVFilter = 1, int IsHijing = 0, float HFE_min1 = 4.0, float HFE_min2 = 4.0)
-      : TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor), xSection(xSection), VzMax(VzMax), NVtxMin(NVtxMin), 
-      CCFilter(CCFilter), PVFilter(PVFilter), IsHijing(IsHijing), HFE_min1(HFE_min1), HFE_min2(HFE_min2) {
+             int CCFilter = 1, int PVFilter = 1, int IsHijing = 0, float HFE_min1 = 4.0, float HFE_min2 = 4.0, bool useOnlineHFE = 0, bool doQA = 0)
+      : TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor), xSection(xSection), VzMax(VzMax),
+      CCFilter(CCFilter), PVFilter(PVFilter), IsHijing(IsHijing), HFE_min1(HFE_min1), HFE_min2(HFE_min2), useOnlineHFE(useOnlineHFE), doQA(doQA) {
   }
   Parameters() {}
   string input;      // Input file name
@@ -20,12 +20,13 @@ public:
 
   float xSection;    // Cross section in b 
   float VzMax;       // Z Vertex
-  int NVtxMin;       // Minimum number of vertices
   int CCFilter;      // Cluster Compatibility Filter
   int PVFilter;      // Primary vertex filter
   int IsHijing;      // Flags sample as Hijing, and imposes Npart > 1 cut
   float HFE_min1;    // Minimum energy for HF
   float HFE_min2;    // Minimum subleading energy for the HF's opposite side
+  bool useOnlineHFE; // Use online HFE cuts
+  bool doQA;          // Do QA or not
 
   void printParameters() const {
 
@@ -36,12 +37,13 @@ public:
     cout << "Scale factor: " << scaleFactor << endl;
     cout << "Cross section: " << xSection << endl;
     cout << "VzMax: " << VzMax << endl;
-    cout << "NVtxMin: " << NVtxMin << endl;
     cout << "CCFilter: " << CCFilter << endl;
     cout << "PVFilter: " << PVFilter << endl;
     cout << "IsHijing: " << IsHijing << endl;
     cout << "HFE_min1: " << HFE_min1 << endl;
     cout << "HFE_min2: " << HFE_min2 << endl;
+    cout << "useOnlineHFE: " << useOnlineHFE << endl;
+    cout << "doQA: " << doQA << endl;
   }
 };
 
@@ -62,8 +64,6 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   hXSection->SetBinContent(1, par.xSection);
   TH1D *hVzMax = new TH1D("parVzMax", "parVzMax", 1, 0, 1);
   hVzMax->SetBinContent(1, par.VzMax);
-  TH1D *hNVtxMin = new TH1D("parNVtxMin", "parNVtxMin", 1, 0, 1);
-  hNVtxMin->SetBinContent(1, par.NVtxMin);
   TH1D *hCCFilter = new TH1D("parCCFilter", "parCCFilter", 1, 0, 1);
   hCCFilter->SetBinContent(1, par.CCFilter);
   TH1D *hPVFilter = new TH1D("parPVFilter", "parPVFilter", 1, 0, 1);
@@ -74,6 +74,11 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   hHFE_min1->SetBinContent(1, par.HFE_min1);
   TH1D *hHFE_min2 = new TH1D("parHFE_min2", "parHFE_min2", 1, 0, 1);
   hHFE_min2->SetBinContent(1, par.HFE_min2);
+  TH1D *hUseOnlineHFE = new TH1D("parUseOnlineHFE", "parUseOnlineHFE", 1, 0, 1);
+  hUseOnlineHFE->SetBinContent(1, par.useOnlineHFE);
+
+  TH1D *hDoQA = new TH1D("parDoQA", "parDoQA", 1, 0, 1);
+  hDoQA->SetBinContent(1, par.doQA);
   
 
   // Write histograms to the output file
@@ -83,12 +88,13 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
 
   hXSection->Write();
   hVzMax->Write();
-  hNVtxMin->Write();
   hCCFilter->Write();
   hPVFilter->Write();
   hIsHijing->Write();
   hHFE_min1->Write();
   hHFE_min2->Write();
+  hUseOnlineHFE->Write();
+  hDoQA->Write();
 
   // Clean up
   delete hTriggerChoice;
@@ -96,9 +102,11 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   delete hScaleFactor;
   delete hXSection;
   delete hVzMax;
-  delete hNVtxMin;
+  delete hCCFilter;
   delete hPVFilter;
   delete hIsHijing;
   delete hHFE_min1;
   delete hHFE_min2;
+  delete hUseOnlineHFE;
+  delete hDoQA;
 }
