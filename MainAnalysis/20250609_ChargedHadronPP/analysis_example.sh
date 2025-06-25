@@ -12,11 +12,18 @@ SCALEFACTOR=1.0
 source clean.sh
 
 INPUT=$PATHSKIM/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root
+
 OUTPUTANALYSIS=output.root
 ./ExecuteChargedHadronRAA \
   --Input $INPUT \
-  --TRACKPTMIN $TRACKPTMIN \
-  --TriggerChoice $TRIGGER \
-  --ScaleFactor $SCALEFACTOR \
   --IsData $ISDATA \
-  --Output $OUTPUTANALYSIS
+  --Output $OUTPUTANALYSIS \
+  --ScaleFactor $SCALEFACTOR
+
+OUTPUTANALYSIS=output_trackCor.root
+./ExecuteChargedHadronRAA \
+  --Input $INPUT \
+  --IsData $ISDATA \
+  --Output $OUTPUTANALYSIS \
+  --ScaleFactor $SCALEFACTOR \
+  --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/

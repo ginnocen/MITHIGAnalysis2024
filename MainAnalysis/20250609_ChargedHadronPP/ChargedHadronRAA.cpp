@@ -16,6 +16,7 @@ using namespace std;
 #include "helpMessage.h"
 #include "parameter.h" // Parameters for the analysis
 #include "utilities.h" // Utility functions for the analysis
+#include "trackingEfficiency2025ppref.h"
 
 //============================================================//
 // Function to check for configuration errors
@@ -127,6 +128,12 @@ public:
     ProgressBar Bar(cout, nEntry);
     Bar.SetStyle(1);
 
+    TrkEff2025ppref *TrackEfficiencyPP2025 = nullptr;
+    if (par.TrackEfficiencyPath != "") {
+      TrackEfficiencyPP2025 = new TrkEff2025ppref(false, par.TrackEfficiencyPath);
+    }
+
+    int eventsRejected = 0;
     for (unsigned long i = 0; i < nEntry; i++) {
       MChargedHadronRAA->GetEntry(i);
       if (i % 1000 == 0) {
@@ -136,20 +143,35 @@ public:
 
       // event-level
       // event selection criteria
-      if (!eventSelection(MChargedHadronRAA, hNEvtPassCuts)) continue;
+      if (!eventSelection(MChargedHadronRAA, hNEvtPassCuts)) {
+        eventsRejected++;
+        continue;
+      }
 
       // track-level
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
+
+        // apply track correction
+        double trkWeight = 1.0;
+        if (TrackEfficiencyPP2025) {
+          double trkPt = MChargedHadronRAA->trkPt->at(j);
+          double trkEta = MChargedHadronRAA->trkEta->at(j);
+          trkWeight *= TrackEfficiencyPP2025->getCorrection(trkPt, trkEta);
+        }
 
         // track selection criteria
         if (!trackSelection(MChargedHadronRAA, j, hNTrkPassCuts)) continue;
 
         // fill histograms
-        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j));
-        hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j));
+        hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j), trkWeight);
         
       } // end of track loop
     } // end of event loop
+
+    cout << "Total events: " << nEntry << endl;
+    cout << "Events rejected: " << eventsRejected << endl;
+    cout << "Events passing cuts: " << nEntry - eventsRejected << endl;
+
   } // end of analyze
 
   void writeHistograms(TFile *outf) {
@@ -180,12 +202,15 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", 0);              // Data or MC
   float scaleFactor = CL.GetDouble("ScaleFactor", 1.0);
   int TriggerChoice = CL.GetInt("TriggerChoice", 0);
+
   Parameters par(MinTrackPt, TriggerChoice, IsData, scaleFactor);
   par.input = CL.Get("Input", "input.root");    // Input file
   par.output = CL.Get("Output", "output.root"); // Output file
+  par.TrackEfficiencyPath = CL.Get("TrackEfficiencyPath", ""); // Path to track efficiency corrections
   if (checkError(par))
     return -1;
   std::cout << "Parameters are set" << std::endl;
+
   // Analyze Data
   DataAnalyzer analyzer(par.input.c_str(), par.output.c_str(), "");
   analyzer.analyze(par);

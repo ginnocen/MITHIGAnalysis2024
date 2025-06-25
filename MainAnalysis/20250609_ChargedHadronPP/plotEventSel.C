@@ -258,12 +258,23 @@ void plotEventSel(const char* input =   "output.root", const char* output =  "pl
         return;
     }
 
+    TFile* fin_corr = TFile::Open("output_trackCor.root", "READ");
+    if (!fin_corr || fin_corr->IsZombie()) {
+        std::cerr << "Error: Unable to open file output_trackCor.root" << std::endl;
+        return;
+    }
+
     TH1D* hNEvtPassCuts = (TH1D*)fin->Get("hNEvtPassCuts");
     TH1D* hNTrkPassCuts = (TH1D*)fin->Get("hNTrkPassCuts");
 
     TH2D* hTrkPtEta = (TH2D*)fin->Get("hTrkPtEta");
     TH1D* hTrkPt = (TH1D*) hTrkPtEta->ProjectionX("hTrkPt");
     TH1D* hTrkEta = (TH1D*) hTrkPtEta->ProjectionY("hTrkEta");
+
+    TH2D* hTrkPtEta_corr = (TH2D*)fin_corr->Get("hTrkPtEta");
+    hTrkPtEta_corr->SetName("hTrkPtEta_corr");
+    TH1D* hTrkPt_corr = (TH1D*) hTrkPtEta_corr->ProjectionX("hTrkPt_corr");
+    TH1D* hTrkEta_corr = (TH1D*) hTrkPtEta_corr->ProjectionY("hTrkEta_corr");
 
     // make canvas
     TCanvas* c1 = new TCanvas("c1", "c1", 1600, 1200);
@@ -294,7 +305,7 @@ void plotEventSel(const char* input =   "output.root", const char* output =  "pl
 
     c1->cd(3);
     plotSimple(
-        {hTrkPt}, "hTrkPt", {"hTrkPt"},
+        {hTrkPt, hTrkPt_corr}, "hTrkPt", {"hTrkPt", "hTrkPt w trkCorr"},
         "Track pT [GeV/c]", -1, -1,
         "Counts", 1, 1e7,
         false, true
@@ -302,7 +313,7 @@ void plotEventSel(const char* input =   "output.root", const char* output =  "pl
     
     c1->cd(4);
     plotSimple(
-        {hTrkEta}, "hTrkEta", {"hTrkEta"},
+        {hTrkEta, hTrkEta_corr}, "hTrkEta", {"hTrkEta", "hTrkEta w trkCorr"},
         "Track #eta", -3, 3,
         "Counts", 1, 1e7,
         false, true
