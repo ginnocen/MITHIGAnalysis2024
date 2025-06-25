@@ -19,6 +19,7 @@ public:
   int TriggerChoice; // FIXME: option to be defined
   bool IsData;       // Data or MC
   float scaleFactor; // Scale factor
+  string TrackEfficiencyPath; // Path to track efficiency corrections
   void printParameters() const {
 
     cout << "Input file: " << input << endl;
@@ -27,6 +28,7 @@ public:
     cout << "TriggerChoice: " << TriggerChoice << endl;
     cout << "IsData: " << IsData << endl;
     cout << "Scale factor: " << scaleFactor << endl;
+    cout << "Track Efficiency Path: " << TrackEfficiencyPath << endl;
   }
 };
 

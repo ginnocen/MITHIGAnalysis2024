@@ -17,6 +17,7 @@ using namespace std;
 #include "trackingEfficiency2017pp.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
+#include "trackingEfficiency2025ppref.h"
 
 #include "include/cent_OO_hijing_PF.h"
 
@@ -60,9 +61,12 @@ int main(int argc, char *argv[]) {
   bool DebugMode = CL.GetBool("DebugMode", false);
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
+  TrkEff2025ppref *TrackEfficiencyPP2025 = nullptr;
   if (DoGenLevel == false) {
     if (IsPP == true && (Year == 2017)) // using 2017 pp data corrections
       TrackEfficiencyPP2017 = new TrkEff2017pp(false, TrackEfficiencyPath);
+    else if (IsPP == true && (Year == 2025)) // using 2025 pp data corrections
+      TrackEfficiencyPP2025 = new TrkEff2025ppref(false, TrackEfficiencyPath);
     else {
       cerr << endl;
       cerr << "Error in track efficiency!" << endl;
@@ -247,6 +251,8 @@ int main(int argc, char *argv[]) {
         if (DoGenLevel == false) {
           if (IsPP == true && (Year == 2017))
             TrackCorrection = TrackEfficiencyPP2017->getCorrection(trkPt, trkEta);
+          else if (IsPP == true && (Year == 2025))
+            TrackCorrection = TrackEfficiencyPP2025->getCorrection(trkPt, trkEta);
         } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)
