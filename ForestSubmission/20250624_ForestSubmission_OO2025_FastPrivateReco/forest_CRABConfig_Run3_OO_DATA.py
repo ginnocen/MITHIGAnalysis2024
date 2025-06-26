@@ -33,7 +33,7 @@ config.Data.inputDBS = inputDatabase
 config.Data.outLFNDirBase = output
 config.Data.splitting = 'EventAwareLumiBased'
 config.Data.unitsPerJob = 10000
-config.Data.totalUnits = 1
+config.Data.totalUnits = -1
 config.Data.publication = False
 config.Data.allowNonValidInputDataset = True
 
