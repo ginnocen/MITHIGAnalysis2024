@@ -1,9 +1,12 @@
 # Oxygen-Oxygen Foresting
 
-## Contents
-* 1) Setup
-* 2) Processing Forests
-* 3) Terms and References
+1. Setup
+2. Processing Forests
+3. Quick Reference
+    - CMSSW 
+    - CRAB
+
+--------------------------------------------------------------------------------
 
 ## 1) Setup
 
@@ -13,12 +16,10 @@ cmsrel CMSSW_15_0_9
 cd CMSSW_15_0_9/src
 cmsenv
 ```
-
 [!IMPORTANT]
-> To use CRAB for foresting, you will need to be setup your environment 
-> on **lxplus9**.
+> To use CRAB for foresting, you will need to work from **lxplus8**.
 > ```bash
-> ssh <your_cern_id>@lxplus9.cern.ch
+> ssh <your_cern_id>@lxplus8.cern.ch
 > ```
 
 ### 1.2) Add CMS Heavy Ion foresting tools
@@ -61,12 +62,40 @@ Navigate to the forest folder:
 cd /ForestSubmission/20250624_ForestSubmission_OO2025_FastPrivateReco/
 ```
 
+--------------------------------------------------------------------------------
+
 ## 2) Processing Forests
+
+### 2.0) Edit CRABConfig settings
+Make a **copy** of the CRABConfig file with an appropriate name:
+```bash
+cp forest_CRABConfig_Run3_OO_DATA.py forest_CRABConfig_Run3_OO_DATA_<your_label>.py
+```
+
+Modify the input and output paths in the config (shown below):
+```Python
+# INPUT/OUTPUT SETTINGS
+
+jobTag = 'Run3_OO_IonPhysics_runXXXXXX'
+input = 'DAS_PATH'
+inputDatabase = 'global'
+output = '/store/group/phys_heavyions/' + username + '/Run3_OO_2025Data_FastPrivateReco/'
+outputServer = 'T2_CH_CERN'
+```
+Explanation of variables:
+- `jobTag` is a personal label for differentiating samples.
+- `input` is the miniAOD path on [CMS DAS](https://cmsweb.cern.ch/das/).
+- `inputDatabase` is the DAS "dbs instance" that contains the files.
+- `output` is the path on the output server. Forested files are saved here.
+- `outputServer` is the CMS T2 server where data will be stored.
 
 ### 2.1) Prepare your directory
 ```bash
 source clean.sh
 ```
+> [!NOTE]
+> `clean.sh` assumes some CMSSW_15_0_* folder and your MITHIGAnalysis repo are
+> in the same directory.
 
 ### 2.2) Initialize VOMS proxy
 ```bash
@@ -79,15 +108,56 @@ voms-proxy-init -rfc -voms cms
 > ```
 > This will let you initialize VOMS just by running the command: `proxy`
 
+### 2.3) Submit CRAB jobs
+```bash
+crab submit -c forest_CRABConfig_Run3_OO_DATA_<your_label>.py
+```
 
-# 3) Terms and References
+### 2.4) Track status of CRAB jobs
+You can view the status of a job with:
+```bash
+crab status -d CrabWorkArea/crab_<your job tag>/
+```
+> [!TIP]
+> Always check job status ~2-3 minutes after submitting to make sure the job
+> has been accepted! If you see the status `SUBMITREFUSED` you will need to fix
+> the config(s) and delete the job folder from `CrabWorkArea/` before
+> submitting it again.
+
+When you (inevitably) have failed jobs, you can resubmit them with:
+```bash
+crab resubmit -d CrabWorkArea/crab_<your job tag>/
+```
+Optionally you can also change the requested memory or runtime for jobs when
+you resubmit:
+```bash
+crab resubmit --maxmemory 2500 --maxruntime 300 -d CrabWorkArea/crab_<your job tag>/
+```
+> [!WARNING]
+> Requesting more than the maximum allowed memory or runtime will result in
+> your job being refused and **you will be unable to __resubmit__ any failed jobs
+> for that CRAB submission!** 
+> * `maxmemory` **must not exceed 5000** (MB)!
+> * `maxruntime` **must not exceed 900** (minutes)!
+
+If you need to stop a job before it finishes, use:
+```bash
+crab kill -d CrabWorkArea/crab_<your job tag>/
+```
+
+
+
+--------------------------------------------------------------------------------
+
+# 3) Quick Reference
 
 ## CMSSW
+```bash
+# Run CMSSWConfig LOCALLY:
+cmsRun forest_CMSSWConfig_XXXX.py
+```
 
 ## CRAB
-
-### Helpful Commands
-
 ```bash
 # Submit job:
 crab submit -c <CRAB_config_file.py>
@@ -103,9 +173,3 @@ crab resubmit -d <path/to/crab_status_directory/>
 # Resubmit with max memory and max runtime
 crab resubmit --maxmemory 3000 --maxruntime 450 -d <path/to/crab_status_directory/>
 ```
-> [!WARNING]
-> Requesting more than the maximum allowed memory or runtime will result in
-> your job being refused and **you will be unable to resubmit __any__ jobs after
-> that!** 
-> * `maxmemory` **cannot exceed 5000** (MB)
-> * `maxruntime` **cannot exceed 900** (minutes)
