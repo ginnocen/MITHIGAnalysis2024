@@ -5,10 +5,11 @@ username = getUsername()
 ###############################################################################
 # INPUT/OUTPUT SETTINGS
 
-jobTag = 'Run3_OO_TestDataConfigsWithMC_v1'
+jobTag = 'Run3_OO_IonPhysics_runXXXXXX'
 input = 'DAS_PATH'
 inputDatabase = 'global'
 output = '/store/group/phys_heavyions/' + username + '/Run3_OO_2025Data_FastPrivateReco/'
+outputServer = 'T2_CH_CERN'
 
 ###############################################################################
 
@@ -35,4 +36,4 @@ config.Data.totalUnits = -1
 config.Data.publication = False
 config.Data.allowNonValidInputDataset = True
 
-config.Site.storageSite = 'T2_CH_CERN'
+config.Site.storageSite = outputServer
