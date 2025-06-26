@@ -1,13 +1,13 @@
 #!/bin/bash
-source clean.sh
 
-PATHSAMPLE=/afs/cern.ch/work/g/ginnocen/public/OOsamples/Forests
-PATHSKIMSAMPLE=Output
+FILEPATH=${1}
+COUNTER=${2}
+OUTPUT=${3}
 
-rm -rf Output/
-mkdir -p Output/
-./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
-   --Output ${PATHSKIMSAMPLE}/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
+file="$FILEPATH"
+
+./Execute --Input "$file" \
+   --Output ${OUTPUT}/output_${COUNTER}.root \
    --DoGenLevel false \
    --Year 2024 \
    --IsData true \
@@ -20,3 +20,7 @@ mkdir -p Output/
    --sampleType -1 \
    --DebugMode true \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
+wait
+
+sleep 0.1
+wait

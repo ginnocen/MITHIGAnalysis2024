@@ -1,7 +1,7 @@
-default: TestRun
+#default: TestRun
 
-TestRun: Execute
-	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_Hijing_merged_DEBUG.root \
+#TestRun: Execute
+#	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_Hijing_merged_DEBUG.root \
                   --Output skim_testfile.root \
                   --DoGenLevel false \
                   --Year 2025 \
@@ -11,8 +11,8 @@ TestRun: Execute
                   --sampleType 0 \
                   --DebugMode true \
                   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
-TestRunBase: Execute
-	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_Hijing_merged_DEBUG.root \
+#TestRunBase: Execute
+#	./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_Hijing_merged_DEBUG.root \
                   --Output skim_testfile.root \
                   --DoGenLevel false \
                   --Year 2025 \

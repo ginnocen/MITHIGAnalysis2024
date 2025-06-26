@@ -1,5 +1,5 @@
-#ifndef TRKEFF2025PPREF
-#define TRKEFF2025PPREF
+#ifndef TRKEFF2024PPREF
+#define TRKEFF2024PPREF
 
 #include "TFile.h"
 #include "TH2D.h"
@@ -8,11 +8,11 @@
 #include <iostream>
 #include <string>
 
-class TrkEff2025ppref{
+class TrkEff2024ppref{
 public:
 
-  TrkEff2025ppref( bool isQuiet_ = false ,std::string filePath = "");
-  ~TrkEff2025ppref();
+  TrkEff2024ppref( bool isQuiet_ = false ,std::string filePath = "");
+  ~TrkEff2024ppref();
 
   float getCorrection(float pt, float eta);
   float getEfficiency( float pt, float eta, bool passesCheck = false);
@@ -33,21 +33,21 @@ private:
 
 };
 
-inline bool TrkEff2025ppref::checkBounds(float pt, float eta){
+inline bool TrkEff2024ppref::checkBounds(float pt, float eta){
   if( TMath::Abs(eta) > 2.4 ){
-    if( ! isQuiet) std::cout << "TrkEff2025ppref: track outside |eta|<2.4, please apply this cut!  I am returning a correction factor of 0 for this track for now." << std::endl;
+    if( ! isQuiet) std::cout << "TrkEff2024ppref: track outside |eta|<2.4, please apply this cut!  I am returning a correction factor of 0 for this track for now." << std::endl;
     return false;
   }
   
   if( pt< 0 || pt > 500 ){
-    if( ! isQuiet) std::cout << "TrkEff2025ppref: pT is outside the range [0,500].  I am returning a correction factor of 0 for this track for now." << std::endl;
+    if( ! isQuiet) std::cout << "TrkEff2024ppref: pT is outside the range [0,500].  I am returning a correction factor of 0 for this track for now." << std::endl;
     return false;
   }
 
   return true;
 }
 
-float TrkEff2025ppref::getCorrection(float pt, float eta){
+float TrkEff2024ppref::getCorrection(float pt, float eta){
   if( !checkBounds(pt, eta) ) return 0;
   
   float efficiency = getEfficiency(pt, eta, true);
@@ -58,12 +58,12 @@ float TrkEff2025ppref::getCorrection(float pt, float eta){
   if(efficiency > 0.001){
     return (1-fake)*(1-secondary)/efficiency;
   } else {
-    if( ! isQuiet ) std::cout << "TrkEff2025ppref: Warning! Tracking efficiency is very low for this track (close to dividing by 0).  Returning correction factor of 0 for this track for now." << std::endl;
+    if( ! isQuiet ) std::cout << "TrkEff2024ppref: Warning! Tracking efficiency is very low for this track (close to dividing by 0).  Returning correction factor of 0 for this track for now." << std::endl;
     return 0;
   }
 }
 
-float TrkEff2025ppref::getEfficiency( float pt, float eta, bool passesCheck){
+float TrkEff2024ppref::getEfficiency( float pt, float eta, bool passesCheck){
   if( !passesCheck){
     if(  !checkBounds(pt, eta) ) return 0;
   }
@@ -71,7 +71,7 @@ float TrkEff2025ppref::getEfficiency( float pt, float eta, bool passesCheck){
   return eff->GetBinContent( eff->FindBin(eta, pt) ) * 0.979;//0.979 is scale factor from D mesons
 }
 
-float TrkEff2025ppref::getFake( float pt, float eta,  bool passesCheck){
+float TrkEff2024ppref::getFake( float pt, float eta,  bool passesCheck){
   if( !passesCheck){
     if(  !checkBounds(pt, eta) ) return 0;
   }
@@ -79,7 +79,7 @@ float TrkEff2025ppref::getFake( float pt, float eta,  bool passesCheck){
   return fake->GetBinContent( fake->FindBin(eta, pt) );
 }
 
-float TrkEff2025ppref::getSecondary( float pt, float eta, bool passesCheck){
+float TrkEff2024ppref::getSecondary( float pt, float eta, bool passesCheck){
   if( !passesCheck){
     if(  !checkBounds(pt, eta) ) return 0;
   }
@@ -88,11 +88,9 @@ float TrkEff2025ppref::getSecondary( float pt, float eta, bool passesCheck){
 }
 
 
-TrkEff2025ppref::TrkEff2025ppref(bool isQuiet_, std::string filePath){
+TrkEff2024ppref::TrkEff2024ppref(bool isQuiet_, std::string filePath){
   isQuiet = isQuiet_;
-    if(!isQuiet) std::cout << "TrkEff2025ppref class opening in general tracks mode!" << std::endl;
-
-    std::cout<<"maees it here"<<std::endl;
+    if(!isQuiet) std::cout << "TrkEff2024ppref class opening in general tracks mode!" << std::endl;
     
     trkEff = TFile::Open( (filePath + "Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Nominal_10thJune2025.root").c_str(),"open");
     
@@ -106,7 +104,7 @@ TrkEff2025ppref::TrkEff2025ppref(bool isQuiet_, std::string filePath){
 
 }
 
-TrkEff2025ppref::~TrkEff2025ppref(){
+TrkEff2024ppref::~TrkEff2024ppref(){
   trkEff->Close();
 }
 

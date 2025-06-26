@@ -17,7 +17,7 @@ using namespace std;
 #include "trackingEfficiency2017pp.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
-#include "trackingEfficiency2025ppref.h"
+#include "trackingEfficiency2024ppref.h"
 
 #include "include/cent_OO_hijing_PF.h"
 
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
   bool DoGenLevel = CL.GetBool("DoGenLevel", false);
   bool IsData = CL.GetBool("IsData", false);
   bool IsPP = CL.GetBool("IsPP", false);
-  int Year = CL.GetInt("Year", 2025);
+  int Year = CL.GetInt("Year", 2024);
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
@@ -61,18 +61,12 @@ int main(int argc, char *argv[]) {
   bool DebugMode = CL.GetBool("DebugMode", false);
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
-  TrkEff2025ppref *TrackEfficiencyPP2025 = nullptr;
+  TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
   if (DoGenLevel == false) {
     if (IsPP == true && (Year == 2017)) // using 2017 pp data corrections
       TrackEfficiencyPP2017 = new TrkEff2017pp(false, TrackEfficiencyPath);
-    else if (IsPP == true && (Year == 2025)) // using 2025 pp data corrections
-      TrackEfficiencyPP2025 = new TrkEff2025ppref(false, TrackEfficiencyPath);
-    else {
-      cerr << endl;
-      cerr << "Error in track efficiency!" << endl;
-      cerr << "Data/Year combination (IsPP = " << IsPP << ", Year = " << Year << ") does not exist!" << endl;
-      cerr << endl;
-    }
+    else if (IsPP == true && (Year == 2024)) // using 2024 pp data corrections
+      TrackEfficiencyPP2024 = new TrkEff2024ppref(false, TrackEfficiencyPath);
   }
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
@@ -208,6 +202,9 @@ int main(int argc, char *argv[]) {
             continue;
         } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
+          // KD: apply track selection criteria that matches that used for efficiency files, if available
+          if ((IsPP == true && (Year == 2024)) && ApplyTrackRejection == true && MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
+            continue;
           if (ApplyTrackRejection == true && MTrack.PassChargedHadronPPStandardCuts(iTrack) == false)
             continue;
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
@@ -251,8 +248,8 @@ int main(int argc, char *argv[]) {
         if (DoGenLevel == false) {
           if (IsPP == true && (Year == 2017))
             TrackCorrection = TrackEfficiencyPP2017->getCorrection(trkPt, trkEta);
-          else if (IsPP == true && (Year == 2025))
-            TrackCorrection = TrackEfficiencyPP2025->getCorrection(trkPt, trkEta);
+          else if (IsPP == true && (Year == 2024))
+            TrackCorrection = TrackEfficiencyPP2024->getCorrection(trkPt, trkEta);
         } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)

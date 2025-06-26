@@ -2376,6 +2376,34 @@ bool PPTrackTreeMessenger::PassChargedHadronPPStandardCuts(int index)
    return true;
 }
 
+bool PPTrackTreeMessenger::trackingEfficiency2024ppref_selection(int index)
+{
+   if(index >= nTrk)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+   //FIXME: currently this matches Vipul analysis
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(trkPt->at(index) > 10 && RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
+   return true;
+
+}
+
 ZDCTreeMessenger::ZDCTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());

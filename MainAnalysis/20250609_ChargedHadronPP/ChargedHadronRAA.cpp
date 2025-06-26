@@ -16,7 +16,6 @@ using namespace std;
 #include "helpMessage.h"
 #include "parameter.h" // Parameters for the analysis
 #include "utilities.h" // Utility functions for the analysis
-#include "trackingEfficiency2025ppref.h"
 
 //============================================================//
 // Function to check for configuration errors
@@ -56,7 +55,7 @@ bool trackSelection(const ChargedHadronRAATreeMessenger *MChargedHadronRAA, unsi
   hNTrkPassCuts->Fill(2); // High purity
 
   double RelativeUncertainty = MChargedHadronRAA->trkPtError->at(j) / MChargedHadronRAA->trkPt->at(j);
-  if (RelativeUncertainty > 0.1) return false;
+  if (MChargedHadronRAA->trkPt->at(j) > 10 && RelativeUncertainty > 0.1) return false;
   hNTrkPassCuts->Fill(3); // Relative uncertainty < 10%
 
   if (fabs(MChargedHadronRAA->trkDxyAssociatedVtx->at(j)) / MChargedHadronRAA->trkDxyErrAssociatedVtx->at(j) > 3) return false;
@@ -116,7 +115,7 @@ public:
     hNTrkPassCuts = new TH1D("hNTrkPassCuts", "Number of tracks passing cuts", 7, 0.5, 7.5);
     hNTrkPassCuts->GetXaxis()->SetBinLabel(1, "Total Tracks");
     hNTrkPassCuts->GetXaxis()->SetBinLabel(2, "+ High Purity");
-    hNTrkPassCuts->GetXaxis()->SetBinLabel(3, "+ Relative Uncertainty < 10%");
+    hNTrkPassCuts->GetXaxis()->SetBinLabel(3, "+ pT > 10 && Rel pT Error < 10%");
     hNTrkPassCuts->GetXaxis()->SetBinLabel(4, "+ Dxy < 3 sigma");
     hNTrkPassCuts->GetXaxis()->SetBinLabel(5, "+ Dz < 3 sigma");
     hNTrkPassCuts->GetXaxis()->SetBinLabel(6, "+ Eta < 1");
@@ -127,11 +126,6 @@ public:
     unsigned long nEntry = MChargedHadronRAA->GetEntries() * par.scaleFactor;
     ProgressBar Bar(cout, nEntry);
     Bar.SetStyle(1);
-
-    TrkEff2025ppref *TrackEfficiencyPP2025 = nullptr;
-    if (par.TrackEfficiencyPath != "") {
-      TrackEfficiencyPP2025 = new TrkEff2025ppref(false, par.TrackEfficiencyPath);
-    }
 
     int eventsRejected = 0;
     for (unsigned long i = 0; i < nEntry; i++) {
@@ -151,12 +145,10 @@ public:
       // track-level
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
 
-        // apply track correction
+        // apply track efficiency correction
         double trkWeight = 1.0;
-        if (TrackEfficiencyPP2025) {
-          double trkPt = MChargedHadronRAA->trkPt->at(j);
-          double trkEta = MChargedHadronRAA->trkEta->at(j);
-          trkWeight *= TrackEfficiencyPP2025->getCorrection(trkPt, trkEta);
+        if (par.UseTrackWeight) {
+          trkWeight *= MChargedHadronRAA->trackWeight->at(j);
         }
 
         // track selection criteria
@@ -206,7 +198,7 @@ int main(int argc, char *argv[]) {
   Parameters par(MinTrackPt, TriggerChoice, IsData, scaleFactor);
   par.input = CL.Get("Input", "input.root");    // Input file
   par.output = CL.Get("Output", "output.root"); // Output file
-  par.TrackEfficiencyPath = CL.Get("TrackEfficiencyPath", ""); // Path to track efficiency corrections
+  par.UseTrackWeight = CL.GetBool("UseTrackWeight", false); // Path to track efficiency corrections
   if (checkError(par))
     return -1;
   std::cout << "Parameters are set" << std::endl;
