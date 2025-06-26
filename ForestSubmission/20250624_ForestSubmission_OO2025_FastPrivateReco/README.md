@@ -5,12 +5,13 @@
 3. Quick Reference
     - CMSSW 
     - CRAB
+    - VOMS Certificate Setup
 
 --------------------------------------------------------------------------------
 
 ## 1) Setup
 
-> [!IMPORTANT]
+> [!WARNING]
 > To use CRAB for foresting, you will need to work from **lxplus8**.
 > ```bash
 > ssh <your_cern_id>@lxplus8.cern.ch
@@ -158,6 +159,7 @@ crab kill -d CrabWorkArea/crab_<your job tag>/
 cmsRun forest_CMSSWConfig_XXXX.py
 ```
 
+
 ## CRAB
 ```bash
 # Submit job:
@@ -174,3 +176,44 @@ crab resubmit -d <path/to/crab_status_directory/>
 # Resubmit with max memory and max runtime
 crab resubmit --maxmemory 3000 --maxruntime 450 -d <path/to/crab_status_directory/>
 ```
+
+
+## VOMS Certificate Setup
+
+### Obtaining Certificates
+
+https://ca.cern.ch/ca/user/Request.aspx?template=ee2user
+
+Use the “New Grid User Certificate” tab to get a new CERN grid. You should set a password for this, and will need to remember it.
+
+### Linux/Unix Installation
+
+https://twiki.cern.ch/twiki/bin/view/CMSPublic/WorkBookStartingGrid#BasicGrid
+
+To **setup the certificate** in your remote workspace, you should:
+1. Export the certificate from your browser to a file in p12 format. You can 
+give any name to your p12 file (in the example below the name is `mycert.p12`).
+
+2. Place the p12 certificate file in the `.globus` directory of your home area. 
+If the `.globus` directory doesn't exist, create it.
+```bash
+cd ~
+mkdir .globus
+cd ~/.globus
+mv /path/to/mycert.p12 .
+```
+
+3. Execute the following shell commands:
+```bash
+rm -f usercert.pem
+rm -f userkey.pem
+openssl pkcs12 -in mycert.p12 -clcerts -nokeys -out usercert.pem
+openssl pkcs12 -in mycert.p12 -nocerts -out userkey.pem
+chmod 400 userkey.pem
+chmod 400 usercert.pem
+```
+> [!WARNING]
+> **If you are new to VOMS, you will need to sign the Acceptable Usage Policy 
+> (AUP)** before you are able to access files, tools, and servers secured by
+> certificate access. Just follow instructions here to sign the CMS AUP:
+> https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideLcgAccess#AUP
