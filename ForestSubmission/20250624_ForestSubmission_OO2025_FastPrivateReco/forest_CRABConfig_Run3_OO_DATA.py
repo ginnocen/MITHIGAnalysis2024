@@ -24,8 +24,7 @@ config.JobType.psetName = 'forest_CMSSWConfig_Run3_OO_DATA_miniAOD.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.maxMemoryMB = 5000
 config.JobType.pyCfgParams = ['noprint']
-#config.JobType.scriptExe = 'ZDCemapScript.sh'
-#config.JobType.inputFiles = ['ZDCemap_PbPbUPC2023.txt']
+config.JobType.inputFiles = ['emap_2025_full.txt']
 config.JobType.allowUndistributedCMSSW = True
 
 config.Data.inputDataset = input
