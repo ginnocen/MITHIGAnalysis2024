@@ -61,7 +61,7 @@ git switch mainOO
 
 Navigate to the forest folder:
 ```bash
-cd /ForestSubmission/20250624_ForestSubmission_OO2025_FastPrivateReco/
+cd ForestSubmission/20250624_ForestSubmission_OO2025_FastPrivateReco/
 ```
 
 --------------------------------------------------------------------------------
