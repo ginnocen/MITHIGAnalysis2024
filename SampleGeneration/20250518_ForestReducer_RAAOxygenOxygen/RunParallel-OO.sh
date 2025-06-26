@@ -1,7 +1,7 @@
 #!/bin/bash
 DATE=$(date +%Y%m%d)
 
-source clean.sh
+#source clean.sh
 
 MAXCORES=40 # too many parallel cores can cause event loss, increase with caution!
 NFILES=50 # files for ppref go 1-999

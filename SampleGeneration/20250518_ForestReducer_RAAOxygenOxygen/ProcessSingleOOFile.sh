@@ -24,7 +24,7 @@ file="$FILEPATH"
    --PFTree particleFlowAnalyser/pftree \
    --sampleType $SAMPLETYPE \
    --DebugMode $DEBUGMODE \
-   #--TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
+   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 wait
 
 sleep 0.1
