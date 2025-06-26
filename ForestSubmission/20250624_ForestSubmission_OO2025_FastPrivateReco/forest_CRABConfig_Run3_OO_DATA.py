@@ -25,6 +25,7 @@ config.JobType.pluginName = 'Analysis'
 config.JobType.maxMemoryMB = 5000
 config.JobType.pyCfgParams = ['noprint']
 config.JobType.inputFiles = ['emap_2025_full.txt']
+config.JobType.scriptExe = 'runCrabWithEmap.sh'
 config.JobType.allowUndistributedCMSSW = True
 
 config.Data.inputDataset = input
