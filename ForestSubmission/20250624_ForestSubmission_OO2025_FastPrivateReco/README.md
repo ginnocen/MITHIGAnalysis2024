@@ -16,7 +16,7 @@ cmsrel CMSSW_15_0_9
 cd CMSSW_15_0_9/src
 cmsenv
 ```
-[!IMPORTANT]
+> [!IMPORTANT]
 > To use CRAB for foresting, you will need to work from **lxplus8**.
 > ```bash
 > ssh <your_cern_id>@lxplus8.cern.ch
