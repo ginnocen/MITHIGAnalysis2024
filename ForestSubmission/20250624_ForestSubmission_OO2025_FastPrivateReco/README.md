@@ -10,17 +10,18 @@
 
 ## 1) Setup
 
+> [!IMPORTANT]
+> To use CRAB for foresting, you will need to work from **lxplus8**.
+> ```bash
+> ssh <your_cern_id>@lxplus8.cern.ch
+> ```
+
 ### 1.1) Install CMSSW
 ```bash
 cmsrel CMSSW_15_0_9
 cd CMSSW_15_0_9/src
 cmsenv
 ```
-> [!IMPORTANT]
-> To use CRAB for foresting, you will need to work from **lxplus8**.
-> ```bash
-> ssh <your_cern_id>@lxplus8.cern.ch
-> ```
 
 ### 1.2) Add CMS Heavy Ion foresting tools
 ```bash
