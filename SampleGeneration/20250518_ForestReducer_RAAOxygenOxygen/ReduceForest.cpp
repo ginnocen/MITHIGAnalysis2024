@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
         // If OO sample
         MChargedHadronRAA.passDefaultEventSelection_WithoutHF = getDefaultOOEventSel_WithoutHF(MChargedHadronRAA);
         // Fill HF selection bits
-        MChargedHadronRAA.passHFSelection->push_back(checkHFCondition(MChargedHadronRAA, 6., 6.));
+        MChargedHadronRAA.passHFSelection->push_back(checkHFCondition(MChargedHadronRAA, 6., 6., false));
       }
 
       MChargedHadronRAA.FillEntry();
