@@ -287,8 +287,8 @@ int main(int argc, char *argv[]) {
         // Fill HF selection bits
         MChargedHadronRAA.passHFAND_6p06p0_Offline = checkHFCondition(MChargedHadronRAA, 6., 6., false);
         MChargedHadronRAA.passHFAND_6p06p0_Online = checkHFCondition(MChargedHadronRAA, 6., 6., true);
-        MChargedHadronRAA.passHFOR_8p0_Offline = checkHFCondition(MChargedHadronRAA, 8., 0., false);
-        MChargedHadronRAA.passHFOR_8p0_Online = checkHFCondition(MChargedHadronRAA, 8., 0., true);
+        MChargedHadronRAA.passHFOR_8p0_Offline = checkHFCondition(MChargedHadronRAA, 8., -2., false);
+        MChargedHadronRAA.passHFOR_8p0_Online = checkHFCondition(MChargedHadronRAA, 8., -2., true);
       }
 
       MChargedHadronRAA.FillEntry();
