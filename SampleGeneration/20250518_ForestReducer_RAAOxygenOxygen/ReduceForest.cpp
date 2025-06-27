@@ -279,13 +279,16 @@ int main(int argc, char *argv[]) {
 
       if (IsPP) {
         // If PP sample
-        MChargedHadronRAA.passBaselineEventSelection = getDefaultPPEventSel(MChargedHadronRAA);
+        MChargedHadronRAA.passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
         // FIXME: Check if the HF information is present in pp
       } else {
         // If OO sample
-        MChargedHadronRAA.passBaselineEventSelection = getDefaultOOEventSel_WithoutHF(MChargedHadronRAA);
+        MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
         // Fill HF selection bits
-        MChargedHadronRAA.passHFSelection->push_back(checkHFCondition(MChargedHadronRAA, 6., 6., false));
+        MChargedHadronRAA.passHFAND_6p06p0_Offline->push_back(checkHFCondition(MChargedHadronRAA, 6., 6., false));
+        MChargedHadronRAA.passHFAND_6p06p0_Online->push_back(checkHFCondition(MChargedHadronRAA, 6., 6., true));
+        MChargedHadronRAA.passHFOR_8p0_Offline->push_back(checkHFCondition(MChargedHadronRAA, 8., 0., false));
+        MChargedHadronRAA.passHFOR_8p0_Online->push_back(checkHFCondition(MChargedHadronRAA, 8., 0., true));
       }
 
       MChargedHadronRAA.FillEntry();

@@ -1,4 +1,4 @@
-bool getDefaultOOEventSel_WithoutHF(ChargedHadronRAATreeMessenger &ch) {
+bool getBaselineOOEventSel(ChargedHadronRAATreeMessenger &ch) {
     // zVtx cut
     if (fabs(ch.VZ) >= 15.){ return false; }
 
@@ -11,7 +11,7 @@ bool getDefaultOOEventSel_WithoutHF(ChargedHadronRAATreeMessenger &ch) {
     return true;
 }
 
-bool getDefaultPPEventSel(ChargedHadronRAATreeMessenger &ch) {
+bool getBaselinePPEventSel(ChargedHadronRAATreeMessenger &ch) {
     // zVtx cut
     if (fabs(ch.VZ) >= 15.0) { return false; }
   
