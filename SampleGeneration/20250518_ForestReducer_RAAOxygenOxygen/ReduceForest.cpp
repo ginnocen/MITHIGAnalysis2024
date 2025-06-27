@@ -19,6 +19,7 @@ using namespace std;
 #include "trackingEfficiency2023PbPb.h"
 
 #include "include/cent_OO_hijing_PF.h"
+#include "include/skimSelectionBits_OO_PP.h"
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -270,6 +271,21 @@ int main(int argc, char *argv[]) {
           MChargedHadronRAA.AllndofVtx->push_back(MTrack.ndofVtx->at(iDebVtx));
           MChargedHadronRAA.AllptSumVtx->push_back(MTrack.ptSumVtx->at(iDebVtx));
         }
+      }
+
+      ////////////////////////////////////////
+      ///// Fill default selection bits //////
+      ////////////////////////////////////////
+
+      if (IsPP) {
+        // If PP sample
+        MChargedHadronRAA.passDefaultEventSelection_WithoutHF = getDefaultPPEventSel(MChargedHadronRAA);
+        // FIXME: Check if the HF information is present in pp
+      } else {
+        // If OO sample
+        MChargedHadronRAA.passDefaultEventSelection_WithoutHF = getDefaultOOEventSel_WithoutHF(MChargedHadronRAA);
+        // Fill HF selection bits
+        MChargedHadronRAA.passHFSelection->push_back(checkHFCondition(MChargedHadronRAA, 6., 6.));
       }
 
       MChargedHadronRAA.FillEntry();
