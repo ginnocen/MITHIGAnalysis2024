@@ -25,7 +25,7 @@ process.source = cms.Source("PoolSource",
 
 # number of events to process, set to -1 to process all events
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(1000)
 )
 
 ###############################################################################
@@ -69,6 +69,7 @@ process.TFileService = cms.Service("TFileService",
 
 # event analysis
 process.load('HeavyIonsAnalysis.EventAnalysis.hltanalysis_cfi')
+process.load('L1Trigger.L1TNtuples.l1MetFilterRecoTree_cfi')
 process.load('HeavyIonsAnalysis.EventAnalysis.particleFlowAnalyser_cfi')
 process.particleFlowAnalyser.ptMin = cms.double(0.)
 process.particleFlowAnalyser.absEtaMax = cms.double(6.)
@@ -81,7 +82,6 @@ process.load('HeavyIonsAnalysis.EventAnalysis.l1object_cfi')
 # process.hiEvtAnalyzer.doCentrality = cms.bool(False) # used for UPC
 
 # add L1 MET filter
-process.load('L1Trigger.L1TNtuples.l1MetFilterRecoTree_cfi')
 
 ################################
 # electrons, photons, muons
@@ -99,33 +99,33 @@ process.load("HeavyIonsAnalysis.MuonAnalysis.muonAnalyzer_cfi")
 #########################
 # ZDC RecHit Producer && Analyzer
 #########################
-# to prevent crash related to HcalSeverityLevelComputerRcd record
-process.load("RecoLocalCalo.HcalRecAlgos.hcalRecAlgoESProd_cfi")
-process.load('HeavyIonsAnalysis.ZDCAnalysis.ZDCAnalyzersPbPb_cff')
-
-# =============================================================================
-# ==================== modification needed for the fsc data ===================
-from CondCore.CondDB.CondDB_cfi import *
-process.es_pool = cms.ESSource("PoolDBESSource",
-    toGet = cms.VPSet(
-        cms.PSet(
-            record = cms.string("HcalElectronicsMapRcd"),
-            tag = cms.string("HcalElectronicsMap_v10.0_offline")
-        )
-    ),
-    connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS'),
-)
-process.es_prefer = cms.ESPrefer('HcalTextCalibrations', 'es_ascii')
-process.es_ascii = cms.ESSource(
-    'HcalTextCalibrations',
-    input = cms.VPSet(
-        cms.PSet(
-            object = cms.string('ElectronicsMap'),
-            file = cms.FileInPath("emap_2025_full.txt")
-        )
-    )
-)
-# =============================================================================
+## to prevent crash related to HcalSeverityLevelComputerRcd record
+#process.load("RecoLocalCalo.HcalRecAlgos.hcalRecAlgoESProd_cfi")
+#process.load('HeavyIonsAnalysis.ZDCAnalysis.ZDCAnalyzersPbPb_cff')
+#
+## =============================================================================
+## ==================== modification needed for the fsc data ===================
+#from CondCore.CondDB.CondDB_cfi import *
+#process.es_pool = cms.ESSource("PoolDBESSource",
+#    toGet = cms.VPSet(
+#        cms.PSet(
+#            record = cms.string("HcalElectronicsMapRcd"),
+#            tag = cms.string("HcalElectronicsMap_v10.0_offline")
+#        )
+#    ),
+#    connect = cms.string('frontier://FrontierProd/CMS_CONDITIONS'),
+#)
+#process.es_prefer = cms.ESPrefer('HcalTextCalibrations', 'es_ascii')
+#process.es_ascii = cms.ESSource(
+#    'HcalTextCalibrations',
+#    input = cms.VPSet(
+#        cms.PSet(
+#            object = cms.string('ElectronicsMap'),
+#            file = cms.FileInPath("emap_2025_full.txt")
+#        )
+#    )
+#)
+## =============================================================================
 
 ###############################################################################
 # main forest sequence
@@ -139,8 +139,8 @@ process.forest = cms.Path(
     process.trackSequencePP +
     process.particleFlowAnalyser +
     process.hiEvtAnalyzer #+
+#    process.zdcSequencePbPb
 #    process.ggHiNtuplizer +
-#    process.zdcSequencePbPb +
 #    process.unpackedMuons +
 #    process.muonAnalyzer
 )
