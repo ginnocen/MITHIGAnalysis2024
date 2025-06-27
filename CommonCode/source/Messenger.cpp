@@ -3733,7 +3733,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
    Tree->SetBranchAddress("sampleType", &sampleType);
-   Tree->SetBranchAddress("passDefaultEventSelection_WithoutHF", &passDefaultEventSelection_WithoutHF);
+   Tree->SetBranchAddress("passBaselineEventSelection", &passBaselineEventSelection);
    Tree->SetBranchAddress("passHFSelection", &passHFSelection);
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPhi", &trkPhi);
@@ -3863,7 +3863,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("Ncoll",                      &Ncoll, "Ncoll/F");
    Tree->Branch("leadingPtEta1p0_sel",        &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
    Tree->Branch("sampleType",                 &sampleType, "sampleType/I");
-   Tree->Branch("passDefaultEventSelection_WithoutHF", &passDefaultEventSelection_WithoutHF, "passDefaultEventSelection_WithoutHF/O");
+   Tree->Branch("passBaselineEventSelection", &passBaselineEventSelection, "passBaselineEventSelection/O");
    Tree->Branch("passHFSelection",            &passHFSelection);
    Tree->Branch("trkPt",                      &trkPt);
    Tree->Branch("trkPhi",                     &trkPhi);
@@ -3952,7 +3952,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
    sampleType = -1;
-   passDefaultEventSelection_WithoutHF = false;
+   passBaselineEventSelection = false;
    passHFSelection->clear();
    trkPt->clear();
    trkPhi->clear();

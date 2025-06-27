@@ -1039,7 +1039,7 @@ public:
    float leadingPtEta1p0_sel;
    int sampleType;
    
-   bool passDefaultEventSelection_WithoutHF; // Store default event selection decision, excluding any HF cut, different for OO and PP
+   bool passBaselineEventSelection; // Store default event selection decision, excluding any HF cut, different for OO and PP
    std::vector<bool> *passHFSelection; // Store multiple different HF selection bits, see ReduceForest.cpp for filling information
    
    std::vector<float> *trkPt;
