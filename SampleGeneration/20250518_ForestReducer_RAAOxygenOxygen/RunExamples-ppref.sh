@@ -1,12 +1,13 @@
 #!/bin/bash
 source clean.sh
 
-rm -rf Output/
-mkdir -p Output/
-./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
-   --Output ${PATHSKIMSAMPLE}/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
+INPUT=/afs/cern.ch/work/g/ginnocen/public/OOsamples/Forests
+OUTPUT=Output
+
+./Execute --Input $INPUT/HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
+   --Output $OUTPUT/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
    --DoGenLevel false \
-   --Year 2017 \
+   --Year 2024 \
    --IsData true \
    --IsPP true \
    --Fraction 1.0 \

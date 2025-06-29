@@ -17,8 +17,10 @@ using namespace std;
 #include "trackingEfficiency2017pp.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
+#include "trackingEfficiency2024ppref.h"
 
 #include "include/cent_OO_hijing_PF.h"
+#include "include/skimSelectionBits_OO_PP.h"
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -44,7 +46,7 @@ int main(int argc, char *argv[]) {
   bool DoGenLevel = CL.GetBool("DoGenLevel", false);
   bool IsData = CL.GetBool("IsData", false);
   bool IsPP = CL.GetBool("IsPP", false);
-  int Year = CL.GetInt("Year", 2025);
+  int Year = CL.GetInt("Year", 2024);
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
@@ -60,15 +62,12 @@ int main(int argc, char *argv[]) {
   bool DebugMode = CL.GetBool("DebugMode", false);
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
+  TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
   if (DoGenLevel == false) {
     if (IsPP == true && (Year == 2017)) // using 2017 pp data corrections
       TrackEfficiencyPP2017 = new TrkEff2017pp(false, TrackEfficiencyPath);
-    else {
-      cerr << endl;
-      cerr << "Error in track efficiency!" << endl;
-      cerr << "Data/Year combination (IsPP = " << IsPP << ", Year = " << Year << ") does not exist!" << endl;
-      cerr << endl;
-    }
+    else if (IsPP == true && (Year == 2024)) // using 2024 pp data corrections
+      TrackEfficiencyPP2024 = new TrkEff2024ppref(false, TrackEfficiencyPath);
   }
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
@@ -204,6 +203,9 @@ int main(int argc, char *argv[]) {
             continue;
         } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
+          // KD: apply track selection criteria that matches that used for efficiency files, if available
+          if ((IsPP == true && (Year == 2024)) && ApplyTrackRejection == true && MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
+            continue;
           if (ApplyTrackRejection == true && MTrack.PassChargedHadronPPStandardCuts(iTrack) == false)
             continue;
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
@@ -247,6 +249,8 @@ int main(int argc, char *argv[]) {
         if (DoGenLevel == false) {
           if (IsPP == true && (Year == 2017))
             TrackCorrection = TrackEfficiencyPP2017->getCorrection(trkPt, trkEta);
+          else if (IsPP == true && (Year == 2024))
+            TrackCorrection = TrackEfficiencyPP2024->getCorrection(trkPt, trkEta);
         } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)
@@ -270,6 +274,33 @@ int main(int argc, char *argv[]) {
           MChargedHadronRAA.AllndofVtx->push_back(MTrack.ndofVtx->at(iDebVtx));
           MChargedHadronRAA.AllptSumVtx->push_back(MTrack.ptSumVtx->at(iDebVtx));
         }
+      }
+
+      ////////////////////////////////////////
+      ///// Fill default selection bits //////
+      ////////////////////////////////////////
+
+      if (IsPP) {
+        // If PP sample
+        MChargedHadronRAA.passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
+        // FIXME: Check if the HF information is present in pp
+      } else {
+        // If OO sample
+        MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
+        // Fill HF selection bits
+        MChargedHadronRAA.passHFAND_6p06p0_Offline = checkHFANDCondition(MChargedHadronRAA, 6., 6., false);
+        MChargedHadronRAA.passHFOR_8p0_Offline = checkHFORCondition(MChargedHadronRAA, 8., false);
+
+        // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
+        // Therefore selection bits default to false
+        if (sampleType == 2 || sampleType == 4) {
+          MChargedHadronRAA.passHFAND_6p06p0_Online = false;
+          MChargedHadronRAA.passHFOR_8p0_Online = false;
+        } else {
+          MChargedHadronRAA.passHFAND_6p06p0_Online = checkHFANDCondition(MChargedHadronRAA, 6., 6., true);
+          MChargedHadronRAA.passHFOR_8p0_Online = checkHFORCondition(MChargedHadronRAA, 8., true);
+        }
+        
       }
 
       MChargedHadronRAA.FillEntry();

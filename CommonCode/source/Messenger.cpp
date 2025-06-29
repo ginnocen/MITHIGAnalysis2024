@@ -2376,6 +2376,34 @@ bool PPTrackTreeMessenger::PassChargedHadronPPStandardCuts(int index)
    return true;
 }
 
+bool PPTrackTreeMessenger::trackingEfficiency2024ppref_selection(int index)
+{
+   if(index >= nTrk)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+   //FIXME: currently this matches Vipul analysis
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(trkPt->at(index) > 10 && RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
+   return true;
+
+}
+
 ZDCTreeMessenger::ZDCTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());
@@ -3731,6 +3759,11 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
    Tree->SetBranchAddress("sampleType", &sampleType);
+   Tree->SetBranchAddress("passBaselineEventSelection", &passBaselineEventSelection);
+   Tree->SetBranchAddress("passHFAND_6p06p0_Offline", &passHFAND_6p06p0_Offline);
+   Tree->SetBranchAddress("passHFAND_6p06p0_Online", &passHFAND_6p06p0_Online);
+   Tree->SetBranchAddress("passHFOR_8p0_Offline", &passHFOR_8p0_Offline);
+   Tree->SetBranchAddress("passHFOR_8p0_Online", &passHFOR_8p0_Online);
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPhi", &trkPhi);
    Tree->SetBranchAddress("trkPtError", &trkPtError);
@@ -3858,6 +3891,11 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("Ncoll",                      &Ncoll, "Ncoll/F");
    Tree->Branch("leadingPtEta1p0_sel",        &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
    Tree->Branch("sampleType",                 &sampleType, "sampleType/I");
+   Tree->Branch("passBaselineEventSelection", &passBaselineEventSelection, "passBaselineEventSelection/O");
+   Tree->Branch("passHFAND_6p06p0_Offline",   &passHFAND_6p06p0_Offline, "passHFAND_6p06p0_Offline/O");
+   Tree->Branch("passHFAND_6p06p0_Online",    &passHFAND_6p06p0_Online, "passHFAND_6p06p0_Online/O");
+   Tree->Branch("passHFOR_8p0_Offline",       &passHFOR_8p0_Offline, "passHFOR_8p0_Offline/O");
+   Tree->Branch("passHFOR_8p0_Online",        &passHFOR_8p0_Online, "passHFOR_8p0_Online/O");
    Tree->Branch("trkPt",                      &trkPt);
    Tree->Branch("trkPhi",                     &trkPhi);
    Tree->Branch("trkPtError",                 &trkPtError);
@@ -3945,6 +3983,11 @@ void ChargedHadronRAATreeMessenger::Clear()
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
    sampleType = -1;
+   passBaselineEventSelection = false;
+   passHFAND_6p06p0_Offline = false;
+   passHFAND_6p06p0_Online = false;
+   passHFOR_8p0_Offline = false;
+   passHFOR_8p0_Online = false;
    trkPt->clear();
    trkPhi->clear();
    trkPtError->clear();

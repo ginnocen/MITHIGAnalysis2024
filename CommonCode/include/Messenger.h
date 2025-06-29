@@ -752,6 +752,7 @@ public:
    bool Initialize();
    bool GetEntry(int iEntry);
    bool PassChargedHadronPPStandardCuts(int index);
+   bool trackingEfficiency2024ppref_selection(int index);
 };
 
 class ZDCTreeMessenger
@@ -1038,7 +1039,13 @@ public:
    float Ncoll;
    float leadingPtEta1p0_sel;
    int sampleType;
-
+   
+   bool passBaselineEventSelection; // Store default event selection decision, excluding any HF cut, different for OO and PP
+   bool passHFAND_6p06p0_Offline;
+   bool passHFAND_6p06p0_Online;
+   bool passHFOR_8p0_Offline;
+   bool passHFOR_8p0_Online;
+   
    std::vector<float> *trkPt;
    std::vector<float> *trkPhi;
    std::vector<float> *trkPtError;
