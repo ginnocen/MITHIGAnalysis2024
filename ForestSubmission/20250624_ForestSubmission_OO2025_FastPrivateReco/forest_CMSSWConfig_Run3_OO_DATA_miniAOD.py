@@ -156,8 +156,8 @@ process.load('HeavyIonsAnalysis.EventAnalysis.hffilterPF_cfi')
 process.pAna = cms.EndPath(process.skimanalysis)
 
 process.HFAdcana = cms.EDAnalyzer("HFAdcToGeV",
-    # digiLabel = cms.untracked.InputTag("hcalDigis"),
-    digiLabel = cms.untracked.InputTag("simHcalUnsuppressedDigis","HFQIE10DigiCollection"),
+    digiLabel = cms.untracked.InputTag("hcalDigis"),
+    #digiLabel = cms.untracked.InputTag("simHcalUnsuppressedDigis","HFQIE10DigiCollection"),
     minimized = cms.untracked.bool(True),
     fillhf = cms.bool(False) # only turn this on when you have or know how to produce "towerMaker"
 )
