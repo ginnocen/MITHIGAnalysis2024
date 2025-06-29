@@ -3759,6 +3759,11 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
    Tree->SetBranchAddress("sampleType", &sampleType);
+   Tree->SetBranchAddress("passBaselineEventSelection", &passBaselineEventSelection);
+   Tree->SetBranchAddress("passHFAND_6p06p0_Offline", &passHFAND_6p06p0_Offline);
+   Tree->SetBranchAddress("passHFAND_6p06p0_Online", &passHFAND_6p06p0_Online);
+   Tree->SetBranchAddress("passHFOR_8p0_Offline", &passHFOR_8p0_Offline);
+   Tree->SetBranchAddress("passHFOR_8p0_Online", &passHFOR_8p0_Online);
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPhi", &trkPhi);
    Tree->SetBranchAddress("trkPtError", &trkPtError);
@@ -3886,6 +3891,11 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("Ncoll",                      &Ncoll, "Ncoll/F");
    Tree->Branch("leadingPtEta1p0_sel",        &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
    Tree->Branch("sampleType",                 &sampleType, "sampleType/I");
+   Tree->Branch("passBaselineEventSelection", &passBaselineEventSelection, "passBaselineEventSelection/O");
+   Tree->Branch("passHFAND_6p06p0_Offline",   &passHFAND_6p06p0_Offline, "passHFAND_6p06p0_Offline/O");
+   Tree->Branch("passHFAND_6p06p0_Online",    &passHFAND_6p06p0_Online, "passHFAND_6p06p0_Online/O");
+   Tree->Branch("passHFOR_8p0_Offline",       &passHFOR_8p0_Offline, "passHFOR_8p0_Offline/O");
+   Tree->Branch("passHFOR_8p0_Online",        &passHFOR_8p0_Online, "passHFOR_8p0_Online/O");
    Tree->Branch("trkPt",                      &trkPt);
    Tree->Branch("trkPhi",                     &trkPhi);
    Tree->Branch("trkPtError",                 &trkPtError);
@@ -3973,6 +3983,11 @@ void ChargedHadronRAATreeMessenger::Clear()
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
    sampleType = -1;
+   passBaselineEventSelection = false;
+   passHFAND_6p06p0_Offline = false;
+   passHFAND_6p06p0_Online = false;
+   passHFOR_8p0_Offline = false;
+   passHFOR_8p0_Online = false;
    trkPt->clear();
    trkPhi->clear();
    trkPtError->clear();
