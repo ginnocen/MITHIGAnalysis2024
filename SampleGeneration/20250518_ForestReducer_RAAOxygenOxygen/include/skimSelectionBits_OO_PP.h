@@ -29,7 +29,7 @@ bool getBaselinePPEventSel(ChargedHadronRAATreeMessenger &ch) {
     return true;
 }
 
-bool checkHFCondition(ChargedHadronRAATreeMessenger &ch, float HFE_min1, float HFE_min2, bool useOnlineHFE) {
+bool checkHFCondition(ChargedHadronRAATreeMessenger &ch, float HFE_min1, float HFE_min2, bool useOnlineHFE, bool acceptEmptyHFOnLowSide = true) {
     if (HFE_min1 < HFE_min2) {
         std::cout << "ERROR: HFE_min1 < HFE_min2 in HF selection bit check, please make sure that (HFE_min1 >= HFE_min2) !" << std::endl;
         return false;
@@ -44,7 +44,7 @@ bool checkHFCondition(ChargedHadronRAATreeMessenger &ch, float HFE_min1, float H
     } else {
         float hiHF = max(ch.HFEMaxPlus, ch.HFEMaxMinus);
         float loHF = min(ch.HFEMaxPlus, ch.HFEMaxMinus);
-        if(hiHF <= HFE_min1 || loHF <= HFE_min2) {
+        if(hiHF <= HFE_min1 || (loHF <= HFE_min2 && loHF != -1)) {
             return false;
         }
     }
