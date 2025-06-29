@@ -1,6 +1,6 @@
 void testhist(const char* th1dname = "hMult"){
 
-    vector<double> fracs = {1, 0.1, 0.02, 0};
+    vector<double> fracs = {0.6, 0.15, 0.15, 0};
     vector<string> files= {"template_OO.root", "template_SD.root", "template_DD.root","template_aO.root"};
 
 

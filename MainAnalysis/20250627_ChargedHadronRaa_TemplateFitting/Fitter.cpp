@@ -4,6 +4,7 @@
 #include <TH1D.h>
 #include <TH2D.h>
 #include <TH3D.h>
+#include <THStack.h>
 #include <TLegend.h>
 #include <TColor.h>
 #include <TTree.h>
@@ -100,7 +101,7 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         // define fractions
         for(int i = 0; i < fractions.size(); i++){
             std::string frac_name = "f_" + template_names[i]; std::string frac_title = "Fraction " + template_names[i];
-            RooRealVar* f = new RooRealVar(frac_name.c_str(), frac_title.c_str(), fractions[i], 0, 4.0);
+            RooRealVar* f = new RooRealVar(frac_name.c_str(), frac_title.c_str(), fractions[i], 0, 1.0);
             fractions_vars.push_back(f);
         }
             
@@ -110,7 +111,15 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         RooArgList fracList;
         for (auto* f : fractions_vars) fracList.add(*f);
         model = new RooAddPdf("model", "Model", pdfList, fracList, false);
-        result = model->fitTo(*dh_data, Save(), Range("fitRange"), Verbose(), PrintLevel(1),SumW2Error(true),Minimizer("Minuit2","Migrad"),Strategy(2),MaxCalls(1000000));
+        result = model->fitTo(*dh_data, 
+            Save(), 
+            Range("fitRange"), 
+            Verbose(), 
+            PrintLevel(1),
+            SumW2Error(true),
+            Minimizer("Minuit2","Migrad"),
+            Strategy(2),
+            MaxCalls(1000000));
         
         // obtain correct fractions
         double sum_fractions = 0;
@@ -122,7 +131,7 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
 
         for(int i = 0; i < fractions_vars.size(); i++){
             fractions[i] /= sum_fractions; // Normalize fractions
-            cout << "Unnormalized fractions " << template_names[i] << ": " << fractions_vars[i]->getVal() << endl;
+            //cout << "Unnormalized fractions " << template_names[i] << ": " << fractions_vars[i]->getVal() << endl;
             cout << "Normalized fractions " << template_names[i] << ": " << fractions[i] << endl;
         }
 
@@ -186,41 +195,34 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         gPad->SetRightMargin(0.05);
         gPad->SetBottomMargin(0);
         gPad->SetTopMargin(0.1);
-       
 
         std::vector<int> colors = {kRed+1, kBlue+1, kGreen+2, kMagenta+1, kCyan+1, kOrange+7, kViolet+1, kPink+1};
 
-        // Clone and scale templates by fitted fractions
+        // Clone and scale templates by fitted fractions, add to THStack
         std::vector<TH1D*> stacked_hists;
         double total = data->Integral();
+        TH1D* hsum = nullptr;
+        THStack* hstack = new THStack("hstack", "Stacked Fit Templates");
         for (size_t i = 0; i < templates.size(); ++i) {
             TH1D* h = (TH1D*)templates[i]->Clone(("stacked_"+template_names[i]).c_str());
             double frac = (i < fractions.size()) ? fractions[i] : 0.0;
             h->Scale(frac * total / h->Integral());
-            h->SetFillColor(colors[i % colors.size()]);
-            h->SetLineColor(colors[i % colors.size()]);
-            h->SetLineWidth(2);
-            h->SetFillStyle(1001);
-            h->SetMarkerStyle(0);
+            hstack->Add(h);
             stacked_hists.push_back(h);
+            if (i == 0) {
+                hsum = (TH1D*)h->Clone("hsum");
+            } else {
+                hsum->Add(h);
+            }
         }
 
-        // Draw stacked histograms
-        TH1D* hsum = (TH1D*)stacked_hists[0]->Clone("hsum");
-        hsum->SetStats(0);
-        hsum->Reset();
-        for (size_t i = 0; i < stacked_hists.size(); ++i) {
-        hsum->Add(stacked_hists[i]);
-        }
-        hsum->GetYaxis()->SetTitle("Events(Normalized)");
-        hsum->GetXaxis()->SetTitle(varname.c_str());
-        hsum->SetMinimum(1e-6);
-        hsum->SetMaximum(data->GetMaximum()*50);
-        hsum->Draw("HIST");
-        for (size_t i = 0; i < stacked_hists.size(); ++i) {
-            stacked_hists[i]->Draw("HIST SAME");
-        }
-        
+        // Draw the stack
+        hstack->Draw("HIST");
+        hstack->GetYaxis()->SetTitle("Events(Normalized)");
+        hstack->GetXaxis()->SetTitle(varname.c_str());
+        hstack->SetMinimum(1e-6);
+        hstack->SetMaximum(data->GetMaximum()*50);
+
         // Draw data points on top
         data->SetMarkerStyle(20);
         data->SetMarkerColor(kBlack);

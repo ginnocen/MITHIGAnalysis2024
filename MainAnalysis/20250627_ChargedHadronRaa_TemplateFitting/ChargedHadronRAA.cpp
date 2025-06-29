@@ -141,7 +141,7 @@ public:
         Bar.Print();
       }
       MChargedHadronRAA->GetEntry(i);
-      if(!eventSelection(MChargedHadronRAA, par)) {continue;}
+      //if(!eventSelection(MChargedHadronRAA, par)) {continue;}
       if(par.doQA){QA->AnalyzeEvent(MChargedHadronRAA, weight);}
 
       
