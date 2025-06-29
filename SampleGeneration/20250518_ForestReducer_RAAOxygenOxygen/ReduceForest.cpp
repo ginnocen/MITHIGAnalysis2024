@@ -19,6 +19,7 @@ using namespace std;
 #include "trackingEfficiency2023PbPb.h"
 
 #include "include/cent_OO_hijing_PF.h"
+#include "include/skimSelectionBits_OO_PP.h"
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -270,6 +271,33 @@ int main(int argc, char *argv[]) {
           MChargedHadronRAA.AllndofVtx->push_back(MTrack.ndofVtx->at(iDebVtx));
           MChargedHadronRAA.AllptSumVtx->push_back(MTrack.ptSumVtx->at(iDebVtx));
         }
+      }
+
+      ////////////////////////////////////////
+      ///// Fill default selection bits //////
+      ////////////////////////////////////////
+
+      if (IsPP) {
+        // If PP sample
+        MChargedHadronRAA.passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
+        // FIXME: Check if the HF information is present in pp
+      } else {
+        // If OO sample
+        MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
+        // Fill HF selection bits
+        MChargedHadronRAA.passHFAND_6p06p0_Offline = checkHFANDCondition(MChargedHadronRAA, 6., 6., false);
+        MChargedHadronRAA.passHFOR_8p0_Offline = checkHFORCondition(MChargedHadronRAA, 8., false);
+
+        // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
+        // Therefore selection bits default to false
+        if (sampleType == 2 || sampleType == 4) {
+          MChargedHadronRAA.passHFAND_6p06p0_Online = false;
+          MChargedHadronRAA.passHFOR_8p0_Online = false;
+        } else {
+          MChargedHadronRAA.passHFAND_6p06p0_Online = checkHFANDCondition(MChargedHadronRAA, 6., 6., true);
+          MChargedHadronRAA.passHFOR_8p0_Online = checkHFORCondition(MChargedHadronRAA, 8., true);
+        }
+        
       }
 
       MChargedHadronRAA.FillEntry();
