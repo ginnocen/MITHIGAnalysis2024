@@ -1,13 +1,11 @@
 #!/bin/bash
 source clean.sh
 
-PATHSAMPLE=/afs/cern.ch/work/g/ginnocen/public/OOsamples/Forests
-PATHSKIMSAMPLE=Output
+INPUT=/afs/cern.ch/work/g/ginnocen/public/OOsamples/Forests
+OUTPUT=Output
 
-rm -rf Output/
-mkdir -p Output/
-./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
-   --Output ${PATHSKIMSAMPLE}/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
+./Execute --Input $INPUT/HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
+   --Output $OUTPUT/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
    --DoGenLevel false \
    --Year 2024 \
    --IsData true \

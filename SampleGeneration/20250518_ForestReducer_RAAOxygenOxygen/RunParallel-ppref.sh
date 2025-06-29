@@ -4,8 +4,8 @@ DATE=$(date +%Y%m%d)
 source clean.sh
 
 MAXCORES=40
-NFILES=50 # files for ppref go 1-999
-# set =1 for agreed upon debug file for Vipul comparison, set =999 for full production
+NFILES=1 # number of files to cap the processing at, if -1 processess all files
+# set =1 for agreed upon debug file for Vipul comparison (we just used his first file in the directory HiForestMiniAOD_1.root), set =999 for full production
 
 NAME="${DATE}_Skim_ppref2024"
 PATHSAMPLE="/eos/cms/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000"
@@ -27,13 +27,18 @@ rm -rf $OUTPUT &> /dev/null
 mkdir -p $OUTPUT
 
 # Loop through each file in the file list
-for COUNTER in $(seq 1 $NFILES); do
-    FILEPATH="${PATHSAMPLE}/HiForestMiniAOD_${COUNTER}.root"
+COUNTER=0
+for FILEPATH in "$PATHSAMPLE"/HiForestMiniAOD*; do
 
-    echo ./ProcessLocalSkim-ppref.sh $FILEPATH $COUNTER $OUTPUT &
-    ./ProcessLocalSkim-ppref.sh $FILEPATH $COUNTER $OUTPUT &
+    if [ $NFILES -gt 0 ] && [ $COUNTER -ge $NFILES ]; then
+        break
+    fi
+
+    echo ./ProcessSinglepprefFile.sh $FILEPATH $COUNTER $OUTPUT &
+    ./ProcessSinglepprefFile.sh $FILEPATH $COUNTER $OUTPUT &
 
     wait_for_slot
+    ((COUNTER++))
 done
 wait
 

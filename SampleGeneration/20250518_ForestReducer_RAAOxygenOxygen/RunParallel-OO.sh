@@ -1,21 +1,21 @@
 #!/bin/bash
 DATE=$(date +%Y%m%d)
 
-#source clean.sh
+source clean.sh
 
-MAXCORES=40 # too many parallel cores can cause event loss, increase with caution!
-NFILES=50 # files for ppref go 1-999
+MAXCORES=20  # too many parallel cores can cause event loss, increase with caution!
+NFILES=-1 # number of files to cap the processing at, if -1 processess all files
 DOGENLEVEL=0
 ISDATA=0
-SAMPLETYPE=1 # 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
+SAMPLETYPE=0 # 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
 DEBUGMODE=1
 
+NAME="${DATE}_Skim_OOMCforJing"
+PATHSAMPLE="/eos/cms/store/group/phys_heavyions/wangj/Forest2025/MinBias_Pythia_Angantyr_OO_5362GeV/crab_HiForest_250520_Pythia_Angantyr_OO_OO_5362GeV_250626/250629_005206/0000"
 
-NAME="${DATE}_OOparallel_2025"
-PATHSAMPLE="/home/bakovacs/UPCAnalysisMIT2024/MITHIGAnalysis2024/SampleGeneration/20250518_ForestReducer_RAAOxygenOxygen/test_paralell"
 # set your output directory here
-OUTPUT="/home/bakovacs/UPCAnalysisMIT2024/MITHIGAnalysis2024/SampleGeneration/20250518_ForestReducer_RAAOxygenOxygen/test_parallel_out_$NAME"
-MERGEDOUTPUT="/home/bakovacs/UPCAnalysisMIT2024/MITHIGAnalysis2024/SampleGeneration/20250518_ForestReducer_RAAOxygenOxygen/test_parallel_out_$NAME.root"
+OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME"
+MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/$NAME.root"
 rm $MERGEDOUTPUT &> /dev/null
 
 # Function to monitor active processes
@@ -31,13 +31,18 @@ rm -rf $OUTPUT &> /dev/null
 mkdir -p $OUTPUT
 
 # Loop through each file in the file list
-for COUNTER in $(seq 1 $NFILES); do
-    FILEPATH="${PATHSAMPLE}/SD_parallel_test_${COUNTER}.root"
+COUNTER=0
+for FILEPATH in "$PATHSAMPLE"/HiForestMiniAOD*; do
 
-    echo ./ProcessSingleOOFile.sh $FILEPATH $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $DEBUGMODE &
-    ./ProcessSingleOOFile.sh $FILEPATH $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $DEBUGMODE &
+    if [ $NFILES -gt 0 ] && [ $COUNTER -ge $NFILES ]; then
+        break
+    fi
+
+    echo ./ProcessSingleOOFile.sh "$FILEPATH" $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $DEBUGMODE &
+    ./ProcessSingleOOFile.sh "$FILEPATH" $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $DEBUGMODE &
 
     wait_for_slot
+    ((COUNTER++))
 done
 wait
 
