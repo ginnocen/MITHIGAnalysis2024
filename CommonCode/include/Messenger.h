@@ -757,6 +757,7 @@ public:
    bool Initialize();
    bool GetEntry(int iEntry);
    bool PassChargedHadronPPStandardCuts(int index);
+   bool trackingEfficiency2024ppref_selection(int index);
 };
 
 class ZDCTreeMessenger
