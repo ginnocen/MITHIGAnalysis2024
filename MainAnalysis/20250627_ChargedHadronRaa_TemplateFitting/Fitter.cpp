@@ -207,6 +207,8 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
             TH1D* h = (TH1D*)templates[i]->Clone(("stacked_"+template_names[i]).c_str());
             double frac = (i < fractions.size()) ? fractions[i] : 0.0;
             h->Scale(frac * total / h->Integral());
+            h->SetFillColor(colors[i % colors.size()]);
+            h->SetLineColor(colors[i % colors.size()]);
             hstack->Add(h);
             stacked_hists.push_back(h);
             if (i == 0) {
@@ -352,6 +354,7 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
     delete cres;
 }
 
+    // 5. Fit diagnostics
     void fit_diagnostics(const std::string& filename = "fit_result.log") {
         std::ofstream log(filename);
         if (!log.is_open()) {
@@ -395,6 +398,95 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         log.close();
         }
 
+
+    // 6. Save relevant hists to root file
+    void save_all_histograms(const std::string& filename = "fit_outputs.root") {
+        TFile* fout = new TFile(filename.c_str(), "RECREATE");
+
+        // --- Save stacked fit result histograms ---
+        double total = data->Integral();
+        std::vector<int> colors = {kRed+1, kBlue+1, kGreen+2, kMagenta+1, kCyan+1, kOrange+7, kViolet+1, kPink+1};
+        std::vector<TH1D*> stacked_hists;
+        for (size_t i = 0; i < templates.size(); ++i) {
+            TH1D* h = (TH1D*)templates[i]->Clone(("stacked_"+template_names[i]).c_str());
+            double frac = (i < fractions.size()) ? fractions[i] : 0.0;
+            h->Scale(frac * total / h->Integral());
+            h->SetFillColor(colors[i % colors.size()]);
+            h->SetLineColor(colors[i % colors.size()]);
+            h->Write();
+            stacked_hists.push_back(h);
+        }
+        // Save the sum histogram
+        TH1D* hsum = (TH1D*)stacked_hists[0]->Clone("hsum");
+        hsum->Reset();
+        for (auto h : stacked_hists) hsum->Add(h);
+        hsum->Write();
+
+        // --- Save data histogram ---
+        if (data) data->Write("data");
+
+        // --- Save pulls as TH1D ---
+        if (model && dh_data) {
+            RooPlot* fitframe = x->frame();
+            dh_data->plotOn(fitframe, Name("data"), MarkerStyle(20), LineColor(kBlack));
+            model->plotOn(fitframe, Name("fit"), LineColor(kBlue+2), LineWidth(2));
+            RooHist* hpull = fitframe->pullHist("data", "fit");
+            int nbins = hpull->GetN();
+            TH1D* hpull_hist = new TH1D("pulls", "Pulls (Data - Fit) / Error", nbins, data->GetXaxis()->GetXmin(), data->GetXaxis()->GetXmax());
+            for (int i = 0; i < nbins; ++i) {
+                double x, y;
+                hpull->GetPoint(i, x, y);
+                hpull_hist->SetBinContent(i+1, y);
+            }
+            hpull_hist->Write();
+            delete fitframe;
+            delete hpull_hist;
+        }
+
+        // --- Save residuals as TGraph ---
+        int nbins = data->GetNbinsX();
+        std::vector<double> xvals, normresiduals;
+        for (int i = 1; i <= nbins; ++i) {
+            double xval = data->GetBinCenter(i);
+            double dataval = data->GetBinContent(i);
+            double fitval = hsum->GetBinContent(i);
+            xvals.push_back(xval);
+            if (dataval != 0)
+                normresiduals.push_back((dataval - fitval) / dataval);
+            else
+                normresiduals.push_back(0.0);
+        }
+        TGraph* gnormres = new TGraph(nbins);
+        for (int i = 0; i < nbins; ++i)
+            gnormres->SetPoint(i, xvals[i], normresiduals[i]);
+        gnormres->SetName("normalized_residuals");
+        gnormres->Write();
+        delete gnormres;
+
+        // --- Save ratio as TGraph ---
+        std::vector<double> ratios;
+        for (int i = 1; i <= nbins; ++i) {
+            double dataval = data->GetBinContent(i);
+            double fitval = hsum->GetBinContent(i);
+            if (dataval != 0)
+                ratios.push_back(fitval / dataval);
+            else
+                ratios.push_back(0);
+        }
+        TGraph* gratio = new TGraph(nbins);
+        for (int i = 0; i < nbins; ++i)
+            gratio->SetPoint(i, xvals[i], ratios[i]);
+        gratio->SetName("fit_over_data_ratio");
+        gratio->Write();
+        delete gratio;
+
+        // Clean up
+        for (auto h : stacked_hists) delete h;
+        delete hsum;
+        fout->Close();
+        delete fout;
+    }
+
     void plot_fit(const std::string& basename = "fit_result") {
         
         plot_distributions(basename + "_distributions.pdf");
@@ -402,6 +494,7 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         plot_pulls(basename + "_pulls.pdf");
         plot_residuals(basename + "_residuals.pdf");
         fit_diagnostics(basename + "_diagnostics.log");
+        save_all_histograms(basename + "_histograms.root");
     }
 
 
