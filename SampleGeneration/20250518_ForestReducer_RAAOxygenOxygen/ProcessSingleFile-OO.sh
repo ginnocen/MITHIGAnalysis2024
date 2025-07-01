@@ -8,6 +8,7 @@ ISDATA=${5}
 SAMPLETYPE=${6}
 DEBUGMODE=${7}
 INCLUDEPPSANDFSC=${8}
+SAVETRIGGERBITS=${9}
 
 
 file="$FILEPATH"
@@ -26,6 +27,7 @@ file="$FILEPATH"
    --sampleType $SAMPLETYPE \
    --DebugMode $DEBUGMODE \
    --includeFSCandPPSMode $INCLUDEPPSANDFSC \
+   --saveTriggerBitsMode $SAVETRIGGERBITS \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 wait
 

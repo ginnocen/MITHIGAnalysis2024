@@ -21,6 +21,7 @@ using namespace std;
 
 #include "include/cent_OO_hijing_PF.h"
 #include "include/skimSelectionBits_OO_PP.h"
+#include "include/parseFSCandPPSInfo.h"
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -63,6 +64,7 @@ int main(int argc, char *argv[]) {
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
   bool DebugMode = CL.GetBool("DebugMode", false);
   bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
+  int saveTriggerBitsMode = CL.GetInt("saveTriggerBitsMode", 0);
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
@@ -77,7 +79,7 @@ int main(int argc, char *argv[]) {
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
-  MChargedHadronRAA.SetBranch(&Tree, DebugMode, includeFSCandPPSMode);
+  MChargedHadronRAA.SetBranch(&Tree, DebugMode, includeFSCandPPSMode, saveTriggerBitsMode);
 
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
@@ -129,6 +131,8 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;
       MChargedHadronRAA.hiHF_pf = MEvent.hiHF_pf;
+      MChargedHadronRAA.hiHFPlus_pf = MEvent.hiHFPlus_pf;
+      MChargedHadronRAA.hiHFMinus_pf = MEvent.hiHFMinus_pf;
       if (IsPP == false)
         MChargedHadronRAA.hiBin = getHiBinFromhiHF(MEvent.hiHF_pf);
       else
@@ -184,16 +188,17 @@ int main(int argc, char *argv[]) {
       } // end of IsPP
       else { // !IsPP
         if (IsData == true) {
-          // NOTE: These are pO triggers
-          MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
-          MChargedHadronRAA.HLT_OxyZDC1nOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
-          MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
-          MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
-          MChargedHadronRAA.HLT_OxyNotMBHF2_v1= MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
-          MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
-          MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
-          MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
-          MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
+          if (saveTriggerBitsMode==2) { // pO triggers
+            MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
+            MChargedHadronRAA.HLT_OxyZDC1nOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
+            MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
+            MChargedHadronRAA.HLT_OxyNotMBHF2_v1= MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
+            MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
+            MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
+          }
         } // end of !IsPP && IsData
         else { // !IsPP && !IsData
         }
@@ -303,10 +308,7 @@ int main(int argc, char *argv[]) {
           std::cout << "ERROR: in the PPS tree of the forest n > PPSMAXN; skipping PPS information filling" << std::endl;
         } else {
           for (int iPPS = 0; iPPS < MPPS.n ; iPPS++) {
-            MChargedHadronRAA.PPS_zside->push_back(MPPS.zside[iPPS]);
-            MChargedHadronRAA.PPS_station->push_back(MPPS.station[iPPS]);
-            MChargedHadronRAA.PPS_x->push_back(MPPS.x[iPPS]);
-            MChargedHadronRAA.PPS_y->push_back(MPPS.y[iPPS]);
+            fillPPSInfo(MChargedHadronRAA, MPPS, iPPS);
           }
         }
 
@@ -315,30 +317,7 @@ int main(int argc, char *argv[]) {
           std::cout << "ERROR: in the FSC tree of the forest n > FSCMAXN; skipping FSC information filling" << std::endl;
         } else {
           for (int iFSC = 0; iFSC < MFSC.n ; iFSC++) {
-            MChargedHadronRAA.FSC_zside->push_back(MFSC.zside[iFSC]);
-            MChargedHadronRAA.FSC_section->push_back(MFSC.section[iFSC]);
-            MChargedHadronRAA.FSC_channel->push_back(MFSC.channel[iFSC]);
-
-            MChargedHadronRAA.FSC_adcTs0->push_back(MFSC.adcTs0[iFSC]);
-            MChargedHadronRAA.FSC_adcTs1->push_back(MFSC.adcTs1[iFSC]);
-            MChargedHadronRAA.FSC_adcTs2->push_back(MFSC.adcTs2[iFSC]);
-            MChargedHadronRAA.FSC_adcTs3->push_back(MFSC.adcTs3[iFSC]);
-            MChargedHadronRAA.FSC_adcTs4->push_back(MFSC.adcTs4[iFSC]);
-            MChargedHadronRAA.FSC_adcTs5->push_back(MFSC.adcTs5[iFSC]);
-
-            MChargedHadronRAA.FSC_chargefCTs0->push_back(MFSC.chargefCTs0[iFSC]);
-            MChargedHadronRAA.FSC_chargefCTs1->push_back(MFSC.chargefCTs1[iFSC]);
-            MChargedHadronRAA.FSC_chargefCTs2->push_back(MFSC.chargefCTs2[iFSC]);
-            MChargedHadronRAA.FSC_chargefCTs3->push_back(MFSC.chargefCTs3[iFSC]);
-            MChargedHadronRAA.FSC_chargefCTs4->push_back(MFSC.chargefCTs4[iFSC]);
-            MChargedHadronRAA.FSC_chargefCTs5->push_back(MFSC.chargefCTs5[iFSC]);
-
-            MChargedHadronRAA.FSC_tdcTs0->push_back(MFSC.tdcTs0[iFSC]);
-            MChargedHadronRAA.FSC_tdcTs1->push_back(MFSC.tdcTs1[iFSC]);
-            MChargedHadronRAA.FSC_tdcTs2->push_back(MFSC.tdcTs2[iFSC]);
-            MChargedHadronRAA.FSC_tdcTs3->push_back(MFSC.tdcTs3[iFSC]);
-            MChargedHadronRAA.FSC_tdcTs4->push_back(MFSC.tdcTs4[iFSC]);
-            MChargedHadronRAA.FSC_tdcTs5->push_back(MFSC.tdcTs5[iFSC]);
+            fillFSCInfo(MChargedHadronRAA, MFSC, iFSC);
           }
         }
       }

@@ -86,6 +86,10 @@ bool HiEventTreeMessenger::Initialize()
    if(Tree->GetBranch("hiEvtPlanes"))   Tree->SetBranchAddress("hiEvtPlanes", &hiEvtPlanes);
    if(Tree->GetBranch("hiHF_pf"))       Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
    else                                 hiHF_pf = 0.;
+   if(Tree->GetBranch("hiHFPlus_pf"))   Tree->SetBranchAddress("hiHFPlus_pf", &hiHFPlus_pf);
+   else                                 hiHFPlus_pf = 0.;
+   if(Tree->GetBranch("hiHFMinus_pf"))  Tree->SetBranchAddress("hiHFMinus_pf", &hiHFMinus_pf);
+   else                                 hiHFMinus_pf = 0.;
    if(Tree->GetBranch("Ncoll"))         Tree->SetBranchAddress("Ncoll", &Ncoll);
    else                                 Ncoll = 0.;
    if(Tree->GetBranch("Npart"))         Tree->SetBranchAddress("Npart", &Npart);
@@ -3756,16 +3760,16 @@ bool DzeroUPCTreeMessenger::FillEntry()
    return true;
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, bool Debug, bool includeFSCandPPS)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
 {
    Initialized = false;
    WriteMode = false;
 
    Tree = (TTree *)File.Get(TreeName.c_str());
-   Initialize(Debug, includeFSCandPPS);
+   Initialize(Debug, includeFSCandPPS, saveTriggerBits);
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName, bool Debug, bool includeFSCandPPS)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
 {
    Initialized = false;
    WriteMode = false;
@@ -3774,15 +3778,15 @@ ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::s
       Tree = (TTree *)File->Get(TreeName.c_str());
    else
       Tree = nullptr;
-   Initialize(Debug, includeFSCandPPS);
+   Initialize(Debug, includeFSCandPPS, saveTriggerBits);
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree, bool Debug, bool includeFSCandPPS)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
 {
    Initialized = false;
    WriteMode = false;
 
-   Initialize(ChargedHadRAATree, Debug, includeFSCandPPS);
+   Initialize(ChargedHadRAATree, Debug, includeFSCandPPS, saveTriggerBits);
 }
 
 ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
@@ -3824,46 +3828,45 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
       }
 
       if (includeFSCandPPSMode) {
-         delete PPS_zside;
-         delete PPS_station;
-         delete PPS_x;
-         delete PPS_y;
+         delete PPSStation0M_x;
+         delete PPSStation0M_y;
+         delete PPSStation2M_x;
+         delete PPSStation2M_y;
 
-         delete FSC_zside;
-         delete FSC_section;
-         delete FSC_channel;
+         delete FSC2topM_adc;
+         delete FSC2topM_chargefC;
+         delete FSC2topM_tdc;
 
-         delete FSC_adcTs0;
-         delete FSC_adcTs1;
-         delete FSC_adcTs2;
-         delete FSC_adcTs3;
-         delete FSC_adcTs4;
-         delete FSC_adcTs5;
+         delete FSC2bottomM_adc;
+         delete FSC2bottomM_chargefC;
+         delete FSC2bottomM_tdc;
 
-         delete FSC_chargefCTs0;
-         delete FSC_chargefCTs1;
-         delete FSC_chargefCTs2;
-         delete FSC_chargefCTs3;
-         delete FSC_chargefCTs4;
-         delete FSC_chargefCTs5;
+         delete FSC3bottomleftM_adc;
+         delete FSC3bottomleftM_chargefC;
+         delete FSC3bottomleftM_tdc;
 
-         delete FSC_tdcTs0;
-         delete FSC_tdcTs1;
-         delete FSC_tdcTs2;
-         delete FSC_tdcTs3;
-         delete FSC_tdcTs4;
-         delete FSC_tdcTs5;
+         delete FSC3bottomrightM_adc;
+         delete FSC3bottomrightM_chargefC;
+         delete FSC3bottomrightM_tdc;
+
+         delete FSC3topleftM_adc;
+         delete FSC3topleftM_chargefC;
+         delete FSC3topleftM_tdc;
+
+         delete FSC3toprightM_adc;
+         delete FSC3toprightM_chargefC;
+         delete FSC3toprightM_tdc;
       }
    }
 }
 
-bool ChargedHadronRAATreeMessenger::Initialize(TTree *ChargedHadRAATree, bool Debug, bool includeFSCandPPS)
+bool ChargedHadronRAATreeMessenger::Initialize(TTree *ChargedHadRAATree, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
 {
    Tree = ChargedHadRAATree;
-   return Initialize(Debug, includeFSCandPPS);
+   return Initialize(Debug, includeFSCandPPS, saveTriggerBits);
 }
 
-bool ChargedHadronRAATreeMessenger::Initialize(bool Debug, bool includeFSCandPPS)
+bool ChargedHadronRAATreeMessenger::Initialize(bool Debug, bool includeFSCandPPS, int saveTriggerBits)
 {
    if(Tree == nullptr)
       return false;
@@ -3871,6 +3874,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug, bool includeFSCandPPS
    Initialized = true;
    DebugMode = Debug;
    includeFSCandPPSMode = includeFSCandPPS;
+   saveTriggerBitsMode = saveTriggerBits;
    trkPt = nullptr;
    trkPhi = nullptr;
    trkPtError = nullptr;
@@ -3919,6 +3923,8 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug, bool includeFSCandPPS
    Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
    Tree->SetBranchAddress("mMaxL1HFAdcMinus", &mMaxL1HFAdcMinus);
    Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
+   Tree->SetBranchAddress("hiHFPlus_pf", &hiHFPlus_pf);
+   Tree->SetBranchAddress("hiHFMinus_pf", &hiHFMinus_pf);
    Tree->SetBranchAddress("Npart", &Npart);
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
@@ -3929,15 +3935,17 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug, bool includeFSCandPPS
    Tree->SetBranchAddress("passHFOR_8p0_Offline", &passHFOR_8p0_Offline);
    Tree->SetBranchAddress("passHFOR_8p0_Online", &passHFOR_8p0_Online);
 
-   Tree->SetBranchAddress("HLT_OxyZeroBias_v1",                &HLT_OxyZeroBias_v1);
-   Tree->SetBranchAddress("HLT_OxyZDC1nOR_v1",                 &HLT_OxyZDC1nOR_v1);
-   Tree->SetBranchAddress("HLT_OxySingleMuOpen_NotMBHF2OR_v1", &HLT_OxySingleMuOpen_NotMBHF2OR_v1);
-   Tree->SetBranchAddress("HLT_OxySingleJet8_ZDC1nAsymXOR_v1", &HLT_OxySingleJet8_ZDC1nAsymXOR_v1);
-   Tree->SetBranchAddress("HLT_OxyNotMBHF2_v1",                &HLT_OxyNotMBHF2_v1);
-   Tree->SetBranchAddress("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1", &HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1);
-   Tree->SetBranchAddress("HLT_OxyZeroBias_MinPixelCluster400_v1", &HLT_OxyZeroBias_MinPixelCluster400_v1);
-   Tree->SetBranchAddress("HLT_MinimumBiasHF_OR_BptxAND_v1",   &HLT_MinimumBiasHF_OR_BptxAND_v1);
-   Tree->SetBranchAddress("HLT_MinimumBiasHF_AND_BptxAND_v1",  &HLT_MinimumBiasHF_AND_BptxAND_v1);
+   if (saveTriggerBitsMode == 2) { // pO HLT bits
+      Tree->SetBranchAddress("HLT_OxyZeroBias_v1",                &HLT_OxyZeroBias_v1);
+      Tree->SetBranchAddress("HLT_OxyZDC1nOR_v1",                 &HLT_OxyZDC1nOR_v1);
+      Tree->SetBranchAddress("HLT_OxySingleMuOpen_NotMBHF2OR_v1", &HLT_OxySingleMuOpen_NotMBHF2OR_v1);
+      Tree->SetBranchAddress("HLT_OxySingleJet8_ZDC1nAsymXOR_v1", &HLT_OxySingleJet8_ZDC1nAsymXOR_v1);
+      Tree->SetBranchAddress("HLT_OxyNotMBHF2_v1",                &HLT_OxyNotMBHF2_v1);
+      Tree->SetBranchAddress("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1", &HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1);
+      Tree->SetBranchAddress("HLT_OxyZeroBias_MinPixelCluster400_v1", &HLT_OxyZeroBias_MinPixelCluster400_v1);
+      Tree->SetBranchAddress("HLT_MinimumBiasHF_OR_BptxAND_v1",   &HLT_MinimumBiasHF_OR_BptxAND_v1);
+      Tree->SetBranchAddress("HLT_MinimumBiasHF_AND_BptxAND_v1",  &HLT_MinimumBiasHF_AND_BptxAND_v1);
+   }
 
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPhi", &trkPhi);
@@ -3985,65 +3993,63 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug, bool includeFSCandPPS
    }
 
    if (includeFSCandPPSMode) {
-      PPS_zside = nullptr;
-      PPS_station = nullptr;
-      PPS_x = nullptr;
-      PPS_y = nullptr;
+      PPSStation0M_x = nullptr;
+      PPSStation0M_y = nullptr;
+      PPSStation2M_x = nullptr;
+      PPSStation2M_y = nullptr;
 
-      FSC_zside = nullptr;
-      FSC_section = nullptr;
-      FSC_channel = nullptr;
+      FSC2topM_adc = nullptr;
+      FSC2topM_chargefC = nullptr;
+      FSC2topM_tdc = nullptr;
 
-      FSC_adcTs0 = nullptr;
-      FSC_adcTs1 = nullptr;
-      FSC_adcTs2 = nullptr;
-      FSC_adcTs3 = nullptr;
-      FSC_adcTs4 = nullptr;
-      FSC_adcTs5 = nullptr;
+      FSC2bottomM_adc = nullptr;
+      FSC2bottomM_chargefC = nullptr;
+      FSC2bottomM_tdc = nullptr;
 
-      FSC_chargefCTs0 = nullptr;
-      FSC_chargefCTs1 = nullptr;
-      FSC_chargefCTs2 = nullptr;
-      FSC_chargefCTs3 = nullptr;
-      FSC_chargefCTs4 = nullptr;
-      FSC_chargefCTs5 = nullptr;
+      FSC3bottomleftM_adc = nullptr;
+      FSC3bottomleftM_chargefC = nullptr;
+      FSC3bottomleftM_tdc = nullptr;
 
-      FSC_tdcTs0 = nullptr;
-      FSC_tdcTs1 = nullptr;
-      FSC_tdcTs2 = nullptr;
-      FSC_tdcTs3 = nullptr;
-      FSC_tdcTs4 = nullptr;
-      FSC_tdcTs5 = nullptr;
+      FSC3bottomrightM_adc = nullptr;
+      FSC3bottomrightM_chargefC = nullptr;
+      FSC3bottomrightM_tdc = nullptr;
 
-      Tree->SetBranchAddress("PPS_zside", &PPS_zside);
-      Tree->SetBranchAddress("PPS_station", &PPS_station);
-      Tree->SetBranchAddress("PPS_x", &PPS_x);
-      Tree->SetBranchAddress("PPS_y", &PPS_y);
+      FSC3topleftM_adc = nullptr;
+      FSC3topleftM_chargefC = nullptr;
+      FSC3topleftM_tdc = nullptr;
 
-      Tree->SetBranchAddress("FSC_zside", &FSC_zside);
-      Tree->SetBranchAddress("FSC_section", &FSC_section);
-      Tree->SetBranchAddress("FSC_channel", &FSC_channel);
+      FSC3toprightM_adc = nullptr;
+      FSC3toprightM_chargefC = nullptr;
+      FSC3toprightM_tdc = nullptr;
+
+      Tree->SetBranchAddress("PPSStation0M_x", &PPSStation0M_x);
+      Tree->SetBranchAddress("PPSStation0M_y", &PPSStation0M_y);
+      Tree->SetBranchAddress("PPSStation2M_x", &PPSStation2M_x);
+      Tree->SetBranchAddress("PPSStation2M_y", &PPSStation2M_y);
       
-      Tree->SetBranchAddress("FSC_adcTs0", &FSC_adcTs0);
-      Tree->SetBranchAddress("FSC_adcTs1", &FSC_adcTs1);
-      Tree->SetBranchAddress("FSC_adcTs2", &FSC_adcTs2);
-      Tree->SetBranchAddress("FSC_adcTs3", &FSC_adcTs3);
-      Tree->SetBranchAddress("FSC_adcTs4", &FSC_adcTs4);
-      Tree->SetBranchAddress("FSC_adcTs5", &FSC_adcTs5);
+      Tree->SetBranchAddress("FSC2topM_adc", &FSC2topM_adc);
+      Tree->SetBranchAddress("FSC2topM_chargefC", &FSC2topM_chargefC);
+      Tree->SetBranchAddress("FSC2topM_tdc", &FSC2topM_tdc);
 
-      Tree->SetBranchAddress("FSC_chargefCTs0", &FSC_chargefCTs0);
-      Tree->SetBranchAddress("FSC_chargefCTs1", &FSC_chargefCTs1);
-      Tree->SetBranchAddress("FSC_chargefCTs2", &FSC_chargefCTs2);
-      Tree->SetBranchAddress("FSC_chargefCTs3", &FSC_chargefCTs3);
-      Tree->SetBranchAddress("FSC_chargefCTs4", &FSC_chargefCTs4);
-      Tree->SetBranchAddress("FSC_chargefCTs5", &FSC_chargefCTs5);
+      Tree->SetBranchAddress("FSC2bottomM_adc", &FSC2bottomM_adc);
+      Tree->SetBranchAddress("FSC2bottomM_chargefC", &FSC2bottomM_chargefC);
+      Tree->SetBranchAddress("FSC2bottomM_tdc", &FSC2bottomM_tdc);
 
-      Tree->SetBranchAddress("FSC_tdcTs0", &FSC_tdcTs0);
-      Tree->SetBranchAddress("FSC_tdcTs1", &FSC_tdcTs1);
-      Tree->SetBranchAddress("FSC_tdcTs2", &FSC_tdcTs2);
-      Tree->SetBranchAddress("FSC_tdcTs3", &FSC_tdcTs3);
-      Tree->SetBranchAddress("FSC_tdcTs4", &FSC_tdcTs4);
-      Tree->SetBranchAddress("FSC_tdcTs5", &FSC_tdcTs5);
+      Tree->SetBranchAddress("FSC3bottomleftM_adc", &FSC3bottomleftM_adc);
+      Tree->SetBranchAddress("FSC3bottomleftM_chargefC", &FSC3bottomleftM_chargefC);
+      Tree->SetBranchAddress("FSC3bottomleftM_tdc", &FSC3bottomleftM_tdc);
+
+      Tree->SetBranchAddress("FSC3bottomrightM_adc", &FSC3bottomrightM_adc);
+      Tree->SetBranchAddress("FSC3bottomrightM_chargefC", &FSC3bottomrightM_chargefC);
+      Tree->SetBranchAddress("FSC3bottomrightM_tdc", &FSC3bottomrightM_tdc);
+
+      Tree->SetBranchAddress("FSC3topleftM_adc", &FSC3topleftM_adc);
+      Tree->SetBranchAddress("FSC3topleftM_chargefC", &FSC3topleftM_chargefC);
+      Tree->SetBranchAddress("FSC3topleftM_tdc", &FSC3topleftM_tdc);
+      
+      Tree->SetBranchAddress("FSC3toprightM_adc", &FSC3toprightM_adc);
+      Tree->SetBranchAddress("FSC3toprightM_chargefC", &FSC3toprightM_chargefC);
+      Tree->SetBranchAddress("FSC3toprightM_tdc", &FSC3toprightM_tdc);
    }
 
    return true;
@@ -4065,7 +4071,7 @@ bool ChargedHadronRAATreeMessenger::GetEntry(int iEntry)
    return true;
 }
 
-bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug, bool includeFSCandPPS)
+bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
 {
    if(T == nullptr)
       return false;
@@ -4074,6 +4080,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug, bool include
    WriteMode = true;
    DebugMode = Debug;
    includeFSCandPPSMode = includeFSCandPPS;
+   saveTriggerBitsMode = saveTriggerBits;
 
    trkPt = new std::vector<float>();
    trkPhi = new std::vector<float>();
@@ -4125,6 +4132,8 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug, bool include
    Tree->Branch("mMaxL1HFAdcPlus",            &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
    Tree->Branch("mMaxL1HFAdcMinus",           &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
    Tree->Branch("hiHF_pf",                    &hiHF_pf, "hiHF_pf/F");
+   Tree->Branch("hiHFPlus_pf",                &hiHFPlus_pf, "hiHFPlus_pf/F");
+   Tree->Branch("hiHFMinus_pf",               &hiHFMinus_pf, "hiHFMinus_pf/F");
    Tree->Branch("Npart",                      &Npart, "Npart/F");
    Tree->Branch("Ncoll",                      &Ncoll, "Ncoll/F");
    Tree->Branch("leadingPtEta1p0_sel",        &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
@@ -4135,15 +4144,17 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug, bool include
    Tree->Branch("passHFOR_8p0_Offline",       &passHFOR_8p0_Offline, "passHFOR_8p0_Offline/O");
    Tree->Branch("passHFOR_8p0_Online",        &passHFOR_8p0_Online, "passHFOR_8p0_Online/O");
    
-   Tree->Branch("HLT_OxyZeroBias_v1",         &HLT_OxyZeroBias_v1, "HLT_OxyZeroBias_v1/O");
-   Tree->Branch("HLT_OxyZDC1nOR_v1",          &HLT_OxyZDC1nOR_v1, "HLT_OxyZDC1nOR_v1/O");
-   Tree->Branch("HLT_OxySingleMuOpen_NotMBHF2OR_v1",        &HLT_OxySingleMuOpen_NotMBHF2OR_v1, "HLT_OxySingleMuOpen_NotMBHF2OR_v1/O");
-   Tree->Branch("HLT_OxySingleJet8_ZDC1nAsymXOR_v1",        &HLT_OxySingleJet8_ZDC1nAsymXOR_v1, "HLT_OxySingleJet8_ZDC1nAsymXOR_v1/O");
-   Tree->Branch("HLT_OxyNotMBHF2_v1",         &HLT_OxyNotMBHF2_v1, "HLT_OxyNotMBHF2_v1/O");
-   Tree->Branch("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1",&HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1, "HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1/O");
-   Tree->Branch("HLT_OxyZeroBias_MinPixelCluster400_v1",                      &HLT_OxyZeroBias_MinPixelCluster400_v1, "HLT_OxyZeroBias_MinPixelCluster400_v1/O");
-   Tree->Branch("HLT_MinimumBiasHF_OR_BptxAND_v1",                            &HLT_MinimumBiasHF_OR_BptxAND_v1, "HLT_MinimumBiasHF_OR_BptxAND_v1/O");
-   Tree->Branch("HLT_MinimumBiasHF_AND_BptxAND_v1",                           &HLT_MinimumBiasHF_AND_BptxAND_v1, "HLT_MinimumBiasHF_AND_BptxAND_v1/O");
+   if (saveTriggerBitsMode == 2) { // pO HLT bits
+      Tree->Branch("HLT_OxyZeroBias_v1",                                         &HLT_OxyZeroBias_v1, "HLT_OxyZeroBias_v1/O");
+      Tree->Branch("HLT_OxyZDC1nOR_v1",                                          &HLT_OxyZDC1nOR_v1, "HLT_OxyZDC1nOR_v1/O");
+      Tree->Branch("HLT_OxySingleMuOpen_NotMBHF2OR_v1",                          &HLT_OxySingleMuOpen_NotMBHF2OR_v1, "HLT_OxySingleMuOpen_NotMBHF2OR_v1/O");
+      Tree->Branch("HLT_OxySingleJet8_ZDC1nAsymXOR_v1",                          &HLT_OxySingleJet8_ZDC1nAsymXOR_v1, "HLT_OxySingleJet8_ZDC1nAsymXOR_v1/O");
+      Tree->Branch("HLT_OxyNotMBHF2_v1",                                         &HLT_OxyNotMBHF2_v1, "HLT_OxyNotMBHF2_v1/O");
+      Tree->Branch("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1",&HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1, "HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1/O");
+      Tree->Branch("HLT_OxyZeroBias_MinPixelCluster400_v1",                      &HLT_OxyZeroBias_MinPixelCluster400_v1, "HLT_OxyZeroBias_MinPixelCluster400_v1/O");
+      Tree->Branch("HLT_MinimumBiasHF_OR_BptxAND_v1",                            &HLT_MinimumBiasHF_OR_BptxAND_v1, "HLT_MinimumBiasHF_OR_BptxAND_v1/O");
+      Tree->Branch("HLT_MinimumBiasHF_AND_BptxAND_v1",                           &HLT_MinimumBiasHF_AND_BptxAND_v1, "HLT_MinimumBiasHF_AND_BptxAND_v1/O");
+   }
 
    Tree->Branch("trkPt",                      &trkPt);
    Tree->Branch("trkPhi",                     &trkPhi);
@@ -4191,65 +4202,63 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug, bool include
    }
 
    if (includeFSCandPPSMode) {
-      PPS_zside = new std::vector<int>();
-      PPS_station = new std::vector<int>();
-      PPS_x = new std::vector<float>();
-      PPS_y = new std::vector<float>();
+      PPSStation0M_x = new std::vector<float>();
+      PPSStation0M_y = new std::vector<float>();
+      PPSStation2M_x = new std::vector<float>();
+      PPSStation2M_y = new std::vector<float>();
 
-      FSC_zside = new std::vector<int>();
-      FSC_section = new std::vector<int>();
-      FSC_channel = new std::vector<int>();
+      FSC2topM_adc = new std::vector<int>();
+      FSC2topM_chargefC = new std::vector<float>();
+      FSC2topM_tdc = new std::vector<int>();
 
-      FSC_adcTs0 = new std::vector<int>();
-      FSC_adcTs1 = new std::vector<int>();
-      FSC_adcTs2 = new std::vector<int>();
-      FSC_adcTs3 = new std::vector<int>();
-      FSC_adcTs4 = new std::vector<int>();
-      FSC_adcTs5 = new std::vector<int>();
+      FSC2bottomM_adc = new std::vector<int>();
+      FSC2bottomM_chargefC = new std::vector<float>();
+      FSC2bottomM_tdc = new std::vector<int>();
 
-      FSC_chargefCTs0 = new std::vector<float>();
-      FSC_chargefCTs1 = new std::vector<float>();
-      FSC_chargefCTs2 = new std::vector<float>();
-      FSC_chargefCTs3 = new std::vector<float>();
-      FSC_chargefCTs4 = new std::vector<float>();
-      FSC_chargefCTs5 = new std::vector<float>();
+      FSC3bottomleftM_adc = new std::vector<int>();
+      FSC3bottomleftM_chargefC = new std::vector<float>();
+      FSC3bottomleftM_tdc = new std::vector<int>();
 
-      FSC_tdcTs0 = new std::vector<int>();
-      FSC_tdcTs1 = new std::vector<int>();
-      FSC_tdcTs2 = new std::vector<int>();
-      FSC_tdcTs3 = new std::vector<int>();
-      FSC_tdcTs4 = new std::vector<int>();
-      FSC_tdcTs5 = new std::vector<int>();
+      FSC3bottomrightM_adc = new std::vector<int>();
+      FSC3bottomrightM_chargefC = new std::vector<float>();
+      FSC3bottomrightM_tdc = new std::vector<int>();
 
-      Tree->Branch("PPS_zside",               &PPS_zside);
-      Tree->Branch("PPS_station",             &PPS_station);
-      Tree->Branch("PPS_x",                   &PPS_x);
-      Tree->Branch("PPS_y",                   &PPS_y);
+      FSC3topleftM_adc = new std::vector<int>();
+      FSC3topleftM_chargefC = new std::vector<float>();
+      FSC3topleftM_tdc = new std::vector<int>();
 
-      Tree->Branch("FSC_zside",               &FSC_zside);
-      Tree->Branch("FSC_section",             &FSC_section);
-      Tree->Branch("FSC_channel",             &FSC_channel);
+      FSC3toprightM_adc = new std::vector<int>();
+      FSC3toprightM_chargefC = new std::vector<float>();
+      FSC3toprightM_tdc = new std::vector<int>();
 
-      Tree->Branch("FSC_adcTs0",              &FSC_adcTs0);
-      Tree->Branch("FSC_adcTs1",              &FSC_adcTs1);
-      Tree->Branch("FSC_adcTs2",              &FSC_adcTs2);
-      Tree->Branch("FSC_adcTs3",              &FSC_adcTs3);
-      Tree->Branch("FSC_adcTs4",              &FSC_adcTs4);
-      Tree->Branch("FSC_adcTs5",              &FSC_adcTs5);
+      Tree->Branch("PPSStation0M_x",          &PPSStation0M_x);
+      Tree->Branch("PPSStation0M_y",          &PPSStation0M_y);
+      Tree->Branch("PPSStation2M_x",          &PPSStation2M_x);
+      Tree->Branch("PPSStation2M_y",          &PPSStation2M_y);
 
-      Tree->Branch("FSC_chargefCTs0",         &FSC_chargefCTs0);
-      Tree->Branch("FSC_chargefCTs1",         &FSC_chargefCTs1);
-      Tree->Branch("FSC_chargefCTs2",         &FSC_chargefCTs2);
-      Tree->Branch("FSC_chargefCTs3",         &FSC_chargefCTs3);
-      Tree->Branch("FSC_chargefCTs4",         &FSC_chargefCTs4);
-      Tree->Branch("FSC_chargefCTs5",         &FSC_chargefCTs5);
+      Tree->Branch("FSC2topM_adc",            &FSC2topM_adc);
+      Tree->Branch("FSC2topM_chargefC",       &FSC2topM_chargefC);
+      Tree->Branch("FSC2topM_tdc",            &FSC2topM_tdc);
 
-      Tree->Branch("FSC_tdcTs0",              &FSC_tdcTs0);
-      Tree->Branch("FSC_tdcTs1",              &FSC_tdcTs1);
-      Tree->Branch("FSC_tdcTs2",              &FSC_tdcTs2);
-      Tree->Branch("FSC_tdcTs3",              &FSC_tdcTs3);
-      Tree->Branch("FSC_tdcTs4",              &FSC_tdcTs4);
-      Tree->Branch("FSC_tdcTs5",              &FSC_tdcTs5);
+      Tree->Branch("FSC2bottomM_adc",         &FSC2bottomM_adc);
+      Tree->Branch("FSC2bottomM_chargefC",    &FSC2bottomM_chargefC);
+      Tree->Branch("FSC2bottomM_tdc",         &FSC2bottomM_tdc);
+
+      Tree->Branch("FSC3bottomleftM_adc",     &FSC3bottomleftM_adc);
+      Tree->Branch("FSC3bottomleftM_chargefC",&FSC3bottomleftM_chargefC);
+      Tree->Branch("FSC3bottomleftM_tdc",     &FSC3bottomleftM_tdc);
+
+      Tree->Branch("FSC3bottomrightM_adc",    &FSC3bottomrightM_adc);
+      Tree->Branch("FSC3bottomrightM_chargefC",&FSC3bottomrightM_chargefC);
+      Tree->Branch("FSC3bottomrightM_tdc",    &FSC3bottomrightM_tdc);
+
+      Tree->Branch("FSC3topleftM_adc",        &FSC3topleftM_adc);
+      Tree->Branch("FSC3topleftM_chargefC",   &FSC3topleftM_chargefC);
+      Tree->Branch("FSC3topleftM_tdc",        &FSC3topleftM_tdc);
+
+      Tree->Branch("FSC3toprightM_adc",       &FSC3toprightM_adc);
+      Tree->Branch("FSC3toprightM_chargefC",  &FSC3toprightM_chargefC);
+      Tree->Branch("FSC3toprightM_tdc",       &FSC3toprightM_tdc);
    }
 
    return true;
@@ -4290,6 +4299,8 @@ void ChargedHadronRAATreeMessenger::Clear()
    mMaxL1HFAdcPlus = 0;
    mMaxL1HFAdcMinus = 0;
    hiHF_pf = 0.;
+   hiHFPlus_pf = 0.;
+   hiHFMinus_pf = 0.;
    Npart = 0.;
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
@@ -4300,15 +4311,17 @@ void ChargedHadronRAATreeMessenger::Clear()
    passHFOR_8p0_Offline = false;
    passHFOR_8p0_Online = false;
 
-   HLT_OxyZeroBias_v1 = false;
-   HLT_OxyZDC1nOR_v1 = false;
-   HLT_OxySingleMuOpen_NotMBHF2OR_v1 = false;
-   HLT_OxySingleJet8_ZDC1nAsymXOR_v1 = false;
-   HLT_OxyNotMBHF2_v1 = false;
-   HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1 = false;
-   HLT_OxyZeroBias_MinPixelCluster400_v1 = false;
-   HLT_MinimumBiasHF_OR_BptxAND_v1 = false;
-   HLT_MinimumBiasHF_AND_BptxAND_v1 = false;
+   if (saveTriggerBitsMode == 2) { // pO HLT bits
+      HLT_OxyZeroBias_v1 = false;
+      HLT_OxyZDC1nOR_v1 = false;
+      HLT_OxySingleMuOpen_NotMBHF2OR_v1 = false;
+      HLT_OxySingleJet8_ZDC1nAsymXOR_v1 = false;
+      HLT_OxyNotMBHF2_v1 = false;
+      HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1 = false;
+      HLT_OxyZeroBias_MinPixelCluster400_v1 = false;
+      HLT_MinimumBiasHF_OR_BptxAND_v1 = false;
+      HLT_MinimumBiasHF_AND_BptxAND_v1 = false;
+   }
 
    trkPt->clear();
    trkPhi->clear();
@@ -4345,35 +4358,34 @@ void ChargedHadronRAATreeMessenger::Clear()
    }
 
    if (includeFSCandPPSMode) {
-      PPS_zside->clear();
-      PPS_station->clear();
-      PPS_x->clear();
-      PPS_y->clear();
+      PPSStation0M_x->clear();
+      PPSStation0M_y->clear();
+      PPSStation2M_x->clear();
+      PPSStation2M_y->clear();
 
-      FSC_zside->clear();
-      FSC_section->clear();
-      FSC_channel->clear();
+      FSC2topM_adc->clear();
+      FSC2topM_chargefC->clear();
+      FSC2topM_tdc->clear();
 
-      FSC_adcTs0->clear();
-      FSC_adcTs1->clear();
-      FSC_adcTs2->clear();
-      FSC_adcTs3->clear();
-      FSC_adcTs4->clear();
-      FSC_adcTs5->clear();
+      FSC2bottomM_adc->clear();
+      FSC2bottomM_chargefC->clear();
+      FSC2bottomM_tdc->clear();
 
-      FSC_chargefCTs0->clear();
-      FSC_chargefCTs1->clear();
-      FSC_chargefCTs2->clear();
-      FSC_chargefCTs3->clear();
-      FSC_chargefCTs4->clear();
-      FSC_chargefCTs5->clear();
+      FSC3bottomleftM_adc->clear();
+      FSC3bottomleftM_chargefC->clear();
+      FSC3bottomleftM_tdc->clear();
 
-      FSC_tdcTs0->clear();
-      FSC_tdcTs1->clear();
-      FSC_tdcTs2->clear();
-      FSC_tdcTs3->clear();
-      FSC_tdcTs4->clear();
-      FSC_tdcTs5->clear();
+      FSC3bottomrightM_adc->clear();
+      FSC3bottomrightM_chargefC->clear();
+      FSC3bottomrightM_tdc->clear();
+
+      FSC3topleftM_adc->clear();
+      FSC3topleftM_chargefC->clear();
+      FSC3topleftM_tdc->clear();
+
+      FSC3toprightM_adc->clear();
+      FSC3toprightM_chargefC->clear();
+      FSC3toprightM_tdc->clear();
    }
 }
 /*
