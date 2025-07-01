@@ -861,6 +861,18 @@ void TriggerTreeMessenger::FillTriggerNames()
 {
    Name.clear();
    Decision.clear();
+
+   // 2025 pO run
+   Name.push_back("HLT_OxyZeroBias_v1");
+   Name.push_back("HLT_OxyZDC1nOR_v1");
+   Name.push_back("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
+   Name.push_back("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
+   Name.push_back("HLT_OxyNotMBHF2_v1");
+   Name.push_back("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
+   Name.push_back("HLT_OxyZeroBias_MinPixelCluster400_v1");
+   Name.push_back("HLT_MinimumBiasHF_OR_BptxAND_v1");
+   Name.push_back("HLT_MinimumBiasHF_AND_BptxAND_v1");
+
    // 2024 triggers UPCs
    Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
    Name.push_back("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
@@ -3818,6 +3830,17 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("passHFAND_6p06p0_Online", &passHFAND_6p06p0_Online);
    Tree->SetBranchAddress("passHFOR_8p0_Offline", &passHFOR_8p0_Offline);
    Tree->SetBranchAddress("passHFOR_8p0_Online", &passHFOR_8p0_Online);
+
+   Tree->SetBranchAddress("HLT_OxyZeroBias_v1",                &HLT_OxyZeroBias_v1);
+   Tree->SetBranchAddress("HLT_OxyZDC1nOR_v1",                 &HLT_OxyZDC1nOR_v1);
+   Tree->SetBranchAddress("HLT_OxySingleMuOpen_NotMBHF2OR_v1", &HLT_OxySingleMuOpen_NotMBHF2OR_v1);
+   Tree->SetBranchAddress("HLT_OxySingleJet8_ZDC1nAsymXOR_v1", &HLT_OxySingleJet8_ZDC1nAsymXOR_v1);
+   Tree->SetBranchAddress("HLT_OxyNotMBHF2_v1",                &HLT_OxyNotMBHF2_v1);
+   Tree->SetBranchAddress("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1", &HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1);
+   Tree->SetBranchAddress("HLT_OxyZeroBias_MinPixelCluster400_v1", &HLT_OxyZeroBias_MinPixelCluster400_v1);
+   Tree->SetBranchAddress("HLT_MinimumBiasHF_OR_BptxAND_v1",   &HLT_MinimumBiasHF_OR_BptxAND_v1);
+   Tree->SetBranchAddress("HLT_MinimumBiasHF_AND_BptxAND_v1",  &HLT_MinimumBiasHF_AND_BptxAND_v1);
+
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPhi", &trkPhi);
    Tree->SetBranchAddress("trkPtError", &trkPtError);
@@ -3960,6 +3983,17 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("passHFAND_6p06p0_Online",    &passHFAND_6p06p0_Online, "passHFAND_6p06p0_Online/O");
    Tree->Branch("passHFOR_8p0_Offline",       &passHFOR_8p0_Offline, "passHFOR_8p0_Offline/O");
    Tree->Branch("passHFOR_8p0_Online",        &passHFOR_8p0_Online, "passHFOR_8p0_Online/O");
+   
+   Tree->Branch("HLT_OxyZeroBias_v1",         &HLT_OxyZeroBias_v1, "HLT_OxyZeroBias_v1/O");
+   Tree->Branch("HLT_OxyZDC1nOR_v1",          &HLT_OxyZDC1nOR_v1, "HLT_OxyZDC1nOR_v1/O");
+   Tree->Branch("HLT_OxySingleMuOpen_NotMBHF2OR_v1",        &HLT_OxySingleMuOpen_NotMBHF2OR_v1, "HLT_OxySingleMuOpen_NotMBHF2OR_v1/O");
+   Tree->Branch("HLT_OxySingleJet8_ZDC1nAsymXOR_v1",        &HLT_OxySingleJet8_ZDC1nAsymXOR_v1, "HLT_OxySingleJet8_ZDC1nAsymXOR_v1/O");
+   Tree->Branch("HLT_OxyNotMBHF2_v1",         &HLT_OxyNotMBHF2_v1, "HLT_OxyNotMBHF2_v1/O");
+   Tree->Branch("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1",&HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1, "HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1/O");
+   Tree->Branch("HLT_OxyZeroBias_MinPixelCluster400_v1",                      &HLT_OxyZeroBias_MinPixelCluster400_v1, "HLT_OxyZeroBias_MinPixelCluster400_v1/O");
+   Tree->Branch("HLT_MinimumBiasHF_OR_BptxAND_v1",                            &HLT_MinimumBiasHF_OR_BptxAND_v1, "HLT_MinimumBiasHF_OR_BptxAND_v1/O");
+   Tree->Branch("HLT_MinimumBiasHF_AND_BptxAND_v1",                           &HLT_MinimumBiasHF_AND_BptxAND_v1, "HLT_MinimumBiasHF_AND_BptxAND_v1/O");
+
    Tree->Branch("trkPt",                      &trkPt);
    Tree->Branch("trkPhi",                     &trkPhi);
    Tree->Branch("trkPtError",                 &trkPtError);
@@ -4062,6 +4096,17 @@ void ChargedHadronRAATreeMessenger::Clear()
    passHFAND_6p06p0_Online = false;
    passHFOR_8p0_Offline = false;
    passHFOR_8p0_Online = false;
+
+   HLT_OxyZeroBias_v1 = false;
+   HLT_OxyZDC1nOR_v1 = false;
+   HLT_OxySingleMuOpen_NotMBHF2OR_v1 = false;
+   HLT_OxySingleJet8_ZDC1nAsymXOR_v1 = false;
+   HLT_OxyNotMBHF2_v1 = false;
+   HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1 = false;
+   HLT_OxyZeroBias_MinPixelCluster400_v1 = false;
+   HLT_MinimumBiasHF_OR_BptxAND_v1 = false;
+   HLT_MinimumBiasHF_AND_BptxAND_v1 = false;
+
    trkPt->clear();
    trkPhi->clear();
    trkPtError->clear();

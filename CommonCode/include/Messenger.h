@@ -1066,6 +1066,17 @@ public:
    bool passHFAND_6p06p0_Online;
    bool passHFOR_8p0_Offline;
    bool passHFOR_8p0_Online;
+
+   // Trigger bits
+   bool HLT_OxyZeroBias_v1;
+   bool HLT_OxyZDC1nOR_v1;
+   bool HLT_OxySingleMuOpen_NotMBHF2OR_v1;
+   bool HLT_OxySingleJet8_ZDC1nAsymXOR_v1;
+   bool HLT_OxyNotMBHF2_v1;
+   bool HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1;
+   bool HLT_OxyZeroBias_MinPixelCluster400_v1;
+   bool HLT_MinimumBiasHF_OR_BptxAND_v1;
+   bool HLT_MinimumBiasHF_AND_BptxAND_v1;
    
    std::vector<float> *trkPt;
    std::vector<float> *trkPhi;

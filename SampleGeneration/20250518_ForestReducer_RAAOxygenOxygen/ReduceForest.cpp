@@ -180,6 +180,16 @@ int main(int argc, char *argv[]) {
       } // end of IsPP
       else { // !IsPP
         if (IsData == true) {
+          // NOTE: These are pO triggers
+          MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
+          MChargedHadronRAA.HLT_OxyZDC1nOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
+          MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
+          MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
+          MChargedHadronRAA.HLT_OxyNotMBHF2_v1= MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
+          MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
+          MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
+          MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+          MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
         } // end of !IsPP && IsData
         else { // !IsPP && !IsData
         }
