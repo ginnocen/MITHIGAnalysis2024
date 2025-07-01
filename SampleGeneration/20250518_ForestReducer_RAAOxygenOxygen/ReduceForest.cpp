@@ -59,8 +59,10 @@ int main(int argc, char *argv[]) {
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   string PPSTreeName = CL.Get("PPSTree", "ppsanalyzer/ppstracks");
+  string FSCTreeName = CL.Get("FSCTree", "fscanalyzer/fscdigi");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
   bool DebugMode = CL.GetBool("DebugMode", false);
+  bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
@@ -75,7 +77,7 @@ int main(int argc, char *argv[]) {
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
-  MChargedHadronRAA.SetBranch(&Tree, DebugMode);
+  MChargedHadronRAA.SetBranch(&Tree, DebugMode, includeFSCandPPSMode);
 
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
@@ -89,6 +91,7 @@ int main(int argc, char *argv[]) {
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     TriggerTreeMessenger MTrigger(InputFile);      // hltanalysis/HltTree
     PPSTreeMessenger MPPS(InputFile, PPSTreeName); // ppsanalyzer/ppstracks
+    FSCTreeMessenger MFSC(InputFile, FSCTreeName); // fscanalyzer/fscdigi
     // METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
 
     int EntryCount = MEvent.GetEntries() * Fraction;
@@ -114,6 +117,7 @@ int main(int argc, char *argv[]) {
       MHFAdc.GetEntry(iE);
       MZDC.GetEntry(iE);
       MPPS.GetEntry(iE);
+      MFSC.GetEntry(iE);
       MTrigger.GetEntry(iE);
       // MMETFilter.GetEntry(iE);
 
@@ -287,7 +291,13 @@ int main(int argc, char *argv[]) {
           MChargedHadronRAA.AllndofVtx->push_back(MTrack.ndofVtx->at(iDebVtx));
           MChargedHadronRAA.AllptSumVtx->push_back(MTrack.ptSumVtx->at(iDebVtx));
         }
+      }
 
+      ////////////////////////////
+      /// PPS & FSC variables ////
+      ////////////////////////////
+
+      if (includeFSCandPPSMode) {
         // PPS variables
         if (MPPS.n > PPSMAXN) {
           std::cout << "ERROR: in the PPS tree of the forest n > PPSMAXN; skipping PPS information filling" << std::endl;
@@ -300,6 +310,37 @@ int main(int argc, char *argv[]) {
           }
         }
 
+        // FSC variables
+        if (MPPS.n > FSCMAXN) {
+          std::cout << "ERROR: in the FSC tree of the forest n > FSCMAXN; skipping FSC information filling" << std::endl;
+        } else {
+          for (int iFSC = 0; iFSC < MFSC.n ; iFSC++) {
+            MChargedHadronRAA.FSC_zside->push_back(MFSC.zside[iFSC]);
+            MChargedHadronRAA.FSC_section->push_back(MFSC.section[iFSC]);
+            MChargedHadronRAA.FSC_channel->push_back(MFSC.channel[iFSC]);
+
+            MChargedHadronRAA.FSC_adcTs0->push_back(MFSC.adcTs0[iFSC]);
+            MChargedHadronRAA.FSC_adcTs1->push_back(MFSC.adcTs1[iFSC]);
+            MChargedHadronRAA.FSC_adcTs2->push_back(MFSC.adcTs2[iFSC]);
+            MChargedHadronRAA.FSC_adcTs3->push_back(MFSC.adcTs3[iFSC]);
+            MChargedHadronRAA.FSC_adcTs4->push_back(MFSC.adcTs4[iFSC]);
+            MChargedHadronRAA.FSC_adcTs5->push_back(MFSC.adcTs5[iFSC]);
+
+            MChargedHadronRAA.FSC_chargefCTs0->push_back(MFSC.chargefCTs0[iFSC]);
+            MChargedHadronRAA.FSC_chargefCTs1->push_back(MFSC.chargefCTs1[iFSC]);
+            MChargedHadronRAA.FSC_chargefCTs2->push_back(MFSC.chargefCTs2[iFSC]);
+            MChargedHadronRAA.FSC_chargefCTs3->push_back(MFSC.chargefCTs3[iFSC]);
+            MChargedHadronRAA.FSC_chargefCTs4->push_back(MFSC.chargefCTs4[iFSC]);
+            MChargedHadronRAA.FSC_chargefCTs5->push_back(MFSC.chargefCTs5[iFSC]);
+
+            MChargedHadronRAA.FSC_tdcTs0->push_back(MFSC.tdcTs0[iFSC]);
+            MChargedHadronRAA.FSC_tdcTs1->push_back(MFSC.tdcTs1[iFSC]);
+            MChargedHadronRAA.FSC_tdcTs2->push_back(MFSC.tdcTs2[iFSC]);
+            MChargedHadronRAA.FSC_tdcTs3->push_back(MFSC.tdcTs3[iFSC]);
+            MChargedHadronRAA.FSC_tdcTs4->push_back(MFSC.tdcTs4[iFSC]);
+            MChargedHadronRAA.FSC_tdcTs5->push_back(MFSC.tdcTs5[iFSC]);
+          }
+        }
       }
 
       ////////////////////////////////////////

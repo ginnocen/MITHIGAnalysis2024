@@ -7,6 +7,7 @@ DOGENLEVEL=${4}
 ISDATA=${5}
 SAMPLETYPE=${6}
 DEBUGMODE=${7}
+INCLUDEPPSANDFSC=${8}
 
 
 file="$FILEPATH"
@@ -24,6 +25,7 @@ file="$FILEPATH"
    --PFTree particleFlowAnalyser/pftree \
    --sampleType $SAMPLETYPE \
    --DebugMode $DEBUGMODE \
+   --includeFSCandPPSMode $INCLUDEPPSANDFSC \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 wait
 
