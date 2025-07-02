@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
-  MChargedHadronRAA.SetBranch(&Tree, DebugMode, includeFSCandPPSMode, saveTriggerBitsMode);
+  MChargedHadronRAA.SetBranch(&Tree, saveTriggerBitsMode, DebugMode, includeFSCandPPSMode);
 
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());

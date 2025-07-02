@@ -3760,16 +3760,16 @@ bool DzeroUPCTreeMessenger::FillEntry()
    return true;
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Initialized = false;
    WriteMode = false;
 
    Tree = (TTree *)File.Get(TreeName.c_str());
-   Initialize(Debug, includeFSCandPPS, saveTriggerBits);
+   Initialize(saveTriggerBits, Debug, includeFSCandPPS);
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Initialized = false;
    WriteMode = false;
@@ -3778,15 +3778,15 @@ ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::s
       Tree = (TTree *)File->Get(TreeName.c_str());
    else
       Tree = nullptr;
-   Initialize(Debug, includeFSCandPPS, saveTriggerBits);
+   Initialize(saveTriggerBits, Debug, includeFSCandPPS);
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Initialized = false;
    WriteMode = false;
 
-   Initialize(ChargedHadRAATree, Debug, includeFSCandPPS, saveTriggerBits);
+   Initialize(ChargedHadRAATree, saveTriggerBits, Debug, includeFSCandPPS);
 }
 
 ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
@@ -3860,13 +3860,13 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
    }
 }
 
-bool ChargedHadronRAATreeMessenger::Initialize(TTree *ChargedHadRAATree, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
+bool ChargedHadronRAATreeMessenger::Initialize(TTree *ChargedHadRAATree, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Tree = ChargedHadRAATree;
-   return Initialize(Debug, includeFSCandPPS, saveTriggerBits);
+   return Initialize(saveTriggerBits, Debug, includeFSCandPPS);
 }
 
-bool ChargedHadronRAATreeMessenger::Initialize(bool Debug, bool includeFSCandPPS, int saveTriggerBits)
+bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    if(Tree == nullptr)
       return false;
@@ -4071,7 +4071,7 @@ bool ChargedHadronRAATreeMessenger::GetEntry(int iEntry)
    return true;
 }
 
-bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug, bool includeFSCandPPS, int saveTriggerBits)
+bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    if(T == nullptr)
       return false;

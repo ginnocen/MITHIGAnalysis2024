@@ -1196,15 +1196,15 @@ private:
    int saveTriggerBitsMode; // 0 for no HLT bits saved, 1 for HLT OO, 2 for HLT pO
 
 public:
-   ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false, bool includeFSCandPPS = false, int saveTriggerBits = 0);
-   ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false, bool includeFSCandPPS = false, int saveTriggerBits = 0);
-   ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree = nullptr, bool Debug = false, bool includeFSCandPPS = false, int saveTriggerBits = 0);
+   ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName = "tree", int saveTriggerBits = 0, bool Debug = false, bool includeFSCandPPS = false);
+   ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName = "tree", int saveTriggerBits = 0, bool Debug = false, bool includeFSCandPPS = false);
+   ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree = nullptr, int saveTriggerBits = 0, bool Debug = false, bool includeFSCandPPS = false);
    ~ChargedHadronRAATreeMessenger();
-   bool Initialize(TTree *ChargedHadRAATree, bool Debug = false, bool includeFSCandPPS = false, int saveTriggerBits = 0);
-   bool Initialize(bool Debug = false, bool includeFSCandPPS = false, int saveTriggerBits = 0);
+   bool Initialize(TTree *ChargedHadRAATree, int saveTriggerBits = 0, bool Debug = false, bool includeFSCandPPS = false);
+   bool Initialize(int saveTriggerBits = 0, bool Debug = false, bool includeFSCandPPS = false);
    int GetEntries();
    bool GetEntry(int iEntry);
-   bool SetBranch(TTree *T, bool Debug = false, bool includeFSCandPPS = false, int saveTriggerBits = 0);
+   bool SetBranch(TTree *T, int saveTriggerBits = 0, bool Debug = false, bool includeFSCandPPS = false);
    void Clear();
    //void CopyNonTrack(ChargedHadronRAATreeMessenger &M);
    bool FillEntry();
