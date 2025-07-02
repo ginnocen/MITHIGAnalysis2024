@@ -1,9 +1,7 @@
 void testhist(const char* th1dname = "hMult"){
 
-    vector<double> fracs = {0.6, 0.15, 0.15, 0};
+    vector<double> fracs = {0.8, 0.15, 0.05, 0};
     vector<string> files= {"template_OO.root", "template_SD.root", "template_DD.root","template_aO.root"};
-
-
 
     TH1D* hSum = nullptr;
 
@@ -23,7 +21,7 @@ void testhist(const char* th1dname = "hMult"){
         hclone->Scale(fracs[i]/h->Integral()); // Normalize the histogram
 
         if (!hSum) {
-            hSum = (TH1D*)hclone->Clone("hMult");
+            hSum = (TH1D*)hclone->Clone(th1dname);
             hSum->Reset(); // Reset the summed histogram
         }
         hSum->Add(hclone); // Add the cloned histogram to the sum
@@ -31,7 +29,7 @@ void testhist(const char* th1dname = "hMult"){
 
     }
 
-    hSum->SetName("hMult");
+    hSum->SetName(th1dname);
     //hSum->Scale(1.0 / hSum->Integral()); // Normalize the summed histogram
 
     if (hSum) {

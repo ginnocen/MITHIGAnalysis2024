@@ -199,19 +199,19 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         std::vector<int> colors = {kRed+1, kBlue+1, kGreen+2, kMagenta+1, kCyan+1, kOrange+7, kViolet+1, kPink+1};
 
         // Clone and scale templates by fitted fractions, add to THStack
-        std::vector<TH1D*> stacked_hists;
+        std::vector<std::pair<TH1D*, std::string>> stacked_hists;
         double total = data->Integral();
         TH1D* hsum = nullptr;
         THStack* hstack = new THStack("hstack", "Stacked Fit Templates");
-        for (size_t i = 0; i < templates.size(); ++i) {
+        for (int i = templates.size() - 1; i >= 0; --i) {
             TH1D* h = (TH1D*)templates[i]->Clone(("stacked_"+template_names[i]).c_str());
             double frac = (i < fractions.size()) ? fractions[i] : 0.0;
             h->Scale(frac * total / h->Integral());
             h->SetFillColor(colors[i % colors.size()]);
             h->SetLineColor(colors[i % colors.size()]);
             hstack->Add(h);
-            stacked_hists.push_back(h);
-            if (i == 0) {
+            stacked_hists.push_back({h, template_names[i]});
+            if (i == templates.size() - 1) {
                 hsum = (TH1D*)h->Clone("hsum");
             } else {
                 hsum->Add(h);
@@ -234,8 +234,8 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         // Legend
         auto legfit = new TLegend(0.6, 0.6, 0.88, 0.88);
         legfit->AddEntry(data, "Data", "lep");
-        for (size_t i = 0; i < stacked_hists.size(); ++i) {
-            legfit->AddEntry(stacked_hists[i], template_names[i].c_str(), "f");
+        for (int i = stacked_hists.size() - 1; i >= 0; --i) {
+            legfit->AddEntry(stacked_hists[i].first, stacked_hists[i].second.c_str(), "f");
         }
         legfit->Draw();
         legfit->SetLineWidth(0);
@@ -271,6 +271,7 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         gratio->GetXaxis()->SetTitle(varname.c_str());
         gratio->SetTitle("");
         gratio->SetMarkerStyle(20);
+        gratio->SetMarkerColor(kRed);
         gratio->SetMarkerSize(1);
         gratio->SetMinimum(0.9);
         gratio->SetMaximum(1.1);
@@ -286,7 +287,7 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
         cfit->SaveAs(filename.c_str());
 
         // Clean up
-        for (auto h : stacked_hists) delete h;
+        for (auto& h : stacked_hists) delete h.first;
         delete hsum;
         delete cfit;
     }
@@ -341,11 +342,13 @@ fit(vector<TH1D*> templates, vector<string> template_names, TH1D* data, vector<d
     TGraph* gnormres = new TGraph(nbins);
     for (int i = 0; i < nbins; ++i)
         gnormres->SetPoint(i, xvals[i], normresiduals[i]);
-    gnormres->SetTitle("Normalized Residuals;X;(Data - Fit)/Data");
+    //gnormres->SetTitle("Normalized Residuals;;(Data - Fit)/Data");
+    gnormres->GetYaxis()->SetTitle("Normalized Residuals (Data - Fit) / Data");
+    gnormres->GetXaxis()->SetTitle(varname.c_str());
     gnormres->SetMarkerStyle(20);
 
     TCanvas* cres = new TCanvas("cres", "Fit with Residuals", 2000, 1000);
-    cres->SetMargin(0.15, 0.05, 0.15, 0.05);
+    cres->SetMargin(0.15, 0.05, 0.15, 0.15);
     gnormres->Draw("AP");
     cres->SaveAs(filename.c_str());
     // Clean up
