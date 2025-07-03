@@ -1105,10 +1105,14 @@ public:
    int sampleType;
    
    bool passBaselineEventSelection; // Store default event selection decision, excluding any HF cut, different for OO and PP
-   bool passHFAND_6p06p0_Offline;
-   bool passHFAND_6p06p0_Online;
-   bool passHFOR_8p0_Offline;
-   bool passHFOR_8p0_Online;
+   bool passL1HFAND_16_Online;
+   bool passL1HFOR_16_Online;
+   bool passL1HFAND_14_Online;
+   bool passL1HFOR_14_Online;
+   bool passL1HFAND_16_Offline;
+   bool passL1HFOR_16_Offline;
+   bool passL1HFAND_14_Offline;
+   bool passL1HFOR_14_Offline;
 
    // Trigger bits
    bool HLT_OxyZeroBias_v1;

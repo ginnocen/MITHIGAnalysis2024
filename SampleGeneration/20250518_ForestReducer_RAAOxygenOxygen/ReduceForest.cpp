@@ -334,17 +334,23 @@ int main(int argc, char *argv[]) {
         // If OO sample
         MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
         // Fill HF selection bits
-        MChargedHadronRAA.passHFAND_6p06p0_Offline = checkHFANDCondition(MChargedHadronRAA, 6., 6., false);
-        MChargedHadronRAA.passHFOR_8p0_Offline = checkHFORCondition(MChargedHadronRAA, 8., false);
+        MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 15., 15., false);
+        MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 14., false);
+        MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 9.5, 9.5, false);
+        MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 9., false);
 
         // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
         // Therefore selection bits default to false
         if (sampleType == 2 || sampleType == 4) {
-          MChargedHadronRAA.passHFAND_6p06p0_Online = false;
-          MChargedHadronRAA.passHFOR_8p0_Online = false;
+          MChargedHadronRAA.passL1HFAND_16_Online = false;
+          MChargedHadronRAA.passL1HFOR_16_Online = false;
+          MChargedHadronRAA.passL1HFAND_14_Online = false;
+          MChargedHadronRAA.passL1HFOR_14_Online = false;
         } else {
-          MChargedHadronRAA.passHFAND_6p06p0_Online = checkHFANDCondition(MChargedHadronRAA, 6., 6., true);
-          MChargedHadronRAA.passHFOR_8p0_Online = checkHFORCondition(MChargedHadronRAA, 8., true);
+          MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
+          MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
+          MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
+          MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
         }
         
       }
