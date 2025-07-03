@@ -55,9 +55,6 @@ class fit{
     vector<double> xmin;
     vector<double> xmax;
 
-    // RooFit
-    //vector<RooRealVar*> x;
-    
     vector<RooRealVar*> xs;
     vector<RooDataHist*> dh_data;
     vector<vector<RooDataHist*>> dh_templates;
@@ -67,7 +64,7 @@ class fit{
     vector<RooFitResult*> result;
     
 
-fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*> data, vector<double> fractions, vector<string> varname, vector<double> xmin, vector<double> xmax) {
+    fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*> data, vector<double> fractions, vector<string> varname, vector<double> xmin, vector<double> xmax) {
         this->templates = templates;
         this->template_names = template_names;
         this->data = data;
@@ -94,10 +91,10 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
         for (const auto& n : varname) cat.defineType(n.c_str());
 
         // 2. Template PDFs for each channel
-        std::vector<std::vector<RooHistPdf*>> pdfs(varname.size());
+        vector<vector<RooHistPdf*>> pdfs(varname.size());
         for (size_t c = 0; c < varname.size(); ++c) {
             for (size_t t = 0; t < templates.size(); ++t) {
-                if (!templates[t][c]) { std::cerr << "Missing template " << t << "," << c << std::endl; exit(1); }
+                if (!templates[t][c]) { cerr << "Missing template " << t << "," << c << endl; exit(1); }
                 auto* dh = new RooDataHist(Form("dh_temp_%zu_%zu", t, c), "template", RooArgList(*xs[c]), templates[t][c]);
                 pdfs[c].push_back(new RooHistPdf(Form("pdf_%zu_%zu", t, c), "pdf", *xs[c], *dh));
             }
@@ -105,20 +102,20 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
 
         // 3. Fractions (N-1 free, last constrained)
         RooArgList fracList;
-        std::vector<RooRealVar*> fracVars;
+        vector<RooRealVar*> fracVars;
         for (size_t i = 0; i < template_names.size() - 1; ++i) {
             auto* f = new RooRealVar(Form("f_%s", template_names[i].c_str()), "Fraction", fractions[i], 0, 1);
             fracVars.push_back(f);
             fracList.add(*f);
         }
-        std::string formula = "1";
+        string formula = "1";
         for (size_t i = 0; i < template_names.size() - 1; ++i)
-            formula += "-@" + std::to_string(i);
+            formula += "-@" + to_string(i);
         auto* lastFrac = new RooFormulaVar(Form("f_%s", template_names.back().c_str()), formula.c_str(), fracList);
         fracList.add(*lastFrac);
 
         // 4. RooAddPdf for each channel
-        std::vector<RooAddPdf*> models;
+        vector<RooAddPdf*> models;
         for (size_t c = 0; c < varname.size(); ++c) {
             RooArgList pdfList;
             for (auto* p : pdfs[c]) pdfList.add(*p);
@@ -159,11 +156,11 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
         //    Minimizer("Minuit2","Migrad"),
         //    Strategy(2),
          //   MaxCalls(1000000));
-        std::cout << "Fit status: " << fitResult->status() << std::endl;
+        cout << "Fit status: " << fitResult->status() << endl;
 
 
         fractions.clear();
-        std::vector<double> fraction_errors;
+        vector<double> fraction_errors;
         for (int i = 0; i < fracList.getSize(); ++i) {
             RooAbsArg* arg = fracList.at(i);
             double val = 0, err = 0;
@@ -177,11 +174,11 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
             fractions.push_back(val);
             fraction_errors.push_back(err);
         }
-        std::cout << "Fitted fractions:" << std::endl;
+        cout << "Fitted fractions:" << endl;
         for (size_t i = 0; i < template_names.size(); ++i) {
-            std::cout << "  " << template_names[i]
+            cout << "  " << template_names[i]
                     << ": " << fractions[i]
-                    << " +/- " << fraction_errors[i] << std::endl;
+                    << " +/- " << fraction_errors[i] << endl;
         }
 
         this->xs = xs;
@@ -206,15 +203,15 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
     /////////////////////////////
 
    
-    void plot_distributions(const std::string& basename = "templates_vs_data") {
-        std::vector<int> colors = {kRed+1, kBlue+1, kGreen+2, kMagenta+1, kCyan+1, kOrange+7, kViolet+1, kPink+1};
+    void plot_distributions(const string& basename = "templates_vs_data") {
+        vector<int> colors = {kRed+1, kBlue+1, kGreen+2, kMagenta+1, kCyan+1, kOrange+7, kViolet+1, kPink+1};
 
         for (size_t c = 0; c < varname.size(); ++c) {
             TCanvas* c1 = new TCanvas(("c_templates_" + varname[c]).c_str(), ("Templates vs Data " + varname[c]).c_str(), 2000, 2000);
 
             // Prepare normalized templates and find the one with the highest maximum
-            std::vector<TH1D*> htemplates;
-            std::vector<double> maxvals;
+            vector<TH1D*> htemplates;
+            vector<double> maxvals;
             for (size_t t = 0; t < templates.size(); ++t) {
                 TH1D* h = (TH1D*)templates[t][c]->Clone(("template_norm_" + template_names[t] + "_" + varname[c]).c_str());
                 double tempInt = h->Integral();
@@ -276,8 +273,8 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
         }
     }
 
-    void plot_fit_results(const std::string& basename = "fit_result_with_ratio") {
-        std::vector<int> colors = {kRed+1, kBlue+1, kGreen+2, kMagenta+1, kCyan+1, kOrange+7, kViolet+1, kPink+1};
+    void plot_fit_results(const string& basename = "fit_result_with_ratio") {
+        vector<int> colors = {kRed+1, kBlue+1, kGreen+2, kMagenta+1, kCyan+1, kOrange+7, kViolet+1, kPink+1};
 
         for (size_t c = 0; c < varname.size(); ++c) {
             TCanvas* cfit = new TCanvas(("c_fit_" + varname[c]).c_str(), ("Fit Result with Ratio " + varname[c]).c_str(), 2000, 2000);
@@ -294,7 +291,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
             // Stack templates by fitted fractions
             double total = data[c]->Integral();
             THStack* hstack = new THStack(("hstack_" + varname[c]).c_str(), "Stacked Fit Templates");
-            std::vector<TH1D*> stacked_hists;
+            vector<TH1D*> stacked_hists;
             for (int t = templates.size() - 1; t >= 0; --t) {
                 TH1D* h = (TH1D*)templates[t][c]->Clone(("stacked_" + template_names[t] + "_" + varname[c]).c_str());
                 double frac = (t < fractions.size()) ? fractions[t] : 0.0;
@@ -342,7 +339,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
             for (auto h : stacked_hists) hsum->Add(h);
 
             int nbins = data[c]->GetNbinsX();
-            std::vector<double> xvals, ratios;
+            vector<double> xvals, ratios;
             for (int i = 1; i <= nbins; ++i) {
                 double xval = data[c]->GetBinCenter(i);
                 double dataval = data[c]->GetBinContent(i);
@@ -382,7 +379,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
     }
 
 
-   void plot_pulls_and_residuals(const std::string& basename = "fit") {
+   void plot_pulls_and_residuals(const string& basename = "fit") {
         for (size_t c = 0; c < varname.size(); ++c) {
             // Safety check
             if (c >= dh_data.size() || c >= model.size() || c >= data.size()) continue;
@@ -395,7 +392,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
             RooHist* hpull = fitframe->pullHist("data", "fit");
 
             int nbins = data[c]->GetNbinsX();
-            std::vector<double> xvals, normresiduals;
+            vector<double> xvals, normresiduals;
             double maxabs = 0;
             for (int i = 1; i <= nbins; ++i) {
                 double xval = data[c]->GetBinCenter(i);
@@ -407,7 +404,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
                 double resid = (dataval != 0) ? (dataval - fitval) / dataval : 0.0;
                 xvals.push_back(xval);
                 normresiduals.push_back(resid);
-                if (std::abs(resid) > maxabs) maxabs = std::abs(resid);
+                if (abs(resid) > maxabs) maxabs = abs(resid);
             }
 
             // Compute scaling factor to make max residual ~3
@@ -453,10 +450,10 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
 
     }
 
-    void write_fit_log(const std::string& logname = "fit_results.log") {
-        std::ofstream log(logname);
+    void write_fit_log(const string& logname = "fit_results.log") {
+        ofstream log(logname);
         if (!log.is_open()) {
-            std::cerr << "Could not open log file: " << logname << std::endl;
+            cerr << "Could not open log file: " << logname << endl;
             return;
         }
         log << "Fit Results Log\n";
@@ -487,7 +484,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
             int npar = cov.GetNrows();
             for (int i = 0; i < npar; ++i) {
                 for (int j = 0; j < npar; ++j)
-                    log << std::setw(12) << cov(i, j) << " ";
+                    log << setw(12) << cov(i, j) << " ";
                 log << "\n";
             }
 
@@ -496,7 +493,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
             const TMatrixDSym& corr = result[c]->correlationMatrix();
             for (int i = 0; i < npar; ++i) {
                 for (int j = 0; j < npar; ++j)
-                    log << std::setw(12) << corr(i, j) << " ";
+                    log << setw(12) << corr(i, j) << " ";
                 log << "\n";
             }
 
@@ -510,7 +507,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
                 double exp = model[c]->getVal(RooArgSet(*xs[c])) * data[c]->Integral();
                 if (err > 0) {
                     double pull = (obs - exp) / err;
-                    chi2 += std::pow((obs - exp) / err, 2);
+                    chi2 += pow((obs - exp) / err, 2);
                     pull_sum += pull;
                     pull_sum2 += pull * pull;
                     ndf++;
@@ -520,19 +517,19 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
             log << "  Chi2/NDF: " << chi2 << " / " << ndf << " = " << (ndf > 0 ? chi2/ndf : 0) << "\n";
             if (npull > 0) {
                 double pull_mean = pull_sum / npull;
-                double pull_rms = std::sqrt(pull_sum2 / npull - pull_mean * pull_mean);
+                double pull_rms = sqrt(pull_sum2 / npull - pull_mean * pull_mean);
                 log << "  Pull mean: " << pull_mean << ", Pull RMS: " << pull_rms << "\n";
             }
             log << "\n";
         }
         log.close();
-        std::cout << "Fit results written to " << logname << std::endl;
+        cout << "Fit results written to " << logname << endl;
     }
 
-    void write_histograms_to_root(const std::string& filename = "fit_histograms.root") {
+    void write_histograms_to_root(const string& filename = "fit_histograms.root") {
         TFile fout(filename.c_str(), "RECREATE");
         if (!fout.IsOpen()) {
-            std::cerr << "Could not open output file: " << filename << std::endl;
+            cerr << "Could not open output file: " << filename << endl;
             return;
         }
 
@@ -552,7 +549,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
         // Write fitted stacked histograms and pulls/residuals
         for (size_t c = 0; c < varname.size(); ++c) {
             double total = data[c]->Integral();
-            std::vector<TH1D*> stacked_hists;
+            vector<TH1D*> stacked_hists;
             for (int t = templates.size() - 1; t >= 0; --t) {
                 TH1D* h = (TH1D*)templates[t][c]->Clone(Form("fitted_%s_%s", template_names[t].c_str(), varname[c].c_str()));
                 double frac = (t < fractions.size()) ? fractions[t] : 0.0;
@@ -574,7 +571,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
 
                 // Compute pulls and residuals
                 double maxabs = 0;
-                std::vector<double> residuals;
+                vector<double> residuals;
                 for (int i = 1; i <= nbins; ++i) {
                     double obs = data[c]->GetBinContent(i);
                     double err = data[c]->GetBinError(i);
@@ -583,7 +580,7 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
                     double resid = (obs != 0) ? (obs - fitval) / obs : 0.0;
                     hpull->SetBinContent(i, pull);
                     residuals.push_back(resid);
-                    if (std::abs(resid) > maxabs) maxabs = std::abs(resid);
+                    if (abs(resid) > maxabs) maxabs = abs(resid);
                 }
                 // Scale residuals so max is ~3
                 double scale = (maxabs > 0) ? 3.0 / maxabs : 1.0;
@@ -601,17 +598,17 @@ fit(vector<vector<TH1D*>> templates, vector<string> template_names, vector<TH1D*
         }
 
         fout.Close();
-        std::cout << "Histograms (including pulls and residuals) written to " << filename << std::endl;
+        cout << "Histograms (including pulls and residuals) written to " << filename << endl;
     }
 
-    void processfit(const std::string& name){
+    void processfit(const string& name){
 
         write_fit_log(name + "_fit_results.log");
         write_histograms_to_root(name + "_fit_histograms.root");
         plot_distributions(name + "_templates_vs_data");        
         plot_fit_results(name + "_fit_result");
         plot_pulls_and_residuals(name + "_fit_pulls_residuals");
-        std::cout << "Fit processing complete. Results saved." << std::endl;
+        cout << "Fit processing complete. Results saved." << endl;
 
     }
     
@@ -641,7 +638,7 @@ int main(int argc, char *argv[]) {
     for (int c = 0; c < M; ++c) {
         TH1D* h = (TH1D*)dataF->Get(branches[c].c_str());
         if (h) data[c] = (TH1D*)h->Clone();
-        else std::cerr << "ERROR: Could not find data histogram '" << branches[c] << "' in file " << dataFile << std::endl;
+        else cerr << "ERROR: Could not find data histogram '" << branches[c] << "' in file " << dataFile << endl;
     }
 
     // Load templates: [template][channel]
@@ -651,7 +648,7 @@ int main(int argc, char *argv[]) {
         for (int c = 0; c < M; ++c) {
             TH1D* h = (TH1D*)f->Get(branches[c].c_str());
             if (h) templates[t][c] = (TH1D*)h->Clone();
-            else std::cerr << "ERROR: Could not find template histogram '" << branches[c] << "' in file " << templateFiles[t] << std::endl;
+            else cerr << "ERROR: Could not find template histogram '" << branches[c] << "' in file " << templateFiles[t] << endl;
         }
         //f->Close();
     }
@@ -666,9 +663,7 @@ int main(int argc, char *argv[]) {
         xmax
     );
     a.simultaneousFit();
-    a.plot_distributions("t");
-    a.plot_fit_results("fit_result");
-    a.plot_pulls_and_residuals("hello");
+    a.processfit("fit_results");
 
     return 0;
 }
