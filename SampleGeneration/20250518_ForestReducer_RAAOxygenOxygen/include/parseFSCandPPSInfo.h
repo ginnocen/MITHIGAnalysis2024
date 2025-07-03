@@ -1,3 +1,6 @@
+#ifndef CHARGEDHADRONRAAFSCANDPPSPARSEFUNCS
+#define CHARGEDHADRONRAAFSCANDPPSPARSEFUNCS
+
 void fillFSCInfo(ChargedHadronRAATreeMessenger &MCH, FSCTreeMessenger &MFSC, int n) {
     if (MFSC.zside[n] != -1 || MFSC.section[n] != 1) { return; }
 
@@ -141,3 +144,5 @@ void fillPPSInfo(ChargedHadronRAATreeMessenger &MCH, PPSTreeMessenger &MPPS, int
         MCH.PPSStation2M_y->push_back(MPPS.y[n]);
     }
 }
+
+#endif

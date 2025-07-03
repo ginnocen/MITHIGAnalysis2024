@@ -313,7 +313,7 @@ int main(int argc, char *argv[]) {
         }
 
         // FSC variables
-        if (MPPS.n > FSCMAXN) {
+        if (MFSC.n > FSCMAXN) {
           std::cout << "ERROR: in the FSC tree of the forest n > FSCMAXN; skipping FSC information filling" << std::endl;
         } else {
           for (int iFSC = 0; iFSC < MFSC.n ; iFSC++) {
