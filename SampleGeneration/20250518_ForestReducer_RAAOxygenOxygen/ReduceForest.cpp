@@ -18,6 +18,7 @@ using namespace std;
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
 #include "trackingEfficiency2024ppref.h"
+#include "trackingEfficiency2025OO.h"
 
 #include "include/cent_OO_hijing_PF.h"
 #include "include/skimSelectionBits_OO_PP.h"
@@ -68,11 +69,14 @@ int main(int argc, char *argv[]) {
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
+  TrkEff2025OO *TrackEfficiencyOO2025 = nullptr;
   if (DoGenLevel == false) {
     if (IsPP == true && (Year == 2017)) // using 2017 pp data corrections
       TrackEfficiencyPP2017 = new TrkEff2017pp(false, TrackEfficiencyPath);
     else if (IsPP == true && (Year == 2024)) // using 2024 pp data corrections
-      TrackEfficiencyPP2024 = new TrkEff2024ppref(false, TrackEfficiencyPath);
+      TrackEfficiencyPP2024 = new TrkEff2024ppref(true, TrackEfficiencyPath);
+    else if (IsPP == false && (Year == 2025)) // Using OO MC corrections
+      TrackEfficiencyOO2025 = new TrkEff2025OO(true, TrackEfficiencyPath);
   }
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
@@ -172,6 +176,12 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.PVFilter = MSkim.PVFilter;
       MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
       MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
+      MChargedHadronRAA.VZ_pf = MEvent.vz;
+
+      // event selection correction calculation
+      double eventCorrection = 1.0;
+      // TODO: KD to implement, right now weight fills as 1
+      MChargedHadronRAA.eventWeight = eventCorrection;
 
       if (IsPP == true) {
         if (IsData == true) {
@@ -228,8 +238,8 @@ int main(int argc, char *argv[]) {
           // KD: apply track selection criteria that matches that used for efficiency files, if available
           if ((IsPP == true && (Year == 2024)) && ApplyTrackRejection == true && MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
             continue;
-          if (ApplyTrackRejection == true && MTrack.PassChargedHadronPPStandardCuts(iTrack) == false)
-            continue;
+          if ((IsPP == false && (Year == 2025)) && ApplyTrackRejection == true && MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
+            continue; // Using ppref track selection for OO for now
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
             leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
           }
@@ -273,6 +283,8 @@ int main(int argc, char *argv[]) {
             TrackCorrection = TrackEfficiencyPP2017->getCorrection(trkPt, trkEta);
           else if (IsPP == true && (Year == 2024))
             TrackCorrection = TrackEfficiencyPP2024->getCorrection(trkPt, trkEta);
+          else if (IsPP == false && (Year == 2025))
+            TrackCorrection = TrackEfficiencyOO2025->getCorrection(trkPt, trkEta);
         } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)
