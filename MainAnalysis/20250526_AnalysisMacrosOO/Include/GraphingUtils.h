@@ -2,6 +2,8 @@
 #include <TLegend.h>
 #include <TGraph.h>
 #include <TCanvas.h>
+#include "TStyle.h"
+
 //Took a lot of these default setups from Jings /xjjlibs/xjjroot/xjjrootuti.h
 namespace PlotUtils {
 

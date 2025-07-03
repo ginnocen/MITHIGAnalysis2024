@@ -6,22 +6,19 @@
 using namespace std;
 
 struct EfficiencyResults {
-    vector<double> x;
-    vector<double> EfficiencyHijingAND;
-    vector<double> EfficiencyHijingOR;
+    vector<float> HFEmax_Online_min1;
+    vector<float> HFEmax_Online_min2;
+    vector<float> HFEmax_Offline_min1;
+    vector<float> HFEmax_Offline_min2;
 
-    vector<double> EfficiencySDAND;
-    vector<double> EfficiencySDOR;
+    vector<float> EfficiencyHijing;
+    vector<float> EfficiencySD;
+    vector<float> EfficiencyDD;
+    vector<float> EfficiencyAO;
+    vector<float> Purity;
 
-    vector<double> BKGRejectionAND;
-    vector<double> BKGRejectionOR;
-
-    vector<double> PurityAND;
-    vector<double> PurityOR;
     float xsec_SD;
     float xsec_DD;
     float xsec_had;
-    int N;
-    float xMax;
-    int coincidence;
+    float xsec_alphaO;
 };
