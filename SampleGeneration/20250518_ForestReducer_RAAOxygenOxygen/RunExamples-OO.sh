@@ -13,7 +13,7 @@ OUTPUT=/data00/kdeverea/OOsamples/Skims/temp.root
    --Fraction 1.0 \
    --ApplyTriggerRejection true \
    --ApplyEventRejection true \
-   --ApplyTrackRejection false \
+   --ApplyTrackRejection true \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType -1 \
    --DebugMode true \
