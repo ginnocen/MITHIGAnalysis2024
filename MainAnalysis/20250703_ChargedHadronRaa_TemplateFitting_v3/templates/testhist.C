@@ -1,7 +1,9 @@
-void testhist(const char* th1dname = "hMult"){
+void testhist(const char* th1dname = "hTrkEta"){
 
     vector<double> fracs = {0.8, 0.15, 0.05, 0};
     vector<string> files= {"template_OO.root", "template_SD.root", "template_DD.root","template_aO.root"};
+
+
 
     TH1D* hSum = nullptr;
 
