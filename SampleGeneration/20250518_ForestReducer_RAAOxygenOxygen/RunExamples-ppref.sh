@@ -1,19 +1,21 @@
 #!/bin/bash
 source clean.sh
 
-INPUT=/afs/cern.ch/work/g/ginnocen/public/OOsamples/Forests
-OUTPUT=Output
+DATE=$(date +%Y%m%d)
 
-./Execute --Input $INPUT/HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
-   --Output $OUTPUT/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root \
+INPUT=/eos/cms/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000/HiForestMiniAOD_1.root
+OUTPUT=/data00/kdeverea/OOsamples/Skims/${DATE}_Skim_ppref2024_debug_noTrackEventSelection.root
+
+./Execute --Input $INPUT \
+   --Output $OUTPUT \
    --DoGenLevel false \
    --Year 2024 \
    --IsData true \
    --IsPP true \
    --Fraction 1.0 \
    --ApplyTriggerRejection true \
-   --ApplyEventRejection true \
-   --ApplyTrackRejection true \
+   --ApplyEventRejection false \
+   --ApplyTrackRejection false \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType -1 \
    --DebugMode true \
