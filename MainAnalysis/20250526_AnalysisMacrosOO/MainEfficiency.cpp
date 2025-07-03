@@ -18,6 +18,8 @@
 #include "EfficiencyResults.h"
 #include "ReturnEfficiency.h"
 #include "Plot.h"
+#include <chrono> // Add this at the top
+
 
 using namespace std;
 
@@ -37,6 +39,7 @@ void getEfficiencyParameters(CommandLine CL, Parameters &par) {
 }
 
 int main(int argc, char *argv[]) {
+
   CommandLine CL(argc, argv);
   Parameters par;
   FileNames filename;
@@ -52,6 +55,18 @@ int main(int argc, char *argv[]) {
   cout << "Background File AlphaO: " << filename.BackgroundFiles[2] << endl;
   
   getEfficiencyParameters(CL, par);
+
+  vector<double> min1_vector = CL.GetDoubleVector("HFEmax_Offline_min1_vector");
+  vector<double> min2_vector = CL.GetDoubleVector("HFEmax_Offline_min2_vector");
+
+  vector<Parameters> par_vector = {};
+
+   for (int i = 0; i < min1_vector.size(); i++) {
+    par.HFEmax_Offline_min1 = min1_vector[i];
+    par.HFEmax_Offline_min2 = min2_vector[i];
+    par_vector.push_back(par);
+  }
+
   bool IsHijing = true; 
 
   int HFEMmax_Online_min1 = static_cast<int>(par.HFEmax_Online_min1);
@@ -60,12 +75,20 @@ int main(int argc, char *argv[]) {
   // 1) With Given Inputs, the efficiency will automatically be calculated
   TFile *file_signal = TFile::Open(filename.SignalFile.c_str());
   ChargedHadronRAATreeMessenger *ch = new ChargedHadronRAATreeMessenger(file_signal, "Tree");
-  calculateEfficiency(ch,par,IsHijing,-1);
+  cout << "/////// IMPORTANT EFFICIENCY INFORMATION HERE ///////" << endl;
+  for (Parameters &par : par_vector) {
+    par.HFEmax_Online_min1 = HFEMmax_Online_min1;
+    par.HFEmax_Online_min2 = HFEMmax_Online_min2;
+    calculateEfficiency(ch,par,IsHijing,-1);
+  }
+  cout << "/////// IMPORTANT EFFICIENCY INFORMATION DONE ///////" << endl;
+  cout << "/////// CALCULATING PURITY  ///////" << endl;
 
-  // 2)The code would scan up to 20 GeV to save it in a root file named
-  vector<Parameters> par_vector = {};
+  // 2)The code would scan save it in a root file named
+
+
   // Choose 5-7 values centered around the initial HFEmax_Offline_min1, but not below 0
-  int nPoints = 7; // Number of points (odd for symmetry)
+  /*int nPoints = 7; // Number of points (odd for symmetry)
   int center = static_cast<int>(par.HFEmax_Offline_min1);
   int step = 1; // Step size between points
 
@@ -77,13 +100,15 @@ int main(int argc, char *argv[]) {
     par.HFEmax_Offline_min2 = i;
     par_vector.push_back(par);
     par.HFEmax_Offline_min1 = i;
-    par.HFEmax_Offline_min2 = 0;
+    par.HFEmax_Offline_min2 = -2;
     par_vector.push_back(par);
-  }
-  std::string outfolder = "Data/";
-  std::string rootfilename = WriteEfficiencyRoot(filename, par_vector, -1, outfolder, Form("%iOR_"));
+  }*/
+  std::string dataoutfolder = "Data/";
+  std::string rootfilename = WriteEfficiencyRoot(filename, par_vector, -1, dataoutfolder, Form("%iOR_"));
  // std::string rootfilename = "Data/EfficiencyData/EfficiencyPurityData_N49_trkpt-1_OfflineAND.root";
   EfficiencyResults res = ReturnEfficiency_root(rootfilename.c_str());
+
+  cout << "/////// CALCULATING PURITY DONE ///////" << endl;
 
   // 3) The code would plot the efficiency and purity
   HistVar1D hvar = {

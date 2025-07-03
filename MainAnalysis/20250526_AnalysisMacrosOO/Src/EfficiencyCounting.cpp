@@ -36,12 +36,12 @@ for (int i = 0; i < ch->GetEntries(); ++i) {
 double ratio = static_cast<double>(evtPassedSel) / denominator;
 
 cout << "Parameters used for counting:" << endl;
-cout << "HFEmax_Online_min1: " << par.HFEmax_Online_min1 << " GeV" << endl;
-cout << "HFEmax_Online_min2: " << par.HFEmax_Online_min2 << " GeV" << endl;
+cout << "HFEmax_Online_min1: " << par.HFEmax_Online_min1 << " adc" << endl;
+cout << "HFEmax_Online_min2: " << par.HFEmax_Online_min2 << " adc" << endl;
 cout << "HFEmax_Offline_min1: " << par.HFEmax_Offline_min1 << " GeV" << endl;  
 cout << "HFEmax_Offline_min2: " << par.HFEmax_Offline_min2 << " GeV" << endl;
 
-cout << "Selection Efficiency: " << ratio*100 << endl;
+cout << "Selection Efficiency: " << ratio*100 << "(%)" << endl;
 cout << "Number of Event: " << evtTotal << endl;
 cout << "Number of Event after ptCuts: " << trkPtCut << ": " << denominator << endl;
 cout << "Number of event after cuts : " << evtPassedSel << endl;

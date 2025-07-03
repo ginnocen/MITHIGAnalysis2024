@@ -73,12 +73,10 @@ void drawROCmultiShapes(
 
             // Label logic
             std::string label;
-            if (min2 == 0)
-                label = Form("%.1f OR", res.HFEmax_Offline_min1[j]);
-            else if (min1 == min2)
+            if (min1 == min2)
                 label = Form("%.1f AND", res.HFEmax_Offline_min1[j]);
-            else
-                label = Form("%.1f", res.HFEmax_Offline_min1[j]);
+            else if (min2 != min1)
+                label = Form("%.1f OR", res.HFEmax_Offline_min1[j]);
             legendEntries.push_back({ptGraph, label});
         }
     }
