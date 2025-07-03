@@ -8,7 +8,7 @@
 using namespace std;
 void drawROCmultiShapes(
     const vector<EfficiencyResults>& resultsVec,
-    const vector<vector<double>>& effVecs,
-    const vector<vector<double>>& purityVecs,
+    const vector<vector<float>>& effVecs,
+    const vector<vector<float>>& purityVecs,
     const vector<string>& labels,
-    const HistVar1D& hvar); 
+    const HistVar1D& hvar);

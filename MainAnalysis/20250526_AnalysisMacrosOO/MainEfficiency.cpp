@@ -17,6 +17,7 @@
 #include "EfficiencyWrite.h"
 #include "EfficiencyResults.h"
 #include "ReturnEfficiency.h"
+#include "Plot.h"
 
 using namespace std;
 
@@ -63,25 +64,37 @@ int main(int argc, char *argv[]) {
 
   // 2)The code would scan up to 20 GeV to save it in a root file named
   vector<Parameters> par_vector = {};
-  /*for (int i = 0; i < par.HFEmax_Offline_min1 + 10; i++){
+  // Choose 5-7 values centered around the initial HFEmax_Offline_min1, but not below 0
+  int nPoints = 7; // Number of points (odd for symmetry)
+  int center = static_cast<int>(par.HFEmax_Offline_min1);
+  int step = 1; // Step size between points
+
+  int start = std::max(0, center - (nPoints / 2) * step);
+  int end = center + (nPoints / 2) * step;
+
+  for (int i = start; i <= end; i += step) {
     par.HFEmax_Offline_min1 = i;
     par.HFEmax_Offline_min2 = i;
-  }*/
- // std::string outfolder = "Data/EfficiencyData/";
- // std::string rootfilename = WriteEfficiencyRoot(filename, par_vector, -1, outfolder, Form("%iOR_"));
-  std::string rootfilename = "Data/EfficiencyData/EfficiencyPurityData_N49_trkpt-1_OfflineAND.root";
+    par_vector.push_back(par);
+    par.HFEmax_Offline_min1 = i;
+    par.HFEmax_Offline_min2 = 0;
+    par_vector.push_back(par);
+  }
+  std::string outfolder = "Data/";
+  std::string rootfilename = WriteEfficiencyRoot(filename, par_vector, -1, outfolder, Form("%iOR_"));
+ // std::string rootfilename = "Data/EfficiencyData/EfficiencyPurityData_N49_trkpt-1_OfflineAND.root";
   EfficiencyResults res = ReturnEfficiency_root(rootfilename.c_str());
 
   // 3) The code would plot the efficiency and purity
   HistVar1D hvar = {
-      "ROC curve with mMaxL1HFAdc selection",   // histTitle
+      "ROC curve with HFEMax selection",   // histTitle
       "HF Energy ADC",         // xLabel
       "Events rejected from selection",         // yLabel
       100,                    // nbin
-      0,                    // xmin
-      90,                    // xmax
-      0,                    // ymin
-      1,                    // ymax
+      0.8,                    // xmin
+      1,                    // xmax
+      0.8,                    // ymin
+      1.1,                    // ymax
       "Plots/",             // outFolderName
       "TESTINGTESTING"            // outFileName
   };
@@ -91,6 +104,11 @@ int main(int argc, char *argv[]) {
   vector<vector<float>> purityVecs;
   vector<float> vPurity;
 
+  res.xsec_SD = par.xsec_SD;
+  res.xsec_DD = par.xsec_DD;
+  res.xsec_had = par.xsec_had;
+  res.xsec_alphaO = par.xsec_alphaO;
+
   for (int j = 0; j < resultsVec.size(); j++){
     EfficiencyResults res = resultsVec[j];
     for (int i = 0; i < effVecs[j].size(); i++) {
@@ -99,7 +117,11 @@ int main(int argc, char *argv[]) {
             {res.EfficiencyHijing[i], res.EfficiencySD[i], res.EfficiencyDD[i], res.EfficiencyAO[i]},
             {1, 1, 1, 0}); // Assuming background fraction is 1 for all
         vPurity.push_back(Purity);
-        cout << "i = " << i << endl;
+        cout << "" << i << endl;
+        cout << "HFEmax_Online_min1: " << res.HFEmax_Online_min1[i] << endl;
+        cout << "HFEmax_Online_min2: " << res.HFEmax_Online_min2[i] << endl;
+        cout << "HFEmax_Offline_min1: " << res.HFEmax_Offline_min1[i] << endl;
+        cout << "HFEmax_Offline_min2: " << res.HFEmax_Offline_min2[i] << endl;
         cout << "EfficiencyHijing: " << res.EfficiencyHijing[i] << endl;
         cout << "EfficiencySD: " << res.EfficiencySD[i] << endl;
         cout << "EfficiencyDD: " << res.EfficiencyDD[i] << endl;
@@ -109,11 +131,7 @@ int main(int argc, char *argv[]) {
     purityVecs.push_back(vPurity);
 }
 
-  /*drawROCmultiShapes(
-    const vector<EfficiencyResults>& resultsVec,
-    const vector<vector<double>>& effVecs,
-    const vector<vector<double>>& purityVecs,
-    const vector<string>& labels,
-    const HistVar1D& hvar); */
+  vector<string> labels = {"Efficiency and Purity"};
+  drawROCmultiShapes(resultsVec, effVecs, purityVecs, labels, hvar);
   return 0;
 }

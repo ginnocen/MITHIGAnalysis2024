@@ -1,32 +1,14 @@
 source clean.sh
 
 # Choose dataset here
-DATASET="Hijing"   # or "StarlightSD", "StarlightDD", etc.
-# Define base path
-PATHSKIM="/data00/OOsamples/Skims/"
-
-# Choose input file based on dataset
-if [[ $DATASET == "Hijing" ]]; then
-    INPUT="$PATHSKIM/skim_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root"
-elif [[ $DATASET == "StarlightSD" ]]; then
-    INPUT="$PATHSKIM/skim_HiForest_250514_Starlight_SingleDiffraction_OO_5362GeV_1505PR47944.root"
-elif [[ $DATASET == "StarlightDD" ]]; then
-    INPUT="$PATHSKIM/skim_HiForest_250514_Starlight_DoubleDiffraction_OO_5362GeV_1505PR47944.root"
-else
-    echo "Unknown dataset: $DATASET"
-    exit 1
-fi
-
-OUTPUTANALYSIS=output.root
-
 VZMAX=15.0
 NVTXMIN=1
 CCFILTER=1
 PVFILTER=1
 HFE_ONLINE_MIN1=16.0
 HFE_ONLINE_MIN2=0.0
-HFE_OFFLINE_MIN1=0.0
-HFE_OFFLINE_MIN2=0.0
+HFE_OFFLINE_MIN1=6.0
+HFE_OFFLINE_MIN2=6.0
 XSEC_SD=0.3
 XSEC_DD=0.0003
 XSEC_HAD=1.3

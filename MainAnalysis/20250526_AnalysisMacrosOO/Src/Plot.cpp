@@ -49,7 +49,7 @@ void drawROCmultiShapes(
     TMultiGraph* mg = new TMultiGraph();
 
     cout << "------- Drawing ROC Curves -------" << endl;
-    cout << "Number of efficiency vectors: " << effVecs.size() << endl;
+    cout << "Number of efficiency vectors: " <<  effVecs.size() << endl;
     cout << "Number of unique min1 values: " << uniqueMin1.size() << endl;
     cout << "Number of results: " << resultsVec.size() << endl;
     cout << "Number of Purity vectors: " << purityVecs.size() << endl;
@@ -64,6 +64,8 @@ void drawROCmultiShapes(
             int color = min1ToColor[min1];
 
             TGraph* ptGraph = new TGraph(1, &effVecs[i][j], &purityVecs[i][j]);
+            cout << "Plotting point for min1 = " << min1 << ", min2 = " << min2
+                 << ", color = " << color << ", marker style = " << markerStyles[i % markerStyles.size()] << endl;
             ptGraph->SetMarkerColor(color);
             ptGraph->SetMarkerStyle(markerStyles[i % markerStyles.size()]);
             ptGraph->SetMarkerSize(1.5);
