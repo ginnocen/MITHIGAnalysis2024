@@ -21,6 +21,7 @@ using namespace std;
 
 #include "include/cent_OO_hijing_PF.h"
 #include "include/skimSelectionBits_OO_PP.h"
+#include "include/parseFSCandPPSInfo.h"
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -58,8 +59,12 @@ int main(int argc, char *argv[]) {
   int sampleType = CL.GetInteger("sampleType", 0);
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
+  string PPSTreeName = CL.Get("PPSTree", "ppsanalyzer/ppstracks");
+  string FSCTreeName = CL.Get("FSCTree", "fscanalyzer/fscdigi");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
   bool DebugMode = CL.GetBool("DebugMode", false);
+  bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
+  int saveTriggerBitsMode = CL.GetInt("saveTriggerBitsMode", 0);
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
@@ -74,7 +79,7 @@ int main(int argc, char *argv[]) {
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
-  MChargedHadronRAA.SetBranch(&Tree, DebugMode);
+  MChargedHadronRAA.SetBranch(&Tree, saveTriggerBitsMode, DebugMode, includeFSCandPPSMode);
 
   for (string InputFileName : InputFileNames) {
     TFile InputFile(InputFileName.c_str());
@@ -87,6 +92,8 @@ int main(int argc, char *argv[]) {
     HFAdcMessenger MHFAdc(InputFile);              // HFAdcana/adc
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     TriggerTreeMessenger MTrigger(InputFile);      // hltanalysis/HltTree
+    PPSTreeMessenger MPPS(InputFile, PPSTreeName); // ppsanalyzer/ppstracks
+    FSCTreeMessenger MFSC(InputFile, FSCTreeName); // fscanalyzer/fscdigi
     // METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
 
     int EntryCount = MEvent.GetEntries() * Fraction;
@@ -111,6 +118,8 @@ int main(int argc, char *argv[]) {
 
       MHFAdc.GetEntry(iE);
       MZDC.GetEntry(iE);
+      MPPS.GetEntry(iE);
+      MFSC.GetEntry(iE);
       MTrigger.GetEntry(iE);
       // MMETFilter.GetEntry(iE);
 
@@ -122,6 +131,8 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.Lumi = MEvent.Lumi;
       MChargedHadronRAA.Event = MEvent.Event;
       MChargedHadronRAA.hiHF_pf = MEvent.hiHF_pf;
+      MChargedHadronRAA.hiHFPlus_pf = MEvent.hiHFPlus_pf;
+      MChargedHadronRAA.hiHFMinus_pf = MEvent.hiHFMinus_pf;
       if (IsPP == false)
         MChargedHadronRAA.hiBin = getHiBinFromhiHF(MEvent.hiHF_pf);
       else
@@ -177,6 +188,17 @@ int main(int argc, char *argv[]) {
       } // end of IsPP
       else { // !IsPP
         if (IsData == true) {
+          if (saveTriggerBitsMode==2) { // pO triggers
+            MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
+            MChargedHadronRAA.HLT_OxyZDC1nOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
+            MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
+            MChargedHadronRAA.HLT_OxyNotMBHF2_v1= MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
+            MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
+            MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
+          }
         } // end of !IsPP && IsData
         else { // !IsPP && !IsData
         }
@@ -276,6 +298,30 @@ int main(int argc, char *argv[]) {
         }
       }
 
+      ////////////////////////////
+      /// PPS & FSC variables ////
+      ////////////////////////////
+
+      if (includeFSCandPPSMode) {
+        // PPS variables
+        if (MPPS.n > PPSMAXN) {
+          std::cout << "ERROR: in the PPS tree of the forest n > PPSMAXN; skipping PPS information filling" << std::endl;
+        } else {
+          for (int iPPS = 0; iPPS < MPPS.n ; iPPS++) {
+            fillPPSInfo(MChargedHadronRAA, MPPS, iPPS);
+          }
+        }
+
+        // FSC variables
+        if (MFSC.n > FSCMAXN) {
+          std::cout << "ERROR: in the FSC tree of the forest n > FSCMAXN; skipping FSC information filling" << std::endl;
+        } else {
+          for (int iFSC = 0; iFSC < MFSC.n ; iFSC++) {
+            fillFSCInfo(MChargedHadronRAA, MFSC, iFSC);
+          }
+        }
+      }
+
       ////////////////////////////////////////
       ///// Fill default selection bits //////
       ////////////////////////////////////////
@@ -288,17 +334,23 @@ int main(int argc, char *argv[]) {
         // If OO sample
         MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
         // Fill HF selection bits
-        MChargedHadronRAA.passHFAND_6p06p0_Offline = checkHFANDCondition(MChargedHadronRAA, 6., 6., false);
-        MChargedHadronRAA.passHFOR_8p0_Offline = checkHFORCondition(MChargedHadronRAA, 8., false);
+        MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 15., 15., false);
+        MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 14., false);
+        MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 9.5, 9.5, false);
+        MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 9., false);
 
         // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
         // Therefore selection bits default to false
         if (sampleType == 2 || sampleType == 4) {
-          MChargedHadronRAA.passHFAND_6p06p0_Online = false;
-          MChargedHadronRAA.passHFOR_8p0_Online = false;
+          MChargedHadronRAA.passL1HFAND_16_Online = false;
+          MChargedHadronRAA.passL1HFOR_16_Online = false;
+          MChargedHadronRAA.passL1HFAND_14_Online = false;
+          MChargedHadronRAA.passL1HFOR_14_Online = false;
         } else {
-          MChargedHadronRAA.passHFAND_6p06p0_Online = checkHFANDCondition(MChargedHadronRAA, 6., 6., true);
-          MChargedHadronRAA.passHFOR_8p0_Online = checkHFORCondition(MChargedHadronRAA, 8., true);
+          MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
+          MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
+          MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
+          MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
         }
         
       }

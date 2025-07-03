@@ -1,3 +1,6 @@
+#ifndef CHARGEDHADRONRAAOOSKIMSELECTIONBITFUNCS
+#define CHARGEDHADRONRAAOOSKIMSELECTIONBITFUNCS
+
 bool getBaselineOOEventSel(ChargedHadronRAATreeMessenger &ch) {
     // zVtx cut
     if (fabs(ch.VZ) >= 15.){ return false; }
@@ -75,3 +78,5 @@ bool checkHFORCondition(ChargedHadronRAATreeMessenger &ch, float HFE_min, bool u
 
     return true;
 }
+
+#endif

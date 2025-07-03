@@ -6,7 +6,9 @@ OUTPUT=${3}
 DOGENLEVEL=${4}
 ISDATA=${5}
 SAMPLETYPE=${6}
-DEBUGMODE=${7}
+SAVETRIGGERBITS=${7}
+DEBUGMODE=${8}
+INCLUDEPPSANDFSC=${9}
 
 
 file="$FILEPATH"
@@ -24,6 +26,8 @@ file="$FILEPATH"
    --PFTree particleFlowAnalyser/pftree \
    --sampleType $SAMPLETYPE \
    --DebugMode $DEBUGMODE \
+   --includeFSCandPPSMode $INCLUDEPPSANDFSC \
+   --saveTriggerBitsMode $SAVETRIGGERBITS \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 wait
 
