@@ -198,7 +198,16 @@ int main(int argc, char *argv[]) {
       } // end of IsPP
       else { // !IsPP
         if (IsData == true) {
-          if (saveTriggerBitsMode==2) { // pO triggers
+          if (saveTriggerBitsMode == 1) { // OO triggers
+            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nAsymXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nAsymXOR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nXOR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nAsymXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nAsymXOR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nXOR_v1");
+            MChargedHadronRAA.HLT_OxyZDC1nOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
+            MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 = MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+            MChargedHadronRAA.HLT_OxyL1SingleJet20_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyL1SingleJet20_v1");
+          } else if (saveTriggerBitsMode == 2) { // pO triggers
             MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
             MChargedHadronRAA.HLT_OxyZDC1nOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
             MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
@@ -226,6 +235,9 @@ int main(int argc, char *argv[]) {
 
       // loop over tracks
       int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
+      MChargedHadronRAA.nTrk = NTrack;
+      int locMultipicityEta2p4 = 0;
+      int locMultipicityEta1p0 = 0;
       float leadingTrackPtEta1p0 = 0.;
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
         if (DoGenLevel == true) {
@@ -277,6 +289,9 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.trkNormChi2->push_back(trkNormChi2);
         MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
 
+        if (abs(trkEta) < 1.0 && trkPt > 0.4) { locMultipicityEta1p0++; }
+        if (abs(trkEta) < 2.4 && trkPt > 0.4) { locMultipicityEta2p4++; }
+
         double TrackCorrection = 1;
         if (DoGenLevel == false) {
           if (IsPP == true && (Year == 2017))
@@ -289,6 +304,8 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
+      MChargedHadronRAA.multipicityEta1p0 = locMultipicityEta1p0;
+      MChargedHadronRAA.multipicityEta2p4 = locMultipicityEta2p4;
 
       ////////////////////////////
       ///// Debug variables //////
@@ -346,10 +363,10 @@ int main(int argc, char *argv[]) {
         // If OO sample
         MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
         // Fill HF selection bits
-        MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 15., 15., false);
-        MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 14., false);
-        MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 9.5, 9.5, false);
-        MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 9., false);
+        MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 19.5, 19.5, false);
+        MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 18., false);
+        MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 12.5, 12.5, false);
+        MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 12., false);
 
         // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
         // Therefore selection bits default to false

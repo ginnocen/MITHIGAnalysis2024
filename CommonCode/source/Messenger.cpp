@@ -866,7 +866,7 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.clear();
    Decision.clear();
 
-   // 2025 pO run
+   // 2025 pO and OO run
    Name.push_back("HLT_OxyZeroBias_v1");
    Name.push_back("HLT_OxyZDC1nOR_v1");
    Name.push_back("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
@@ -876,6 +876,12 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.push_back("HLT_OxyZeroBias_MinPixelCluster400_v1");
    Name.push_back("HLT_MinimumBiasHF_OR_BptxAND_v1");
    Name.push_back("HLT_MinimumBiasHF_AND_BptxAND_v1");
+
+   Name.push_back("HLT_OxySingleJet16_ZDC1nAsymXOR_v1");
+   Name.push_back("HLT_OxySingleJet16_ZDC1nXOR_v1");
+   Name.push_back("HLT_OxySingleJet24_ZDC1nAsymXOR_v1");
+   Name.push_back("HLT_OxySingleJet24_ZDC1nXOR_v1");
+   Name.push_back("HLT_OxyL1SingleJet20_v1");
 
    // 2024 triggers UPCs
    Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
@@ -3930,6 +3936,9 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("chi2Vtx", &chi2Vtx);
    Tree->SetBranchAddress("ndofVtx", &ndofVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
+   Tree->SetBranchAddress("nTrk", &nTrk);
+   Tree->SetBranchAddress("multipicityEta2p4", &multipicityEta2p4);
+   Tree->SetBranchAddress("multipicityEta1p0", &multipicityEta1p0);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxPlus2", &HFEMaxPlus2);
    Tree->SetBranchAddress("HFEMaxPlus3", &HFEMaxPlus3);
@@ -3968,6 +3977,12 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    if(Tree->GetBranch("HLT_OxyZeroBias_MinPixelCluster400_v1")) Tree->SetBranchAddress("HLT_OxyZeroBias_MinPixelCluster400_v1", &HLT_OxyZeroBias_MinPixelCluster400_v1);
    if(Tree->GetBranch("HLT_MinimumBiasHF_OR_BptxAND_v1"))     Tree->SetBranchAddress("HLT_MinimumBiasHF_OR_BptxAND_v1",   &HLT_MinimumBiasHF_OR_BptxAND_v1);
    if(Tree->GetBranch("HLT_MinimumBiasHF_AND_BptxAND_v1"))    Tree->SetBranchAddress("HLT_MinimumBiasHF_AND_BptxAND_v1",  &HLT_MinimumBiasHF_AND_BptxAND_v1);
+
+   if(Tree->GetBranch("HLT_OxySingleJet16_ZDC1nAsymXOR_v1"))  Tree->SetBranchAddress("HLT_OxySingleJet16_ZDC1nAsymXOR_v1",  &HLT_OxySingleJet16_ZDC1nAsymXOR_v1);
+   if(Tree->GetBranch("HLT_OxySingleJet16_ZDC1nXOR_v1"))      Tree->SetBranchAddress("HLT_OxySingleJet16_ZDC1nXOR_v1",  &HLT_OxySingleJet16_ZDC1nXOR_v1);
+   if(Tree->GetBranch("HLT_OxySingleJet24_ZDC1nAsymXOR_v1"))  Tree->SetBranchAddress("HLT_OxySingleJet24_ZDC1nAsymXOR_v1",  &HLT_OxySingleJet24_ZDC1nAsymXOR_v1);
+   if(Tree->GetBranch("HLT_OxySingleJet24_ZDC1nXOR_v1"))      Tree->SetBranchAddress("HLT_OxySingleJet24_ZDC1nXOR_v1",  &HLT_OxySingleJet24_ZDC1nXOR_v1);
+   if(Tree->GetBranch("HLT_OxyL1SingleJet20_v1"))             Tree->SetBranchAddress("HLT_OxyL1SingleJet20_v1",  &HLT_OxyL1SingleJet20_v1);
 
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPhi", &trkPhi);
@@ -4141,6 +4156,9 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("chi2Vtx",                    &chi2Vtx, "chi2Vtx/F");
    Tree->Branch("ndofVtx",                    &ndofVtx, "ndofVtx/F");
    Tree->Branch("nVtx",                       &nVtx, "nVtx/I");
+   Tree->Branch("nTrk",                       &nTrk, "nTrk/I");
+   Tree->Branch("multipicityEta2p4",          &multipicityEta2p4, "multipicityEta2p4/I");
+   Tree->Branch("multipicityEta1p0",          &multipicityEta1p0, "multipicityEta1p0/I");
    Tree->Branch("HFEMaxPlus",                 &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxPlus2",                &HFEMaxPlus2, "HFEMaxPlus2/F");
    Tree->Branch("HFEMaxPlus3",                &HFEMaxPlus3, "HFEMaxPlus3/F");
@@ -4170,7 +4188,16 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("passL1HFAND_14_Offline",     &passL1HFAND_14_Offline, "passL1HFAND_14_Offline/O");
    Tree->Branch("passL1HFOR_14_Offline",      &passL1HFOR_14_Offline, "passL1HFOR_14_Offline/O");
    
-   if (saveTriggerBitsMode == 2) { // pO HLT bits
+   if (saveTriggerBitsMode == 1) {        // OO HLT bits 
+      Tree->Branch("HLT_OxySingleJet16_ZDC1nAsymXOR_v1",                         &HLT_OxySingleJet16_ZDC1nAsymXOR_v1, "HLT_OxySingleJet16_ZDC1nAsymXOR_v1/O");
+      Tree->Branch("HLT_OxySingleJet16_ZDC1nXOR_v1",                             &HLT_OxySingleJet16_ZDC1nXOR_v1, "HLT_OxySingleJet16_ZDC1nXOR_v1/O");
+      Tree->Branch("HLT_OxySingleJet24_ZDC1nAsymXOR_v1",                         &HLT_OxySingleJet24_ZDC1nAsymXOR_v1, "HLT_OxySingleJet24_ZDC1nAsymXOR_v1/O");
+      Tree->Branch("HLT_OxySingleJet24_ZDC1nXOR_v1",                             &HLT_OxySingleJet24_ZDC1nXOR_v1, "HLT_OxySingleJet24_ZDC1nXOR_v1/O");
+      Tree->Branch("HLT_OxyZDC1nOR_v1",                                          &HLT_OxyZDC1nOR_v1, "HLT_OxyZDC1nOR_v1/O");
+      Tree->Branch("HLT_OxyZeroBias_v1",                                         &HLT_OxyZeroBias_v1, "HLT_OxyZeroBias_v1/O");
+      Tree->Branch("HLT_MinimumBiasHF_OR_BptxAND_v1",                            &HLT_MinimumBiasHF_OR_BptxAND_v1, "HLT_MinimumBiasHF_OR_BptxAND_v1/O");
+      Tree->Branch("HLT_OxyL1SingleJet20_v1",                                    &HLT_OxyL1SingleJet20_v1, "HLT_OxyL1SingleJet20_v1/O");
+   } else if (saveTriggerBitsMode == 2) { // pO HLT bits
       Tree->Branch("HLT_OxyZeroBias_v1",                                         &HLT_OxyZeroBias_v1, "HLT_OxyZeroBias_v1/O");
       Tree->Branch("HLT_OxyZDC1nOR_v1",                                          &HLT_OxyZDC1nOR_v1, "HLT_OxyZDC1nOR_v1/O");
       Tree->Branch("HLT_OxySingleMuOpen_NotMBHF2OR_v1",                          &HLT_OxySingleMuOpen_NotMBHF2OR_v1, "HLT_OxySingleMuOpen_NotMBHF2OR_v1/O");
@@ -4314,6 +4341,9 @@ void ChargedHadronRAATreeMessenger::Clear()
    chi2Vtx = 0.;
    ndofVtx = 0.;
    nVtx = 0;
+   nTrk = 0;
+   multipicityEta2p4 = 0;
+   multipicityEta1p0 = 0;
    HFEMaxPlus = -9999.;
    HFEMaxPlus2 = -9999.;
    HFEMaxPlus3 = -9999.;
@@ -4343,7 +4373,16 @@ void ChargedHadronRAATreeMessenger::Clear()
    passL1HFAND_14_Offline = false;
    passL1HFOR_14_Offline = false;
 
-   if (saveTriggerBitsMode == 2) { // pO HLT bits
+   if (saveTriggerBitsMode == 1) { // OO HLT bits
+      HLT_OxySingleJet16_ZDC1nAsymXOR_v1 = false;
+      HLT_OxySingleJet16_ZDC1nXOR_v1 = false;
+      HLT_OxySingleJet24_ZDC1nAsymXOR_v1 = false;
+      HLT_OxySingleJet24_ZDC1nXOR_v1 = false;
+      HLT_OxyZDC1nOR_v1 = false;
+      HLT_OxyZeroBias_v1 = false;
+      HLT_MinimumBiasHF_OR_BptxAND_v1 = false;
+      HLT_OxyL1SingleJet20_v1 = false;
+   } else if (saveTriggerBitsMode == 2) { // pO HLT bits
       HLT_OxyZeroBias_v1 = false;
       HLT_OxyZDC1nOR_v1 = false;
       HLT_OxySingleMuOpen_NotMBHF2OR_v1 = false;
