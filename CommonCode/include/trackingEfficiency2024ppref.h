@@ -18,6 +18,7 @@ public:
   float getEfficiency( float pt, float eta, bool passesCheck = false);
   float getFake( float pt, float eta, bool passesCheck = false);
   float getSecondary( float pt, float eta, bool passesCheck = false);
+  float getMultipleReco( float pt, float eta, bool passesCheck = false);
 
 
 private:
@@ -30,6 +31,7 @@ private:
   TH2F * eff;
   TH2F * fake;
   TH2F * sec;
+  TH2F * mul;
 
 };
 
@@ -53,10 +55,11 @@ float TrkEff2024ppref::getCorrection(float pt, float eta){
   float efficiency = getEfficiency(pt, eta, true);
   float fake = getFake(pt, eta, true);
   float secondary = getSecondary(pt, eta, true);
+  float multipleReco = getMultipleReco(pt, eta, true);
 
   //protect against dividing by 0
   if(efficiency > 0.001){
-    return (1-fake)*(1-secondary)/efficiency;
+    return (1 - fake) * (1 - secondary) / (efficiency * (1 + multipleReco));
   } else {
     if( ! isQuiet ) std::cout << "TrkEff2024ppref: Warning! Tracking efficiency is very low for this track (close to dividing by 0).  Returning correction factor of 0 for this track for now." << std::endl;
     return 0;
@@ -87,12 +90,20 @@ float TrkEff2024ppref::getSecondary( float pt, float eta, bool passesCheck){
   return sec->GetBinContent( sec->FindBin(eta, pt) );
 }
 
+float TrkEff2024ppref::getMultipleReco( float pt, float eta, bool passesCheck){
+  if( !passesCheck){
+    if(  !checkBounds(pt, eta) ) return 0;
+  }
+
+  return mul->GetBinContent( mul->FindBin(eta, pt) );
+}
+
 
 TrkEff2024ppref::TrkEff2024ppref(bool isQuiet_, std::string filePath){
   isQuiet = isQuiet_;
     if(!isQuiet) std::cout << "TrkEff2024ppref class opening in general tracks mode!" << std::endl;
     
-    trkEff = TFile::Open( (filePath + "Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Nominal_10thJune2025.root").c_str(),"open");
+    trkEff = TFile::Open(filePath.c_str(),"open");
     
     if( !(trkEff->IsOpen() ) ){
       std::cout << "WARNING, COULD NOT FIND TRACK EFFICIENCY FILE FOR GENERAL TRACKS!" << std::endl;
@@ -100,6 +111,7 @@ TrkEff2024ppref::TrkEff2024ppref(bool isQuiet_, std::string filePath){
       eff = (TH2F*) trkEff->Get("hEff_2D");
       fake = (TH2F*) trkEff->Get("hFak_2D");
       sec = (TH2F*) trkEff->Get("hSec_2D");
+      mul = (TH2F*) trkEff->Get("hMul_2D");
     }
 
 }

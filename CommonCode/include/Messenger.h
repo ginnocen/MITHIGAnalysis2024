@@ -1092,7 +1092,7 @@ public:
    float chi2Vtx, ndofVtx;                      //best vertex from track tree
    float ptSumVtx;
    int nVtx;
-   int nTrk, multipicityEta2p4, multipicityEta1p0; // different kinds of multiplicity definitions 
+   int nTrk, multiplicityEta2p4, multiplicityEta1p0; // different kinds of multiplicity definitions 
    float HFEMaxPlus;
    float HFEMaxPlus2;
    float HFEMaxPlus3;
@@ -1160,6 +1160,10 @@ public:
 
    // weighting properties
    std::vector<float> *trackWeight;
+   std::vector<float> *trackingEfficiency2017pp;
+   std::vector<float> *trackingEfficiency_Nominal;
+   std::vector<float> *trackingEfficiency_Loose;
+   std::vector<float> *trackingEfficiency_Tight;
 
    // Debug mode quantities
    std::vector<float> *AllxVtx;

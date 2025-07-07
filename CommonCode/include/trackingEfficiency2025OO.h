@@ -11,7 +11,7 @@
 class TrkEff2025OO{
 public:
 
-  TrkEff2025OO( bool isQuiet_ = false ,std::string filePath = "");
+  TrkEff2025OO( bool isQuiet_ = false ,std::string filePath_pythiahijing = "", std::string filePath_hijing = "");
   ~TrkEff2025OO();
 
   float getCorrection(float pt, float eta);
@@ -100,15 +100,15 @@ float TrkEff2025OO::getMultipleReco( float pt, float eta, bool passesCheck){
 }
 
 
-TrkEff2025OO::TrkEff2025OO(bool isQuiet_, std::string filePath){
+TrkEff2025OO::TrkEff2025OO(bool isQuiet_, std::string filePath_pythiahijing, std::string filePath_hijing){
   isQuiet = isQuiet_;
     if(!isQuiet) std::cout << "TrkEff2025OO class opening in general tracks mode!" << std::endl;
 
     // Effeciency, Secondary and multpleReco histograms are imported from Pythia+HIJING simulation, but since Pythia+HIJING has unrealistic fake rates, we use the fake rate from HIJIING alone, two input files are needed.
     
-    trkEffSecMul = TFile::Open( (filePath + "Eff_OO_2025_PythiaHijing_NopU_Nominal.root").c_str(),"open");
+    trkEffSecMul = TFile::Open(filePath_pythiahijing.c_str(),"open");
 
-    trkFak = TFile::Open( (filePath + "Eff_OO_2025_Hijing_NopU_Nominal.root").c_str(),"open");
+    trkFak = TFile::Open(filePath_hijing.c_str(),"open");
     
     if( !(trkEffSecMul->IsOpen() ) ){
       std::cout << "WARNING, COULD NOT FIND TRACK EFFICIENCY FILE FOR GENERAL TRACKS!" << std::endl;

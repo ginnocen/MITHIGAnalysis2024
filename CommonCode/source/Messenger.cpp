@@ -3834,6 +3834,10 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
       delete trkNormChi2;
       delete pfEnergy;
       delete trackWeight;
+      delete trackingEfficiency2017pp;
+      delete trackingEfficiency_Nominal;
+      delete trackingEfficiency_Loose;
+      delete trackingEfficiency_Tight;
 
       if (DebugMode == true) {
          // delete debug related vectors
@@ -3916,6 +3920,10 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    trkNormChi2 = nullptr;
    pfEnergy = nullptr;
    trackWeight = nullptr;
+   trackingEfficiency2017pp = nullptr;
+   trackingEfficiency_Nominal = nullptr;
+   trackingEfficiency_Loose = nullptr;
+   trackingEfficiency_Tight = nullptr;
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -3937,8 +3945,8 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("ndofVtx", &ndofVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
    Tree->SetBranchAddress("nTrk", &nTrk);
-   Tree->SetBranchAddress("multipicityEta2p4", &multipicityEta2p4);
-   Tree->SetBranchAddress("multipicityEta1p0", &multipicityEta1p0);
+   Tree->SetBranchAddress("multiplicityEta2p4", &multiplicityEta2p4);
+   Tree->SetBranchAddress("multiplicityEta1p0", &multiplicityEta1p0);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxPlus2", &HFEMaxPlus2);
    Tree->SetBranchAddress("HFEMaxPlus3", &HFEMaxPlus3);
@@ -4001,6 +4009,10 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("trkNormChi2", &trkNormChi2);
    Tree->SetBranchAddress("pfEnergy", &pfEnergy);
    Tree->SetBranchAddress("trackWeight", &trackWeight);
+   Tree->SetBranchAddress("trackingEfficiency2017pp", &trackingEfficiency2017pp);
+   Tree->SetBranchAddress("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
+   Tree->SetBranchAddress("trackingEfficiency_Loose", &trackingEfficiency_Loose);
+   Tree->SetBranchAddress("trackingEfficiency_Tight", &trackingEfficiency_Tight);
 
    // initialize debug quantities
    AllxVtx = nullptr;
@@ -4134,6 +4146,10 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    trkNormChi2 = new std::vector<float>();
    pfEnergy = new std::vector<float>();
    trackWeight = new std::vector<float>();
+   trackingEfficiency2017pp = new std::vector<float>();
+   trackingEfficiency_Nominal = new std::vector<float>();
+   trackingEfficiency_Loose = new std::vector<float>();
+   trackingEfficiency_Tight = new std::vector<float>();
 
    Tree = T;
 
@@ -4157,8 +4173,8 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("ndofVtx",                    &ndofVtx, "ndofVtx/F");
    Tree->Branch("nVtx",                       &nVtx, "nVtx/I");
    Tree->Branch("nTrk",                       &nTrk, "nTrk/I");
-   Tree->Branch("multipicityEta2p4",          &multipicityEta2p4, "multipicityEta2p4/I");
-   Tree->Branch("multipicityEta1p0",          &multipicityEta1p0, "multipicityEta1p0/I");
+   Tree->Branch("multiplicityEta2p4",          &multiplicityEta2p4, "multiplicityEta2p4/I");
+   Tree->Branch("multiplicityEta1p0",          &multiplicityEta1p0, "multiplicityEta1p0/I");
    Tree->Branch("HFEMaxPlus",                 &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxPlus2",                &HFEMaxPlus2, "HFEMaxPlus2/F");
    Tree->Branch("HFEMaxPlus3",                &HFEMaxPlus3, "HFEMaxPlus3/F");
@@ -4226,6 +4242,10 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("trkNormChi2",                &trkNormChi2);
    Tree->Branch("pfEnergy",                   &pfEnergy);
    Tree->Branch("trackWeight",                &trackWeight);
+   Tree->Branch("trackingEfficiency2017pp",   &trackingEfficiency2017pp);
+   Tree->Branch("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
+   Tree->Branch("trackingEfficiency_Loose",   &trackingEfficiency_Loose);
+   Tree->Branch("trackingEfficiency_Tight",   &trackingEfficiency_Tight);
 
    if (DebugMode) {
       // set debug related branches
@@ -4342,8 +4362,8 @@ void ChargedHadronRAATreeMessenger::Clear()
    ndofVtx = 0.;
    nVtx = 0;
    nTrk = 0;
-   multipicityEta2p4 = 0;
-   multipicityEta1p0 = 0;
+   multiplicityEta2p4 = 0;
+   multiplicityEta1p0 = 0;
    HFEMaxPlus = -9999.;
    HFEMaxPlus2 = -9999.;
    HFEMaxPlus3 = -9999.;
@@ -4411,6 +4431,10 @@ void ChargedHadronRAATreeMessenger::Clear()
    trkNormChi2->clear();
    pfEnergy->clear();
    trackWeight->clear();
+   trackingEfficiency2017pp->clear();
+   trackingEfficiency_Nominal->clear();
+   trackingEfficiency_Loose->clear();
+   trackingEfficiency_Tight->clear();
 
    if (DebugMode) {
       // clear debug related branches
