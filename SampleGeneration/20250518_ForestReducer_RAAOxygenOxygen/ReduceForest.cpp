@@ -69,14 +69,28 @@ int main(int argc, char *argv[]) {
 
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
+  TrkEff2024ppref *TrackEfficiencyPP2024_DCALoose = nullptr;
+  TrkEff2024ppref *TrackEfficiencyPP2024_DCATight = nullptr;
   TrkEff2025OO *TrackEfficiencyOO2025 = nullptr;
+  TrkEff2025OO *TrackEfficiencyOO2025_DCALoose = nullptr;
+  TrkEff2025OO *TrackEfficiencyOO2025_DCATight = nullptr;
   if (DoGenLevel == false) {
-    if (IsPP == true && (Year == 2017)) // using 2017 pp data corrections
-      TrackEfficiencyPP2017 = new TrkEff2017pp(false, TrackEfficiencyPath);
-    else if (IsPP == true && (Year == 2024)) // using 2024 pp data corrections
-      TrackEfficiencyPP2024 = new TrkEff2024ppref(true, TrackEfficiencyPath);
-    else if (IsPP == false && (Year == 2025)) // Using OO MC corrections
-      TrackEfficiencyOO2025 = new TrkEff2025OO(true, TrackEfficiencyPath);
+    if (IsPP == true) {
+      // using 2017 pp data corrections
+      TrackEfficiencyPP2017 = new TrkEff2017pp(true, TrackEfficiencyPath);
+
+      // using 2024 pp data corrections
+      TrackEfficiencyPP2024 = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Nominal_10thJune2025.root", TrackEfficiencyPath.c_str()));
+
+      // 2024 ppref, DCA loose and tight
+      TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Loose_10thJune2025.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Tight_10thJune2025.root", TrackEfficiencyPath.c_str()));
+
+    }
+    else if (IsPP == false) {
+      // Using OO MC corrections
+      TrackEfficiencyOO2025 = new TrkEff2025OO(true, Form("%s/Eff_OO_2025_PythiaHijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()), Form("%s/Eff_OO_2025_Hijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()));
+    }
   }
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
@@ -236,8 +250,8 @@ int main(int argc, char *argv[]) {
       // loop over tracks
       int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
       MChargedHadronRAA.nTrk = NTrack;
-      int locMultipicityEta2p4 = 0;
-      int locMultipicityEta1p0 = 0;
+      int locMultiplicityEta2p4 = 0;
+      int locMultiplicityEta1p0 = 0;
       float leadingTrackPtEta1p0 = 0.;
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
         if (DoGenLevel == true) {
@@ -289,23 +303,36 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.trkNormChi2->push_back(trkNormChi2);
         MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
 
-        if (abs(trkEta) < 1.0 && trkPt > 0.4) { locMultipicityEta1p0++; }
-        if (abs(trkEta) < 2.4 && trkPt > 0.4) { locMultipicityEta2p4++; }
+        if (abs(trkEta) < 1.0 && trkPt > 0.4) { locMultiplicityEta1p0++; }
+        if (abs(trkEta) < 2.4 && trkPt > 0.4) { locMultiplicityEta2p4++; }
 
         double TrackCorrection = 1;
         if (DoGenLevel == false) {
+          // efficiency correction component of total track weight
+          if (IsPP == true) {
+            MChargedHadronRAA.trackingEfficiency2017pp->push_back(TrackEfficiencyPP2017->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(TrackEfficiencyPP2024->getCorrection(trkPt, trkEta));
+            // 2024 ppref, DCA loose and tight
+            MChargedHadronRAA.trackingEfficiency_Loose->push_back(TrackEfficiencyPP2024_DCALoose->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Tight->push_back(TrackEfficiencyPP2024_DCATight->getCorrection(trkPt, trkEta));
+          } else if (IsPP == false) {
+            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(TrackEfficiencyOO2025->getCorrection(trkPt, trkEta));
+          }
+
+          // total track correction calculation
           if (IsPP == true && (Year == 2017))
             TrackCorrection = TrackEfficiencyPP2017->getCorrection(trkPt, trkEta);
           else if (IsPP == true && (Year == 2024))
             TrackCorrection = TrackEfficiencyPP2024->getCorrection(trkPt, trkEta);
           else if (IsPP == false && (Year == 2025))
             TrackCorrection = TrackEfficiencyOO2025->getCorrection(trkPt, trkEta);
+
         } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
-      MChargedHadronRAA.multipicityEta1p0 = locMultipicityEta1p0;
-      MChargedHadronRAA.multipicityEta2p4 = locMultipicityEta2p4;
+      MChargedHadronRAA.multiplicityEta1p0 = locMultiplicityEta1p0;
+      MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
 
       ////////////////////////////
       ///// Debug variables //////
