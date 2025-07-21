@@ -19,6 +19,7 @@ using namespace std;
 #include "trackingEfficiency2023PbPb.h"
 #include "trackingEfficiency2024ppref.h"
 #include "trackingEfficiency2025OO.h"
+#include "eventSelectionCorrection.h"
 
 #include "include/cent_OO_hijing_PF.h"
 #include "include/skimSelectionBits_OO_PP.h"
@@ -66,7 +67,9 @@ int main(int argc, char *argv[]) {
   bool DebugMode = CL.GetBool("DebugMode", false);
   bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
   int saveTriggerBitsMode = CL.GetInt("saveTriggerBitsMode", 0);
+  bool includePFMode = CL.GetBool("includePFMode", true);
 
+  // load track correction helpers
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024_DCALoose = nullptr;
@@ -93,8 +96,15 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  // load event selection correction helpers
+  EvtSelCorrection *EventSelectionEfficiency = nullptr;
+  if (DoGenLevel == false) {
+    // pp and OO handled by same file
+    // EventSelectionEfficiency = new EvtSelCorrection(true, "EventSelEffFile.root");
+  }
+
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
-  TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
+  TTree Tree("Tree", Form("Tree for OO RAA analysis :) (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
   ChargedHadronRAATreeMessenger MChargedHadronRAA;
   MChargedHadronRAA.SetBranch(&Tree, saveTriggerBitsMode, DebugMode, includeFSCandPPSMode);
@@ -131,7 +141,7 @@ int main(int argc, char *argv[]) {
       MEvent.GetEntry(iE);
       MGen.GetEntry(iE);
       MTrack.GetEntry(iE);
-      MPF.GetEntry(iE);
+      if (includePFMode) MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
 
       MHFAdc.GetEntry(iE);
@@ -192,11 +202,6 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
       MChargedHadronRAA.VZ_pf = MEvent.vz;
 
-      // event selection correction calculation
-      double eventCorrection = 1.0;
-      // TODO: KD to implement, right now weight fills as 1
-      MChargedHadronRAA.eventWeight = eventCorrection;
-
       if (IsPP == true) {
         if (IsData == true) {
           int HLT_PPRefZeroBias_v6 = MTrigger.CheckTriggerStartWith("HLT_PPRefZeroBias_v6");
@@ -238,14 +243,17 @@ int main(int argc, char *argv[]) {
       } // end of IsPP == false
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
-      std::vector<float> EMaxHFPlus_top3 = GetMaxEnergyHF(&MPF, 3.0, 5.2);
-      std::vector<float> EMaxHFMinus_top3 = GetMaxEnergyHF(&MPF, -5.2, -3.0);
-      MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus_top3[0];
-      MChargedHadronRAA.HFEMaxPlus2 = EMaxHFPlus_top3[1];
-      MChargedHadronRAA.HFEMaxPlus3 = EMaxHFPlus_top3[2];
-      MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus_top3[0];
-      MChargedHadronRAA.HFEMaxMinus2 = EMaxHFMinus_top3[1];
-      MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
+      if (includePFMode) {
+        std::vector<float> EMaxHFPlus_top3 = GetMaxEnergyHF(&MPF, 3.0, 5.2);
+        std::vector<float> EMaxHFMinus_top3 = GetMaxEnergyHF(&MPF, -5.2, -3.0);
+        MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus_top3[0];
+        MChargedHadronRAA.HFEMaxPlus2 = EMaxHFPlus_top3[1];
+        MChargedHadronRAA.HFEMaxPlus3 = EMaxHFPlus_top3[2];
+        MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus_top3[0];
+        MChargedHadronRAA.HFEMaxMinus2 = EMaxHFMinus_top3[1];
+        MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
+      }
+      
 
       // loop over tracks
       int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
@@ -334,6 +342,13 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.multiplicityEta1p0 = locMultiplicityEta1p0;
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
 
+      // event selection correction calculation
+      double eventCorrection = 1.0;
+      if (EventSelectionEfficiency != nullptr) {
+        eventCorrection = EventSelectionEfficiency->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+      }
+      MChargedHadronRAA.eventWeight = eventCorrection;
+
       ////////////////////////////
       ///// Debug variables //////
       ////////////////////////////
@@ -390,23 +405,25 @@ int main(int argc, char *argv[]) {
         // If OO sample
         MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
         // Fill HF selection bits
-        MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 19.5, 19.5, false);
-        MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 18., false);
-        MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 12.5, 12.5, false);
-        MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 12., false);
+        if (includePFMode) {
+          MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 19.5, 19.5, false);
+          MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 18., false);
+          MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 12.5, 12.5, false);
+          MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 12., false);
 
-        // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
-        // Therefore selection bits default to false
-        if (sampleType == 2 || sampleType == 4) {
-          MChargedHadronRAA.passL1HFAND_16_Online = false;
-          MChargedHadronRAA.passL1HFOR_16_Online = false;
-          MChargedHadronRAA.passL1HFAND_14_Online = false;
-          MChargedHadronRAA.passL1HFOR_14_Online = false;
-        } else {
-          MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
-          MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
-          MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
-          MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
+          // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
+          // Therefore selection bits default to false
+          if (sampleType == 2 || sampleType == 4) {
+            MChargedHadronRAA.passL1HFAND_16_Online = false;
+            MChargedHadronRAA.passL1HFOR_16_Online = false;
+            MChargedHadronRAA.passL1HFAND_14_Online = false;
+            MChargedHadronRAA.passL1HFOR_14_Online = false;
+          } else {
+            MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
+            MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
+            MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
+            MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
+          }
         }
         
       }
