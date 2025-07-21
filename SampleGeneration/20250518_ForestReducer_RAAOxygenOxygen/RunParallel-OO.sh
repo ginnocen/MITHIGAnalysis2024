@@ -4,7 +4,7 @@ DATE=$(date +%Y%m%d)
 source clean.sh
 
 MAXCORES=40  # too many parallel cores can cause event loss, increase with caution!
-NFILES=1 # number of files to cap the processing at, if -1 processess all files
+NFILES=5 # number of files to cap the processing at, if -1 processess all files
 DOGENLEVEL=0
 ISDATA=1
 SAMPLETYPE=-1 # 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
@@ -20,23 +20,23 @@ XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/g
 # ============================================================
 # OO data, low pT PD
 # ============================================================
-NAME="${DATE}_Skim_OO_IonPhysics0_LowPtV2_250711_104114_test"
-PATHSAMPLE="/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest/IonPhysics0/crab_OO_IonPhysics0_LowPtV2/250711_104114/0000"
+#NAME="${DATE}_Skim_OO_IonPhysics0_LowPtV2_250711_104114_test"
+#PATHSAMPLE="/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest/IonPhysics0/crab_OO_IonPhysics0_LowPtV2/250711_104114/0000"
 
 # set your output directory here
-OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0004"
-MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/${NAME}_0004.root"
+#OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0004"
+#MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/${NAME}_0004.root"
 
 
 # ============================================================
 # OO data, high pT PD
 # ============================================================
-#NAME="${DATE}_Skim_OO_IonPhysics5_HighPtV2_250711_104159_40files"
-#PATHSAMPLE="/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest/IonPhysics5/crab_OO_IonPhysics5_HighPtV2/250711_104159/0000"
+NAME="${DATE}_Skim_OO_IonPhysics5_HighPtV2_250711_104159_40files"
+PATHSAMPLE="/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest/IonPhysics5/crab_OO_IonPhysics5_HighPtV2/250711_104159/0000"
 
 # set your output directory here
-#OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0000"
-#MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0000.root"
+OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0000"
+MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0000.root"
 
 
 
