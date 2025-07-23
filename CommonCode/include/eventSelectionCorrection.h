@@ -76,7 +76,7 @@ EvtSelCorrection::EvtSelCorrection(bool isQuiet_, std::string filePath){
     if( !(eventEfficiencyFile->IsOpen() ) ){
       std::cout << "WARNING, COULD NOT FIND EVENT EFFICIENCY FILE FOR GENERAL EVENTS!" << std::endl;
     } else {
-      eff = (TH1D*) eventEfficiencyFile->Get("heff");
+      eff = (TH1D*) eventEfficiencyFile->Get("hEff");
     }
 
 }

@@ -10,8 +10,9 @@ INPUT_ON_XRD=1 # set to 1 if input files are on xrd, 0 if they are local
 #XRDSERV="root://xrootd.cmsaf.mit.edu/" # mit t2 server
 XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/group...
 
-NAME="${DATE}_Skim_ppref2024_all_noEvtSel_test"
-PATHSAMPLE="/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000"
+NAME="${DATE}_Skim_ppref2024_Official_noEvtSel_test"
+PATHSAMPLE="/store/group/phys_heavyions/kdeverea/Run3_2024_ppRef_Official/QCD_pThat-15to1200_TuneCP5_5p36TeV_pythia8/crab_Run3_2024_ppRef_Official/250723_164604/0000"
+#PATHSAMPLE="/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000"
 # set your output directory here
 OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME"
 MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/$NAME.root"
