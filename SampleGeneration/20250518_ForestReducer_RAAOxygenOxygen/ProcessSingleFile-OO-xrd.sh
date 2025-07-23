@@ -36,6 +36,8 @@ wait
    --includePFMode $INCLUDEPF \
    --saveTriggerBitsMode $SAVETRIGGERBITS \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
+   --MakeEventWeight false \
+   --EvtSelCorrectionFile ${ProjectBase}/CommonCode/root/EventSelEffFile-OO.root \
    --HideProgressBar false
 wait
 

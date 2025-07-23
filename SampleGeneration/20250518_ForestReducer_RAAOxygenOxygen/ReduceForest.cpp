@@ -68,6 +68,8 @@ int main(int argc, char *argv[]) {
   bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
   int saveTriggerBitsMode = CL.GetInt("saveTriggerBitsMode", 0);
   bool includePFMode = CL.GetBool("includePFMode", true);
+  bool MakeEventWeight = CL.GetBool("MakeEventWeight", false);
+  string EvtSelCorrectionFile = CL.Get("EvtSelCorrectionFile", "EventSelEffFile-OO.root");
 
   // load track correction helpers
   TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
@@ -98,9 +100,9 @@ int main(int argc, char *argv[]) {
 
   // load event selection correction helpers
   EvtSelCorrection *EventSelectionEfficiency = nullptr;
-  if (DoGenLevel == false) {
-    // pp and OO handled by same file
-    // EventSelectionEfficiency = new EvtSelCorrection(true, "EventSelEffFile.root");
+  if (MakeEventWeight && DoGenLevel == false) {
+    // pp and OO handled by same header file
+    EventSelectionEfficiency = new EvtSelCorrection(true, EvtSelCorrectionFile.c_str());
   }
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
@@ -344,7 +346,7 @@ int main(int argc, char *argv[]) {
 
       // event selection correction calculation
       double eventCorrection = 1.0;
-      if (EventSelectionEfficiency != nullptr) {
+      if (MakeEventWeight && EventSelectionEfficiency != nullptr) {
         eventCorrection = EventSelectionEfficiency->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
       MChargedHadronRAA.eventWeight = eventCorrection;

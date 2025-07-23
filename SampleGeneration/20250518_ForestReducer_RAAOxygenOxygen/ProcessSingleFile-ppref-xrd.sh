@@ -27,6 +27,8 @@ echo "Processing $FILE"
    --sampleType -1 \
    --DebugMode true \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
+   --MakeEventWeight false \
+   --EvtSelCorrectionPath ${ProjectBase}/CommonCode/root/EventSelEffFile-ppref.root \
    --HideProgressBar false
 wait
 

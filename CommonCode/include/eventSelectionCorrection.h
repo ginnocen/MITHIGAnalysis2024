@@ -38,7 +38,7 @@ inline bool EvtSelCorrection::checkBounds(float mult){
   double maxEdge = eff->GetBinLowEdge(eff->GetNbinsX() + 1);
 
   if (mult < minEdge || mult > maxEdge) {
-    if (!isQuiet) std::cout << "EvtSelCorrection: multiplicity is outside the range [" << minEdge << "," << maxEdge << "]. Returning correction factor of 0 for this track for now." << std::endl;
+    if (!isQuiet) std::cout << "EvtSelCorrection: multiplicity is outside the range [" << minEdge << "," << maxEdge << "]. Returning correction factor of 0 for this event for now." << std::endl;
     return false;
   }
 
@@ -54,7 +54,7 @@ float EvtSelCorrection::getCorrection(float mult){
   if(efficiency > 0.001){
     return 1 / efficiency;
   } else {
-    if( ! isQuiet ) std::cout << "EvtSelCorrection: Warning! Tracking efficiency is very low for this track (close to dividing by 0).  Returning correction factor of 0 for this track for now." << std::endl;
+    if( ! isQuiet ) std::cout << "EvtSelCorrection: Warning! Event efficiency is very low for this event (close to dividing by 0).  Returning correction factor of 0 for this event for now." << std::endl;
     return 0;
   }
 }
@@ -69,12 +69,12 @@ float EvtSelCorrection::getEfficiency(float mult, bool passesCheck){
 
 EvtSelCorrection::EvtSelCorrection(bool isQuiet_, std::string filePath){
   isQuiet = isQuiet_;
-    if(!isQuiet) std::cout << "EvtSelCorrection class opening in general tracks mode!" << std::endl;
+    if(!isQuiet) std::cout << "EvtSelCorrection class opening in general events mode!" << std::endl;
     
     eventEfficiencyFile = TFile::Open(filePath.c_str());
 
     if( !(eventEfficiencyFile->IsOpen() ) ){
-      std::cout << "WARNING, COULD NOT FIND EVENT EFFICIENCY FILE FOR GENERAL TRACKS!" << std::endl;
+      std::cout << "WARNING, COULD NOT FIND EVENT EFFICIENCY FILE FOR GENERAL EVENTS!" << std::endl;
     } else {
       eff = (TH1D*) eventEfficiencyFile->Get("heff");
     }
