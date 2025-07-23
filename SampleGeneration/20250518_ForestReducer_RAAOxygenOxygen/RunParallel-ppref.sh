@@ -3,15 +3,16 @@ DATE=$(date +%Y%m%d)
 
 source clean.sh
 
-MAXCORES=1 # too many parallel cores can cause event loss, increase with caution!
+MAXCORES=40 # too many parallel cores can cause event loss, increase with caution!
 NFILES=1 # number of files to cap the processing at, if -1 processess all files
 # set =1 for agreed upon debug file for Vipul comparison (we just used his first file in the directory HiForestMiniAOD_1.root), set =999 for full production
 INPUT_ON_XRD=1 # set to 1 if input files are on xrd, 0 if they are local
 #XRDSERV="root://xrootd.cmsaf.mit.edu/" # mit t2 server
 XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/group...
 
-NAME="${DATE}_Skim_ppref2024_all"
-PATHSAMPLE="/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000"
+NAME="${DATE}_Skim_ppref2024_Official_noEvtSel_test"
+PATHSAMPLE="/store/group/phys_heavyions/kdeverea/Run3_2024_ppRef_Official/QCD_pThat-15to1200_TuneCP5_5p36TeV_pythia8/crab_Run3_2024_ppRef_Official/250723_164604/0000"
+#PATHSAMPLE="/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000"
 # set your output directory here
 OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME"
 MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/$NAME.root"
