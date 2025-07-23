@@ -37,13 +37,26 @@ private:
 };
 
 inline bool TrkEff2025OO::checkBounds(float pt, float eta){
-  if( TMath::Abs(eta) > 2.4 ){
-    if( ! isQuiet) std::cout << "TrkEff2025OO: track outside |eta|<2.4, please apply this cut!  I am returning a correction factor of 0 for this track for now." << std::endl;
+  if (!eff) {
+    if (!isQuiet) std::cout << "TrkEff2025OO: Efficiency histogram not loaded. Returning false." << std::endl;
     return false;
   }
-  
-  if( pt< 0 || pt > 500 ){
-    if( ! isQuiet) std::cout << "TrkEff2025OO: pT is outside the range [0,500].  I am returning a correction factor of 0 for this track for now." << std::endl;
+
+  // Get eta axis range
+  double etaMin = eff->GetXaxis()->GetBinLowEdge(1);
+  double etaMax = eff->GetXaxis()->GetBinUpEdge(eff->GetXaxis()->GetNbins());
+
+  // Get pt axis range
+  double ptMin = eff->GetYaxis()->GetBinLowEdge(1);
+  double ptMax = eff->GetYaxis()->GetBinUpEdge(eff->GetYaxis()->GetNbins());
+
+  if (eta < etaMin || eta > etaMax) {
+    if (!isQuiet) std::cout << "TrkEff2025OO: track outside eta range [" << etaMin << "," << etaMax << "], returning correction factor of 0." << std::endl;
+    return false;
+  }
+
+  if (pt < ptMin || pt > ptMax) {
+    if (!isQuiet) std::cout << "TrkEff2025OO: pT outside range [" << ptMin << "," << ptMax << "], returning correction factor of 0." << std::endl;
     return false;
   }
 
@@ -72,7 +85,7 @@ float TrkEff2025OO::getEfficiency( float pt, float eta, bool passesCheck){
     if(  !checkBounds(pt, eta) ) return 0;
   }
 
-  return eff->GetBinContent( eff->FindBin(eta, pt) ) * 0.979;//0.979 is scale factor from D mesons
+  return eff->GetBinContent( eff->FindBin(eta, pt) );
 }
 
 float TrkEff2025OO::getFake( float pt, float eta,  bool passesCheck){
