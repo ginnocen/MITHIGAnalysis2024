@@ -16,19 +16,35 @@ public:
   string input;      // Input file name
   string output;     // Output file name
   float MinTrackPt;  // Minimum track pt
+  float MaxTrackPt;  // Maximum track pt
   int TriggerChoice; // FIXME: option to be defined
   bool IsData;       // Data or MC
+  bool IsPP;
   float scaleFactor; // Scale factor
   bool UseTrackWeight; // Use track weight
+  bool UseEventWeight; // Use event weight
+  bool ApplyEventSelection; // Apply event selection criteria
+  float MinLeadingTrackPt; // Minimum leading track pT for event selection
+  int TrackWeightSelection; // Selection criteria for track weight
+  string EventCorrectionFile; // File for event selection efficiency
+  bool HideProgressBar; // Hide progress bar in output
   void printParameters() const {
 
     cout << "Input file: " << input << endl;
     cout << "Output file: " << output << endl;
     cout << "MinTrackPt: " << MinTrackPt << endl;
+    cout << "MaxTrackPt: " << MaxTrackPt << endl;
     cout << "TriggerChoice: " << TriggerChoice << endl;
     cout << "IsData: " << IsData << endl;
+    cout << "IsPP: " << IsPP << endl;
     cout << "Scale factor: " << scaleFactor << endl;
     cout << "UseTrackWeight: " << UseTrackWeight << endl;
+    cout << "UseEventWeight: " << UseEventWeight << endl;
+    cout << "ApplyEventSelection: " << ApplyEventSelection << endl;
+    cout << "MinLeadingTrackPt: " << MinLeadingTrackPt << endl;
+    cout << "TrackWeightSelection: " << TrackWeightSelection << endl;
+    cout << "EventCorrectionFile: " << EventCorrectionFile << endl;
+    cout << "HideProgressBar: " << HideProgressBar << endl;
   }
 };
 
