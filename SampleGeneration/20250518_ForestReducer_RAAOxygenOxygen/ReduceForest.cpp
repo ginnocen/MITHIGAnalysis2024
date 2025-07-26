@@ -13,17 +13,17 @@ using namespace std;
 #include "ProgressBar.h"
 
 #include "TrackResidualCorrector.h"
+#include "eventSelectionCorrection.h"
 #include "tnp_weight.h"
 #include "trackingEfficiency2017pp.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
 #include "trackingEfficiency2024ppref.h"
 #include "trackingEfficiency2025OO.h"
-#include "eventSelectionCorrection.h"
 
 #include "include/cent_OO_hijing_PF.h"
-#include "include/skimSelectionBits_OO_PP.h"
 #include "include/parseFSCandPPSInfo.h"
+#include "include/skimSelectionBits_OO_PP.h"
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -85,16 +85,23 @@ int main(int argc, char *argv[]) {
       TrackEfficiencyPP2017 = new TrkEff2017pp(true, TrackEfficiencyPath);
 
       // using 2024 pp data corrections
-      TrackEfficiencyPP2024 = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Nominal_10thJune2025.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024 = new TrkEff2024ppref(
+          true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Nominal_10thJune2025.root",
+                     TrackEfficiencyPath.c_str()));
 
       // 2024 ppref, DCA loose and tight
-      TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Loose_10thJune2025.root", TrackEfficiencyPath.c_str()));
-      TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Tight_10thJune2025.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(
+          true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Loose_10thJune2025.root",
+                     TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(
+          true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Tight_10thJune2025.root",
+                     TrackEfficiencyPath.c_str()));
 
-    }
-    else if (IsPP == false) {
+    } else if (IsPP == false) {
       // Using OO MC corrections
-      TrackEfficiencyOO2025 = new TrkEff2025OO(true, Form("%s/Eff_OO_2025_PythiaHijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()), Form("%s/Eff_OO_2025_Hijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyOO2025 =
+          new TrkEff2025OO(true, Form("%s/Eff_OO_2025_PythiaHijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()));
     }
   }
 
@@ -143,7 +150,8 @@ int main(int argc, char *argv[]) {
       MEvent.GetEntry(iE);
       MGen.GetEntry(iE);
       MTrack.GetEntry(iE);
-      if (includePFMode) MPF.GetEntry(iE);
+      if (includePFMode)
+        MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
 
       MHFAdc.GetEntry(iE);
@@ -220,24 +228,35 @@ int main(int argc, char *argv[]) {
       else { // !IsPP
         if (IsData == true) {
           if (saveTriggerBitsMode == 1) { // OO triggers
-            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nAsymXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nAsymXOR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nXOR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nAsymXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nAsymXOR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nXOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nXOR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nAsymXOR_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nAsymXOR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nXOR_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nXOR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nAsymXOR_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nAsymXOR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nXOR_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nXOR_v1");
             MChargedHadronRAA.HLT_OxyZDC1nOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
             MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
-            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 = MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
             MChargedHadronRAA.HLT_OxyL1SingleJet20_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyL1SingleJet20_v1");
           } else if (saveTriggerBitsMode == 2) { // pO triggers
             MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
-            MChargedHadronRAA.HLT_OxyZDC1nOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
-            MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1= MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
-            MChargedHadronRAA.HLT_OxyNotMBHF2_v1= MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
-            MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
-            MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1= MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
-            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
-            MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1= MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
+            MChargedHadronRAA.HLT_OxyZDC1nOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
+            MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
+            MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
+            MChargedHadronRAA.HLT_OxyNotMBHF2_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
+            MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
+            MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+            MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1 =
+                MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
           }
         } // end of !IsPP && IsData
         else { // !IsPP && !IsData
@@ -255,7 +274,6 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.HFEMaxMinus2 = EMaxHFMinus_top3[1];
         MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
       }
-      
 
       // loop over tracks
       int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
@@ -272,9 +290,11 @@ int main(int argc, char *argv[]) {
         } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
           // KD: apply track selection criteria that matches that used for efficiency files, if available
-          if ((IsPP == true && (Year == 2024)) && ApplyTrackRejection == true && MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
+          if ((IsPP == true && (Year == 2024)) && ApplyTrackRejection == true &&
+              MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
             continue;
-          if ((IsPP == false && (Year == 2025)) && ApplyTrackRejection == true && MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
+          if ((IsPP == false && (Year == 2025)) && ApplyTrackRejection == true &&
+              MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
             continue; // Using ppref track selection for OO for now
           if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
             leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
@@ -313,20 +333,28 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.trkNormChi2->push_back(trkNormChi2);
         MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
 
-        if (abs(trkEta) < 1.0 && trkPt > 0.4) { locMultiplicityEta1p0++; }
-        if (abs(trkEta) < 2.4 && trkPt > 0.4) { locMultiplicityEta2p4++; }
+        if (abs(trkEta) < 1.0 && trkPt > 0.4) {
+          locMultiplicityEta1p0++;
+        }
+        if (abs(trkEta) < 2.4 && trkPt > 0.4) {
+          locMultiplicityEta2p4++;
+        }
 
         double TrackCorrection = 1;
         if (DoGenLevel == false) {
           // efficiency correction component of total track weight
           if (IsPP == true) {
             MChargedHadronRAA.trackingEfficiency2017pp->push_back(TrackEfficiencyPP2017->getCorrection(trkPt, trkEta));
-            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(TrackEfficiencyPP2024->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
+                TrackEfficiencyPP2024->getCorrection(trkPt, trkEta));
             // 2024 ppref, DCA loose and tight
-            MChargedHadronRAA.trackingEfficiency_Loose->push_back(TrackEfficiencyPP2024_DCALoose->getCorrection(trkPt, trkEta));
-            MChargedHadronRAA.trackingEfficiency_Tight->push_back(TrackEfficiencyPP2024_DCATight->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Loose->push_back(
+                TrackEfficiencyPP2024_DCALoose->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Tight->push_back(
+                TrackEfficiencyPP2024_DCATight->getCorrection(trkPt, trkEta));
           } else if (IsPP == false) {
-            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(TrackEfficiencyOO2025->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
+                TrackEfficiencyOO2025->getCorrection(trkPt, trkEta));
           }
 
           // total track correction calculation
@@ -378,18 +406,20 @@ int main(int argc, char *argv[]) {
       if (includeFSCandPPSMode) {
         // PPS variables
         if (MPPS.n > PPSMAXN) {
-          std::cout << "ERROR: in the PPS tree of the forest n > PPSMAXN; skipping PPS information filling" << std::endl;
+          std::cout << "ERROR: in the PPS tree of the forest n > PPSMAXN; skipping PPS information filling"
+                    << std::endl;
         } else {
-          for (int iPPS = 0; iPPS < MPPS.n ; iPPS++) {
+          for (int iPPS = 0; iPPS < MPPS.n; iPPS++) {
             fillPPSInfo(MChargedHadronRAA, MPPS, iPPS);
           }
         }
 
         // FSC variables
         if (MFSC.n > FSCMAXN) {
-          std::cout << "ERROR: in the FSC tree of the forest n > FSCMAXN; skipping FSC information filling" << std::endl;
+          std::cout << "ERROR: in the FSC tree of the forest n > FSCMAXN; skipping FSC information filling"
+                    << std::endl;
         } else {
-          for (int iFSC = 0; iFSC < MFSC.n ; iFSC++) {
+          for (int iFSC = 0; iFSC < MFSC.n; iFSC++) {
             fillFSCInfo(MChargedHadronRAA, MFSC, iFSC);
           }
         }
@@ -413,8 +443,8 @@ int main(int argc, char *argv[]) {
           MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 12.5, 12.5, false);
           MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 12., false);
 
-          // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and mMaxL1HFAdcPlus info 
-          // Therefore selection bits default to false
+          // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and
+          // mMaxL1HFAdcPlus info Therefore selection bits default to false
           if (sampleType == 2 || sampleType == 4) {
             MChargedHadronRAA.passL1HFAND_16_Online = false;
             MChargedHadronRAA.passL1HFOR_16_Online = false;
@@ -427,7 +457,6 @@ int main(int argc, char *argv[]) {
             MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
           }
         }
-        
       }
 
       MChargedHadronRAA.FillEntry();
