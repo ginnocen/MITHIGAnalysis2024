@@ -2398,7 +2398,7 @@ bool PPTrackTreeMessenger::PassChargedHadronPPStandardCuts(int index)
    return true;
 }
 
-bool PPTrackTreeMessenger::trackingEfficiency2024ppref_selection(int index)
+bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025StardardCuts(int index)
 {
    //FIXME: currently this matches Vipul analysis
    if(index >= nTrk)
@@ -2432,6 +2432,77 @@ bool PPTrackTreeMessenger::trackingEfficiency2024ppref_selection(int index)
    return true;
 
 }
+
+bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025LooseCuts(int index)
+{
+   //FIXME: currently this matches Vipul analysis
+   if(index >= nTrk)
+      return false;
+
+   if(abs(trkCharge->at(index)) != 1)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+
+   if (trkPt->at(index) < 0.1)
+      return false;
+
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(trkPt->at(index) > 10 && RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 5)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 5)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
+   return true;
+
+}
+
+bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025TightCuts(int index)
+{
+   //FIXME: currently this matches Vipul analysis
+   if(index >= nTrk)
+      return false;
+
+   if(abs(trkCharge->at(index)) != 1)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+
+   if (trkPt->at(index) < 0.1)
+      return false;
+
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(trkPt->at(index) > 10 && RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 2)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 2)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
+   return true;
+
+}
+
 
 ZDCTreeMessenger::ZDCTreeMessenger(TFile &File, std::string TreeName)
 {
@@ -3822,8 +3893,10 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
       delete trkNLayers;
       delete trkNormChi2;
       delete pfEnergy;
+      delete trkPassChargedHadron_Nominal;
+      delete trkPassChargedHadron_Loose;
+      delete trkPassChargedHadron_Tight;
       delete trackWeight;
-      delete trackingEfficiency2017pp;
       delete trackingEfficiency_Nominal;
       delete trackingEfficiency_Loose;
       delete trackingEfficiency_Tight;
@@ -3908,8 +3981,10 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    trkNLayers = nullptr;
    trkNormChi2 = nullptr;
    pfEnergy = nullptr;
+   trkPassChargedHadron_Nominal = nullptr;
+   trkPassChargedHadron_Loose = nullptr;
+   trkPassChargedHadron_Tight = nullptr;
    trackWeight = nullptr;
-   trackingEfficiency2017pp = nullptr;
    trackingEfficiency_Nominal = nullptr;
    trackingEfficiency_Loose = nullptr;
    trackingEfficiency_Tight = nullptr;
@@ -3997,8 +4072,10 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("trkNLayers", &trkNLayers);
    Tree->SetBranchAddress("trkNormChi2", &trkNormChi2);
    Tree->SetBranchAddress("pfEnergy", &pfEnergy);
+   Tree->SetBranchAddress("trkPassChargedHadron_Nominal", &trkPassChargedHadron_Nominal);
+   Tree->SetBranchAddress("trkPassChargedHadron_Loose", &trkPassChargedHadron_Loose);
+   Tree->SetBranchAddress("trkPassChargedHadron_Tight", &trkPassChargedHadron_Tight);
    Tree->SetBranchAddress("trackWeight", &trackWeight);
-   Tree->SetBranchAddress("trackingEfficiency2017pp", &trackingEfficiency2017pp);
    Tree->SetBranchAddress("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
    Tree->SetBranchAddress("trackingEfficiency_Loose", &trackingEfficiency_Loose);
    Tree->SetBranchAddress("trackingEfficiency_Tight", &trackingEfficiency_Tight);
@@ -4134,8 +4211,10 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    trkNLayers = new std::vector<char>();
    trkNormChi2 = new std::vector<float>();
    pfEnergy = new std::vector<float>();
+   trkPassChargedHadron_Nominal = new std::vector<bool>();
+   trkPassChargedHadron_Loose = new std::vector<bool>();
+   trkPassChargedHadron_Tight = new std::vector<bool>();
    trackWeight = new std::vector<float>();
-   trackingEfficiency2017pp = new std::vector<float>();
    trackingEfficiency_Nominal = new std::vector<float>();
    trackingEfficiency_Loose = new std::vector<float>();
    trackingEfficiency_Tight = new std::vector<float>();
@@ -4230,8 +4309,10 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("trkNLayers",                 &trkNLayers);
    Tree->Branch("trkNormChi2",                &trkNormChi2);
    Tree->Branch("pfEnergy",                   &pfEnergy);
+   Tree->Branch("trkPassChargedHadron_Nominal", &trkPassChargedHadron_Nominal);
+   Tree->Branch("trkPassChargedHadron_Loose", &trkPassChargedHadron_Loose);
+   Tree->Branch("trkPassChargedHadron_Tight", &trkPassChargedHadron_Tight);
    Tree->Branch("trackWeight",                &trackWeight);
-   Tree->Branch("trackingEfficiency2017pp",   &trackingEfficiency2017pp);
    Tree->Branch("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
    Tree->Branch("trackingEfficiency_Loose",   &trackingEfficiency_Loose);
    Tree->Branch("trackingEfficiency_Tight",   &trackingEfficiency_Tight);
@@ -4419,8 +4500,10 @@ void ChargedHadronRAATreeMessenger::Clear()
    trkNLayers->clear();
    trkNormChi2->clear();
    pfEnergy->clear();
+   trkPassChargedHadron_Nominal->clear();
+   trkPassChargedHadron_Loose->clear();
+   trkPassChargedHadron_Tight->clear();
    trackWeight->clear();
-   trackingEfficiency2017pp->clear();
    trackingEfficiency_Nominal->clear();
    trackingEfficiency_Loose->clear();
    trackingEfficiency_Tight->clear();

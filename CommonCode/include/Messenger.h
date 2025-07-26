@@ -758,7 +758,9 @@ public:
    bool Initialize();
    bool GetEntry(int iEntry);
    bool PassChargedHadronPPStandardCuts(int index);
-   bool trackingEfficiency2024ppref_selection(int index);
+   bool PassChargedHadronPPOONeNe2025StardardCuts(int index);
+   bool PassChargedHadronPPOONeNe2025LooseCuts(int index);
+   bool PassChargedHadronPPOONeNe2025TightCuts(int index);
 };
 
 class ZDCTreeMessenger
@@ -1153,9 +1155,13 @@ public:
    std::vector<float> *trkNormChi2;
    std::vector<float> *pfEnergy;
 
+   //track selection booleans
+   std::vector<bool> *trkPassChargedHadron_Nominal;
+   std::vector<bool> *trkPassChargedHadron_Loose;
+   std::vector<bool> *trkPassChargedHadron_Tight;
+
    // weighting properties
    std::vector<float> *trackWeight;
-   std::vector<float> *trackingEfficiency2017pp;
    std::vector<float> *trackingEfficiency_Nominal;
    std::vector<float> *trackingEfficiency_Loose;
    std::vector<float> *trackingEfficiency_Tight;
