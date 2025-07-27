@@ -2398,7 +2398,7 @@ bool PPTrackTreeMessenger::PassChargedHadronPPStandardCuts(int index)
    return true;
 }
 
-bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025StardardCuts(int index)
+bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025StandardCuts(int index)
 {
    //FIXME: currently this matches Vipul analysis
    if(index >= nTrk)
