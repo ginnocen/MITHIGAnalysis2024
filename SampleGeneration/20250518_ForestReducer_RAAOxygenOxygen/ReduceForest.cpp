@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
   // int Year = CL.GetInt("Year", 2024);
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
+  // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", false);
