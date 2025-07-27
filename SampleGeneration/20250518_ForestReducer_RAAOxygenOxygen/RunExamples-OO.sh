@@ -17,4 +17,5 @@ OUTPUT=tempOO.root
    --PFTree particleFlowAnalyser/pftree \
    --sampleType -1 \
    --DebugMode true \
+   --includeL1EMU true \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/

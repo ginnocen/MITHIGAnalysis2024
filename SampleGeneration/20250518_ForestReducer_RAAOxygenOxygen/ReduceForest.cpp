@@ -259,10 +259,6 @@ int main(int argc, char *argv[]) {
           int HLT_PPRefZeroBias_v6 = MTrigger.CheckTriggerStartWith("HLT_PPRefZeroBias_v6");
           if (ApplyTriggerRejection == 1 && HLT_PPRefZeroBias_v6 == 0)
             continue;
-          // if (ApplyEventRejection &&
-          //     (MChargedHadronRAA.ClusterCompatibilityFilter == false || MChargedHadronRAA.PVFilter == false)) {
-          //   continue;
-          // } // end of if on ApplyEventRejection
         } // end of CollisionSystem == "pp" abd IsData == true
         else {
         } // end of CollisionSystem == "pp" && IsData == false
@@ -343,26 +339,34 @@ int main(int argc, char *argv[]) {
       ////////////////////////////////////////////////////
       //////// Fill Baseline evt. sel filters ////////////
       ////////////////////////////////////////////////////
-
+      bool passBaselineEventSelection = false;
       if (CollisionSystem == "pp") { // PVfilter, PV position within 15 cm
-        MChargedHadronRAA.passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
+        passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
       } else if (CollisionSystem == "OO" || CollisionSystem == "NeNe" ||
                  CollisionSystem == "pO") { // PVfilter, PV position within 15 cm, ClusterCompatibilityFilter
-        MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
+        passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
       }
-
+      MChargedHadronRAA.passBaselineEventSelection = passBaselineEventSelection;
       ///////////////////////////////////////////
       ////////// Offline HF conditions //////////
       ///////////////////////////////////////////
 
+      int passHFAND_10_Offline = false;
+      int passHFAND_13_Offline = false;
+      int passHFAND_19_Offline = false;
+      int passOR_OfflineHFAND = false;
+
       if (CollisionSystem != "pp" && includePFMode) {
-        MChargedHadronRAA.passHFAND_10_Offline = checkHFANDCondition(MChargedHadronRAA, 10., 10., false);
-        MChargedHadronRAA.passHFAND_13_Offline = checkHFANDCondition(MChargedHadronRAA, 13., 13., false);
-        MChargedHadronRAA.passHFAND_19_Offline = checkHFANDCondition(MChargedHadronRAA, 19., 19., false);
-      } else {
-        MChargedHadronRAA.passHFAND_10_Offline = false;
-        MChargedHadronRAA.passHFAND_13_Offline = false;
-        MChargedHadronRAA.passHFAND_19_Offline = false;
+        passHFAND_10_Offline = checkHFANDCondition(MChargedHadronRAA, 10., 10., false);
+        passHFAND_13_Offline = checkHFANDCondition(MChargedHadronRAA, 13., 13., false);
+        passHFAND_19_Offline = checkHFANDCondition(MChargedHadronRAA, 19., 19., false);
+
+        if (ApplyEventRejection && IsData == true) {
+          passOR_OfflineHFAND = passHFAND_10_Offline || passHFAND_13_Offline || passHFAND_19_Offline;
+          if (passOR_OfflineHFAND == false) {
+            continue; // reject event if none of the HFAND conditions are met
+          }
+        }
       }
 
       // loop over tracks
