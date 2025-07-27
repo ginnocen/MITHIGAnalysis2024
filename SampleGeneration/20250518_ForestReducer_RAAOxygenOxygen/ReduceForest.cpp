@@ -343,7 +343,7 @@ int main(int argc, char *argv[]) {
         if (DoGenLevel == false) {
           // KD: apply track selection criteria that matches that used for efficiency files, if available
 
-          isSelectedTrackNominal = MTrack.PassChargedHadronPPOONeNe2025StardardCuts(iTrack);
+          isSelectedTrackNominal = MTrack.PassChargedHadronPPOONeNe2025StandardCuts(iTrack);
           isSelectedTrackLoose = MTrack.PassChargedHadronPPOONeNe2025LooseCuts(iTrack);
           isSelectedTrackTight = MTrack.PassChargedHadronPPOONeNe2025TightCuts(iTrack);
 
