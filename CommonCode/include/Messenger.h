@@ -758,7 +758,7 @@ public:
    bool Initialize();
    bool GetEntry(int iEntry);
    bool PassChargedHadronPPStandardCuts(int index);
-   bool PassChargedHadronPPOONeNe2025StardardCuts(int index);
+   bool PassChargedHadronPPOONeNe2025StandardCuts(int index);
    bool PassChargedHadronPPOONeNe2025LooseCuts(int index);
    bool PassChargedHadronPPOONeNe2025TightCuts(int index);
 };
