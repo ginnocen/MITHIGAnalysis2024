@@ -1114,10 +1114,9 @@ public:
    bool passL1HFOR_16_Online;
    bool passL1HFAND_14_Online;
    bool passL1HFOR_14_Online;
-   bool passL1HFAND_16_Offline;
-   bool passL1HFOR_16_Offline;
-   bool passL1HFAND_14_Offline;
-   bool passL1HFOR_14_Offline;
+   bool passHFAND_10_Offline;
+   bool passHFAND_13_Offline;
+   bool passHFAND_19_Offline;
 
    // Trigger bits
 

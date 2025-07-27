@@ -4035,10 +4035,9 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("passL1HFOR_16_Online", &passL1HFOR_16_Online);
    Tree->SetBranchAddress("passL1HFAND_14_Online", &passL1HFAND_14_Online);
    Tree->SetBranchAddress("passL1HFOR_14_Online", &passL1HFOR_14_Online);
-   Tree->SetBranchAddress("passL1HFAND_16_Offline", &passL1HFAND_16_Offline);
-   Tree->SetBranchAddress("passL1HFOR_16_Offline", &passL1HFOR_16_Offline);
-   Tree->SetBranchAddress("passL1HFAND_14_Offline", &passL1HFAND_14_Offline);
-   Tree->SetBranchAddress("passL1HFOR_14_Offline", &passL1HFOR_14_Offline);   
+   Tree->SetBranchAddress("passHFAND_10_Offline", &passHFAND_10_Offline);
+   Tree->SetBranchAddress("passHFAND_13_Offline", &passHFAND_13_Offline);
+   Tree->SetBranchAddress("passHFAND_19_Offline", &passHFAND_19_Offline);
 
    if(Tree->GetBranch("HLT_OxyZeroBias_v1"))                  Tree->SetBranchAddress("HLT_OxyZeroBias_v1", &HLT_OxyZeroBias_v1);
    if(Tree->GetBranch("HLT_OxyZDC1nOR_v1"))                   Tree->SetBranchAddress("HLT_OxyZDC1nOR_v1",  &HLT_OxyZDC1nOR_v1);
@@ -4267,11 +4266,10 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("passL1HFOR_16_Online",       &passL1HFOR_16_Online, "passL1HFOR_16_Online/O");
    Tree->Branch("passL1HFAND_14_Online",      &passL1HFAND_14_Online, "passL1HFAND_14_Online/O");
    Tree->Branch("passL1HFOR_14_Online",       &passL1HFOR_14_Online, "passL1HFOR_14_Online/O");
-   Tree->Branch("passL1HFAND_16_Offline",     &passL1HFAND_16_Offline, "passL1HFAND_16_Offline/O");
-   Tree->Branch("passL1HFOR_16_Offline",      &passL1HFOR_16_Offline, "passL1HFOR_16_Offline/O");
-   Tree->Branch("passL1HFAND_14_Offline",     &passL1HFAND_14_Offline, "passL1HFAND_14_Offline/O");
-   Tree->Branch("passL1HFOR_14_Offline",      &passL1HFOR_14_Offline, "passL1HFOR_14_Offline/O");
-   
+   Tree->Branch("passHFAND_10_Offline",       &passHFAND_10_Offline, "passHFAND_10_Offline/O");
+   Tree->Branch("passHFAND_13_Offline",       &passHFAND_13_Offline, "passHFAND_13_Offline/O");
+   Tree->Branch("passHFAND_19_Offline",       &passHFAND_19_Offline, "passHFAND_19_Offline/O");
+
    if (saveTriggerBitsMode == 1) {        // OO HLT bits 
       Tree->Branch("HLT_OxySingleJet16_ZDC1nAsymXOR_v1",                         &HLT_OxySingleJet16_ZDC1nAsymXOR_v1, "HLT_OxySingleJet16_ZDC1nAsymXOR_v1/O");
       Tree->Branch("HLT_OxySingleJet16_ZDC1nXOR_v1",                             &HLT_OxySingleJet16_ZDC1nXOR_v1, "HLT_OxySingleJet16_ZDC1nXOR_v1/O");
@@ -4458,10 +4456,9 @@ void ChargedHadronRAATreeMessenger::Clear()
    passL1HFOR_16_Online = false;
    passL1HFAND_14_Online = false;
    passL1HFOR_14_Online = false;
-   passL1HFAND_16_Offline = false;
-   passL1HFOR_16_Offline = false;
-   passL1HFAND_14_Offline = false;
-   passL1HFOR_14_Offline = false;
+   passHFAND_10_Offline = false;
+   passHFAND_13_Offline = false;
+   passHFAND_19_Offline = false;
 
    if (saveTriggerBitsMode == 1) { // OO HLT bits
       HLT_OxySingleJet16_ZDC1nAsymXOR_v1 = false;

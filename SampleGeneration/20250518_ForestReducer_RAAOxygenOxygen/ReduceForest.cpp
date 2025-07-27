@@ -67,6 +67,7 @@ int main(int argc, char *argv[]) {
   bool DebugMode = CL.GetBool("DebugMode", false);
   bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
   bool includePFMode = CL.GetBool("includePFMode", true);
+  bool includeL1EMU = CL.GetBool("includeL1EMU", true);
   bool MakeEventWeight = CL.GetBool("MakeEventWeight", false);
   string EvtSelCorrectionFile = CL.Get("EvtSelCorrectionFile", "EventSelEffFile-OO.root");
 
@@ -323,6 +324,46 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
       }
 
+      //////////////////////////////////////////////////
+      ///// Build L1 emulated trigger selections  //////
+      //////////////////////////////////////////////////
+
+      if (CollisionSystem != "pp" && includeL1EMU) {
+        MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
+        MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
+        MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
+        MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
+      } else {
+        MChargedHadronRAA.passL1HFAND_16_Online = false;
+        MChargedHadronRAA.passL1HFOR_16_Online = false;
+        MChargedHadronRAA.passL1HFAND_14_Online = false;
+        MChargedHadronRAA.passL1HFOR_14_Online = false;
+      }
+      ////////////////////////////////////////////////////
+      //////// Fill Baseline evt. sel filters ////////////
+      ////////////////////////////////////////////////////
+
+      if (CollisionSystem == "pp") { // PVfilter, PV position within 15 cm
+        MChargedHadronRAA.passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
+      } else if (CollisionSystem == "OO" || CollisionSystem == "NeNe" ||
+                 CollisionSystem == "pO") { // PVfilter, PV position within 15 cm, ClusterCompatibilityFilter
+        MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
+      }
+
+      ///////////////////////////////////////////
+      ////////// Offline HF conditions //////////
+      ///////////////////////////////////////////
+
+      if (CollisionSystem != "pp" && includePFMode) {
+        MChargedHadronRAA.passHFAND_10_Offline = checkHFANDCondition(MChargedHadronRAA, 10., 10., false);
+        MChargedHadronRAA.passHFAND_13_Offline = checkHFANDCondition(MChargedHadronRAA, 13., 13., false);
+        MChargedHadronRAA.passHFAND_19_Offline = checkHFANDCondition(MChargedHadronRAA, 19., 19., false);
+      } else {
+        MChargedHadronRAA.passHFAND_10_Offline = false;
+        MChargedHadronRAA.passHFAND_13_Offline = false;
+        MChargedHadronRAA.passHFAND_19_Offline = false;
+      }
+
       // loop over tracks
       int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
       MChargedHadronRAA.nTrk = NTrack;
@@ -498,40 +539,6 @@ int main(int argc, char *argv[]) {
         } else {
           for (int iFSC = 0; iFSC < MFSC.n; iFSC++) {
             fillFSCInfo(MChargedHadronRAA, MFSC, iFSC);
-          }
-        }
-      }
-
-      ////////////////////////////////////////
-      ///// Fill default selection bits //////
-      ////////////////////////////////////////
-
-      if (CollisionSystem == "pp") {
-        // If PP sample
-        MChargedHadronRAA.passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
-        // FIXME: Check if the HF information is present in pp
-      } else {
-        // If OO/pO/NeNe sample
-        MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
-        // Fill HF selection bits
-        if (includePFMode) {
-          MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 19.5, 19.5, false);
-          MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 18., false);
-          MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 12.5, 12.5, false);
-          MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 12., false);
-
-          // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and
-          // mMaxL1HFAdcPlus info Therefore selection bits default to false
-          if (sampleType == 2 || sampleType == 4) {
-            MChargedHadronRAA.passL1HFAND_16_Online = false;
-            MChargedHadronRAA.passL1HFOR_16_Online = false;
-            MChargedHadronRAA.passL1HFAND_14_Online = false;
-            MChargedHadronRAA.passL1HFOR_14_Online = false;
-          } else {
-            MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
-            MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
-            MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
-            MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
           }
         }
       }
