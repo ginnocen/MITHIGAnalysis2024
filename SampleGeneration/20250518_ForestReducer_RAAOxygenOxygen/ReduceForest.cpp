@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
           new TrkEff2025OO(true,
                            Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
                                 TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyOO2025_DCALoose =
           new TrkEff2025OO(true,
                            Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
           new TrkEff2025OO(true,
                            Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
                                 TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyNeNe2025_DCALoose =
           new TrkEff2025OO(true,
                            Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
@@ -330,9 +330,9 @@ int main(int argc, char *argv[]) {
       int locMultiplicityEta1p0 = 0;
       float leadingTrackPtEta1p0 = 0.;
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
-        int isSelectedTrackNominal = false;
-        int isSelectedTrackLoose = false;
-        int isSelectedTrackTight = false;
+        bool isSelectedTrackNominal = false;
+        bool isSelectedTrackLoose = false;
+        bool isSelectedTrackTight = false;
 
         if (DoGenLevel == true) {
           if (MGen.DaughterCount->at(iTrack) > 0)
