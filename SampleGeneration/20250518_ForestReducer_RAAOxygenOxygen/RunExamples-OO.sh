@@ -10,10 +10,10 @@ OUTPUT=tempOO.root
    --DoGenLevel false \
    --IsData true \
    --CollisionSystem OO \
-   --Fraction 0.05 \
-   --ApplyTriggerRejection 1 \
-   --ApplyEventRejection true \
-   --ApplyTrackRejection true \
+   --Fraction 1.0 \
+   --ApplyTriggerRejection 0 \
+   --ApplyEventRejection false \
+   --ApplyTrackRejection false \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType -1 \
    --DebugMode true \
