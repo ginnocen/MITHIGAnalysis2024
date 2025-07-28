@@ -15,7 +15,6 @@ using namespace std;
 #include "TrackResidualCorrector.h"
 #include "eventSelectionCorrection.h"
 #include "tnp_weight.h"
-#include "trackingEfficiency2017pp.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
 #include "trackingEfficiency2024ppref.h"
@@ -48,15 +47,17 @@ int main(int argc, char *argv[]) {
 
   bool DoGenLevel = CL.GetBool("DoGenLevel", false);
   bool IsData = CL.GetBool("IsData", false);
-  bool IsPP = CL.GetBool("IsPP", false);
-  int Year = CL.GetInt("Year", 2024);
+  string CollisionSystem = CL.Get("CollisionSystem", "OO");
+  // bool IsPP = CL.GetBool("IsPP", false);
+  // int Year = CL.GetInt("Year", 2024);
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
+  // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
-  bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", true);
-  // bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
+  bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", false);
   string TrackEfficiencyPath = (DoGenLevel == false) ? CL.Get("TrackEfficiencyPath") : "";
+
   // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
   int sampleType = CL.GetInteger("sampleType", 0);
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
@@ -66,45 +67,87 @@ int main(int argc, char *argv[]) {
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
   bool DebugMode = CL.GetBool("DebugMode", false);
   bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
-  int saveTriggerBitsMode = CL.GetInt("saveTriggerBitsMode", 0);
   bool includePFMode = CL.GetBool("includePFMode", true);
+  bool includeL1EMU = CL.GetBool("includeL1EMU", true);
   bool MakeEventWeight = CL.GetBool("MakeEventWeight", false);
   string EvtSelCorrectionFile = CL.Get("EvtSelCorrectionFile", "EventSelEffFile-OO.root");
 
+  int saveTriggerBitsMode = 0; // default for pp
+  if (CollisionSystem != "pp" && CollisionSystem != "OO" && CollisionSystem != "pO" && CollisionSystem != "NeNe") {
+    std::cout << "ERROR: Collision system must be pp, OO, pO or NeNe. Exiting." << std::endl;
+    return 1;
+  }
+
+  if (CollisionSystem == "OO" || CollisionSystem == "NeNe")
+    saveTriggerBitsMode = 1; // save trigger bits for OO and NeNe
+  else if (CollisionSystem == "pO")
+    saveTriggerBitsMode = 2; // save trigger bits for pO
+
   // load track correction helpers
-  TrkEff2017pp *TrackEfficiencyPP2017 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024_DCALoose = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024_DCATight = nullptr;
+
   TrkEff2025OO *TrackEfficiencyOO2025 = nullptr;
   TrkEff2025OO *TrackEfficiencyOO2025_DCALoose = nullptr;
   TrkEff2025OO *TrackEfficiencyOO2025_DCATight = nullptr;
+
+  TrkEff2025OO *TrackEfficiencyNeNe2025 = nullptr;
+  TrkEff2025OO *TrackEfficiencyNeNe2025_DCALoose = nullptr;
+  TrkEff2025OO *TrackEfficiencyNeNe2025_DCATight = nullptr;
+
+  /*
+  TrkEff2025pO *TrackEfficiencypO2025 = nullptr;
+  TrkEff2025pO *TrackEfficiencyNeNe2025_DCALoose = nullptr;
+  TrkEff2025pO *TrackEfficiencyNeNe2025_DCATight = nullptr;
+  */
+
   if (DoGenLevel == false) {
-    if (IsPP == true) {
-      // using 2017 pp data corrections
-      TrackEfficiencyPP2017 = new TrkEff2017pp(true, TrackEfficiencyPath);
-
-      // using 2024 pp data corrections
+    if (CollisionSystem == "pp") {
       TrackEfficiencyPP2024 = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Nominal_10thJune2025.root",
-                     TrackEfficiencyPath.c_str()));
-
-      // 2024 ppref, DCA loose and tight
+          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Loose_10thJune2025.root",
-                     TrackEfficiencyPath.c_str()));
+          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_QCDptHat15_NopU_2D_vzpthatWeight_Tight_10thJune2025.root",
-                     TrackEfficiencyPath.c_str()));
-
-    } else if (IsPP == false) {
-      // Using OO MC corrections
+          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
+    } else if (CollisionSystem == "OO") {
       TrackEfficiencyOO2025 =
-          new TrkEff2025OO(true, Form("%s/Eff_OO_2025_PythiaHijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_NopU_Nominal.root", TrackEfficiencyPath.c_str()));
+          new TrkEff2025OO(true,
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
+                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyOO2025_DCALoose =
+          new TrkEff2025OO(true,
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
+                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyOO2025_DCATight =
+          new TrkEff2025OO(true,
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",
+                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
+    } else if (CollisionSystem == "NeNe") {
+      // FIXME: NeNe corrections are currently the same as OO
+      TrackEfficiencyNeNe2025 =
+          new TrkEff2025OO(true,
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
+                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyNeNe2025_DCALoose =
+          new TrkEff2025OO(true,
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
+                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyNeNe2025_DCATight =
+          new TrkEff2025OO(true,
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",
+                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
+    } else if (CollisionSystem == "pO") {
+      std::cout << "ERROR: pO tracking efficiency not implemented yet"
+                << std::endl; // FIXME: implement pO tracking efficiency
     }
   }
-
   // load event selection correction helpers
   EvtSelCorrection *EventSelectionEfficiency = nullptr;
   if (MakeEventWeight && DoGenLevel == false) {
@@ -138,7 +181,6 @@ int main(int argc, char *argv[]) {
     if (!HideProgressBar) {
       Bar.SetStyle(-1);
     }
-
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
@@ -171,7 +213,7 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.hiHF_pf = MEvent.hiHF_pf;
       MChargedHadronRAA.hiHFPlus_pf = MEvent.hiHFPlus_pf;
       MChargedHadronRAA.hiHFMinus_pf = MEvent.hiHFMinus_pf;
-      if (IsPP == false)
+      if (CollisionSystem == "OO" || CollisionSystem == "NeNe")
         MChargedHadronRAA.hiBin = getHiBinFromhiHF(MEvent.hiHF_pf);
       else
         MChargedHadronRAA.hiBin = -9999;
@@ -212,56 +254,60 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
       MChargedHadronRAA.VZ_pf = MEvent.vz;
 
-      if (IsPP == true) {
+      if (CollisionSystem == "pp") {
         if (IsData == true) {
           int HLT_PPRefZeroBias_v6 = MTrigger.CheckTriggerStartWith("HLT_PPRefZeroBias_v6");
           if (ApplyTriggerRejection == 1 && HLT_PPRefZeroBias_v6 == 0)
             continue;
-          if (ApplyEventRejection &&
-              (MChargedHadronRAA.ClusterCompatibilityFilter == false || MChargedHadronRAA.PVFilter == false)) {
-            continue;
-          } // end of if on ApplyEventRejection
-        } // end of IsData && IsPP
+        } // end of CollisionSystem == "pp" abd IsData == true
         else {
-        } // end of IsPP && !IsData
-      } // end of IsPP
-      else { // !IsPP
+        } // end of CollisionSystem == "pp" && IsData == false
+      } // end of CollisionSystem == "pp"
+      else if (CollisionSystem == "OO" || CollisionSystem == "NeNe") {
         if (IsData == true) {
-          if (saveTriggerBitsMode == 1) { // OO triggers
-            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nAsymXOR_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nAsymXOR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nXOR_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nXOR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nAsymXOR_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nAsymXOR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nXOR_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nXOR_v1");
-            MChargedHadronRAA.HLT_OxyZDC1nOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
-            MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
-            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
-            MChargedHadronRAA.HLT_OxyL1SingleJet20_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyL1SingleJet20_v1");
-          } else if (saveTriggerBitsMode == 2) { // pO triggers
-            MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
-            MChargedHadronRAA.HLT_OxyZDC1nOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
-            MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
-            MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
-            MChargedHadronRAA.HLT_OxyNotMBHF2_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
-            MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
-            MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
-            MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
-            MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1 =
-                MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
+          int HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
+          int HLT_MinimumBiasHF_OR_BptxAND_v1 = MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+          MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nAsymXOR_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nAsymXOR_v1");
+          MChargedHadronRAA.HLT_OxySingleJet16_ZDC1nXOR_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxySingleJet16_ZDC1nXOR_v1");
+          MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nAsymXOR_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nAsymXOR_v1");
+          MChargedHadronRAA.HLT_OxySingleJet24_ZDC1nXOR_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxySingleJet24_ZDC1nXOR_v1");
+          MChargedHadronRAA.HLT_OxyZDC1nOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
+          MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
+          MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+          MChargedHadronRAA.HLT_OxyL1SingleJet20_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyL1SingleJet20_v1");
+          if (ApplyTriggerRejection == 1 && HLT_OxyZeroBias_v1 == 0) {
+            continue;
           }
-        } // end of !IsPP && IsData
-        else { // !IsPP && !IsData
-        }
-      } // end of IsPP == false
+          if (ApplyTriggerRejection == 2 && HLT_MinimumBiasHF_OR_BptxAND_v1 == 0) {
+            continue;
+          }
+        } // end of CollisionSystem == "OO" && IsData == true
+      } // end of CollisionSystem == "OO"
+      else if (CollisionSystem == "pO") {
+        if (IsData == true) {
+          MChargedHadronRAA.HLT_OxyZeroBias_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_v1");
+          MChargedHadronRAA.HLT_OxyZDC1nOR_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyZDC1nOR_v1");
+          MChargedHadronRAA.HLT_OxySingleMuOpen_NotMBHF2OR_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
+          MChargedHadronRAA.HLT_OxySingleJet8_ZDC1nAsymXOR_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
+          MChargedHadronRAA.HLT_OxyNotMBHF2_v1 = MTrigger.CheckTriggerStartWith("HLT_OxyNotMBHF2_v1");
+          MChargedHadronRAA.HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
+          MChargedHadronRAA.HLT_OxyZeroBias_MinPixelCluster400_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_OxyZeroBias_MinPixelCluster400_v1");
+          MChargedHadronRAA.HLT_MinimumBiasHF_OR_BptxAND_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_OR_BptxAND_v1");
+          MChargedHadronRAA.HLT_MinimumBiasHF_AND_BptxAND_v1 =
+              MTrigger.CheckTriggerStartWith("HLT_MinimumBiasHF_AND_BptxAND_v1");
+        } // end of CollisionSystem == "pO" && IsData == true
+      } // end of CollisionSystem == "pO"
+
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
       if (includePFMode) {
@@ -275,6 +321,54 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
       }
 
+      //////////////////////////////////////////////////
+      ///// Build L1 emulated trigger selections  //////
+      //////////////////////////////////////////////////
+
+      if (CollisionSystem != "pp" && includeL1EMU) {
+        MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
+        MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
+        MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
+        MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
+      } else {
+        MChargedHadronRAA.passL1HFAND_16_Online = false;
+        MChargedHadronRAA.passL1HFOR_16_Online = false;
+        MChargedHadronRAA.passL1HFAND_14_Online = false;
+        MChargedHadronRAA.passL1HFOR_14_Online = false;
+      }
+      ////////////////////////////////////////////////////
+      //////// Fill Baseline evt. sel filters ////////////
+      ////////////////////////////////////////////////////
+      bool passBaselineEventSelection = false;
+      if (CollisionSystem == "pp") { // PVfilter, PV position within 15 cm
+        passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
+      } else if (CollisionSystem == "OO" || CollisionSystem == "NeNe" ||
+                 CollisionSystem == "pO") { // PVfilter, PV position within 15 cm, ClusterCompatibilityFilter
+        passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
+      }
+      MChargedHadronRAA.passBaselineEventSelection = passBaselineEventSelection;
+      ///////////////////////////////////////////
+      ////////// Offline HF conditions //////////
+      ///////////////////////////////////////////
+
+      int passHFAND_10_Offline = false;
+      int passHFAND_13_Offline = false;
+      int passHFAND_19_Offline = false;
+      int passOR_OfflineHFAND = false;
+
+      if (CollisionSystem != "pp" && includePFMode) {
+        passHFAND_10_Offline = checkHFANDCondition(MChargedHadronRAA, 10., 10., false);
+        passHFAND_13_Offline = checkHFANDCondition(MChargedHadronRAA, 13., 13., false);
+        passHFAND_19_Offline = checkHFANDCondition(MChargedHadronRAA, 19., 19., false);
+
+        if (ApplyEventRejection && IsData == true) {
+          passOR_OfflineHFAND = passHFAND_10_Offline || passHFAND_13_Offline || passHFAND_19_Offline;
+          if (passOR_OfflineHFAND == false) {
+            continue; // reject event if none of the HFAND conditions are met
+          }
+        }
+      }
+
       // loop over tracks
       int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
       MChargedHadronRAA.nTrk = NTrack;
@@ -282,6 +376,10 @@ int main(int argc, char *argv[]) {
       int locMultiplicityEta1p0 = 0;
       float leadingTrackPtEta1p0 = 0.;
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
+        bool isSelectedTrackNominal = false;
+        bool isSelectedTrackLoose = false;
+        bool isSelectedTrackTight = false;
+
         if (DoGenLevel == true) {
           if (MGen.DaughterCount->at(iTrack) > 0)
             continue;
@@ -290,13 +388,22 @@ int main(int argc, char *argv[]) {
         } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
           // KD: apply track selection criteria that matches that used for efficiency files, if available
-          if ((IsPP == true && (Year == 2024)) && ApplyTrackRejection == true &&
-              MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
+
+          isSelectedTrackNominal = MTrack.PassChargedHadronPPOONeNe2025StandardCuts(iTrack);
+          isSelectedTrackLoose = MTrack.PassChargedHadronPPOONeNe2025LooseCuts(iTrack);
+          isSelectedTrackTight = MTrack.PassChargedHadronPPOONeNe2025TightCuts(iTrack);
+
+          bool isSelectedTrackORCondition = (isSelectedTrackNominal || isSelectedTrackLoose || isSelectedTrackTight);
+
+          if (ApplyTrackRejection == true && isSelectedTrackORCondition == false)
             continue;
-          if ((IsPP == false && (Year == 2025)) && ApplyTrackRejection == true &&
-              MTrack.trackingEfficiency2024ppref_selection(iTrack) == false)
-            continue; // Using ppref track selection for OO for now
-          if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
+
+          MChargedHadronRAA.trkPassChargedHadron_Nominal->push_back(isSelectedTrackNominal);
+          MChargedHadronRAA.trkPassChargedHadron_Loose->push_back(isSelectedTrackLoose);
+          MChargedHadronRAA.trkPassChargedHadron_Tight->push_back(isSelectedTrackTight);
+
+          if (isSelectedTrackNominal && abs(MTrack.trkEta->at(iTrack)) < 1.0 &&
+              MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
             leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
           }
         } // end of if on DoGenLevel == false
@@ -333,18 +440,19 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.trkNormChi2->push_back(trkNormChi2);
         MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
 
-        if (abs(trkEta) < 1.0 && trkPt > 0.4) {
-          locMultiplicityEta1p0++;
-        }
-        if (abs(trkEta) < 2.4 && trkPt > 0.4) {
-          locMultiplicityEta2p4++;
+        if (isSelectedTrackNominal) {
+          if (abs(trkEta) < 1.0 && trkPt > 0.4) {
+            locMultiplicityEta1p0++;
+          }
+          if (abs(trkEta) < 2.4 && trkPt > 0.4) {
+            locMultiplicityEta2p4++;
+          }
         }
 
         double TrackCorrection = 1;
         if (DoGenLevel == false) {
           // efficiency correction component of total track weight
-          if (IsPP == true) {
-            MChargedHadronRAA.trackingEfficiency2017pp->push_back(TrackEfficiencyPP2017->getCorrection(trkPt, trkEta));
+          if (CollisionSystem == "pp") {
             MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
                 TrackEfficiencyPP2024->getCorrection(trkPt, trkEta));
             // 2024 ppref, DCA loose and tight
@@ -352,19 +460,34 @@ int main(int argc, char *argv[]) {
                 TrackEfficiencyPP2024_DCALoose->getCorrection(trkPt, trkEta));
             MChargedHadronRAA.trackingEfficiency_Tight->push_back(
                 TrackEfficiencyPP2024_DCATight->getCorrection(trkPt, trkEta));
-          } else if (IsPP == false) {
+          } else if (CollisionSystem == "OO") {
             MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
                 TrackEfficiencyOO2025->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Loose->push_back(
+                TrackEfficiencyOO2025_DCALoose->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Tight->push_back(
+                TrackEfficiencyOO2025_DCATight->getCorrection(trkPt, trkEta));
+          } else if (CollisionSystem == "NeNe") {
+            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
+                TrackEfficiencyNeNe2025->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Loose->push_back(
+                TrackEfficiencyNeNe2025_DCALoose->getCorrection(trkPt, trkEta));
+            MChargedHadronRAA.trackingEfficiency_Tight->push_back(
+                TrackEfficiencyNeNe2025_DCATight->getCorrection(trkPt, trkEta));
+          } else if (CollisionSystem == "pO") {
+            MChargedHadronRAA.trackingEfficiency_Nominal->push_back(0.); // No correction for pO
+            MChargedHadronRAA.trackingEfficiency_Loose->push_back(0.);   // No correction for pO
+            MChargedHadronRAA.trackingEfficiency_Tight->push_back(0.);   // No correction for pO
           }
-
           // total track correction calculation
-          if (IsPP == true && (Year == 2017))
-            TrackCorrection = TrackEfficiencyPP2017->getCorrection(trkPt, trkEta);
-          else if (IsPP == true && (Year == 2024))
+          if (CollisionSystem == "pp")
             TrackCorrection = TrackEfficiencyPP2024->getCorrection(trkPt, trkEta);
-          else if (IsPP == false && (Year == 2025))
+          else if (CollisionSystem == "OO")
             TrackCorrection = TrackEfficiencyOO2025->getCorrection(trkPt, trkEta);
-
+          else if (CollisionSystem == "NeNe")
+            TrackCorrection = TrackEfficiencyNeNe2025->getCorrection(trkPt, trkEta);
+          else if (CollisionSystem == "pO")
+            TrackCorrection = 0.; // No correction for pO
         } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
       } // end of loop over tracks (gen or reco)
@@ -425,40 +548,6 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      ////////////////////////////////////////
-      ///// Fill default selection bits //////
-      ////////////////////////////////////////
-
-      if (IsPP) {
-        // If PP sample
-        MChargedHadronRAA.passBaselineEventSelection = getBaselinePPEventSel(MChargedHadronRAA);
-        // FIXME: Check if the HF information is present in pp
-      } else {
-        // If OO sample
-        MChargedHadronRAA.passBaselineEventSelection = getBaselineOOEventSel(MChargedHadronRAA);
-        // Fill HF selection bits
-        if (includePFMode) {
-          MChargedHadronRAA.passL1HFAND_16_Offline = checkHFANDCondition(MChargedHadronRAA, 19.5, 19.5, false);
-          MChargedHadronRAA.passL1HFOR_16_Offline = checkHFORCondition(MChargedHadronRAA, 18., false);
-          MChargedHadronRAA.passL1HFAND_14_Offline = checkHFANDCondition(MChargedHadronRAA, 12.5, 12.5, false);
-          MChargedHadronRAA.passL1HFOR_14_Offline = checkHFORCondition(MChargedHadronRAA, 12., false);
-
-          // FIXME: At the moment the Starlight DD and HIJING alpha-O samples dont have reliable mMaxL1HFAdcMinus and
-          // mMaxL1HFAdcPlus info Therefore selection bits default to false
-          if (sampleType == 2 || sampleType == 4) {
-            MChargedHadronRAA.passL1HFAND_16_Online = false;
-            MChargedHadronRAA.passL1HFOR_16_Online = false;
-            MChargedHadronRAA.passL1HFAND_14_Online = false;
-            MChargedHadronRAA.passL1HFOR_14_Online = false;
-          } else {
-            MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
-            MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
-            MChargedHadronRAA.passL1HFAND_14_Online = checkHFANDCondition(MChargedHadronRAA, 14., 14., true);
-            MChargedHadronRAA.passL1HFOR_14_Online = checkHFORCondition(MChargedHadronRAA, 14., true);
-          }
-        }
-      }
-
       MChargedHadronRAA.FillEntry();
     }
     if (!HideProgressBar) {
@@ -468,7 +557,6 @@ int main(int argc, char *argv[]) {
     } // if (!HideProgressBar)
     InputFile.Close();
   }
-
   OutputFile.cd();
   Tree.Write();
   InfoTree.Write();
