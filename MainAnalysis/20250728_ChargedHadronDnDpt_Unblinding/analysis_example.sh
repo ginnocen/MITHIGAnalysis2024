@@ -5,7 +5,8 @@
 # ============================================================
 source clean.sh
 
-INPUT=samples/skim_HiForest_2025OO_LowPtCfg_2210.root
+INPUT=/data00/kdeverea/OOsamples/Skims/output_20250728_Skim_OO_IonPhysics0_LowPtV2_250711_104114/0000_merged.root
+#INPUT=samples/skim_HiForest_2025OO_LowPtCfg_2210.root
 OUTPUTANALYSIS=output/20250728_skim_HiForest_2025OO_LowPtCfg_2210.root
 
 ./ExecuteChargedHadrondNdpt \
