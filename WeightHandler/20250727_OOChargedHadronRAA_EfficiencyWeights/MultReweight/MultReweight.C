@@ -47,12 +47,12 @@ void MultReweight(
     TH1D* vzReweight_Arg = (TH1D*)fVZReweight->Get("reweight_Arg");
 
     ///////// OBTAIN HISTOGRAMS FOR MULTIPLICITY INFO ////////
-    const Int_t nMultBins = 35;
+    const Int_t nMultBins = 34;
     const Double_t multBins[nMultBins + 1] = {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 
         12, 14, 16, 18, 20, 24, 28, 32, 36, 
         40, 45, 50, 55, 60, 70, 80, 100,
-        120, 150, 200, 250, 300, 400, 600, 1000
+        120, 150, 200, 250, 300, 400, 1000
     };
 
     TH1D* hDataMult = new TH1D("hDataMult", "Data Multiplicity", nMultBins, multBins);

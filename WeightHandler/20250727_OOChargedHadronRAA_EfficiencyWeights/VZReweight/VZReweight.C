@@ -69,8 +69,12 @@ void VZReweight(
      cout << cut_MC.GetTitle() << endl;
 
     //////// OBTAIN HISTOGRAMS FOR VZ INFO ////////
-    TH1D* hDataVZ = new TH1D("hDataVZ", "VZ Distribution Data", 50, -30, 30);
-    histfromtree(tData, cut_DATA, hDataVZ, "VZ");
+    // Z vertex shift correction for data
+    const double vzShift = +0.366387;
+    cout << "Applying VZ shift correction to data: " << vzShift << " cm" << endl;
+    
+    TH1D* hDataVZ = new TH1D("hDataVZ", "VZ Distribution Data (shift corrected)", 50, -30, 30);
+    histfromtree(tData, cut_DATA, hDataVZ, Form("VZ + %f", vzShift));
 
     TH1D* hMCVZ = new TH1D("hMCVZ", "VZ Distribution MC", 50, -30, 30);
     histfromtree(tOO, cut_MC, hMCVZ, "VZ");

@@ -63,7 +63,6 @@ void TrkPtReweight(
     cout << MCcut.GetTitle() << endl;
 
     ///////// OBTAIN HISTOGRAMS FOR TRACK PT INFO ////////
-
     const Int_t nPtBins_log = 26;
     const Double_t pTBins_log[nPtBins_log + 1] = {
         0.5, 0.603, 0.728, 0.879, 1.062, 1.284, 1.553, 1.878, 2.272, 2.749, 3.327, 4.027, 
@@ -170,12 +169,10 @@ void TrkPtReweight(
     c2->SetLogy();
     c2->SetLogx();
     
-    // Create copies for bin width normalization
     TH1D* hDataTrkPt_norm = (TH1D*)hDataTrkPt->Clone("hDataTrkPt_norm");
     TH1D* hMCTrkPt_norm = (TH1D*)hMCTrkPt->Clone("hMCTrkPt_norm");
     TH1D* hMCARGTrkPt_norm = (TH1D*)hMCARGTrkPt->Clone("hMCARGTrkPt_norm");
     
-    // Divide by bin width for each histogram
     for(int i = 1; i <= hDataTrkPt_norm->GetNbinsX(); i++){
         double binWidth = hDataTrkPt_norm->GetBinWidth(i);
         
@@ -195,7 +192,6 @@ void TrkPtReweight(
         hMCARGTrkPt_norm->SetBinError(i, mcArgError / binWidth);
     }
     
-    // Set colors and styles for the distributions
     hDataTrkPt_norm->SetLineColor(kBlack);
     hDataTrkPt_norm->SetLineWidth(2);
     hDataTrkPt_norm->SetMarkerStyle(20);
@@ -210,7 +206,6 @@ void TrkPtReweight(
     hMCARGTrkPt_norm->SetLineColor(kOrange+7);
     hMCARGTrkPt_norm->SetLineWidth(2);
     
-    // Find maximum for proper scaling
     double maxVal = hMCTrkPt_norm->GetMaximum();
     hDataTrkPt_norm->SetMaximum(maxVal * 15);
     hDataTrkPt_norm->GetXaxis()->SetRangeUser(0.5, 64.31);
@@ -227,7 +222,6 @@ void TrkPtReweight(
     leg2->SetFillStyle(0);
     leg2->Draw();
 
-    // Save the reweight histogram and canvas
     TFile* fout = TFile::Open("TrkPtReweight.root", "RECREATE");
     TrkPtReweight->Write();
     TrkPtReweight_Arg->Write();
@@ -240,8 +234,6 @@ void TrkPtReweight(
     c->SaveAs("TrkPTReweight.pdf");
     c2->SaveAs("TrkPTDistributions.pdf");
 
-
     cout << "DONE WITH TRACK PT REWEIGHT" << endl;
-
 }
 
