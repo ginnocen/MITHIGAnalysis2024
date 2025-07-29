@@ -124,8 +124,10 @@ public:
         //  continue;
 
         // eta hist before applying eta cut
+
         hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), trkWeight*evtWeight);
         hTrkEtaUnweighted->Fill(MChargedHadronRAA->trkEta->at(j) );
+
         // apply eta cut (last track selection)
         if (fabs(MChargedHadronRAA->trkEta->at(j)) > 1.0)
           continue;
