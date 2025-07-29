@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
   bool includePFMode = CL.GetBool("includePFMode", true);
   bool includeL1EMU = CL.GetBool("includeL1EMU", true);
   bool MakeEventWeight = CL.GetBool("MakeEventWeight", false);
-  string EvtSelCorrectionFile = CL.Get("EvtSelCorrectionFile", "EventSelEffFile-OO.root");
+  std::vector<std::string> EvtSelCorrectionFiles = CL.GetStringVector("EvtSelCorrectionFiles");
 
   int saveTriggerBitsMode = 0; // default for pp
   if (CollisionSystem != "pp" && CollisionSystem != "OO" && CollisionSystem != "pO" && CollisionSystem != "NeNe") {
@@ -148,11 +148,15 @@ int main(int argc, char *argv[]) {
                 << std::endl; // FIXME: implement pO tracking efficiency
     }
   }
-  // load event selection correction helpers
-  EvtSelCorrection *EventSelectionEfficiency = nullptr;
+  // load event selection correction helpers 
+  EvtSelCorrection *EventSelectionEfficiency_Nominal = nullptr;
+  EvtSelCorrection *EventSelectionEfficiency_Tight = nullptr;
+  EvtSelCorrection *EventSelectionEfficiency_Loose = nullptr;
   if (MakeEventWeight && DoGenLevel == false) {
     // pp and OO handled by same header file
-    EventSelectionEfficiency = new EvtSelCorrection(true, EvtSelCorrectionFile.c_str());
+    EventSelectionEfficiency_Nominal = new EvtSelCorrection(true, EvtSelCorrectionFiles[0].c_str());
+    EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFiles[1].c_str());
+    EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFiles[2].c_str());
   }
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
@@ -495,12 +499,23 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.multiplicityEta1p0 = locMultiplicityEta1p0;
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
 
-      // event selection correction calculation
-      double eventCorrection = 1.0;
-      if (MakeEventWeight && EventSelectionEfficiency != nullptr) {
-        eventCorrection = EventSelectionEfficiency->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+      // event selection correction calculation.
+      float eventEfficiencyCorrection_Nominal = -1.0;
+      if (MakeEventWeight && EventSelectionEfficiency_Nominal != nullptr) {
+        eventEfficiencyCorrection_Nominal = EventSelectionEfficiency_Nominal->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
-      MChargedHadronRAA.eventWeight = eventCorrection;
+      float eventEfficiencyCorrection_Tight = -1.0;
+      if (MakeEventWeight && EventSelectionEfficiency_Tight != nullptr) {
+        eventEfficiencyCorrection_Tight = EventSelectionEfficiency_Tight->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+      }
+      float eventEfficiencyCorrection_Loose = -1.0;
+      if (MakeEventWeight && EventSelectionEfficiency_Loose != nullptr) {
+        eventEfficiencyCorrection_Loose = EventSelectionEfficiency_Loose->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+      }
+
+      MChargedHadronRAA.eventEfficiencyWeight_Nominal = eventEfficiencyCorrection_Nominal;
+      MChargedHadronRAA.eventEfficiencyWeight_Tight = eventEfficiencyCorrection_Tight;
+      MChargedHadronRAA.eventEfficiencyWeight_Loose = eventEfficiencyCorrection_Loose;
 
       ////////////////////////////
       ///// Debug variables //////

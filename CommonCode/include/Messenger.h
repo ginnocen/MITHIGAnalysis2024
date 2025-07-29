@@ -1124,7 +1124,9 @@ public:
    float leadingPtEta1p0_sel;
    int sampleType;
    float VZ_pf;
-   float eventWeight;
+   float eventEfficiencyWeight_Nominal;
+   float eventEfficiencyWeight_Loose;
+   float eventEfficiencyWeight_Tight;
    
    bool passBaselineEventSelection; // Store default event selection decision, excluding any HF cut, different for OO and PP
    bool passL1HFAND_16_Online;
