@@ -102,15 +102,14 @@ public:
       }
 
       float evtWeight = 1.0;
-      if ( par.CollisionType == true && par.ApplyEventSelection == 0 && MChargedHadronRAA->passHFAND_10_Offline ) evtWeight *= 1.;//TODO, needs to be updated with Abraham's weights
-      if ( par.CollisionType == true && par.ApplyEventSelection == 1 && MChargedHadronRAA->passHFAND_13_Offline ) evtWeight *= 1.;//TODO, needs to be updated with Abraham's weights
-      if ( par.CollisionType == true && par.ApplyEventSelection == 2 && MChargedHadronRAA->passHFAND_19_Offline ) evtWeight *= 1.;//TODO, needs to be updated with Abraham's weights
+      if ( par.CollisionType == true && par.ApplyEventSelection == 0 && MChargedHadronRAA->passHFAND_10_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Loose;//TODO, needs to be updated with Abraham's weights
+      if ( par.CollisionType == true && par.ApplyEventSelection == 1 && MChargedHadronRAA->passHFAND_13_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Nominal;//TODO, needs to be updated with Abraham's weights
+      if ( par.CollisionType == true && par.ApplyEventSelection == 2 && MChargedHadronRAA->passHFAND_19_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;//TODO, needs to be updated with Abraham's weights
 
       // track loop
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
-
         // get track selection option
-        float trkWeight = 0.0; //assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection
+        float trkWeight = 0.0; //assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection below
         if (par.UseTrackWeight) {
           if (par.TrackSelectionOption == 1 && MChargedHadronRAA->trkPassChargedHadron_Loose->at(j) )
             trkWeight = MChargedHadronRAA->trackingEfficiency_Loose->at(j); //nonzero weight
@@ -120,14 +119,21 @@ public:
             trkWeight = MChargedHadronRAA->trackingEfficiency_Tight->at(j); //nonzero weight
         }
 
+        if (par.UseSpeciesWeight){//TODO, remove comment once skim is ready
+//          if (par.SpeciesCorrectionOption == 1 )
+//            trkWeight *= MChargedHadronRAA->TrkSpeciesWeight_pp->at(j); //nonzero weight
+//          else if (par.SpeciesCorrectionOption == 2 )
+//            trkWeight *= MChargedHadronRAA->TrkSpeciesWeight_dNdEta40->at(j); //nonzero weight
+//          else if (par.SpeciesCorrectionOption == 3 )
+//            trkWeight *= MChargedHadronRAA->TrkSpeciesWeight_dNdEta100->at(j); //nonzero weight
+	}
+
         //if (!trackSelection(MChargedHadronRAA, j, par, hNTrkPassCuts))
         //  continue;
 
         // eta hist before applying eta cut
-
         hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), trkWeight*evtWeight);
         hTrkEtaUnweighted->Fill(MChargedHadronRAA->trkEta->at(j) );
-
         // apply eta cut (last track selection)
         if (fabs(MChargedHadronRAA->trkEta->at(j)) > 1.0)
           continue;
@@ -168,17 +174,19 @@ int main(int argc, char *argv[]) {
 
   CommandLine CL(argc, argv);
   bool IsData = CL.GetBool("IsData", true);          // Determines whether the analysis is being run on actual data.
-  int TriggerChoice = CL.GetInt("TriggerChoice", 0); // Flag indication choice of trigger
-  float scaleFactor = CL.GetDouble("ScaleFactor", 1.0); // Fraction of the total number of events to be processed
+  int TriggerChoice = CL.GetInt("TriggerChoice"); // Flag indication choice of trigger
+  float scaleFactor = CL.GetDouble("ScaleFactor"); // Fraction of the total number of events to be processed
 
   Parameters par(TriggerChoice, IsData, scaleFactor);
   par.input = CL.Get("Input", "input.root");    // Input file
   par.output = CL.Get("Output", "output.root"); // Output file
-  par.CollisionType = CL.GetBool("CollisionSystem", "OO");  // Flag to indicate if the analysis is for Proton-Proton collisions, false for PP, true for OO/NeNe
-  par.UseTrackWeight = CL.GetBool("UseTrackWeight", false);
-  par.UseEventWeight = CL.GetBool("UseEventWeight", false);
-  par.ApplyEventSelection = CL.GetInt("EventSelectionOption", 0);
-  par.EventCorrectionFile = CL.Get("EventCorrectionFile", ""); // File containing event correction factors
+  par.CollisionType = CL.GetBool("CollisionSystem");  // Flag to indicate if the analysis is for Proton-Proton collisions, false for PP, true for OO/NeNe
+  par.UseSpeciesWeight = CL.GetBool("UseSpeciesWeight");
+  par.UseTrackWeight = CL.GetBool("UseTrackWeight");
+  par.UseEventWeight = CL.GetBool("UseEventWeight");
+  par.TrackSelectionOption = CL.GetInt("TrackWeightSelection");
+  par.ApplyEventSelection = CL.GetInt("EventSelectionOption");
+//  par.EventCorrectionFile = CL.Get("EventCorrectionFile"); // File containing event correction factors
   par.HideProgressBar = CL.GetBool("HideProgressBar", false);
 
   if (checkError(par))
