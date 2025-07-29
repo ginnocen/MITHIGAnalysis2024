@@ -500,15 +500,15 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
 
       // event selection correction calculation.
-      double eventEfficiencyCorrection_Nominal = -1.0;
+      float eventEfficiencyCorrection_Nominal = -1.0;
       if (MakeEventWeight && EventSelectionEfficiency_Nominal != nullptr) {
         eventEfficiencyCorrection_Nominal = EventSelectionEfficiency_Nominal->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
-      double eventEfficiencyCorrection_Tight = -1.0;
+      float eventEfficiencyCorrection_Tight = -1.0;
       if (MakeEventWeight && EventSelectionEfficiency_Tight != nullptr) {
         eventEfficiencyCorrection_Tight = EventSelectionEfficiency_Tight->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
-      double eventEfficiencyCorrection_Loose = -1.0;
+      float eventEfficiencyCorrection_Loose = -1.0;
       if (MakeEventWeight && EventSelectionEfficiency_Loose != nullptr) {
         eventEfficiencyCorrection_Loose = EventSelectionEfficiency_Loose->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
