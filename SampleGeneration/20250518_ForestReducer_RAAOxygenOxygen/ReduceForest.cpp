@@ -500,22 +500,22 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
 
       // event selection correction calculation.
-      double eventCorrection_Nominal = 1.0;
+      double eventEfficiencyCorrection_Nominal = -1.0;
       if (MakeEventWeight && EventSelectionEfficiency_Nominal != nullptr) {
-        eventCorrection_Nominal = EventSelectionEfficiency_Nominal->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+        eventEfficiencyCorrection_Nominal = EventSelectionEfficiency_Nominal->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
-      double eventCorrection_Tight = 1.0;
+      double eventEfficiencyCorrection_Tight = -1.0;
       if (MakeEventWeight && EventSelectionEfficiency_Tight != nullptr) {
-        eventCorrection_Tight = EventSelectionEfficiency_Tight->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+        eventEfficiencyCorrection_Tight = EventSelectionEfficiency_Tight->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
-      double eventCorrection_Loose = 1.0;
+      double eventEfficiencyCorrection_Loose = -1.0;
       if (MakeEventWeight && EventSelectionEfficiency_Loose != nullptr) {
-        eventCorrection_Loose = EventSelectionEfficiency_Loose->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+        eventEfficiencyCorrection_Loose = EventSelectionEfficiency_Loose->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
-    
-      MChargedHadronRAA.eventWeight_Nominal = eventCorrection_Nominal;
-      MChargedHadronRAA.eventWeight_Tight = eventCorrection_Tight;
-      MChargedHadronRAA.eventWeight_Loose = eventCorrection_Loose;
+
+      MChargedHadronRAA.eventEfficiencyWeight_Nominal = eventEfficiencyCorrection_Nominal;
+      MChargedHadronRAA.eventEfficiencyWeight_Tight = eventEfficiencyCorrection_Tight;
+      MChargedHadronRAA.eventEfficiencyWeight_Loose = eventEfficiencyCorrection_Loose;
 
       ////////////////////////////
       ///// Debug variables //////
