@@ -3997,7 +3997,9 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("VY", &VY);
    Tree->SetBranchAddress("VZ", &VZ);
    Tree->SetBranchAddress("VZ_pf", &VZ_pf);
-   Tree->SetBranchAddress("eventWeight", &eventWeight);
+   Tree->SetBranchAddress("eventWeight_Nominal", &eventWeight_Nominal);
+   Tree->SetBranchAddress("eventWeight_Loose", &eventWeight_Loose);
+   Tree->SetBranchAddress("eventWeight_Tight", &eventWeight_Tight);
    Tree->SetBranchAddress("VXError", &VXError);
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
@@ -4228,7 +4230,9 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("VY",                         &VY, "VY/F");
    Tree->Branch("VZ",                         &VZ, "VZ/F");
    Tree->Branch("VZ_pf",                      &VZ_pf, "VZ_pf/F");
-   Tree->Branch("eventWeight",                &eventWeight, "eventWeight/F");
+   Tree->Branch("eventWeight_Nominal",        &eventWeight_Nominal, "eventWeight_Nominal/F");
+   Tree->Branch("eventWeight_Loose",          &eventWeight_Loose, "eventWeight_Loose/F");
+   Tree->Branch("eventWeight_Tight",          &eventWeight_Tight, "eventWeight_Tight/F");
    Tree->Branch("VXError",                    &VXError, "VXError/F");
    Tree->Branch("VYError",                    &VYError, "VYError/F");
    Tree->Branch("VZError",                    &VZError, "VZError/F");
@@ -4418,7 +4422,9 @@ void ChargedHadronRAATreeMessenger::Clear()
    VY = 0.;
    VZ = 0.;
    VZ_pf = 0.;
-   eventWeight = 1.0;
+   eventWeight_Nominal = 1.0;
+   eventWeight_Loose = 1.0;
+   eventWeight_Tight = 1.0;
    VXError = 0.;
    VYError = 0.;
    VZError = 0.;
