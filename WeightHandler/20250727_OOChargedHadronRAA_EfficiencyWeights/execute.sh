@@ -1,6 +1,6 @@
 
 ##### SPECIFY INPUT FILES HERE#####
-DataFile="/data00/kdeverea/OOsamples/Skims/output_20250724_Skim_OO_IonPhysics0_LowPtV2_250711_104114/0000/output_74.root"
+DataFile="/data00/kdeverea/OOsamples/Skims/output_20250728_Skim_OO_IonPhysics0_LowPtV2_250711_104114/0000_merged.root"
 OOFile="/data00/kdeverea/OOsamples/Skims/output_20250725_Skim_OO_MinBias_HIJING_5362GeV/20250725_Skim_OO_MinBias_HIJING_5362GeV.root"
 OOFile_Arg="/data00/kdeverea/OOsamples/Skims/output_20250724_Skim_MinBias_Pythia_Angantyr_OO_5362GeV/20250724_Skim_MinBias_Pythia_Angantyr_OO_5362GeV.root"
     
