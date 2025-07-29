@@ -98,14 +98,14 @@ public:
         //  continue;
 
         // eta hist before applying eta cut
-        hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j));
+        hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j),trkWeight);
 
         // apply eta cut (last track selection)
         if (fabs(MChargedHadronRAA->trkEta->at(j)) > 1.0)
           continue;
 
         // fill dN/dpT
-        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j));
+        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j),trkWeight);
 
       } // end of track loop
     } // end of event loop
