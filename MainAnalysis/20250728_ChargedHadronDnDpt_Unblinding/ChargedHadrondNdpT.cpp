@@ -40,7 +40,7 @@ bool checkError(const Parameters &par) { return false; }
 class DataAnalyzer {
 public:
   TFile *inf, *outf;
-  TH1D *hTrkPt, *hTrkEta;
+  TH1D *hTrkPt, *hTrkEta, *hTrkPtUnweighted, *hTrkEtaUnweighted;
   ChargedHadronRAATreeMessenger *MChargedHadronRAA;
   string title;
 
@@ -64,9 +64,15 @@ public:
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", nPtBins_log, pTBins_log);
     hTrkEta = new TH1D(Form("hTrkEta%s", title.c_str()), "", 50, -3.0, 3.0);
 
+    hTrkPtUnweighted = new TH1D(Form("hTrkPt%sUnweighted", title.c_str()), "", nPtBins_log, pTBins_log);
+    hTrkEtaUnweighted = new TH1D(Form("hTrkEta%sUnweighted", title.c_str()), "", 50, -3.0, 3.0);
+
     hTrkPt->Sumw2();
     hTrkEta->Sumw2();
-    
+
+    hTrkPtUnweighted->Sumw2();
+    hTrkEtaUnweighted->Sumw2();
+
     par.printParameters();
     unsigned long nEntry = MChargedHadronRAA->GetEntries() * par.scaleFactor;
     ProgressBar Bar(cout, nEntry);
@@ -80,32 +86,53 @@ public:
         Bar.Print();
       }
 
+
+      //check trigger
+      if ( par.CollisionType == 0 /*&& MChargedHadronRAA->HLT_OxyZeroBias_v1 == false*/ ) continue;
+      if ( par.CollisionType && par.TriggerChoice == 0 && MChargedHadronRAA->HLT_OxyZeroBias_v1 == false ) continue;
+      if ( par.CollisionType && par.TriggerChoice == 1 && MChargedHadronRAA->HLT_MinimumBiasHF_OR_BptxAND_v1 == false ) continue;
+
+	     
+      //event selection, only for OO/NeNe
+      if (par.CollisionType){
+      if ( !(MChargedHadronRAA->passBaselineEventSelection)) continue; //all events have to pass this
+      if ( par.ApplyEventSelection == 0 && !(MChargedHadronRAA->passHFAND_10_Offline) ) continue;
+      if ( par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_13_Offline) ) continue; 
+      if ( par.ApplyEventSelection == 2 && !(MChargedHadronRAA->passHFAND_19_Offline) ) continue;
+      }
+
+      float evtWeight = 1.0;
+      if ( par.CollisionType == true && par.ApplyEventSelection == 0 && MChargedHadronRAA->passHFAND_10_Offline ) evtWeight *= 1.;//TODO, needs to be updated with Abraham's weights
+      if ( par.CollisionType == true && par.ApplyEventSelection == 1 && MChargedHadronRAA->passHFAND_13_Offline ) evtWeight *= 1.;//TODO, needs to be updated with Abraham's weights
+      if ( par.CollisionType == true && par.ApplyEventSelection == 2 && MChargedHadronRAA->passHFAND_19_Offline ) evtWeight *= 1.;//TODO, needs to be updated with Abraham's weights
+
       // track loop
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
 
         // get track selection option
-        float trkWeight = 1.0;
+        float trkWeight = 0.0; //assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection
         if (par.UseTrackWeight) {
-          if (par.TrackSelectionOption == 1)
-            trkWeight *= MChargedHadronRAA->trackingEfficiency_Loose->at(j);
-          else if (par.TrackSelectionOption == 2)
-            trkWeight *= MChargedHadronRAA->trackingEfficiency_Nominal->at(j);
-          else if (par.TrackSelectionOption == 3)
-            trkWeight *= MChargedHadronRAA->trackingEfficiency_Tight->at(j);
+          if (par.TrackSelectionOption == 1 && MChargedHadronRAA->trkPassChargedHadron_Loose->at(j) )
+            trkWeight = MChargedHadronRAA->trackingEfficiency_Loose->at(j); //nonzero weight
+          else if (par.TrackSelectionOption == 2 && MChargedHadronRAA->trkPassChargedHadron_Nominal->at(j) )
+            trkWeight = MChargedHadronRAA->trackingEfficiency_Nominal->at(j); //nonzero weight
+          else if (par.TrackSelectionOption == 3 && MChargedHadronRAA->trkPassChargedHadron_Tight->at(j))
+            trkWeight = MChargedHadronRAA->trackingEfficiency_Tight->at(j); //nonzero weight
         }
 
         //if (!trackSelection(MChargedHadronRAA, j, par, hNTrkPassCuts))
         //  continue;
 
         // eta hist before applying eta cut
-        hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j),trkWeight);
-
+        hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), trkWeight*evtWeight);
+        hTrkEtaUnweighted->Fill(MChargedHadronRAA->trkEta->at(j) );
         // apply eta cut (last track selection)
         if (fabs(MChargedHadronRAA->trkEta->at(j)) > 1.0)
           continue;
 
         // fill dN/dpT
-        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j),trkWeight);
+        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j), trkWeight*evtWeight);
+        hTrkPtUnweighted->Fill(MChargedHadronRAA->trkPt->at(j) );
 
       } // end of track loop
     } // end of event loop
@@ -115,13 +142,17 @@ public:
   void writeHistograms(TFile *outf) {
     outf->cd();
     smartWrite(hTrkPt);
+    smartWrite(hTrkPtUnweighted);
     smartWrite(hTrkEta);
+    smartWrite(hTrkEtaUnweighted);
   }
 
 private:
   void deleteHistograms() {
     delete hTrkPt;
     delete hTrkEta;
+    delete hTrkPtUnweighted;
+    delete hTrkEtaUnweighted;
   }
 };
 
@@ -141,7 +172,7 @@ int main(int argc, char *argv[]) {
   Parameters par(TriggerChoice, IsData, scaleFactor);
   par.input = CL.Get("Input", "input.root");    // Input file
   par.output = CL.Get("Output", "output.root"); // Output file
-  par.CollisionType = CL.GetBool("CollisionSystem", "OO");  // Flag to indicate if the analysis is for Proton-Proton collisions.
+  par.CollisionType = CL.GetBool("CollisionSystem", "OO");  // Flag to indicate if the analysis is for Proton-Proton collisions, false for PP, true for OO/NeNe
   par.UseTrackWeight = CL.GetBool("UseTrackWeight", false);
   par.UseEventWeight = CL.GetBool("UseEventWeight", false);
   par.ApplyEventSelection = CL.GetInt("EventSelectionOption", 0);
