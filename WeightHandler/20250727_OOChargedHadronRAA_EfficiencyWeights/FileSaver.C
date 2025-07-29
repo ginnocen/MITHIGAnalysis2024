@@ -19,12 +19,16 @@ void FileSaver(
     TH1D* hEff = (TH1D*)fEff->Get(EfficiencyHistName);
     hEff->SetName("hEff");
 
+    TH1D* hRatio = (TH1D*)fEff->Get("hRatio");
+    hRatio->SetName("pTCorrection");
+
     TFile* fout = TFile::Open(outfilename, "RECREATE");
     fout->cd();
 
     // SAVE HISTOGRAMS
     hEff->Write();
-    
+    hRatio->Write();
+
     // SAVE CONFIG. INFO
     TNamed* cutData = new TNamed("DataCut", TCutData.GetTitle());
     TNamed* cutMC = new TNamed("MCCut", TCutMC.GetTitle());
