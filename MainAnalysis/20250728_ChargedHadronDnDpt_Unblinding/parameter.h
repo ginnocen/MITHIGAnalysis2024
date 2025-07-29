@@ -16,10 +16,12 @@ public:
   bool IsData;       // Data or MC
   bool CollisionType;
   float scaleFactor; // Scale factor
+  bool UseSpeciesWeight; //Use species-by-species correction weight
   bool UseTrackWeight; // Use track weight
   bool UseEventWeight; // Use event weight
   bool ApplyEventSelection; // Apply event selection criteria
   int TrackSelectionOption; // Selection criteria for track weight
+  int SpeciesCorrectionOption; //Part species correction option
   string EventCorrectionFile; // File for event selection efficiency
   bool HideProgressBar; // Hide progress bar in output
   void printParameters() const {
@@ -30,11 +32,13 @@ public:
     cout << "IsData: " << IsData << endl;
     cout << "CollisionType: " << CollisionType << endl;
     cout << "Scale factor: " << scaleFactor << endl;
+    cout << "UseSpeciesWeight" << UseSpeciesWeight << endl;
     cout << "UseTrackWeight: " << UseTrackWeight << endl;
     cout << "UseEventWeight: " << UseEventWeight << endl;
     cout << "ApplyEventSelection: " << ApplyEventSelection << endl;
     cout << "TrackSelectionOption: " << TrackSelectionOption << endl;
     cout << "EventCorrectionFile: " << EventCorrectionFile << endl;
+    cout << "SpeciesCorrectionOption: " << SpeciesCorrectionOption << endl;
     cout << "HideProgressBar: " << HideProgressBar << endl;
   }
 };
