@@ -13,6 +13,8 @@ INCLUDEPF=${10}
 SERVER=${11}
 MAXCORES=${12}
 
+EFFPATH=${ProjectBase}/CommonCode/root/
+
 mkdir -p "${OUTPUT}/temp_inputs/"
 FILE="${OUTPUT}/temp_inputs/job_${COUNTER}.root"
 rm $FILE &> /dev/null
@@ -35,9 +37,9 @@ wait
    --includeFSCandPPSMode $INCLUDEPPSANDFSC \
    --includePFMode $INCLUDEPF \
    --saveTriggerBitsMode $SAVETRIGGERBITS \
-   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
-   --MakeEventWeight false \
-   --EvtSelCorrectionFile ${ProjectBase}/CommonCode/root/EventSelEffFile-OO.root \
+   --TrackEfficiencyPath $EFFPATH \
+   --MakeEventWeight true \
+   --EvtSelCorrectionFile "${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root" \
    --HideProgressBar false
 wait
 

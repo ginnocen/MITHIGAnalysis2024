@@ -13,6 +13,8 @@ INCLUDEPF=${10}
 
 file="$FILEPATH"
 
+EFFPATH=${ProjectBase}/CommonCode/root/
+
 ./Execute --Input "$file" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
    --DoGenLevel $DOGENLEVEL \
@@ -29,8 +31,11 @@ file="$FILEPATH"
    --includeFSCandPPSMode $INCLUDEPPSANDFSC \
    --includePFMode $INCLUDEPF \
    --saveTriggerBitsMode $SAVETRIGGERBITS \
-   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
-   --HideProgressBar false
+   --TrackEfficiencyPath $EFFPATH \
+   --HideProgressBar false \
+   --MakeEventWeight true \
+   --EvtSelCorrectionFiles "${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root" \
+
 wait
 
 sleep 0.1
