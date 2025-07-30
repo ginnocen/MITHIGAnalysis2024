@@ -3900,6 +3900,11 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
       delete trackingEfficiency_Nominal;
       delete trackingEfficiency_Loose;
       delete trackingEfficiency_Tight;
+      delete MC_TrkPtReweight;
+      delete MC_TrkDCAReweight;
+      delete TrkSpeciesWeight_pp;
+      delete TrkSpeciesWeight_dNdEta40;
+      delete TrkSpeciesWeight_dNdEta100;
 
       if (DebugMode == true) {
          // delete debug related vectors
@@ -3988,6 +3993,12 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    trackingEfficiency_Nominal = nullptr;
    trackingEfficiency_Loose = nullptr;
    trackingEfficiency_Tight = nullptr;
+   MC_TrkPtReweight = nullptr;
+   MC_TrkDCAReweight = nullptr;
+   TrkSpeciesWeight_pp = nullptr;
+   TrkSpeciesWeight_dNdEta40 = nullptr;
+   TrkSpeciesWeight_dNdEta100 = nullptr;
+
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -4080,6 +4091,11 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
    Tree->SetBranchAddress("trackingEfficiency_Loose", &trackingEfficiency_Loose);
    Tree->SetBranchAddress("trackingEfficiency_Tight", &trackingEfficiency_Tight);
+   Tree->SetBranchAddress("MC_TrkPtReweight", &MC_TrkPtReweight);
+   Tree->SetBranchAddress("MC_TrkDCAReweight", &MC_TrkDCAReweight);
+   Tree->SetBranchAddress("TrkSpeciesWeight_pp", &TrkSpeciesWeight_pp);
+   Tree->SetBranchAddress("TrkSpeciesWeight_dNdEta40", &TrkSpeciesWeight_dNdEta40);
+   Tree->SetBranchAddress("TrkSpeciesWeight_dNdEta100", &TrkSpeciesWeight_dNdEta100);
 
    // initialize debug quantities
    AllxVtx = nullptr;
@@ -4219,6 +4235,12 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    trackingEfficiency_Nominal = new std::vector<float>();
    trackingEfficiency_Loose = new std::vector<float>();
    trackingEfficiency_Tight = new std::vector<float>();
+   MC_TrkPtReweight = new std::vector<float>();
+   MC_TrkDCAReweight = new std::vector<float>();
+   TrkSpeciesWeight_pp = new std::vector<float>();
+   TrkSpeciesWeight_dNdEta40 = new std::vector<float>();
+   TrkSpeciesWeight_dNdEta100 = new std::vector<float>();
+   
 
    Tree = T;
 
@@ -4233,6 +4255,8 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("eventEfficiencyWeight_Nominal",        &eventEfficiencyWeight_Nominal, "eventEfficiencyWeight_Nominal/F");
    Tree->Branch("eventEfficiencyWeight_Loose",          &eventEfficiencyWeight_Loose, "eventEfficiencyWeight_Loose/F");
    Tree->Branch("eventEfficiencyWeight_Tight",          &eventEfficiencyWeight_Tight, "eventEfficiencyWeight_Tight/F");
+   Tree->Branch("MC_VZReweight",              &MC_VZReweight, "MC_VZReweight/F");
+   Tree->Branch("MC_MultReweight",            &MC_MultReweight, "MC_MultReweight/F");
    Tree->Branch("VXError",                    &VXError, "VXError/F");
    Tree->Branch("VYError",                    &VYError, "VYError/F");
    Tree->Branch("VZError",                    &VZError, "VZError/F");
@@ -4318,6 +4342,11 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
    Tree->Branch("trackingEfficiency_Loose",   &trackingEfficiency_Loose);
    Tree->Branch("trackingEfficiency_Tight",   &trackingEfficiency_Tight);
+   Tree->Branch("MC_TrkPtReweight",           &MC_TrkPtReweight);
+   Tree->Branch("MC_TrkDCAReweight",          &MC_TrkDCAReweight);
+   Tree->Branch("TrkSpeciesWeight_pp",        &TrkSpeciesWeight_pp);
+   Tree->Branch("TrkSpeciesWeight_dNdEta40",  &TrkSpeciesWeight_dNdEta40);
+   Tree->Branch("TrkSpeciesWeight_dNdEta100", &TrkSpeciesWeight_dNdEta100);
 
    if (DebugMode) {
       // set debug related branches
@@ -4425,6 +4454,8 @@ void ChargedHadronRAATreeMessenger::Clear()
    eventEfficiencyWeight_Nominal = -1.0;
    eventEfficiencyWeight_Loose = -1.0;
    eventEfficiencyWeight_Tight = -1.0;
+   MC_VZReweight = 1.0;
+   MC_MultReweight = 1.0;
    VXError = 0.;
    VYError = 0.;
    VZError = 0.;
@@ -4510,6 +4541,11 @@ void ChargedHadronRAATreeMessenger::Clear()
    trackingEfficiency_Nominal->clear();
    trackingEfficiency_Loose->clear();
    trackingEfficiency_Tight->clear();
+   MC_TrkPtReweight->clear();
+   MC_TrkDCAReweight->clear();
+   TrkSpeciesWeight_pp->clear();
+   TrkSpeciesWeight_dNdEta40->clear();
+   TrkSpeciesWeight_dNdEta100->clear();
 
    if (DebugMode) {
       // clear debug related branches

@@ -10,7 +10,7 @@ EFFPATH=${ProjectBase}/CommonCode/root/
 ./Execute --Input $INPUT \
    --Output $OUTPUT \
    --DoGenLevel false \
-   --IsData true \
+   --IsData false \
    --CollisionSystem OO \
    --Fraction 1.0 \
    --ApplyTriggerRejection 0 \
@@ -23,3 +23,6 @@ EFFPATH=${ProjectBase}/CommonCode/root/
    --TrackEfficiencyPath ${EFFPATH} \
    --MakeEventWeight true \
    --EvtSelCorrectionFiles "${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root" \
+   --MC_ReweightFile "${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root" \
+   --Species_ReweightFile "${EFFPATH}ParticleSpeciesCorrectionFactorsOO.root" \
+

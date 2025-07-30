@@ -1110,6 +1110,8 @@ public:
    float eventEfficiencyWeight_Nominal;
    float eventEfficiencyWeight_Loose;
    float eventEfficiencyWeight_Tight;
+   float MC_VZReweight;
+   float MC_MultReweight;
    
    bool passBaselineEventSelection; // Store default event selection decision, excluding any HF cut, different for OO and PP
    bool passL1HFAND_16_Online;
@@ -1166,6 +1168,12 @@ public:
    std::vector<float> *trackingEfficiency_Nominal;
    std::vector<float> *trackingEfficiency_Loose;
    std::vector<float> *trackingEfficiency_Tight;
+   std::vector<float> *MC_TrkPtReweight;
+   std::vector<float> *MC_TrkDCAReweight;
+   std::vector<float> *TrkSpeciesWeight_pp;
+   std::vector<float> *TrkSpeciesWeight_dNdEta40;
+   std::vector<float> *TrkSpeciesWeight_dNdEta100;
+   
 
    // Debug mode quantities
    std::vector<float> *AllxVtx;

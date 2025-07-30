@@ -14,6 +14,7 @@ using namespace std;
 
 #include "TrackResidualCorrector.h"
 #include "eventSelectionCorrection.h"
+#include "MCReweighting.h"
 #include "tnp_weight.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
@@ -22,7 +23,7 @@ using namespace std;
 
 #include "include/cent_OO_hijing_PF.h"
 #include "include/parseFSCandPPSInfo.h"
-#include "include/skimSelectionBits_OO_PP.h"
+#include "include/skimSelectionBits_OO_PP.h" 
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -70,7 +71,9 @@ int main(int argc, char *argv[]) {
   bool includePFMode = CL.GetBool("includePFMode", true);
   bool includeL1EMU = CL.GetBool("includeL1EMU", true);
   bool MakeEventWeight = CL.GetBool("MakeEventWeight", false);
-  std::vector<std::string> EvtSelCorrectionFiles = CL.GetStringVector("EvtSelCorrectionFiles");
+  std::vector<std::string> EvtSelCorrectionFiles = CL.GetStringVector("EvtSelCorrectionFiles"); 
+  std::string MC_CorrectionFile = CL.Get("MC_ReweightFile", "");
+  std::string Species_CorrectionFile = CL.Get("Species_ReweightFile", "");
 
   int saveTriggerBitsMode = 0; // default for pp
   if (CollisionSystem != "pp" && CollisionSystem != "OO" && CollisionSystem != "pO" && CollisionSystem != "NeNe") {
@@ -153,11 +156,40 @@ int main(int argc, char *argv[]) {
   EvtSelCorrection *EventSelectionEfficiency_Tight = nullptr;
   EvtSelCorrection *EventSelectionEfficiency_Loose = nullptr;
   if (MakeEventWeight && DoGenLevel == false) {
-    // pp and OO handled by same header file
-    EventSelectionEfficiency_Nominal = new EvtSelCorrection(true, EvtSelCorrectionFiles[0].c_str());
-    EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFiles[1].c_str());
-    EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFiles[2].c_str());
+    // pp and OO handled by same header file!
+    if(EvtSelCorrectionFiles.size() == 1) {
+      EventSelectionEfficiency_Nominal = new EvtSelCorrection(true, EvtSelCorrectionFiles[0].c_str());
+      EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFiles[0].c_str());
+      EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFiles[0].c_str());
+    } else if (EvtSelCorrectionFiles.size() == 3) {
+      EventSelectionEfficiency_Nominal = new EvtSelCorrection(true, EvtSelCorrectionFiles[0].c_str());
+      EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFiles[1].c_str());
+      EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFiles[2].c_str());
+    } else {
+      std::cout << "ERROR: EvtSelCorrectionFiles must contain 1 or 3 files" << EvtSelCorrectionFiles.size() << endl;
+    }
   }
+  
+  MCReweighting *MC_VZReweight = nullptr;
+  MCReweighting *MC_MultReweight = nullptr;
+  MCReweighting *MC_TrkPtReweight = nullptr;
+  MCReweighting *MC_TrkDCAReweight = nullptr;
+  if (IsData == false && MC_CorrectionFile != "") {
+      MC_VZReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "VZReweight");
+      MC_MultReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "MultReweight");
+      MC_TrkPtReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "TrkPtReweight");
+      MC_TrkDCAReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "TrkDCAReweight");
+  }
+
+  MCReweighting *TrkSpeciesWeight_pp = nullptr;
+  MCReweighting *TrkSpeciesWeight_dNdEta40 = nullptr;
+  MCReweighting *TrkSpeciesWeight_dNdEta100 = nullptr;
+  if (IsData == true && Species_CorrectionFile != "") {
+    TrkSpeciesWeight_pp = new MCReweighting(false, Species_CorrectionFile.c_str(), "correctionFactor_PPref");
+    TrkSpeciesWeight_dNdEta40 = new MCReweighting(false, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta40");
+    TrkSpeciesWeight_dNdEta100 = new MCReweighting(false, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta100");
+  }
+
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for OO RAA analysis :) (%s)", VersionString.c_str()));
@@ -458,6 +490,7 @@ int main(int argc, char *argv[]) {
         if (DoGenLevel == false) {
           // efficiency correction component of total track weight
           if (CollisionSystem == "pp") {
+            // EFFICIENCY
             MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
                 TrackEfficiencyPP2024->getCorrection(trkPt, trkEta));
             // 2024 ppref, DCA loose and tight
@@ -465,42 +498,80 @@ int main(int argc, char *argv[]) {
                 TrackEfficiencyPP2024_DCALoose->getCorrection(trkPt, trkEta));
             MChargedHadronRAA.trackingEfficiency_Tight->push_back(
                 TrackEfficiencyPP2024_DCATight->getCorrection(trkPt, trkEta));
+            // SPECIES - returns factor of 1 if track pT > 20 GeV
+            MChargedHadronRAA.TrkSpeciesWeight_pp->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_pp) ? 1 : TrkSpeciesWeight_pp->getCorrection(trkPt)); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta40->push_back(0); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta100->push_back(0);
           } else if (CollisionSystem == "OO") {
+            // EFFICIENCY
             MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
                 TrackEfficiencyOO2025->getCorrection(trkPt, trkEta));
             MChargedHadronRAA.trackingEfficiency_Loose->push_back(
                 TrackEfficiencyOO2025_DCALoose->getCorrection(trkPt, trkEta));
             MChargedHadronRAA.trackingEfficiency_Tight->push_back(
                 TrackEfficiencyOO2025_DCATight->getCorrection(trkPt, trkEta));
+            // SPECIES 
+            MChargedHadronRAA.TrkSpeciesWeight_pp->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_pp) ? 1 : TrkSpeciesWeight_pp->getCorrection(trkPt)); // pp track species weight as "LOOSE" OO species cut
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta40->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_dNdEta40) ? 1 : TrkSpeciesWeight_dNdEta40->getCorrection(trkPt)); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta100->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_dNdEta100) ? 1 : TrkSpeciesWeight_dNdEta100->getCorrection(trkPt)); 
           } else if (CollisionSystem == "NeNe") {
+            // EFFICIENCY
             MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
                 TrackEfficiencyNeNe2025->getCorrection(trkPt, trkEta));
             MChargedHadronRAA.trackingEfficiency_Loose->push_back(
                 TrackEfficiencyNeNe2025_DCALoose->getCorrection(trkPt, trkEta));
             MChargedHadronRAA.trackingEfficiency_Tight->push_back(
                 TrackEfficiencyNeNe2025_DCATight->getCorrection(trkPt, trkEta));
+            // SPECIES
+            MChargedHadronRAA.TrkSpeciesWeight_pp->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_pp) ? 1 : TrkSpeciesWeight_pp->getCorrection(trkPt)); // pp track species weight as "LOOSE" OO species cut
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta40->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_dNdEta40) ? 1 : TrkSpeciesWeight_dNdEta40->getCorrection(trkPt)); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta100->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_dNdEta100) ? 1 : TrkSpeciesWeight_dNdEta100->getCorrection(trkPt)); 
           } else if (CollisionSystem == "pO") {
             MChargedHadronRAA.trackingEfficiency_Nominal->push_back(0.); // No correction for pO
             MChargedHadronRAA.trackingEfficiency_Loose->push_back(0.);   // No correction for pO
             MChargedHadronRAA.trackingEfficiency_Tight->push_back(0.);   // No correction for pO
+            MChargedHadronRAA.TrkSpeciesWeight_pp->push_back(0.); // No correction for pO
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta40->push_back(0.); // No correction for pO
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta100->push_back(0.); // No correction for pO
           }
           // total track correction calculation
           if (CollisionSystem == "pp")
-            TrackCorrection = TrackEfficiencyPP2024->getCorrection(trkPt, trkEta);
+            TrackCorrection = TrackEfficiencyPP2024->getCorrection(trkPt, trkEta) * ((trkPt > 20 || !TrkSpeciesWeight_pp) ? 1 : TrkSpeciesWeight_pp->getCorrection(trkPt));
           else if (CollisionSystem == "OO")
-            TrackCorrection = TrackEfficiencyOO2025->getCorrection(trkPt, trkEta);
+            TrackCorrection = TrackEfficiencyOO2025->getCorrection(trkPt, trkEta) * ((trkPt > 20 || !TrkSpeciesWeight_dNdEta40) ? 1 : TrkSpeciesWeight_dNdEta40->getCorrection(trkPt));
           else if (CollisionSystem == "NeNe")
-            TrackCorrection = TrackEfficiencyNeNe2025->getCorrection(trkPt, trkEta);
+            TrackCorrection = TrackEfficiencyNeNe2025->getCorrection(trkPt, trkEta) * ((trkPt > 20 || !TrkSpeciesWeight_dNdEta40) ? 1 : TrkSpeciesWeight_dNdEta40->getCorrection(trkPt));
           else if (CollisionSystem == "pO")
             TrackCorrection = 0.; // No correction for pO
         } // end of if on DoGenLevel == false
-        MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
+        MChargedHadronRAA.trackWeight->push_back(TrackCorrection); 
+
+        // MC Reweight correction to track pT 
+        float MC_TrkPtWeight = 0;
+        if (IsData == false && MC_TrkPtReweight != nullptr) {
+          MC_TrkPtWeight = MC_TrkPtReweight->getCorrection(trkPt);
+        } 
+        MChargedHadronRAA.MC_TrkPtReweight->push_back(MC_TrkPtWeight);
+        float MC_TrkDCAWeight = 0;
+        if (IsData == false && MC_TrkDCAReweight != nullptr) {
+          MC_TrkDCAWeight = MC_TrkDCAReweight->getCorrection(trkDxyAssociatedVtx);
+        }
+        MChargedHadronRAA.MC_TrkDCAReweight->push_back(MC_TrkDCAWeight);
+
+
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
       MChargedHadronRAA.multiplicityEta1p0 = locMultiplicityEta1p0;
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
 
-      // event selection correction calculation.
+      // event selection correction calculation.  
       float eventEfficiencyCorrection_Nominal = -1.0;
       if (MakeEventWeight && EventSelectionEfficiency_Nominal != nullptr) {
         eventEfficiencyCorrection_Nominal = EventSelectionEfficiency_Nominal->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
@@ -514,9 +585,22 @@ int main(int argc, char *argv[]) {
         eventEfficiencyCorrection_Loose = EventSelectionEfficiency_Loose->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
 
-      MChargedHadronRAA.eventEfficiencyWeight_Nominal = eventEfficiencyCorrection_Nominal;
-      MChargedHadronRAA.eventEfficiencyWeight_Tight = eventEfficiencyCorrection_Tight;
-      MChargedHadronRAA.eventEfficiencyWeight_Loose = eventEfficiencyCorrection_Loose;
+      MChargedHadronRAA.eventEfficiencyWeight_Nominal = (MakeEventWeight && EventSelectionEfficiency_Nominal != nullptr) ? eventEfficiencyCorrection_Nominal : 1.0;
+      MChargedHadronRAA.eventEfficiencyWeight_Tight = (MakeEventWeight && EventSelectionEfficiency_Tight != nullptr) ? eventEfficiencyCorrection_Tight : -1.0;
+      MChargedHadronRAA.eventEfficiencyWeight_Loose = (MakeEventWeight && EventSelectionEfficiency_Loose != nullptr) ? eventEfficiencyCorrection_Loose : -1.0;
+
+      float VZWeightMC = 0;
+      float MultWeightMC = 0;
+      if (IsData == false && MC_VZReweight != nullptr) {
+        VZWeightMC = MC_VZReweight->getCorrection(MChargedHadronRAA.VZ);
+      }
+      if (IsData == false && MC_MultReweight != nullptr) {
+        MultWeightMC = MC_MultReweight->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+      }
+
+      MChargedHadronRAA.MC_VZReweight = VZWeightMC;
+      MChargedHadronRAA.MC_MultReweight = MultWeightMC;
+
 
       ////////////////////////////
       ///// Debug variables //////
