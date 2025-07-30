@@ -166,7 +166,7 @@ int main(int argc, char *argv[]) {
       EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFiles[1].c_str());
       EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFiles[2].c_str());
     } else {
-      std::cout << "ERROR: EvtSelCorrectionFiles must contain 1 or 3 files" << EvtSelCorrectionFiles.size() << endl;
+      std::cout << "ERROR: EvtSelCorrectionFiles must contain 1 or 3 files, got " << EvtSelCorrectionFiles.size() << endl;
     }
   }
   
