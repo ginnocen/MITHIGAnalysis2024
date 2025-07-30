@@ -261,6 +261,7 @@ int main(int argc, char *argv[]) {
       if (CollisionSystem == "pp") {
         if (IsData == true) {
           int HLT_PPRefZeroBias_v6 = MTrigger.CheckTriggerStartWith("HLT_PPRefZeroBias_v6");
+          MChargedHadronRAA.HLT_PPRefZeroBias_v6 = MTrigger.CheckTriggerStartWith("HLT_PPRefZeroBias_v6");
           if (ApplyTriggerRejection == 1 && HLT_PPRefZeroBias_v6 == 0)
             continue;
         } // end of CollisionSystem == "pp" abd IsData == true
