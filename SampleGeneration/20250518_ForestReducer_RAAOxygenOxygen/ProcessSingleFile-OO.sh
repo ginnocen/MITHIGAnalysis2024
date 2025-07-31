@@ -13,30 +13,22 @@ INCLUDEPF=${10}
 
 file="$FILEPATH"
 
-EFFPATH=${ProjectBase}/CommonCode/root/
+CORRPATH=${ProjectBase}/CommonCode/root/
 
 ./Execute --Input "$file" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
    --DoGenLevel $DOGENLEVEL \
-   --Year 2025 \
    --IsData $ISDATA \
-   --IsPP false \
    --Fraction 1.0 \
    --ApplyTriggerRejection true \
    --ApplyEventRejection false \
    --ApplyTrackRejection true \
-   --PFTree particleFlowAnalyser/pftree \
    --sampleType $SAMPLETYPE \
    --DebugMode $DEBUGMODE \
    --includeFSCandPPSMode $INCLUDEPPSANDFSC \
-   --includePFMode $INCLUDEPF \
    --saveTriggerBitsMode $SAVETRIGGERBITS \
-   --TrackEfficiencyPath $EFFPATH \
+   --TrackEfficiencyPath $CORRPATH \
    --HideProgressBar false \
-   --MakeEventWeight true \
-   --EvtSelCorrectionFiles "${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root" \
-   --MC_ReweightFile "${EFFPATH}OORAA_MC_Reweight_HIJING_HF13AND.root" \
-   --Species_ReweightFile "${EFFPATH}ParticleSpeciesCorrectionFactorsOO.root" \
 
 wait
 

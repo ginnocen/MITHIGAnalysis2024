@@ -90,6 +90,18 @@ bool HiEventTreeMessenger::Initialize()
    else                                 hiHFPlus_pf = 0.;
    if(Tree->GetBranch("hiHFMinus_pf"))  Tree->SetBranchAddress("hiHFMinus_pf", &hiHFMinus_pf);
    else                                 hiHFMinus_pf = 0.;
+   if(Tree->GetBranch("hiHFPlus_pfle1")) Tree->SetBranchAddress("hiHFPlus_pfle1", &hiHFPlus_pfle1);
+   else                                 hiHFPlus_pfle1 = 0.;
+   if(Tree->GetBranch("hiHFPlus_pfle2")) Tree->SetBranchAddress("hiHFPlus_pfle2", &hiHFPlus_pfle2);
+   else                                 hiHFPlus_pfle2 = 0.;
+   if(Tree->GetBranch("hiHFPlus_pfle3")) Tree->SetBranchAddress("hiHFPlus_pfle3", &hiHFPlus_pfle3);
+   else                                 hiHFPlus_pfle3 = 0.;
+   if(Tree->GetBranch("hiHFMinus_pfle1")) Tree->SetBranchAddress("hiHFMinus_pfle1", &hiHFMinus_pfle1);
+   else                                 hiHFMinus_pfle1 = 0.;
+   if(Tree->GetBranch("hiHFMinus_pfle2")) Tree->SetBranchAddress("hiHFMinus_pfle2", &hiHFMinus_pfle2);
+   else                                 hiHFMinus_pfle2 = 0.;
+   if(Tree->GetBranch("hiHFMinus_pfle3")) Tree->SetBranchAddress("hiHFMinus_pfle3", &hiHFMinus_pfle3);
+   else                                 hiHFMinus_pfle3 = 0.;
    if(Tree->GetBranch("Ncoll"))         Tree->SetBranchAddress("Ncoll", &Ncoll);
    else                                 Ncoll = 0.;
    if(Tree->GetBranch("Npart"))         Tree->SetBranchAddress("Npart", &Npart);
@@ -4502,7 +4514,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    passHFAND_19_Offline = false;
 
    if (saveTriggerBitsMode == 0){ // PPREF HLT BITS 
-      HLT_PPreZeroBias_v6 = false;
+      HLT_PPRefZeroBias_v6 = false;
    }
    if (saveTriggerBitsMode == 1) { // OO HLT bits
       HLT_OxySingleJet16_ZDC1nAsymXOR_v1 = false;
