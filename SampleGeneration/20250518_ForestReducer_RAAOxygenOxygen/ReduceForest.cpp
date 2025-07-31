@@ -45,22 +45,15 @@ int main(int argc, char *argv[]) {
   CommandLine CL(argc, argv);
   vector<string> InputFileNames = CL.GetStringVector("Input");
   string OutputFileName = CL.Get("Output");
-
   bool DoGenLevel = CL.GetBool("DoGenLevel", false);
   bool IsData = CL.GetBool("IsData", false);
   string CollisionSystem = CL.Get("CollisionSystem", "OO");
-  // bool IsPP = CL.GetBool("IsPP", false);
-  // int Year = CL.GetInt("Year", 2024);
-
   double Fraction = CL.GetDouble("Fraction", 1.00);
-  // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
-  int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
+  int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0); // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", false);
   string TrackEfficiencyPath = (DoGenLevel == false) ? CL.Get("TrackEfficiencyPath") : "";
-
-  // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
-  int sampleType = CL.GetInteger("sampleType", 0);
+  int sampleType = CL.GetInteger("sampleType", 0); // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   string PPSTreeName = CL.Get("PPSTree", "ppsanalyzer/ppstracks");
@@ -75,16 +68,13 @@ int main(int argc, char *argv[]) {
   std::string MC_CorrectionFile = CL.Get("MC_ReweightFile", "");
   std::string Species_CorrectionFile = CL.Get("Species_ReweightFile", "");
 
-  int saveTriggerBitsMode = 0; // default for pp
+  int saveTriggerBitsMode = 0;  
   if (CollisionSystem != "pp" && CollisionSystem != "OO" && CollisionSystem != "pO" && CollisionSystem != "NeNe") {
     std::cout << "ERROR: Collision system must be pp, OO, pO or NeNe. Exiting." << std::endl;
     return 1;
   }
-
-  if (CollisionSystem == "OO" || CollisionSystem == "NeNe")
-    saveTriggerBitsMode = 1; // save trigger bits for OO and NeNe
-  else if (CollisionSystem == "pO")
-    saveTriggerBitsMode = 2; // save trigger bits for pO
+  if (CollisionSystem == "OO" || CollisionSystem == "NeNe") {saveTriggerBitsMode = 1;} // save trigger bits for OO and NeNe
+  else if (CollisionSystem == "pO") {saveTriggerBitsMode = 2;} // save trigger bits for pO
 
   // load track correction helpers
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
@@ -107,50 +97,42 @@ int main(int argc, char *argv[]) {
 
   if (DoGenLevel == false) {
     if (CollisionSystem == "pp") {
-      TrackEfficiencyPP2024 = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
-      TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
-      TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024 = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
     } else if (CollisionSystem == "OO") {
       TrackEfficiencyOO2025 =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
-                                TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
+            Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",TrackEfficiencyPath.c_str()), 
+            Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyOO2025_DCALoose =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
-                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",TrackEfficiencyPath.c_str()),
                            Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyOO2025_DCATight =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",
-                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root", TrackEfficiencyPath.c_str()),
                            Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
     } else if (CollisionSystem == "NeNe") {
       // FIXME: NeNe corrections are currently the same as OO
       TrackEfficiencyNeNe2025 =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
-                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",TrackEfficiencyPath.c_str()),
                            Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyNeNe2025_DCALoose =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
-                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",TrackEfficiencyPath.c_str()),
                            Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
       TrackEfficiencyNeNe2025_DCATight =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",
-                                TrackEfficiencyPath.c_str()),
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",TrackEfficiencyPath.c_str()),
                            Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
     } else if (CollisionSystem == "pO") {
       std::cout << "ERROR: pO tracking efficiency not implemented yet"
                 << std::endl; // FIXME: implement pO tracking efficiency
     }
   }
+
   // load event selection correction helpers 
   EvtSelCorrection *EventSelectionEfficiency_Nominal = nullptr;
   EvtSelCorrection *EventSelectionEfficiency_Tight = nullptr;

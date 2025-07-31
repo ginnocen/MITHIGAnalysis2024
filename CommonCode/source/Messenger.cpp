@@ -4052,6 +4052,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("passHFAND_13_Offline", &passHFAND_13_Offline);
    Tree->SetBranchAddress("passHFAND_19_Offline", &passHFAND_19_Offline);
 
+   if(Tree->GetBranch("HLT_PPRefZeroBias_v6"))            Tree->SetBranchAddress("HLT_PPRefZeroBias_v6", &HLT_PPRefZeroBias_v6); 
    if(Tree->GetBranch("HLT_OxyZeroBias_v1"))                  Tree->SetBranchAddress("HLT_OxyZeroBias_v1", &HLT_OxyZeroBias_v1);
    if(Tree->GetBranch("HLT_OxyZDC1nOR_v1"))                   Tree->SetBranchAddress("HLT_OxyZDC1nOR_v1",  &HLT_OxyZDC1nOR_v1);
    if(Tree->GetBranch("HLT_OxySingleMuOpen_NotMBHF2OR_v1"))   Tree->SetBranchAddress("HLT_OxySingleMuOpen_NotMBHF2OR_v1", &HLT_OxySingleMuOpen_NotMBHF2OR_v1);
@@ -4298,6 +4299,9 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("passHFAND_13_Offline",       &passHFAND_13_Offline, "passHFAND_13_Offline/O");
    Tree->Branch("passHFAND_19_Offline",       &passHFAND_19_Offline, "passHFAND_19_Offline/O");
 
+   if (saveTriggerBitsMode == 0) {        // pp HLT bits
+      Tree->Branch("HLT_PPRefZeroBias_v6",                                      &HLT_PPRefZeroBias_v6, "HLT_PPRefZeroBias_v6/O");
+   }
    if (saveTriggerBitsMode == 1) {        // OO HLT bits 
       Tree->Branch("HLT_OxySingleJet16_ZDC1nAsymXOR_v1",                         &HLT_OxySingleJet16_ZDC1nAsymXOR_v1, "HLT_OxySingleJet16_ZDC1nAsymXOR_v1/O");
       Tree->Branch("HLT_OxySingleJet16_ZDC1nXOR_v1",                             &HLT_OxySingleJet16_ZDC1nXOR_v1, "HLT_OxySingleJet16_ZDC1nXOR_v1/O");
@@ -4497,6 +4501,9 @@ void ChargedHadronRAATreeMessenger::Clear()
    passHFAND_13_Offline = false;
    passHFAND_19_Offline = false;
 
+   if (saveTriggerBitsMode == 0){ // PPREF HLT BITS 
+      HLT_PPreZeroBias_v6 = false;
+   }
    if (saveTriggerBitsMode == 1) { // OO HLT bits
       HLT_OxySingleJet16_ZDC1nAsymXOR_v1 = false;
       HLT_OxySingleJet16_ZDC1nXOR_v1 = false;

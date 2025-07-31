@@ -10,12 +10,12 @@ INPUT_ON_XRD=1 # set to 1 if input files are on xrd, 0 if they are local
 #XRDSERV="root://xrootd.cmsaf.mit.edu/" # mit t2 server
 XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/group...
 
-NAME="${DATE}_Skim_ppref2024_Official_noEvtSel_test_species"
-#PATHSAMPLE="/store/group/phys_heavyions/kdeverea/Run3_2024_ppRef_Official/QCD_pThat-15to1200_TuneCP5_5p36TeV_pythia8/crab_Run3_2024_ppRef_Official/250723_164604/0000"
-PATHSAMPLE="/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000"
+NAME="${DATE}_Skim_ppref2024_Official_noEvtSel_test"
+PATHSAMPLE="/store/group/phys_heavyions/kdeverea/Run3_2024_ppRef_Official/QCD_pThat-15to1200_TuneCP5_5p36TeV_pythia8/crab_Run3_2024_ppRef_Official/250723_164604/0000"
+#PATHSAMPLE="/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0000"
 # set your output directory here
-OUTPUT="/data00/OOsamples/Skims/output_$NAME"
-MERGEDOUTPUT="/data00/OOsamples/Skims/$NAME.root"
+OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME"
+MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/$NAME.root"
 rm $MERGEDOUTPUT &> /dev/null
 
 # Function to monitor active processes
@@ -32,28 +32,22 @@ mkdir -p $OUTPUT
 
 # Loop through each file in the file list
 COUNTER=0
-# First get all subdirectories, then find files within them
-for SUBDIR in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep '^d' | awk '{print $NF}' || xrdfs $XRDSERV ls $PATHSAMPLE | grep -E '000[0-9]+/$'); do
-    echo "Checking subdirectory: $SUBDIR"
-    for FILEPATH in $(xrdfs $XRDSERV ls $SUBDIR | grep 'HiForestMiniAOD' || echo ""); do
-        if [ $NFILES -gt 0 ] && [ $COUNTER -ge $NFILES ]; then
-            break 2
-        fi
+for FILEPATH in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep 'HiForestMiniAOD'); do
 
-        if [ ! -z "$FILEPATH" ]; then
-            echo "Found file: $FILEPATH"
-            if (( $INPUT_ON_XRD == 1 )); then
-                echo ./ProcessSingleFile-ppref-xrd.sh $XRDSERV $FILEPATH $COUNTER $OUTPUT $MAXCORES
-                ./ProcessSingleFile-ppref-xrd.sh $XRDSERV $FILEPATH $COUNTER $OUTPUT $MAXCORES &
-            else
-                echo ./ProcessSingleFile-ppref.sh $FILEPATH $COUNTER $OUTPUT
-                ./ProcessSingleFile-ppref.sh $FILEPATH $COUNTER $OUTPUT &
-            fi
+    if [ $NFILES -gt 0 ] && [ $COUNTER -ge $NFILES ]; then
+        break
+    fi
 
-            wait_for_slot
-            ((COUNTER++))
-        fi
-    done
+    if (( $INPUT_ON_XRD == 1 )); then
+        echo ./ProcessSingleFile-ppref-xrd.sh $XRDSERV $FILEPATH $COUNTER $OUTPUT $MAXCORES
+        ./ProcessSingleFile-ppref-xrd.sh $XRDSERV $FILEPATH $COUNTER $OUTPUT $MAXCORES &
+    else
+        echo ./ProcessSingleFile-ppref.sh $FILEPATH $COUNTER $OUTPUT
+        ./ProcessSingleFile-ppref.sh $FILEPATH $COUNTER $OUTPUT &
+    fi
+
+    wait_for_slot
+    ((COUNTER++))
 done
 wait
 

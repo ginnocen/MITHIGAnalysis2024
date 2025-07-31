@@ -1124,6 +1124,7 @@ public:
 
    // Trigger bits
 
+   bool HLT_PPRefZeroBias_v6;
    // pO and OO triggers
    bool HLT_OxyZeroBias_v1;
    bool HLT_OxyZDC1nOR_v1;
@@ -1140,6 +1141,7 @@ public:
    bool HLT_OxySingleJet24_ZDC1nAsymXOR_v1;
    bool HLT_OxySingleJet24_ZDC1nXOR_v1;
    bool HLT_OxyL1SingleJet20_v1;
+
    
    std::vector<float> *trkPt;
    std::vector<float> *trkPhi;
