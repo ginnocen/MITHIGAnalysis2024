@@ -23,7 +23,6 @@ wait
 
 ./Execute --Input "$FILE" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
-   --DoGenLevel $DOGENLEVEL \
    --Year 2025 \
    --IsData $ISDATA \
    --IsPP false \

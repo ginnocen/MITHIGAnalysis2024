@@ -9,7 +9,6 @@ CORRPATH=${ProjectBase}/CommonCode/root/
 
 ./Execute --Input $INPUT \
    --Output $OUTPUT \
-   --DoGenLevel false \
    --IsData True \
    --CollisionSystem OO \
    --Fraction 1.0 \
