@@ -42,14 +42,13 @@ int main(int argc, char *argv[]) {
   CommandLine CL(argc, argv);
   vector<string> InputFileNames = CL.GetStringVector("Input");
   string OutputFileName = CL.Get("Output");
-  bool DoGenLevel = CL.GetBool("DoGenLevel", false);
   bool IsData = CL.GetBool("IsData", false);
   string CollisionSystem = CL.Get("CollisionSystem", "OO");
   double Fraction = CL.GetDouble("Fraction", 1.00);
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0); // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", false);
-  string CorrectionPath = (DoGenLevel == false) ? CL.Get("CorrectionPath") : "";
+  string CorrectionPath = CL.Get("CorrectionPath");
   int sampleType = CL.GetInteger("sampleType", -1); // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
@@ -88,7 +87,6 @@ int main(int argc, char *argv[]) {
   TrkEff2025pO *TrackEfficiencyNeNe2025_DCATight = nullptr;
   */
 
-  if (DoGenLevel == false) {
     if (CollisionSystem == "pp") {
       TrackEfficiencyPP2024 = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Nominal_Official.root", CorrectionPath.c_str()));
       TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Loose_Official.root", CorrectionPath.c_str()));
@@ -124,13 +122,11 @@ int main(int argc, char *argv[]) {
       std::cout << "ERROR: pO tracking efficiency not implemented yet"
                 << std::endl; // FIXME: implement pO tracking efficiency
     }
-  }
 
   // EVENT SELECTION EFFICIENCY
   EvtSelCorrection *EventSelectionEfficiency_Nominal = nullptr;
   EvtSelCorrection *EventSelectionEfficiency_Tight = nullptr;
   EvtSelCorrection *EventSelectionEfficiency_Loose = nullptr;
-  if (DoGenLevel == false) {  
     std::string EvtSelCorrectionFile_Nominal = "";
     std::string EvtSelCorrectionFile_Tight = "";
     std::string EvtSelCorrectionFile_Loose = "";
@@ -151,7 +147,6 @@ int main(int argc, char *argv[]) {
     EventSelectionEfficiency_Nominal = new EvtSelCorrection(true, EvtSelCorrectionFile_Nominal);
     EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFile_Tight);
     EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFile_Loose);
-  }
 
   // MC REWEIGHTING 
   MCReweighting *MC_VZReweight = nullptr;
@@ -392,7 +387,7 @@ int main(int argc, char *argv[]) {
       }
 
       // loop over tracks
-      int NTrack = DoGenLevel ? MGen.Mult : MTrack.nTrk;
+      int NTrack = MTrack.nTrk;
       MChargedHadronRAA.nTrk = NTrack;
       int locMultiplicityEta2p4 = 0;
       int locMultiplicityEta1p0 = 0;
@@ -402,13 +397,6 @@ int main(int argc, char *argv[]) {
         bool isSelectedTrackLoose = false;
         bool isSelectedTrackTight = false;
 
-        if (DoGenLevel == true) {
-          if (MGen.DaughterCount->at(iTrack) > 0)
-            continue;
-          if (MGen.Charge->at(iTrack) == 0)
-            continue;
-        } // end of if on DoGenLevel == true
-        if (DoGenLevel == false) {
           // KD: apply track selection criteria that matches that used for efficiency files, if available
 
           isSelectedTrackNominal = MTrack.PassChargedHadronPPOONeNe2025StandardCuts(iTrack);
@@ -428,23 +416,22 @@ int main(int argc, char *argv[]) {
               MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
             leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
           }
-        } // end of if on DoGenLevel == false
-        float trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
-        float trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
-        float trkPhi = DoGenLevel ? MGen.Phi->at(iTrack) : MTrack.trkPhi->at(iTrack);
-        float trkPtError = DoGenLevel ? 0 : MTrack.trkPtError->at(iTrack);
-        bool highPurity = DoGenLevel ? true : MTrack.highPurity->at(iTrack);
-        float trkDxyAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDxyAssociatedVtx->at(iTrack);
-        float trkDzAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDzAssociatedVtx->at(iTrack);
-        float trkDxyErrAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDxyErrAssociatedVtx->at(iTrack);
-        float trkDzErrAssociatedVtx = DoGenLevel ? -9999 : MTrack.trkDzErrAssociatedVtx->at(iTrack);
-        int trkAssociatedVtxIndx = DoGenLevel ? -1 : MTrack.trkAssociatedVtxIndx->at(iTrack);
-        char trkCharge = DoGenLevel ? char(MGen.Charge->at(iTrack)) : MTrack.trkCharge->at(iTrack);
-        char trkNHits = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNHits->at(iTrack);
-        char trkNPixHits = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNPixHits->at(iTrack);
-        char trkNLayers = DoGenLevel ? static_cast<char>(-1) : MTrack.trkNLayers->at(iTrack);
-        float trkNormChi2 = DoGenLevel ? -1 : MTrack.trkNormChi2->at(iTrack);
-        float pfEnergy = DoGenLevel ? -9999 : MTrack.pfEnergy->at(iTrack);
+        float trkEta = MTrack.trkEta->at(iTrack);
+        float trkPt = MTrack.trkPt->at(iTrack);
+        float trkPhi = MTrack.trkPhi->at(iTrack);
+        float trkPtError = MTrack.trkPtError->at(iTrack);
+        bool highPurity = MTrack.highPurity->at(iTrack);
+        float trkDxyAssociatedVtx = MTrack.trkDxyAssociatedVtx->at(iTrack);
+        float trkDzAssociatedVtx = MTrack.trkDzAssociatedVtx->at(iTrack);
+        float trkDxyErrAssociatedVtx = MTrack.trkDxyErrAssociatedVtx->at(iTrack);
+        float trkDzErrAssociatedVtx = MTrack.trkDzErrAssociatedVtx->at(iTrack);
+        int trkAssociatedVtxIndx = MTrack.trkAssociatedVtxIndx->at(iTrack);
+        char trkCharge = MTrack.trkCharge->at(iTrack);
+        char trkNHits = MTrack.trkNHits->at(iTrack);
+        char trkNPixHits = MTrack.trkNPixHits->at(iTrack);
+        char trkNLayers = MTrack.trkNLayers->at(iTrack);
+        float trkNormChi2 = MTrack.trkNormChi2->at(iTrack);
+        float pfEnergy = MTrack.pfEnergy->at(iTrack);
         MChargedHadronRAA.trkEta->push_back(trkEta);
         MChargedHadronRAA.trkPt->push_back(trkPt);
         MChargedHadronRAA.trkPhi->push_back(trkPhi);
@@ -472,7 +459,6 @@ int main(int argc, char *argv[]) {
         }
 
         double TrackCorrection = 1;
-        if (DoGenLevel == false) {
           // efficiency correction component of total track weight
           if (CollisionSystem == "pp") {
             MChargedHadronRAA.trackingEfficiency_Nominal->push_back(
@@ -510,7 +496,6 @@ int main(int argc, char *argv[]) {
             TrackCorrection = TrackEfficiencyNeNe2025->getCorrection(trkPt, trkEta);
           else if (CollisionSystem == "pO")
             TrackCorrection = 0.; // No correction for pO
-        } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
 
         /// SPECIES DEPENDENT CORRECTION
