@@ -8,7 +8,6 @@ OUTPUT=/data00/kdeverea/OOsamples/Skims/${DATE}_Skim_ppref2024_debug_noTrackEven
 
 ./Execute --Input $INPUT \
    --Output $OUTPUT \
-   --DoGenLevel false \
    --Year 2024 \
    --IsData true \
    --IsPP true \
