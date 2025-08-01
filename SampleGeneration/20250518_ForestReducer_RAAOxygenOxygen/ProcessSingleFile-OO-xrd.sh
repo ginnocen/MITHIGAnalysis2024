@@ -40,6 +40,8 @@ wait
    --TrackEfficiencyPath $EFFPATH \
    --MakeEventWeight true \
    --EvtSelCorrectionFile "${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root,${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root" \
+   --MC_ReweightFile "${EFFPATH}OORAA_MC_Reweight_HIJING_HF13AND.root" \
+   --Species_ReweightFile "${EFFPATH}ParticleSpeciesCorrectionFactorsOO.root" \
    --HideProgressBar false
 wait
 

@@ -22,6 +22,7 @@ private:
   inline bool checkBounds(float mult);
 
   bool isQuiet;
+  std::string filePath;
 
   TFile * eventEfficiencyFile;
   TH1D * eff;
@@ -46,6 +47,11 @@ inline bool EvtSelCorrection::checkBounds(float mult){
 }
 
 float EvtSelCorrection::getCorrection(float mult){
+  // Return 1 if file path is empty string
+  if(filePath == ""){
+    return -1;
+  }
+  
   if( !checkBounds(mult) ) return 0;
   
   float efficiency = getEfficiency(mult, true);
@@ -67,17 +73,27 @@ float EvtSelCorrection::getEfficiency(float mult, bool passesCheck){
   return eff->GetBinContent( eff->FindBin(mult) );
 }
 
-EvtSelCorrection::EvtSelCorrection(bool isQuiet_, std::string filePath){
+EvtSelCorrection::EvtSelCorrection(bool isQuiet_, std::string filePath_){
   isQuiet = isQuiet_;
-    if(!isQuiet) std::cout << "EvtSelCorrection class opening in general events mode!" << std::endl;
-    
-    eventEfficiencyFile = TFile::Open(filePath.c_str());
+  filePath = filePath_;
+  eventEfficiencyFile = nullptr;
+  eff = nullptr;
+  
+  if(!isQuiet) std::cout << "EvtSelCorrection class opening in general events mode!" << std::endl;
+  
+  // Don't try to open file if path is empty
+  if(filePath.empty()) {
+    if(!isQuiet) std::cout << "EvtSelCorrection: Empty file path provided, no efficiency file will be loaded." << std::endl;
+    return;
+  }
+  
+  eventEfficiencyFile = TFile::Open(filePath.c_str());
 
-    if( !(eventEfficiencyFile->IsOpen() ) ){
-      std::cout << "WARNING, COULD NOT FIND EVENT EFFICIENCY FILE FOR GENERAL EVENTS!" << std::endl;
-    } else {
-      eff = (TH1D*) eventEfficiencyFile->Get("hEff");
-    }
+  if( !eventEfficiencyFile || !(eventEfficiencyFile->IsOpen()) ){
+    std::cout << "WARNING, COULD NOT FIND EVENT EFFICIENCY FILE FOR GENERAL EVENTS!" << std::endl;
+  } else {
+    eff = (TH1D*) eventEfficiencyFile->Get("hEff");
+  }
 
 }
 

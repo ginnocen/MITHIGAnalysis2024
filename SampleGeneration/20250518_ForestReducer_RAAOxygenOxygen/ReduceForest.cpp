@@ -14,6 +14,7 @@ using namespace std;
 
 #include "TrackResidualCorrector.h"
 #include "eventSelectionCorrection.h"
+#include "MCReweighting.h"
 #include "tnp_weight.h"
 #include "trackingEfficiency2018PbPb.h"
 #include "trackingEfficiency2023PbPb.h"
@@ -22,7 +23,7 @@ using namespace std;
 
 #include "include/cent_OO_hijing_PF.h"
 #include "include/parseFSCandPPSInfo.h"
-#include "include/skimSelectionBits_OO_PP.h"
+#include "include/skimSelectionBits_OO_PP.h" 
 
 bool logical_or_vectBool(std::vector<bool> *vec) {
   return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
@@ -35,31 +36,21 @@ std::string toLower(const std::string &str) {
   return lowerStr;
 }
 
-int main(int argc, char *argv[]);
-std::vector<float> GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
-
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
 
   CommandLine CL(argc, argv);
   vector<string> InputFileNames = CL.GetStringVector("Input");
   string OutputFileName = CL.Get("Output");
-
   bool DoGenLevel = CL.GetBool("DoGenLevel", false);
   bool IsData = CL.GetBool("IsData", false);
   string CollisionSystem = CL.Get("CollisionSystem", "OO");
-  // bool IsPP = CL.GetBool("IsPP", false);
-  // int Year = CL.GetInt("Year", 2024);
-
   double Fraction = CL.GetDouble("Fraction", 1.00);
-  // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
-  int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
+  int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0); // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", false);
-  string TrackEfficiencyPath = (DoGenLevel == false) ? CL.Get("TrackEfficiencyPath") : "";
-
-  // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
-  int sampleType = CL.GetInteger("sampleType", 0);
+  string CorrectionPath = (DoGenLevel == false) ? CL.Get("CorrectionPath") : "";
+  int sampleType = CL.GetInteger("sampleType", -1); // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
   string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   string PPSTreeName = CL.Get("PPSTree", "ppsanalyzer/ppstracks");
@@ -67,23 +58,18 @@ int main(int argc, char *argv[]) {
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
   bool DebugMode = CL.GetBool("DebugMode", false);
   bool includeFSCandPPSMode = CL.GetBool("includeFSCandPPSMode", false);
-  bool includePFMode = CL.GetBool("includePFMode", true);
   bool includeL1EMU = CL.GetBool("includeL1EMU", true);
-  bool MakeEventWeight = CL.GetBool("MakeEventWeight", false);
-  std::vector<std::string> EvtSelCorrectionFiles = CL.GetStringVector("EvtSelCorrectionFiles");
+  
 
-  int saveTriggerBitsMode = 0; // default for pp
+  int saveTriggerBitsMode = 0;  
   if (CollisionSystem != "pp" && CollisionSystem != "OO" && CollisionSystem != "pO" && CollisionSystem != "NeNe") {
     std::cout << "ERROR: Collision system must be pp, OO, pO or NeNe. Exiting." << std::endl;
     return 1;
   }
+  if (CollisionSystem == "OO" || CollisionSystem == "NeNe") {saveTriggerBitsMode = 1;} // save trigger bits for OO and NeNe
+  else if (CollisionSystem == "pO") {saveTriggerBitsMode = 2;} // save trigger bits for pO
 
-  if (CollisionSystem == "OO" || CollisionSystem == "NeNe")
-    saveTriggerBitsMode = 1; // save trigger bits for OO and NeNe
-  else if (CollisionSystem == "pO")
-    saveTriggerBitsMode = 2; // save trigger bits for pO
-
-  // load track correction helpers
+  // TRACKING EFFICIENCY
   TrkEff2024ppref *TrackEfficiencyPP2024 = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024_DCALoose = nullptr;
   TrkEff2024ppref *TrackEfficiencyPP2024_DCATight = nullptr;
@@ -104,60 +90,101 @@ int main(int argc, char *argv[]) {
 
   if (DoGenLevel == false) {
     if (CollisionSystem == "pp") {
-      TrackEfficiencyPP2024 = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
-      TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
-      TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(
-          true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
+      TrackEfficiencyPP2024 = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Nominal_Official.root", CorrectionPath.c_str()));
+      TrackEfficiencyPP2024_DCALoose = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Loose_Official.root", CorrectionPath.c_str()));
+      TrackEfficiencyPP2024_DCATight = new TrkEff2024ppref(true, Form("%s/Eff_ppref_2024_Pythia_minBias_NopU_2D_Tight_Official.root", CorrectionPath.c_str()));
     } else if (CollisionSystem == "OO") {
       TrackEfficiencyOO2025 =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
-                                TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
+            Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",CorrectionPath.c_str()), 
+            Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", CorrectionPath.c_str()));
       TrackEfficiencyOO2025_DCALoose =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
-                                TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",CorrectionPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", CorrectionPath.c_str()));
       TrackEfficiencyOO2025_DCATight =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",
-                                TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root", CorrectionPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", CorrectionPath.c_str()));
     } else if (CollisionSystem == "NeNe") {
       // FIXME: NeNe corrections are currently the same as OO
       TrackEfficiencyNeNe2025 =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",
-                                TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", TrackEfficiencyPath.c_str()));
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Nominal_Official.root",CorrectionPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Nominal_Official.root", CorrectionPath.c_str()));
       TrackEfficiencyNeNe2025_DCALoose =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",
-                                TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", TrackEfficiencyPath.c_str()));
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Loose_Official.root",CorrectionPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Loose_Official.root", CorrectionPath.c_str()));
       TrackEfficiencyNeNe2025_DCATight =
           new TrkEff2025OO(true,
-                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",
-                                TrackEfficiencyPath.c_str()),
-                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", TrackEfficiencyPath.c_str()));
+                           Form("%s/Eff_OO_2025_PythiaHijing_QCD_pThat15_NoPU_pThatweight_2D_Tight_Official.root",CorrectionPath.c_str()),
+                           Form("%s/Eff_OO_2025_Hijing_MB_NoPU_2D_Tight_Official.root", CorrectionPath.c_str()));
     } else if (CollisionSystem == "pO") {
       std::cout << "ERROR: pO tracking efficiency not implemented yet"
                 << std::endl; // FIXME: implement pO tracking efficiency
     }
   }
-  // load event selection correction helpers 
+
+  // EVENT SELECTION EFFICIENCY
   EvtSelCorrection *EventSelectionEfficiency_Nominal = nullptr;
   EvtSelCorrection *EventSelectionEfficiency_Tight = nullptr;
   EvtSelCorrection *EventSelectionEfficiency_Loose = nullptr;
-  if (MakeEventWeight && DoGenLevel == false) {
-    // pp and OO handled by same header file
-    EventSelectionEfficiency_Nominal = new EvtSelCorrection(true, EvtSelCorrectionFiles[0].c_str());
-    EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFiles[1].c_str());
-    EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFiles[2].c_str());
+  if (DoGenLevel == false) {  
+    std::string EvtSelCorrectionFile_Nominal = "";
+    std::string EvtSelCorrectionFile_Tight = "";
+    std::string EvtSelCorrectionFile_Loose = "";
+    if(CollisionSystem == "pp"){ // USING OO FILES FOR PPREF ANALYSIS AS DUMMIES
+      // FILL WITH FILES. 
+    }
+    else if(CollisionSystem == "OO"){
+      EvtSelCorrectionFile_Nominal = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root",CorrectionPath.c_str());
+      EvtSelCorrectionFile_Tight = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root",CorrectionPath.c_str());
+      EvtSelCorrectionFile_Loose = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root",CorrectionPath.c_str());
+    }
+    else if(CollisionSystem == "NeNe"){ // USING OO FILES FOR NE-NE ANALYSIS AS DUMMIES
+      // FILL WITH FILES. 
+    }
+    else if(CollisionSystem == "pO") { // USING OO FILES FOR pO ANALYSIS AS DUMMIES
+      // FILL WITH FILES. 
+    }
+    EventSelectionEfficiency_Nominal = new EvtSelCorrection(true, EvtSelCorrectionFile_Nominal);
+    EventSelectionEfficiency_Tight = new EvtSelCorrection(true, EvtSelCorrectionFile_Tight);
+    EventSelectionEfficiency_Loose = new EvtSelCorrection(true, EvtSelCorrectionFile_Loose);
   }
+
+  // MC REWEIGHTING 
+  MCReweighting *MC_VZReweight = nullptr;
+  MCReweighting *MC_MultReweight = nullptr;
+  MCReweighting *MC_TrkPtReweight = nullptr;
+  MCReweighting *MC_TrkDCAReweight = nullptr;
+  std::string MC_CorrectionFile = "";
+  if (IsData == false) {
+    if(CollisionSystem == "pp") {} // DUMMY TO KEEP NULLPTR
+    else if(CollisionSystem == "OO") { MC_CorrectionFile = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root", CorrectionPath.c_str());}
+    else if(CollisionSystem == "NeNe") {} // DUMMY TO KEEP NULLPTR
+    else if(CollisionSystem == "pO") {} // DUMMY TO KEEP NULLPTR
+    MC_VZReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "VZReweight");
+    MC_MultReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "MultReweight");
+    MC_TrkPtReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "TrkPtReweight");
+    MC_TrkDCAReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "TrkDCAReweight");
+  }
+
+  // TRACK SPECIES REWEIGHTING
+  MCReweighting *TrkSpeciesWeight_pp = nullptr;
+  MCReweighting *TrkSpeciesWeight_dNdEta40 = nullptr;
+  MCReweighting *TrkSpeciesWeight_dNdEta100 = nullptr;
+  std::string Species_CorrectionFile = "";
+  if (IsData == true) {
+    if(CollisionSystem == "pp") {} // DUMMY
+    else if(CollisionSystem == "OO") { Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());}
+    else if(CollisionSystem == "pO") {} // DUMMY
+    else if(CollisionSystem == "NeNe") {} // DUMMY
+    TrkSpeciesWeight_pp = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_PPref");
+    TrkSpeciesWeight_dNdEta40 = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta40");
+    TrkSpeciesWeight_dNdEta100 = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta100");
+  }
+
 
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for OO RAA analysis :) (%s)", VersionString.c_str()));
@@ -171,9 +198,9 @@ int main(int argc, char *argv[]) {
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
     PPTrackTreeMessenger MTrack(InputFile, "ppTracks/trackTree");
     GenParticleTreeMessenger MGen(InputFile);      // HiGenParticleAna/hi
-    PFTreeMessenger MPF(InputFile, PFTreeName);    // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile);            // skimanalysis/HltTree
     HFAdcMessenger MHFAdc(InputFile);              // HFAdcana/adc
+    PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     TriggerTreeMessenger MTrigger(InputFile);      // hltanalysis/HltTree
     PPSTreeMessenger MPPS(InputFile, PPSTreeName); // ppsanalyzer/ppstracks
@@ -196,8 +223,6 @@ int main(int argc, char *argv[]) {
       MEvent.GetEntry(iE);
       MGen.GetEntry(iE);
       MTrack.GetEntry(iE);
-      if (includePFMode)
-        MPF.GetEntry(iE);
       MSkim.GetEntry(iE);
 
       MHFAdc.GetEntry(iE);
@@ -217,7 +242,7 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.hiHF_pf = MEvent.hiHF_pf;
       MChargedHadronRAA.hiHFPlus_pf = MEvent.hiHFPlus_pf;
       MChargedHadronRAA.hiHFMinus_pf = MEvent.hiHFMinus_pf;
-      if (CollisionSystem == "OO" || CollisionSystem == "NeNe")
+      if (CollisionSystem == "OO" || CollisionSystem == "NeNe" || CollisionSystem == "pO") /// should we expect a pO centrality? 
         MChargedHadronRAA.hiBin = getHiBinFromhiHF(MEvent.hiHF_pf);
       else
         MChargedHadronRAA.hiBin = -9999;
@@ -256,6 +281,12 @@ int main(int argc, char *argv[]) {
       MChargedHadronRAA.PVFilter = MSkim.PVFilter;
       MChargedHadronRAA.mMaxL1HFAdcPlus = MHFAdc.mMaxL1HFAdcPlus;
       MChargedHadronRAA.mMaxL1HFAdcMinus = MHFAdc.mMaxL1HFAdcMinus;
+      MChargedHadronRAA.HFEMaxPlus = MEvent.hiHFPlus_pfle1;
+      MChargedHadronRAA.HFEMaxPlus2 = MEvent.hiHFPlus_pfle2;
+      MChargedHadronRAA.HFEMaxPlus3 = MEvent.hiHFPlus_pfle3;
+      MChargedHadronRAA.HFEMaxMinus = MEvent.hiHFMinus_pfle1;
+      MChargedHadronRAA.HFEMaxMinus2 = MEvent.hiHFMinus_pfle2;
+      MChargedHadronRAA.HFEMaxMinus3 = MEvent.hiHFMinus_pfle3;
       MChargedHadronRAA.VZ_pf = MEvent.vz;
 
       if (CollisionSystem == "pp") {
@@ -264,7 +295,7 @@ int main(int argc, char *argv[]) {
           MChargedHadronRAA.HLT_PPRefZeroBias_v6 = MTrigger.CheckTriggerStartWith("HLT_PPRefZeroBias_v6");
           if (ApplyTriggerRejection == 1 && HLT_PPRefZeroBias_v6 == 0)
             continue;
-        } // end of CollisionSystem == "pp" abd IsData == true
+        } // end of CollisionSystem == "pp" and IsData == true
         else {
         } // end of CollisionSystem == "pp" && IsData == false
       } // end of CollisionSystem == "pp"
@@ -313,23 +344,9 @@ int main(int argc, char *argv[]) {
         } // end of CollisionSystem == "pO" && IsData == true
       } // end of CollisionSystem == "pO"
 
-      // Loop through the specified ranges for gapgammaN and gapNgamma
-      // gammaN[4] and Ngamma[4] are nominal selection criteria
-      if (includePFMode) {
-        std::vector<float> EMaxHFPlus_top3 = GetMaxEnergyHF(&MPF, 3.0, 5.2);
-        std::vector<float> EMaxHFMinus_top3 = GetMaxEnergyHF(&MPF, -5.2, -3.0);
-        MChargedHadronRAA.HFEMaxPlus = EMaxHFPlus_top3[0];
-        MChargedHadronRAA.HFEMaxPlus2 = EMaxHFPlus_top3[1];
-        MChargedHadronRAA.HFEMaxPlus3 = EMaxHFPlus_top3[2];
-        MChargedHadronRAA.HFEMaxMinus = EMaxHFMinus_top3[0];
-        MChargedHadronRAA.HFEMaxMinus2 = EMaxHFMinus_top3[1];
-        MChargedHadronRAA.HFEMaxMinus3 = EMaxHFMinus_top3[2];
-      }
-
       //////////////////////////////////////////////////
       ///// Build L1 emulated trigger selections  //////
       //////////////////////////////////////////////////
-
       if (CollisionSystem != "pp" && includeL1EMU) {
         MChargedHadronRAA.passL1HFAND_16_Online = checkHFANDCondition(MChargedHadronRAA, 16., 16., true);
         MChargedHadronRAA.passL1HFOR_16_Online = checkHFORCondition(MChargedHadronRAA, 16., true);
@@ -361,7 +378,7 @@ int main(int argc, char *argv[]) {
       int passHFAND_19_Offline = false;
       int passOR_OfflineHFAND = false;
 
-      if (CollisionSystem != "pp" && includePFMode) {
+      if (CollisionSystem != "pp") {
         passHFAND_10_Offline = checkHFANDCondition(MChargedHadronRAA, 10., 10., false);
         passHFAND_13_Offline = checkHFANDCondition(MChargedHadronRAA, 13., 13., false);
         passHFAND_19_Offline = checkHFANDCondition(MChargedHadronRAA, 19., 19., false);
@@ -495,28 +512,75 @@ int main(int argc, char *argv[]) {
             TrackCorrection = 0.; // No correction for pO
         } // end of if on DoGenLevel == false
         MChargedHadronRAA.trackWeight->push_back(TrackCorrection);
+
+        /// SPECIES DEPENDENT CORRECTION
+        if(IsData == true){
+          if(CollisionSystem == "pp"){
+            MChargedHadronRAA.TrkSpeciesWeight_pp->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_pp) ? 1 : TrkSpeciesWeight_pp->getCorrection(trkPt)); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta40->push_back(0); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta100->push_back(0);
+          }
+          if(CollisionSystem == "OO" || CollisionSystem == "NeNe") {
+            MChargedHadronRAA.TrkSpeciesWeight_pp->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_pp) ? 1 : TrkSpeciesWeight_pp->getCorrection(trkPt)); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta40->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_dNdEta40) ? 1 : TrkSpeciesWeight_dNdEta40->getCorrection(trkPt)); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta100->push_back(
+                (trkPt > 20 || !TrkSpeciesWeight_dNdEta100) ? 1 : TrkSpeciesWeight_dNdEta100->getCorrection(trkPt)); 
+          }
+          if(CollisionSystem == "pO") {
+            // SPECIES - returns factor of 1 if track pT > 20 GeV. No correction applied here
+            MChargedHadronRAA.TrkSpeciesWeight_pp->push_back(0); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta40->push_back(0); 
+            MChargedHadronRAA.TrkSpeciesWeight_dNdEta100->push_back(0);
+          }
+        }
+
+        // MC TRACK LEVEL REWEIGHT CORRECTION
+        float MC_TrkPtWeight = 0;
+        if (IsData == false && MC_TrkPtReweight != nullptr) {MC_TrkPtWeight = MC_TrkPtReweight->getCorrection(trkPt);} 
+        MChargedHadronRAA.MC_TrkPtReweight->push_back(MC_TrkPtWeight);
+        
+        float MC_TrkDCAWeight = 0;
+        if (IsData == false && MC_TrkDCAReweight != nullptr) {MC_TrkDCAWeight = MC_TrkDCAReweight->getCorrection(trkDxyAssociatedVtx);}
+        MChargedHadronRAA.MC_TrkDCAReweight->push_back(MC_TrkDCAWeight);
+
       } // end of loop over tracks (gen or reco)
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
       MChargedHadronRAA.multiplicityEta1p0 = locMultiplicityEta1p0;
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
 
-      // event selection correction calculation.
+      // EVENT SELECTION CORRECTION
       float eventEfficiencyCorrection_Nominal = -1.0;
-      if (MakeEventWeight && EventSelectionEfficiency_Nominal != nullptr) {
+      if (EventSelectionEfficiency_Nominal != nullptr) {
         eventEfficiencyCorrection_Nominal = EventSelectionEfficiency_Nominal->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
       float eventEfficiencyCorrection_Tight = -1.0;
-      if (MakeEventWeight && EventSelectionEfficiency_Tight != nullptr) {
+      if (EventSelectionEfficiency_Tight != nullptr) {
         eventEfficiencyCorrection_Tight = EventSelectionEfficiency_Tight->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
       float eventEfficiencyCorrection_Loose = -1.0;
-      if (MakeEventWeight && EventSelectionEfficiency_Loose != nullptr) {
+      if (EventSelectionEfficiency_Loose != nullptr) {
         eventEfficiencyCorrection_Loose = EventSelectionEfficiency_Loose->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
       }
 
-      MChargedHadronRAA.eventEfficiencyWeight_Nominal = eventEfficiencyCorrection_Nominal;
-      MChargedHadronRAA.eventEfficiencyWeight_Tight = eventEfficiencyCorrection_Tight;
-      MChargedHadronRAA.eventEfficiencyWeight_Loose = eventEfficiencyCorrection_Loose;
+      MChargedHadronRAA.eventEfficiencyWeight_Nominal = (EventSelectionEfficiency_Nominal != nullptr) ? eventEfficiencyCorrection_Nominal : -1.0;
+      MChargedHadronRAA.eventEfficiencyWeight_Tight = (EventSelectionEfficiency_Tight != nullptr) ? eventEfficiencyCorrection_Tight : -1.0;
+      MChargedHadronRAA.eventEfficiencyWeight_Loose = (EventSelectionEfficiency_Loose != nullptr) ? eventEfficiencyCorrection_Loose : -1.0;
+
+      float VZWeightMC = 0;
+      float MultWeightMC = 0;
+      if (IsData == false && MC_VZReweight != nullptr) {
+        VZWeightMC = MC_VZReweight->getCorrection(MChargedHadronRAA.VZ);
+      }
+      if (IsData == false && MC_MultReweight != nullptr) {
+        MultWeightMC = MC_MultReweight->getCorrection(MChargedHadronRAA.multiplicityEta2p4);
+      }
+
+      MChargedHadronRAA.MC_VZReweight = VZWeightMC;
+      MChargedHadronRAA.MC_MultReweight = MultWeightMC;
+
 
       ////////////////////////////
       ///// Debug variables //////
@@ -582,33 +646,3 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-// ============================================================================ //
-// Function to Retrieve Maximum Energy in HF Region within Specified Eta Range
-// ============================================================================ //
-std::vector<float> GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.) {
-  if (M == nullptr)
-    return {-9999., -9999., -9999.};
-  if (M->Tree == nullptr)
-    return {-9999., -9999., -9999.};
-
-  std::vector<float> EMax_vec = {-1, -1, -1};
-
-  for (int iPF = 0; iPF < M->ID->size(); iPF++) {
-    if ((M->ID->at(iPF) == 6 || M->ID->at(iPF) == 7) && M->Eta->at(iPF) > etaMin && M->Eta->at(iPF) < etaMax) {
-      float currentE = M->E->at(iPF);
-
-      if (currentE > EMax_vec[0]) {
-        EMax_vec[2] = EMax_vec[1];
-        EMax_vec[1] = EMax_vec[0];
-        EMax_vec[0] = currentE;
-      } else if (currentE > EMax_vec[1]) {
-        EMax_vec[2] = EMax_vec[1];
-        EMax_vec[1] = currentE;
-      } else if (currentE > EMax_vec[2]) {
-        EMax_vec[2] = currentE;
-      }
-    }
-  }
-
-  return EMax_vec;
-}
