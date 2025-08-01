@@ -398,6 +398,11 @@ int main(int argc, char *argv[]) {
       int locMultiplicityEta1p0 = 0;
       float leadingTrackPtEta1p0 = 0.;
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
+        float trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
+        float trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
+        if (trkPt < 0.4 || abs(trkEta) > 2.4) {
+	  continue; // skip tracks that do not pass basic pt and eta cuts
+	}
         bool isSelectedTrackNominal = false;
         bool isSelectedTrackLoose = false;
         bool isSelectedTrackTight = false;
@@ -410,27 +415,33 @@ int main(int argc, char *argv[]) {
         } // end of if on DoGenLevel == true
         if (DoGenLevel == false) {
           // KD: apply track selection criteria that matches that used for efficiency files, if available
-
           isSelectedTrackNominal = MTrack.PassChargedHadronPPOONeNe2025StandardCuts(iTrack);
           isSelectedTrackLoose = MTrack.PassChargedHadronPPOONeNe2025LooseCuts(iTrack);
           isSelectedTrackTight = MTrack.PassChargedHadronPPOONeNe2025TightCuts(iTrack);
 
           bool isSelectedTrackORCondition = (isSelectedTrackNominal || isSelectedTrackLoose || isSelectedTrackTight);
-
           if (ApplyTrackRejection == true && isSelectedTrackORCondition == false)
             continue;
-
-          MChargedHadronRAA.trkPassChargedHadron_Nominal->push_back(isSelectedTrackNominal);
-          MChargedHadronRAA.trkPassChargedHadron_Loose->push_back(isSelectedTrackLoose);
-          MChargedHadronRAA.trkPassChargedHadron_Tight->push_back(isSelectedTrackTight);
-
           if (isSelectedTrackNominal && abs(MTrack.trkEta->at(iTrack)) < 1.0 &&
               MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
             leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
           }
+
+          if (isSelectedTrackNominal) {
+            if (abs(trkEta) < 1.0 && trkPt > 0.4) {
+              locMultiplicityEta1p0++;
+            }
+            if (abs(trkEta) < 2.4 && trkPt > 0.4) {
+              locMultiplicityEta2p4++;
+            }
+          }
         } // end of if on DoGenLevel == false
-        float trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
-        float trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
+
+        if (trkPt < 3.0) continue;
+
+        MChargedHadronRAA.trkPassChargedHadron_Nominal->push_back(isSelectedTrackNominal);
+        MChargedHadronRAA.trkPassChargedHadron_Loose->push_back(isSelectedTrackLoose);
+        MChargedHadronRAA.trkPassChargedHadron_Tight->push_back(isSelectedTrackTight);
         float trkPhi = DoGenLevel ? MGen.Phi->at(iTrack) : MTrack.trkPhi->at(iTrack);
         float trkPtError = DoGenLevel ? 0 : MTrack.trkPtError->at(iTrack);
         bool highPurity = DoGenLevel ? true : MTrack.highPurity->at(iTrack);
@@ -461,16 +472,6 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.trkNLayers->push_back(trkNLayers);
         MChargedHadronRAA.trkNormChi2->push_back(trkNormChi2);
         MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
-
-        if (isSelectedTrackNominal) {
-          if (abs(trkEta) < 1.0 && trkPt > 0.4) {
-            locMultiplicityEta1p0++;
-          }
-          if (abs(trkEta) < 2.4 && trkPt > 0.4) {
-            locMultiplicityEta2p4++;
-          }
-        }
-
         double TrackCorrection = 1;
         if (DoGenLevel == false) {
           // efficiency correction component of total track weight
@@ -547,6 +548,7 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.MC_TrkDCAReweight->push_back(MC_TrkDCAWeight);
 
       } // end of loop over tracks (gen or reco)
+
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
       MChargedHadronRAA.multiplicityEta1p0 = locMultiplicityEta1p0;
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
