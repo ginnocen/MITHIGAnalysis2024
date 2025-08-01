@@ -32,14 +32,16 @@ bool getBaselinePPEventSel(ChargedHadronRAATreeMessenger &ch) {
     return true;
 }
 
-bool checkHFANDCondition(ChargedHadronRAATreeMessenger &ch, float HFE_min1, float HFE_min2, bool useOnlineHFE) {
+
+// NOTE: WE CANNOT USE ONLINE INFORMATION IN CONTEMPORARY SKIMS and Forests -- no ADC tree 
+bool checkHFANDCondition(ChargedHadronRAATreeMessenger &ch, float HFE_min1, float HFE_min2, bool useOnlineHFE) { 
     if (HFE_min1 < HFE_min2) {
         std::cout << "ERROR: HFE_min1 < HFE_min2 in HF selection bit check, please make sure that (HFE_min1 >= HFE_min2) !" << std::endl;
         return false;
     }
 
     if (useOnlineHFE) {
-        int ohiHF = max(ch.mMaxL1HFAdcPlus, ch.mMaxL1HFAdcMinus);
+        int ohiHF = max(ch.mMaxL1HFAdcPlus, ch.mMaxL1HFAdcMinus); 
         int oloHF = min(ch.mMaxL1HFAdcPlus, ch.mMaxL1HFAdcMinus);
         if(ohiHF <= HFE_min1 || oloHF <= HFE_min2) {
             return false;

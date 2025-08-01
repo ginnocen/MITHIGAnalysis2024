@@ -6,6 +6,8 @@ COUNTER=${3}
 OUTPUT=${4}
 MAXCORES=${5}
 
+EFFPATH=${ProjectBase}/CommonCode/root/
+
 mkdir -p "${OUTPUT}/temp_inputs/"
 FILE="${OUTPUT}/temp_inputs/job_${COUNTER}.root"
 rm $FILE &> /dev/null
@@ -17,8 +19,8 @@ echo "Processing $FILE"
    --Output ${OUTPUT}/output_${COUNTER}.root \
    --DoGenLevel false \
    --Year 2024 \
+   --CollisionSystem pp \
    --IsData true \
-   --IsPP true \
    --Fraction 1.0 \
    --ApplyTriggerRejection true \
    --ApplyEventRejection false \
@@ -28,7 +30,8 @@ echo "Processing $FILE"
    --DebugMode true \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
    --MakeEventWeight true \
-   --EvtSelCorrectionFile ${ProjectBase}/CommonCode/root/20250717_ppref2024_all_eventSelection_EventCorrection.root \
+   --Species_ReweightFile "${EFFPATH}ParticleSpeciesCorrectionFactorsOO.root" \
+   --EvtSelCorrectionFiles "${EFFPATH}OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root" \
    --HideProgressBar false
 wait
 
