@@ -17,7 +17,6 @@ CORRPATH=${ProjectBase}/CommonCode/root/
 
 ./Execute --Input "$file" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
-   --DoGenLevel $DOGENLEVEL \
    --IsData $ISDATA \
    --Fraction 1.0 \
    --ApplyTriggerRejection true \

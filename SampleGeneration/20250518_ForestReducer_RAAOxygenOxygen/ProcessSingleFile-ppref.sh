@@ -8,7 +8,6 @@ file="$FILEPATH"
 
 ./Execute --Input "$file" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
-   --DoGenLevel false \
    --Year 2024 \
    --CollisionSystem pp \
    --IsData true \

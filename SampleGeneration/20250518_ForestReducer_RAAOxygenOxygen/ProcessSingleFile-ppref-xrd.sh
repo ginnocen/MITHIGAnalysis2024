@@ -17,7 +17,6 @@ wait
 echo "Processing $FILE"
 ./Execute --Input "$FILE" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
-   --DoGenLevel false \
    --Year 2024 \
    --CollisionSystem pp \
    --IsData true \
