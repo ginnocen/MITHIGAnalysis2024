@@ -400,9 +400,9 @@ int main(int argc, char *argv[]) {
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
         float trkPt = DoGenLevel ? MGen.PT->at(iTrack) : MTrack.trkPt->at(iTrack);
         float trkEta = DoGenLevel ? MGen.Eta->at(iTrack) : MTrack.trkEta->at(iTrack);
-        if (trkPt < 0.4 || abs(trkEta) > 2.4) {
-	  continue; // skip tracks that do not pass basic pt and eta cuts
-	}
+        //if (trkPt < 0.4 || abs(trkEta) > 2.4) {
+	//  continue; // skip tracks that do not pass basic pt and eta cuts
+	//}
         bool isSelectedTrackNominal = false;
         bool isSelectedTrackLoose = false;
         bool isSelectedTrackTight = false;
@@ -437,7 +437,7 @@ int main(int argc, char *argv[]) {
           }
         } // end of if on DoGenLevel == false
 
-        if (trkPt < 3.0) continue;
+        if (trkPt > 3.0){
 
         MChargedHadronRAA.trkPassChargedHadron_Nominal->push_back(isSelectedTrackNominal);
         MChargedHadronRAA.trkPassChargedHadron_Loose->push_back(isSelectedTrackLoose);
@@ -546,7 +546,7 @@ int main(int argc, char *argv[]) {
         float MC_TrkDCAWeight = 0;
         if (IsData == false && MC_TrkDCAReweight != nullptr) {MC_TrkDCAWeight = MC_TrkDCAReweight->getCorrection(trkDxyAssociatedVtx);}
         MChargedHadronRAA.MC_TrkDCAReweight->push_back(MC_TrkDCAWeight);
-
+        }
       } // end of loop over tracks (gen or reco)
 
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
