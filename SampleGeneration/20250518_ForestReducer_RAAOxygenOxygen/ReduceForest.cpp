@@ -420,11 +420,12 @@ int main(int argc, char *argv[]) {
       float leadingTrackPtEta1p0 = 0.;
 
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
+        if (MTrack.trkPt->at(iTrack) < 0.4 || abs(MTrack.trkEta->at(iTrack)) > 2.4)
+          continue; // skip tracks with pT < 0.4 GeV/c and |eta| > 2.4
+
         bool isSelectedTrackNominal = false;
         bool isSelectedTrackLoose = false;
         bool isSelectedTrackTight = false;
-        if (MTrack.trkPt->at(iTrack) < 0.4 || abs(MTrack.trkEta->at(iTrack)) > 2.4)
-          continue; // skip tracks with pT < 0.4 GeV/c and |eta| > 2.4
 
         // KD: apply track selection criteria that matches that used for efficiency files, if available
 
@@ -437,18 +438,16 @@ int main(int argc, char *argv[]) {
         if (ApplyTrackRejection == true && isSelectedTrackORCondition == false)
           continue;
 
-        if (isSelectedTrackNominal && abs(MTrack.trkEta->at(iTrack)) < 1.0 &&
-            MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
-          leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
-        }
         if (isSelectedTrackNominal) {
-          if (abs(MTrack.trkEta->at(iTrack)) < 1.0 && MTrack.trkPt->at(iTrack) > 0.4) {
+          locMultiplicityEta2p4++;
+          if (abs(MTrack.trkEta->at(iTrack)) < 1.0) {
             locMultiplicityEta1p0++;
-          }
-          if (abs(MTrack.trkEta->at(iTrack)) < 2.4 && MTrack.trkPt->at(iTrack) > 0.4) {
-            locMultiplicityEta2p4++;
+            if (MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
+              leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
+            }
           }
         }
+
         float trkPt = MTrack.trkPt->at(iTrack);
         if (trkPt < rejectTracksBelowPt && rejectTracksBelowPtEnabled)
           continue;
