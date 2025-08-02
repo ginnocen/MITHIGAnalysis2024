@@ -1,4 +1,5 @@
 void histfromtree(TTree* T, TCut t, TH1D* h, const char* branch){
+     cout << T->GetEntries(t) << endl;
      T->Project(h->GetName(), branch, t);
      h->Scale(1.0/h->Integral());
 }
@@ -83,11 +84,11 @@ void VZReweight(
     histfromtree(tOO_Arg, cut_MC, hMCARGVZ, "VZ");
 
     //////// DIVIDE-- WANT TO SCALE MC TO DATA ////////
-    TH1D* reweight = (TH1D*)hDataVZ->Clone("reweight");
+    TH1D* reweight = (TH1D*)hDataVZ->Clone("VZReweight");
     reweight->SetTitle("VZ Reweight Factor (Data/MC)");
     reweight->Divide(hMCVZ);
 
-    TH1D* reweight_Arg = (TH1D*)hDataVZ->Clone("reweight_Arg");
+    TH1D* reweight_Arg = (TH1D*)hDataVZ->Clone("VZReweight_Arg");
     reweight_Arg->SetTitle("VZ Reweight Factor (Data/MC Arg)");
     reweight_Arg->Divide(hMCARGVZ);
 
