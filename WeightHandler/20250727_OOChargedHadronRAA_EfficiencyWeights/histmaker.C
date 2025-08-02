@@ -166,12 +166,12 @@ void histmaker(TCut Datacut,
     cout << "STARTING MULTIPLICITY REWEIGHT" << endl;
     //// GET REWEIGHT HISTOGRAMS ////
     TFile* fVZReweight = TFile::Open("VZReweight/VZReweight.root");
-    TH1D* vzReweight = (TH1D*)fVZReweight->Get("reweight");
-    TH1D* vzReweight_Arg = (TH1D*)fVZReweight->Get("reweight_Arg");
+    TH1D* vzReweight = (TH1D*)fVZReweight->Get("VZReweight");
+    TH1D* vzReweight_Arg = (TH1D*)fVZReweight->Get("VZReweight_Arg");
 
     TFile* fMultReweight = TFile::Open("MultReweight/MultReweight.root");
-    TH1D* multReweight = (TH1D*)fMultReweight->Get("multReweight");
-    TH1D* multReweight_Arg = (TH1D*)fMultReweight->Get("multReweight_Arg");
+    TH1D* multReweight = (TH1D*)fMultReweight->Get("MultReweight");
+    TH1D* multReweight_Arg = (TH1D*)fMultReweight->Get("MultReweight_Arg");
 
     TFile* fTrkPtReweight = TFile::Open("TrkPtReweight/TrkPtReweight.root");
     TH1D* TrkPtReweight = (TH1D*)fTrkPtReweight->Get("TrkPtReweight");
@@ -191,12 +191,21 @@ void histmaker(TCut Datacut,
         120, 150, 200, 250, 300, 400, 1000
     };
 
-    const Int_t nPtBins = 26;
+    const Int_t nPtBins_log = 68;
+    const Double_t pTBins_log[nPtBins_log + 1] = {
+        0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.2,2.4,
+        2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0,4.4,4.8,5.2,5.6,6.0,6.4,6.8,7.2,7.6,8.0,
+        8.5,9.0,9.5,10.0,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.6,24.6,
+        26.6,28.6,32.6,36.6,42.6,48.6,54.6,60.6,74.0,86.4,103.6,120.8,140.,165.,
+        250.,400.
+    };
+
+    /*const Int_t nPtBins = 26;
     const Double_t ptBins[nPtBins + 1] = {
         0.5, 0.603, 0.728, 0.879, 1.062, 1.284, 1.553, 1.878, 2.272, 2.749, 
         3.327, 4.027, 4.872, 5.891, 7.117, 8.591, 10.36, 12.48, 
         15.03, 18.08, 21.73, 26.08, 31.28, 37.48, 44.89, 53.73, 64.31
-    };
+    };*/
     // MULTIPLICITY ----- OTHER HISTOGRAMS EASILY ADDABLE
     TH1D* hDataMult_raw = new TH1D("hDataMult_raw", "Data Multiplicity Raw", nMultBins, multBins);
     TH1D* hDataMult_baseline = new TH1D("hDataMult_baseline", "Data Multiplicity with Baseline", nMultBins, multBins);
@@ -274,15 +283,10 @@ void histmaker(TCut Datacut,
     hOO_Arg_Mult_raw->Write();
     hOO_Arg_Mult_baseline->Write();
     hOO_Arg_Mult_ESEL->Write();
-    hOO_Arg_Mult_leadpT5->Write();     
+    hOO_Arg_Mult_leadpT5->Write();
     hDataMult_Eff->Write();
     hOO_Mult_Eff->Write();
-    hOO_Arg_Mult_Eff->Write();
+    hOO_Arg_Mult_Eff->Write();  
+
     outFile->Close();
-
-    cout << "DONE WITH HISTOGRAM MAKER" << endl;
-    cout << endl;
-    cout << endl;
-
 }
-

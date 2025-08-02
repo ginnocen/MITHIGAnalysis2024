@@ -6,11 +6,6 @@ float fill_value(float value = 1.0, int doreweight = 1) {
     }
 }
 
-void histfromtree(TTree* T, TCut t, TH1D* h, const char* branch){
-     T->Project(h->GetName(), branch, t);
-     h->Scale(1.0/h->Integral());
-}
-
 float VZWeight(TH1D* VZ, float vzentry){
     int bin = VZ->FindBin(vzentry);
     float weight = VZ->GetBinContent(bin);
@@ -50,11 +45,11 @@ void TrkPtReweight(
     TTree* tOO = (TTree*)fOO->Get("Tree");
     TTree* tOO_Arg = (TTree*)fOO_Arg->Get("Tree");
 
-    TH1D* vzReweight = (TH1D*)fVZReweight->Get("reweight");
-    TH1D* vzReweight_Arg = (TH1D*)fVZReweight->Get("reweight_Arg");
+    TH1D* vzReweight = (TH1D*)fVZReweight->Get("VZReweight");
+    TH1D* vzReweight_Arg = (TH1D*)fVZReweight->Get("VZReweight_Arg");
 
-    TH1D* multReweight = (TH1D*)fMultReweight->Get("multReweight");
-    TH1D* multReweight_Arg = (TH1D*)fMultReweight->Get("multReweight_Arg");
+    TH1D* multReweight = (TH1D*)fMultReweight->Get("MultReweight");
+    TH1D* multReweight_Arg = (TH1D*)fMultReweight->Get("MultReweight_Arg");
 
     /// PRINT SELECTION CUTS
     cout << "SELECTION FOR DATA TRACK PT HIST: " << endl;
@@ -63,28 +58,54 @@ void TrkPtReweight(
     cout << MCcut.GetTitle() << endl;
 
     ///////// OBTAIN HISTOGRAMS FOR TRACK PT INFO ////////
-    const Int_t nPtBins_log = 26;
+    const Int_t nPtBins_log = 68;
+    const Double_t pTBins_log[nPtBins_log + 1] = {
+        0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.2,2.4,
+        2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0,4.4,4.8,5.2,5.6,6.0,6.4,6.8,7.2,7.6,8.0,
+        8.5,9.0,9.5,10.0,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.6,24.6,
+        26.6,28.6,32.6,36.6,42.6,48.6,54.6,60.6,74.0,86.4,103.6,120.8,140.,165.,
+        250.,400.
+    };
+    
+    /*const Int_t nPtBins_log = 26;
     const Double_t pTBins_log[nPtBins_log + 1] = {
         0.5, 0.603, 0.728, 0.879, 1.062, 1.284, 1.553, 1.878, 2.272, 2.749, 3.327, 4.027, 
         4.872, 5.891, 7.117, 8.591, 10.36, 12.48, 15.03, 18.08, 21.73, 26.08, 31.28, 
         37.48, 44.89, 53.73, 64.31
-    };
+    };*/
 
     TH1D* hDataTrkPt = new TH1D("hDataTrkPt", "Data Track p_{T}", nPtBins_log, pTBins_log);
     TH1D* hMCTrkPt = new TH1D("hMCTrkPt", "HIJING Track p_{T}", nPtBins_log, pTBins_log);
     TH1D* hMCARGTrkPt = new TH1D("hMCARGTrkPt", "Angantyr Track p_{T}", nPtBins_log, pTBins_log);
 
     // OBTAIN DATA HISTOGRAM
-    histfromtree(tData, Datacut, hDataTrkPt, "trkPt");
+    TTreeFormula* dataCutFormula = new TTreeFormula("dataCutFormula", Datacut, tData);
+    vector<float>* trackPt = nullptr;
+    tData->SetBranchAddress("trkPt", &trackPt);
+    vector<bool>* trackpass = nullptr;
+    tData->SetBranchAddress("trkPassChargedHadron_Nominal", &trackpass); 
+    for(int i = 0; i< tData->GetEntries(); i++){
+        if(i % 1000 == 0) {cout << i*1.0 / tData->GetEntries() * 100.0 << "% PROCESSED FOR DATA TRACK PT HIST \r";}
+        tData->GetEntry(i);
+        if(dataCutFormula->EvalInstance() == 0) continue;
+        if(!trackPt || trackPt->empty()) continue;
+        for(size_t j = 0; j < trackPt->size(); j++) {
+            if(trackpass && j < trackpass->size() && trackpass->at(j)){
+                hDataTrkPt->Fill(trackPt->at(j), fill_value(1.0, doreweight));
+            }
+        }
+    }
     hDataTrkPt->Scale(1.0/hDataTrkPt->Integral());
 
     // OBTAIN HIJING HISTOGRAM 
     TTreeFormula* mcCutFormula = new TTreeFormula("mcCutFormula", MCcut, tOO);
     vector<float>* trackPt_mc = nullptr;
-    int multiplicityEta2p4_mc;
-    float VZ_mc;
     tOO->SetBranchAddress("trkPt", &trackPt_mc);
+    vector<bool>* trackpass_mc = nullptr;
+    tOO->SetBranchAddress("trkPassChargedHadron_Nominal", &trackpass_mc);
+    int multiplicityEta2p4_mc;
     tOO->SetBranchAddress("multiplicityEta2p4", &multiplicityEta2p4_mc);
+    float VZ_mc;
     tOO->SetBranchAddress("VZ", &VZ_mc);
     for(int i = 0; i < tOO->GetEntries(); i++){
         if(i % 1000 == 0) cout << i*1.0 / tOO->GetEntries() * 100.0 << "% PROCESSED FOR HIJING TRACK PT HIST \r";
@@ -93,8 +114,10 @@ void TrkPtReweight(
         if(!trackPt_mc || trackPt_mc->empty()) continue;
         float multWeight = MultWeight(multReweight, multiplicityEta2p4_mc);
         float vzWeight = VZWeight(vzReweight, VZ_mc);
-        for(auto& pt : *trackPt_mc) {
-            hMCTrkPt->Fill(pt, fill_value(multWeight * vzWeight, doreweight));
+        for(size_t j = 0; j < trackPt_mc->size(); j++) {
+            if(trackpass_mc && j < trackpass_mc->size() && trackpass_mc->at(j)) {
+                hMCTrkPt->Fill(trackPt_mc->at(j), fill_value(multWeight * vzWeight, doreweight));
+            }
         }
     }
     hMCTrkPt->Scale(1.0/hMCTrkPt->Integral());
@@ -103,11 +126,13 @@ void TrkPtReweight(
     // OBTAIN ANGANTYR HISTOGRAM using cut formula with VZ reweighting
     TTreeFormula* mcArgCutFormula = new TTreeFormula("mcArgCutFormula", MCcut, tOO_Arg);
     vector<float>* trackPt_mc_arg = nullptr;
+    tOO_Arg->SetBranchAddress("trkPt", &trackPt_mc_arg);
+    vector<bool>* trackpass_mc_arg = nullptr;
+    tOO_Arg->SetBranchAddress("trkPassChargedHadron_Nominal", &trackpass_mc_arg);
     int multiplicityEta2p4_arg;
     float VZ_arg;
-    tOO_Arg->SetBranchAddress("trkPt", &trackPt_mc_arg);
-    tOO_Arg->SetBranchAddress("multiplicityEta2p4", &multiplicityEta2p4_arg);
     tOO_Arg->SetBranchAddress("VZ", &VZ_arg);
+    tOO_Arg->SetBranchAddress("multiplicityEta2p4", &multiplicityEta2p4_arg);
     for(int i = 0; i < tOO_Arg->GetEntries(); i++){
         if(i % 1000 == 0) cout << i*1.0 / tOO_Arg->GetEntries() * 100.0 << "% PROCESSED FOR ANGANTYR TRACK PT HIST \r";
         tOO_Arg->GetEntry(i);
@@ -115,8 +140,10 @@ void TrkPtReweight(
         if(!trackPt_mc_arg || trackPt_mc_arg->empty()) continue;
         float multWeight = MultWeight(multReweight_Arg, multiplicityEta2p4_arg);
         float vzWeight = VZWeight(vzReweight_Arg, VZ_arg);
-        for(auto& pt : *trackPt_mc_arg) {
-            hMCARGTrkPt->Fill(pt, fill_value(multWeight * vzWeight, doreweight));
+        for(size_t j = 0; j < trackPt_mc_arg->size(); j++) {
+            if(trackpass_mc_arg && j < trackpass_mc_arg->size() && trackpass_mc_arg->at(j)) {
+                hMCARGTrkPt->Fill(trackPt_mc_arg->at(j), fill_value(multWeight * vzWeight, doreweight));
+            }
         }
     }
     hMCARGTrkPt->Scale(1.0/hMCARGTrkPt->Integral());
@@ -208,7 +235,7 @@ void TrkPtReweight(
     
     double maxVal = hMCTrkPt_norm->GetMaximum();
     hDataTrkPt_norm->SetMaximum(maxVal * 15);
-    hDataTrkPt_norm->GetXaxis()->SetRangeUser(0.5, 64.31);
+    hDataTrkPt_norm->GetXaxis()->SetRangeUser(0.5, 400);
 
     hDataTrkPt_norm->Draw("PE");
     hMCTrkPt_norm->Draw("HIST SAME");
@@ -234,6 +261,12 @@ void TrkPtReweight(
     c->SaveAs("TrkPTReweight.pdf");
     c2->SaveAs("TrkPTDistributions.pdf");
 
+    // Close input files
+    fData->Close();
+    fOO->Close();
+    fOO_Arg->Close();
+    fVZReweight->Close();
+    fMultReweight->Close();
+
     cout << "DONE WITH TRACK PT REWEIGHT" << endl;
 }
-
