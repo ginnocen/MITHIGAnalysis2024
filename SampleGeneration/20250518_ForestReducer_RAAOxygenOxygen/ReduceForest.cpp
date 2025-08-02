@@ -49,6 +49,14 @@ int main(int argc, char *argv[]) {
       CL.GetInteger("ApplyTriggerRejection", 0); // trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   bool ApplyTrackRejection = CL.GetBool("ApplyTrackRejection", false);
+  bool rejectTracksBelowPtEnabled = CL.GetBool("rejectTracksBelowPtEnabled", true); // if false, no rejection is applied
+  float rejectTracksBelowPt = CL.GetDouble("rejectTracksBelowPt", 3.0);
+  if (rejectTracksBelowPt < 0.4) {
+    std::cout << "WARNING: rejectTracksBelowPt is set to " << rejectTracksBelowPt
+              << ". This is lower than the default value of 0.4 GeV/c. "
+                 "This may lead to unexpected results."
+              << std::endl;
+  }
   string CorrectionPath = CL.Get("CorrectionPath");
   int sampleType = CL.GetInteger(
       "sampleType", -1); // 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
@@ -383,10 +391,10 @@ int main(int argc, char *argv[]) {
       ////////// Offline HF conditions //////////
       ///////////////////////////////////////////
 
-      int passHFAND_10_Offline = false;
-      int passHFAND_13_Offline = false;
-      int passHFAND_19_Offline = false;
-      int passOR_OfflineHFAND = false;
+      bool passHFAND_10_Offline = false;
+      bool passHFAND_13_Offline = false;
+      bool passHFAND_19_Offline = false;
+      bool passOR_OfflineHFAND = false;
 
       if (CollisionSystem != "pp") {
         passHFAND_10_Offline = checkHFANDCondition(MChargedHadronRAA, 10., 10., false);
@@ -400,6 +408,9 @@ int main(int argc, char *argv[]) {
           }
         }
       }
+      MChargedHadronRAA.passHFAND_10_Offline = passHFAND_10_Offline;
+      MChargedHadronRAA.passHFAND_13_Offline = passHFAND_13_Offline;
+      MChargedHadronRAA.passHFAND_19_Offline = passHFAND_19_Offline;
 
       // loop over tracks
       int NTrack = MTrack.nTrk;
@@ -407,7 +418,11 @@ int main(int argc, char *argv[]) {
       int locMultiplicityEta2p4 = 0;
       int locMultiplicityEta1p0 = 0;
       float leadingTrackPtEta1p0 = 0.;
+
       for (int iTrack = 0; iTrack < NTrack; iTrack++) {
+        if (MTrack.trkPt->at(iTrack) < 0.4 || abs(MTrack.trkEta->at(iTrack)) > 2.4)
+          continue; // skip tracks with pT < 0.4 GeV/c and |eta| > 2.4
+
         bool isSelectedTrackNominal = false;
         bool isSelectedTrackLoose = false;
         bool isSelectedTrackTight = false;
@@ -423,16 +438,20 @@ int main(int argc, char *argv[]) {
         if (ApplyTrackRejection == true && isSelectedTrackORCondition == false)
           continue;
 
-        MChargedHadronRAA.trkPassChargedHadron_Nominal->push_back(isSelectedTrackNominal);
-        MChargedHadronRAA.trkPassChargedHadron_Loose->push_back(isSelectedTrackLoose);
-        MChargedHadronRAA.trkPassChargedHadron_Tight->push_back(isSelectedTrackTight);
-
-        if (isSelectedTrackNominal && abs(MTrack.trkEta->at(iTrack)) < 1.0 &&
-            MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
-          leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
+        if (isSelectedTrackNominal) {
+          locMultiplicityEta2p4++;
+          if (abs(MTrack.trkEta->at(iTrack)) < 1.0) {
+            locMultiplicityEta1p0++;
+            if (MTrack.trkPt->at(iTrack) > leadingTrackPtEta1p0) {
+              leadingTrackPtEta1p0 = MTrack.trkPt->at(iTrack);
+            }
+          }
         }
-        float trkEta = MTrack.trkEta->at(iTrack);
+
         float trkPt = MTrack.trkPt->at(iTrack);
+        if (trkPt < rejectTracksBelowPt && rejectTracksBelowPtEnabled)
+          continue;
+        float trkEta = MTrack.trkEta->at(iTrack);
         float trkPhi = MTrack.trkPhi->at(iTrack);
         float trkPtError = MTrack.trkPtError->at(iTrack);
         bool highPurity = MTrack.highPurity->at(iTrack);
@@ -447,6 +466,10 @@ int main(int argc, char *argv[]) {
         char trkNLayers = MTrack.trkNLayers->at(iTrack);
         float trkNormChi2 = MTrack.trkNormChi2->at(iTrack);
         float pfEnergy = MTrack.pfEnergy->at(iTrack);
+
+        MChargedHadronRAA.trkPassChargedHadron_Nominal->push_back(isSelectedTrackNominal);
+        MChargedHadronRAA.trkPassChargedHadron_Loose->push_back(isSelectedTrackLoose);
+        MChargedHadronRAA.trkPassChargedHadron_Tight->push_back(isSelectedTrackTight);
         MChargedHadronRAA.trkEta->push_back(trkEta);
         MChargedHadronRAA.trkPt->push_back(trkPt);
         MChargedHadronRAA.trkPhi->push_back(trkPhi);
@@ -463,15 +486,6 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.trkNLayers->push_back(trkNLayers);
         MChargedHadronRAA.trkNormChi2->push_back(trkNormChi2);
         MChargedHadronRAA.pfEnergy->push_back(pfEnergy);
-
-        if (isSelectedTrackNominal) {
-          if (abs(trkEta) < 1.0 && trkPt > 0.4) {
-            locMultiplicityEta1p0++;
-          }
-          if (abs(trkEta) < 2.4 && trkPt > 0.4) {
-            locMultiplicityEta2p4++;
-          }
-        }
 
         double TrackCorrection = 1;
         // efficiency correction component of total track weight
@@ -549,6 +563,7 @@ int main(int argc, char *argv[]) {
         MChargedHadronRAA.MC_TrkDCAReweight->push_back(MC_TrkDCAWeight);
 
       } // end of loop over tracks (gen or reco)
+
       MChargedHadronRAA.leadingPtEta1p0_sel = leadingTrackPtEta1p0;
       MChargedHadronRAA.multiplicityEta1p0 = locMultiplicityEta1p0;
       MChargedHadronRAA.multiplicityEta2p4 = locMultiplicityEta2p4;
