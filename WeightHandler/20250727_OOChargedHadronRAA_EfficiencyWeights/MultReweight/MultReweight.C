@@ -43,8 +43,8 @@ void MultReweight(
     TTree* tOO = (TTree*)fOO->Get("Tree");
     TTree* tOO_Arg = (TTree*)fOO_Arg->Get("Tree");
 
-    TH1D* vzReweight = (TH1D*)fVZReweight->Get("reweight");
-    TH1D* vzReweight_Arg = (TH1D*)fVZReweight->Get("reweight_Arg");
+    TH1D* vzReweight = (TH1D*)fVZReweight->Get("VZReweight");
+    TH1D* vzReweight_Arg = (TH1D*)fVZReweight->Get("VZReweight_Arg");
 
     ///////// OBTAIN HISTOGRAMS FOR MULTIPLICITY INFO ////////
     const Int_t nMultBins = 34;
@@ -99,16 +99,16 @@ void MultReweight(
         hMCARGMult->Fill(multiplicityEta2p4_arg, fill_value(vzWeight, doreweight));
     }
     hMCARGMult->Scale(1.0/hMCARGMult->Integral());
+    cout << endl;
 
     //////// CREATE REWEIGHT FACTORS ////////
-    TH1D* multReweight = (TH1D*)hDataMult->Clone("multReweight");
+    TH1D* multReweight = (TH1D*)hDataMult->Clone("MultReweight");
     multReweight->SetTitle("Multiplicity Reweight Factor (Data/MC HIJING)");
     multReweight->Divide(hMCMult);
 
-    TH1D* multReweight_Arg = (TH1D*)hDataMult->Clone("multReweight_Arg");
+    TH1D* multReweight_Arg = (TH1D*)hDataMult->Clone("MultReweight_Arg");
     multReweight_Arg->SetTitle("Multiplicity Reweight Factor (Data/MC Angantyr)");
     multReweight_Arg->Divide(hMCARGMult);
-
 
     ///////// DRAW REWEIGHT HISTOGRAM ///////
     gStyle->SetOptStat(0);

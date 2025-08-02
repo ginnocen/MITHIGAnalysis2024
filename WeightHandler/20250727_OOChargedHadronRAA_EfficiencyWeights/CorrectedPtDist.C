@@ -21,15 +21,26 @@ void CorrectedPtDist(
     TFile* fEff = TFile::Open(efficiencyfile);
     TH1D* hEff = (TH1D*)fEff->Get(effhistname);
 
-    const Int_t nPtBins = 26;
+    const Int_t nPtBins_log = 68;
+    const Double_t pTBins_log[nPtBins_log + 1] = {
+        0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.2,2.4,
+        2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0,4.4,4.8,5.2,5.6,6.0,6.4,6.8,7.2,7.6,8.0,
+        8.5,9.0,9.5,10.0,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.6,24.6,
+        26.6,28.6,32.6,36.6,42.6,48.6,54.6,60.6,74.0,86.4,103.6,120.8,140.,165.,
+        250.,400.
+    };
+
+    /*const Int_t nPtBins = 26;
     const Double_t ptBins[nPtBins + 1] = {
         0.5, 0.603, 0.728, 0.879, 1.062, 1.284, 1.553, 1.878, 2.272, 2.749, 
         3.327, 4.027, 4.872, 5.891, 7.117, 8.591, 10.36, 12.48, 
         15.03, 18.08, 21.73, 26.08, 31.28, 37.48, 44.89, 53.73, 64.31
-    };
+    };*/
 
-    TH1D* hCorrected = new TH1D("hCorrected", "Corrected p_{T} Distribution", nPtBins, ptBins);
-    TH1D* hUncorrected = new TH1D("hUncorrected", "Uncorrected p_{T} Distribution", nPtBins, ptBins);
+    TH1D* hCorrected = new TH1D("hCorrected", "Corrected p_{T} Distribution", nPtBins_log, pTBins_log);
+    TH1D* hUncorrected = new TH1D("hUncorrected", "Uncorrected p_{T} Distribution", nPtBins_log, pTBins_log);
+    hCorrected->Sumw2();
+    hUncorrected->Sumw2();
     int multiplicity = 0;
     float leadingpT = 0;
     vector<float>* trkPt = nullptr;
