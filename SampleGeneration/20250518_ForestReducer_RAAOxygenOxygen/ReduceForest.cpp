@@ -197,6 +197,7 @@ int main(int argc, char *argv[]) {
     } // DUMMY
     else if (CollisionSystem == "OO") {
       Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());
+    }
     else if (CollisionSystem == "NeNe") {
       Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());
     } else if (CollisionSystem == "pO") {
