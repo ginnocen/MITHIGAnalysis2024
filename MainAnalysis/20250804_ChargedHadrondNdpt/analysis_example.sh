@@ -22,8 +22,8 @@ OUTPUTANALYSIS=output/output_20250804_Skim_OO_IonPhysics0_LowPtV2_250711_104114_
   --MinLeadingTrackPt -1 \
   --TriggerChoice 1 \
   --CollisionSystem true \
-  --EventSelectionOption 1 \
-  --SpeciesCorrectionOption 0 \
+  --EventSelectionOption 2 \
+  --SpeciesCorrectionOption 2 \
   --ScaleFactor 1
 
 #TrackWeightSelection: 1: loose , 2: nominal , 3: tight
