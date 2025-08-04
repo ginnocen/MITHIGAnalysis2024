@@ -219,6 +219,7 @@ int main(int argc, char *argv[]) {
   par.UseEventWeight = CL.GetBool("UseEventWeight");
   par.TrackSelectionOption = CL.GetInt("TrackWeightSelection");
   par.ApplyEventSelection = CL.GetInt("EventSelectionOption");
+  par.SpeciesCorrectionOption = CL.GetInt("SpeciesCorrectionOption");
   //  par.EventCorrectionFile = CL.Get("EventCorrectionFile"); // File containing event correction factors
   par.HideProgressBar = CL.GetBool("HideProgressBar", false);
 
