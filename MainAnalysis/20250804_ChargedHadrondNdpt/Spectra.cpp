@@ -25,22 +25,22 @@ int main() {
 
   //load data
   TFile * f = TFile::Open("ResultsUIC/pp_OO_raa_20250729_Unblinding_Final_v3.root","read");
-  //get pp and OO data
+  //get pp and NucleusNucleus data
   TH1D * pp = (TH1D*)f->Get("pp_Nominal_data_points");
-  TH1D * OO = (TH1D*)f->Get("OO_Nominal_data_points");
+  TH1D * NucleusNucleus = (TH1D*)f->Get("OO_Nominal_data_points");
 
   //load systematics
   TH1D * ppSyst = (TH1D*)f->Get("pp_Total_uncertainty");
-  TH1D * OOSyst = (TH1D*)f->Get("OO_Total_uncertainty");
+  TH1D * NucleusNucleusSyst = (TH1D*)f->Get("OO_Total_uncertainty");
 
-  //applying lumi scaling for OO
-  OO->Scale(1./1571563.58);
+  //applying lumi scaling for NucleusNucleus
+  NucleusNucleus->Scale(1./1571563.58);
 
-  //applying a different lumi scaling for low-pt OO
-  for(int i = 0; i<OO->GetNbinsX(); i++){
-    if(OO->GetBinCenter(i)<10){
-      OO->SetBinContent(i,OO->GetBinContent(i)/261927.26*1571563.58);
-      OO->SetBinError(i,  OO->GetBinError(i)/261927.26*1571563.58);
+  //applying a different lumi scaling for low-pt NucleusNucleus
+  for(int i = 0; i<NucleusNucleus->GetNbinsX(); i++){
+    if(NucleusNucleus->GetBinCenter(i)<10){
+      NucleusNucleus->SetBinContent(i,NucleusNucleus->GetBinContent(i)/261927.26*1571563.58);
+      NucleusNucleus->SetBinError(i,  NucleusNucleus->GetBinError(i)/261927.26*1571563.58);
     }
   }
 
@@ -84,12 +84,12 @@ int main() {
   pp->GetXaxis()->SetRangeUser(3,100);
   pp->Draw("p same");
 
-  OO->SetMarkerStyle(21);
-  OO->SetLineWidth(2);
-  OO->SetMarkerColor(TColor::GetColor("#5790fc"));
-  OO->SetLineColor(TColor::GetColor("#5790fc"));
-  OO->GetXaxis()->SetRangeUser(3,100);
-  OO->Draw("p same");
+  NucleusNucleus->SetMarkerStyle(21);
+  NucleusNucleus->SetLineWidth(2);
+  NucleusNucleus->SetMarkerColor(TColor::GetColor("#5790fc"));
+  NucleusNucleus->SetLineColor(TColor::GetColor("#5790fc"));
+  NucleusNucleus->GetXaxis()->SetRangeUser(3,100);
+  NucleusNucleus->Draw("p same");
 
   //legends
   TLegend * specLeg = new TLegend(0.6,0.75,1,0.9);
@@ -98,7 +98,7 @@ int main() {
   specLeg->SetFillStyle(0);
   specLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
   specLeg->AddEntry(pp,"pp","p"); 
-  specLeg->AddEntry(OO,"OO","p");  
+  specLeg->AddEntry(NucleusNucleus,"NucleusNucleus","p");  
   specLeg->SetFillStyle(0);
   specLeg->Draw("same"); 
 
@@ -108,7 +108,7 @@ int main() {
   systLeg->SetFillStyle(0);
   systLeg->AddEntry((TObject*)0,"","");
   systLeg->AddEntry(ppSyst,"pp","f");
-  systLeg->AddEntry(OOSyst,"OO","f");
+  systLeg->AddEntry(NucleusNucleusSyst,"NucleusNucleus","f");
   systLeg->SetFillStyle(0);
   systLeg->Draw("same");
 
@@ -154,12 +154,12 @@ int main() {
   ppSyst->Draw("same HIST");
 
   //drawing systematics
-  OOSyst->SetFillColor(TColor::GetColor("#5790fc"));
-  OOSyst->SetFillStyle(3004);
-  OOSyst->GetXaxis()->SetRangeUser(3,100);
-  OOSyst->SetLineColor(TColor::GetColor("#5790fc"));
-  OOSyst->SetLineWidth(3);
-  OOSyst->Draw("same HIST");
+  NucleusNucleusSyst->SetFillColor(TColor::GetColor("#5790fc"));
+  NucleusNucleusSyst->SetFillStyle(3004);
+  NucleusNucleusSyst->GetXaxis()->SetRangeUser(3,100);
+  NucleusNucleusSyst->SetLineColor(TColor::GetColor("#5790fc"));
+  NucleusNucleusSyst->SetLineWidth(3);
+  NucleusNucleusSyst->Draw("same HIST");
 
   CMS_lumi( pad1, 0,11);
 
