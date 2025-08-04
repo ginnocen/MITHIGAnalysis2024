@@ -94,15 +94,15 @@ public:
 	     
       //event selection, only for OO/NeNe
       if (par.CollisionType){
-      if ( par.ApplyEventSelection == 0 && !(MChargedHadronRAA->passHFAND_10_Offline) ) continue;
+      if ( par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_10_Offline) ) continue;
       if ( par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_13_Offline) ) continue; 
-      if ( par.ApplyEventSelection == 2 && !(MChargedHadronRAA->passHFAND_19_Offline) ) continue;
+      if ( par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_19_Offline) ) continue;
       }
 
       float evtWeight = 1.0;
-      if ( par.CollisionType == true && par.ApplyEventSelection == 0 && MChargedHadronRAA->passHFAND_10_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Loose;
-      if ( par.CollisionType == true && par.ApplyEventSelection == 1 && MChargedHadronRAA->passHFAND_13_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Nominal;
-      if ( par.CollisionType == true && par.ApplyEventSelection == 2 && MChargedHadronRAA->passHFAND_19_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;
+      if ( par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 1 &&  MChargedHadronRAA->passHFAND_10_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Loose;
+      if ( par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 2 && MChargedHadronRAA->passHFAND_13_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Nominal;
+      if ( par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 3 && MChargedHadronRAA->passHFAND_19_Offline ) evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;
 
       // track loop
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
