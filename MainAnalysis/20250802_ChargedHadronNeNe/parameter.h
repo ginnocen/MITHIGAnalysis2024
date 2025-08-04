@@ -22,6 +22,7 @@ public:
   bool ApplyEventSelection; // Apply event selection criteria
   int TrackSelectionOption; // Selection criteria for track weight
   int SpeciesCorrectionOption; //Part species correction option
+  int EventSelectionOption;
   string EventCorrectionFile; // File for event selection efficiency
   bool HideProgressBar; // Hide progress bar in output
   void printParameters() const {
