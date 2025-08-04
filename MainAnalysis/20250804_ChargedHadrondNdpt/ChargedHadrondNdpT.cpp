@@ -13,11 +13,9 @@ using namespace std;
 #include "CommandLine.h"
 #include "Messenger.h"
 #include "ProgressBar.h"
-// #include "helpMessage.h"
 #include "parameter.h" // Parameters for the analysis
 #include "utilities.h" // Utility functions for the analysis
 
-// #include "eventSelectionCorrection.h"
 
 // Define binnings
 
@@ -160,7 +158,7 @@ public:
 
         // fill dN/dpT
         double pT = MChargedHadronRAA->trkPt->at(j);
-        if (par.CollisionType == 0)
+        if (par.CollisionType == false)
           evtWeight = 1.0; // event weight = 1 for ppRef, placeholder.
         hTrkPtNoEvt->Fill(MChargedHadronRAA->trkPt->at(j), evtWeight / pT);
         hTrkPtNoTrk->Fill(MChargedHadronRAA->trkPt->at(j), trkWeight / pT);
@@ -204,23 +202,22 @@ int main(int argc, char *argv[]) {
   // if (printHelpMessage(argc, argv))
   //   return 0;
 
-  CommandLine CL(argc, argv);
-  bool IsData = CL.GetBool("IsData", true);        // Determines whether the analysis is being run on actual data.
+  CommandLine CL(argc, argv);     
   int TriggerChoice = CL.GetInt("TriggerChoice");  // Flag indication choice of trigger
   float scaleFactor = CL.GetDouble("ScaleFactor"); // Fraction of the total number of events to be processed
 
-  Parameters par(TriggerChoice, IsData, scaleFactor);
+  Parameters par(TriggerChoice, scaleFactor);
   par.input = CL.Get("Input", "input.root");         // Input file
   par.output = CL.Get("Output", "output.root");      // Output file
   par.CollisionType = CL.GetBool("CollisionSystem"); // Flag to indicate if the analysis is for Proton-Proton
                                                      // collisions, false for PP, true for OO/NeNe
+  par.ApplyEventSelection = CL.GetBool("ApplyEventSelection"); 
   par.UseSpeciesWeight = CL.GetBool("UseSpeciesWeight");
   par.UseTrackWeight = CL.GetBool("UseTrackWeight");
   par.UseEventWeight = CL.GetBool("UseEventWeight");
+  par.EventSelectionOption = CL.GetInt("EventSelectionOption"); 
   par.TrackSelectionOption = CL.GetInt("TrackWeightSelection");
-  par.ApplyEventSelection = CL.GetInt("EventSelectionOption");
   par.SpeciesCorrectionOption = CL.GetInt("SpeciesCorrectionOption");
-  //  par.EventCorrectionFile = CL.Get("EventCorrectionFile"); // File containing event correction factors
   par.HideProgressBar = CL.GetBool("HideProgressBar", false);
 
   if (checkError(par))

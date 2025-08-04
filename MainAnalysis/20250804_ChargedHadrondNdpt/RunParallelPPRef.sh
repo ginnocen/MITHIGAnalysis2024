@@ -33,14 +33,11 @@ while IFS= read -r INPUT; do
     ./ExecuteChargedHadrondNdpt \
       --Input "$INPUT" \
       --Output "$OUTPUTFILE" \
-      --IsData true \
       --ApplyEventSelection true \
       --UseSpeciesWeight false \
       --UseEventWeight false \
       --UseTrackWeight true \
       --TrackWeightSelection 2 \
-      --MinTrackPt 0.4 \
-      --MinLeadingTrackPt -1 \
       --TriggerChoice 1 \
       --CollisionSystem false \
       --EventSelectionOption 1 \
