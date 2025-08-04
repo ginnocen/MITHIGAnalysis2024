@@ -194,7 +194,8 @@ int main(int argc, char *argv[]) {
   std::string Species_CorrectionFile = "";
   if (IsData == true) {
     if (CollisionSystem == "pp") {
-    } // DUMMY
+      Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());
+    }
     else if (CollisionSystem == "OO") {
       Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());
     }
@@ -202,7 +203,6 @@ int main(int argc, char *argv[]) {
       Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());
     } else if (CollisionSystem == "pO") {
     } // DUMMY
-    
     TrkSpeciesWeight_pp = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_PPref");
     TrkSpeciesWeight_dNdEta40 = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta40");
     TrkSpeciesWeight_dNdEta100 = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta100");
