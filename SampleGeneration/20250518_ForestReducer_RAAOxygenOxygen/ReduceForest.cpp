@@ -152,12 +152,12 @@ int main(int argc, char *argv[]) {
     // FILL WITH FILES.
   } else if (CollisionSystem == "OO") {
     EvtSelCorrectionFile_Nominal = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root", CorrectionPath.c_str());
-    EvtSelCorrectionFile_Tight = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root", CorrectionPath.c_str());
-    EvtSelCorrectionFile_Loose = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Loose = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Tight = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root", CorrectionPath.c_str());
   } else if (CollisionSystem == "NeNe") { // USING OO FILES FOR NE-NE ANALYSIS AS DUMMIES
     EvtSelCorrectionFile_Nominal = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF13AND.root", CorrectionPath.c_str());
-    EvtSelCorrectionFile_Tight = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF10AND.root", CorrectionPath.c_str());
-    EvtSelCorrectionFile_Loose = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF19AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Loose = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF10AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Tight = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF19AND.root", CorrectionPath.c_str());
   } else if (CollisionSystem == "pO") { // USING OO FILES FOR pO ANALYSIS AS DUMMIES
     // FILL WITH FILES.
   }
