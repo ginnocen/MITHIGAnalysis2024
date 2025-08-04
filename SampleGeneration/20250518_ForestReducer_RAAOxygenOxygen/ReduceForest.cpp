@@ -152,10 +152,12 @@ int main(int argc, char *argv[]) {
     // FILL WITH FILES.
   } else if (CollisionSystem == "OO") {
     EvtSelCorrectionFile_Nominal = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root", CorrectionPath.c_str());
-    EvtSelCorrectionFile_Tight = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root", CorrectionPath.c_str());
-    EvtSelCorrectionFile_Loose = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Loose = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF10AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Tight = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF19AND.root", CorrectionPath.c_str());
   } else if (CollisionSystem == "NeNe") { // USING OO FILES FOR NE-NE ANALYSIS AS DUMMIES
-    // FILL WITH FILES.
+    EvtSelCorrectionFile_Nominal = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF13AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Loose = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF10AND.root", CorrectionPath.c_str());
+    EvtSelCorrectionFile_Tight = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF19AND.root", CorrectionPath.c_str());
   } else if (CollisionSystem == "pO") { // USING OO FILES FOR pO ANALYSIS AS DUMMIES
     // FILL WITH FILES.
   }
@@ -175,7 +177,8 @@ int main(int argc, char *argv[]) {
     else if (CollisionSystem == "OO") {
       MC_CorrectionFile = Form("%s/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root", CorrectionPath.c_str());
     } else if (CollisionSystem == "NeNe") {
-    } // DUMMY TO KEEP NULLPTR
+      MC_CorrectionFile = Form("%s/NENERAA_MULT_EFFICIENCY_HIJING_HF13AND.root", CorrectionPath.c_str());
+    } 
     else if (CollisionSystem == "pO") {
     } // DUMMY TO KEEP NULLPTR
     MC_VZReweight = new MCReweighting(true, MC_CorrectionFile.c_str(), "VZReweight");
@@ -194,10 +197,12 @@ int main(int argc, char *argv[]) {
     } // DUMMY
     else if (CollisionSystem == "OO") {
       Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());
+    }
+    else if (CollisionSystem == "NeNe") {
+      Species_CorrectionFile = Form("%s/ParticleSpeciesCorrectionFactorsOO.root", CorrectionPath.c_str());
     } else if (CollisionSystem == "pO") {
     } // DUMMY
-    else if (CollisionSystem == "NeNe") {
-    } // DUMMY
+    
     TrkSpeciesWeight_pp = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_PPref");
     TrkSpeciesWeight_dNdEta40 = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta40");
     TrkSpeciesWeight_dNdEta100 = new MCReweighting(true, Species_CorrectionFile.c_str(), "correctionFactor_dNdeta100");
