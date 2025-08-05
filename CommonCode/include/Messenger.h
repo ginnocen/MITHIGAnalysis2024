@@ -68,6 +68,12 @@ public:
    float hiHF_pf;
    float hiHFPlus_pf;
    float hiHFMinus_pf;
+   float hiHFPlus_pfle1;
+   float hiHFPlus_pfle2;
+   float hiHFPlus_pfle3;
+   float hiHFMinus_pfle1;
+   float hiHFMinus_pfle2;
+   float hiHFMinus_pfle3;
    float Ncoll;
    float Npart;
 public:
@@ -1110,6 +1116,8 @@ public:
    float eventEfficiencyWeight_Nominal;
    float eventEfficiencyWeight_Loose;
    float eventEfficiencyWeight_Tight;
+   float MC_VZReweight;
+   float MC_MultReweight;
    
    bool passBaselineEventSelection; // Store default event selection decision, excluding any HF cut, different for OO and PP
    bool passL1HFAND_16_Online;
@@ -1122,6 +1130,7 @@ public:
 
    // Trigger bits
 
+   bool HLT_PPRefZeroBias_v6;
    // pO and OO triggers
    bool HLT_OxyZeroBias_v1;
    bool HLT_OxyZDC1nOR_v1;
@@ -1138,6 +1147,7 @@ public:
    bool HLT_OxySingleJet24_ZDC1nAsymXOR_v1;
    bool HLT_OxySingleJet24_ZDC1nXOR_v1;
    bool HLT_OxyL1SingleJet20_v1;
+
    
    std::vector<float> *trkPt;
    std::vector<float> *trkPhi;
@@ -1166,6 +1176,12 @@ public:
    std::vector<float> *trackingEfficiency_Nominal;
    std::vector<float> *trackingEfficiency_Loose;
    std::vector<float> *trackingEfficiency_Tight;
+   std::vector<float> *MC_TrkPtReweight;
+   std::vector<float> *MC_TrkDCAReweight;
+   std::vector<float> *TrkSpeciesWeight_pp;
+   std::vector<float> *TrkSpeciesWeight_dNdEta40;
+   std::vector<float> *TrkSpeciesWeight_dNdEta100;
+   
 
    // Debug mode quantities
    std::vector<float> *AllxVtx;

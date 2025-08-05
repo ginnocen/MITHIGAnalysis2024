@@ -8,7 +8,6 @@ OUTPUT=/data00/kdeverea/OOsamples/Skims/${DATE}_Skim_ppref2024_debug_noTrackEven
 
 ./Execute --Input $INPUT \
    --Output $OUTPUT \
-   --DoGenLevel false \
    --Year 2024 \
    --IsData true \
    --IsPP true \
@@ -19,4 +18,6 @@ OUTPUT=/data00/kdeverea/OOsamples/Skims/${DATE}_Skim_ppref2024_debug_noTrackEven
    --PFTree particleFlowAnalyser/pftree \
    --sampleType -1 \
    --DebugMode true \
-   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
+   --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
+   --EvtSelCorrectionFiles ${ProjectBase}/CommonCode/root/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root \
+   --Species_ReweightFile "${ProjectBase}/CommonCode/root/ParticleSpeciesCorrectionFactorsOO.root" \

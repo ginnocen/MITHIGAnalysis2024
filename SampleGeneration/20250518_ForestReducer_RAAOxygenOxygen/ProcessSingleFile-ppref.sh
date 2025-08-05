@@ -8,10 +8,9 @@ file="$FILEPATH"
 
 ./Execute --Input "$file" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
-   --DoGenLevel false \
    --Year 2024 \
+   --CollisionSystem pp \
    --IsData true \
-   --IsPP true \
    --Fraction 1.0 \
    --ApplyTriggerRejection true \
    --ApplyEventRejection true \
@@ -20,6 +19,8 @@ file="$FILEPATH"
    --sampleType -1 \
    --DebugMode true \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/ \
+   --EvtSelCorrectionFiles "${ProjectBase}/CommonCode/root/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root" \
+   --Species_ReweightFile "${ProjectBase}/CommonCode/root/ParticleSpeciesCorrectionFactorsOO.root" \
    --HideProgressBar true
 wait
 
