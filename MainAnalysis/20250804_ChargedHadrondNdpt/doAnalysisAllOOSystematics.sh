@@ -1,12 +1,37 @@
 #!/bin/bash
 
-DOSYSTEMATICSTRACK=true
+DOCENTRALVALUE=true    
+DOSYSTEMATIC_TRACK=true
+DOSYSTEMATIC_EVTSEL=true
+DOSYSTEMATIC_SPECIES=true
 
-if [ "$DOSYSTEMATICSTRACK" = true ]; then
-    echo "Running PlotSystematics..."
-./RunParallelReadParam.sh --Output OOSystNominalTrack --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight false --UseSpeciesWeight false --UseTrackWeight true --TrackWeightSelection 1 --TriggerChoice 1 --EventSelectionOption 1 --SpeciesCorrectionOption 0 --ScaleFactor 1
-./RunParallelReadParam.sh --Output OOSystLooseTrack   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight false --UseSpeciesWeight false --UseTrackWeight true --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 1 --SpeciesCorrectionOption 0 --ScaleFactor 1
-./RunParallelReadParam.sh --Output OOSystTightTrack   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight false --UseSpeciesWeight false --UseTrackWeight true --TrackWeightSelection 3 --TriggerChoice 1 --EventSelectionOption 1 --SpeciesCorrectionOption 0 --ScaleFactor 1
+if [ "$DOCENTRALVALUE" = true ]; then
+    echo "Running central value..."
 
-## HERE WE NEED TO ADD THE MACROS FOR COMPARING CROSS_SECTIONS and extract systematics
+    #default
+    ./RunParallelReadParam.sh --Output systematic_variations/OOCentralValue --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 2 --SpeciesCorrectionOption 2 --ScaleFactor 1
+fi
+
+if [ "$DOSYSTEMATIC_TRACK" = true ]; then
+    echo "Running track weight systematics..."
+
+    #track weight variations
+    ./RunParallelReadParam.sh --Output systematic_variations/OOSystLooseTrack   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 1 --TriggerChoice 1 --EventSelectionOption 2 --SpeciesCorrectionOption 2 --ScaleFactor 1
+    ./RunParallelReadParam.sh --Output systematic_variations/OOSystTightTrack   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 3 --TriggerChoice 1 --EventSelectionOption 2 --SpeciesCorrectionOption 2 --ScaleFactor 1
+fi
+
+if [ "$DOSYSTEMATIC_EVTSEL" = true ]; then
+    echo "Running event selection systematics..."
+
+    #eventselection variations
+    ./RunParallelReadParam.sh --Output systematic_variations/OOSystLooseEsel   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 1 --SpeciesCorrectionOption 2 --ScaleFactor 1
+    ./RunParallelReadParam.sh --Output systematic_variations/OOSystTightEsel   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 3 --SpeciesCorrectionOption 2 --ScaleFactor 1
+fi
+
+if [ "$DOSYSTEMATIC_SPECIES" = true ]; then
+    echo "Running species correction systematics..."
+
+    #species correction variations
+    ./RunParallelReadParam.sh --Output systematic_variations/OOSystLooseSpecies   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 2 --SpeciesCorrectionOption 1 --ScaleFactor 1
+    ./RunParallelReadParam.sh --Output systematic_variations/OOSystTightSpecies   --Input OO_InputFileList_Reference.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 2 --SpeciesCorrectionOption 3 --ScaleFactor 1
 fi
