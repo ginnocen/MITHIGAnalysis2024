@@ -8,13 +8,13 @@ MODE="output_OOReferenceCentralValue"
     --Input OO_InputFileList.txt \
     --CollisionSystem true \
     --ApplyEventSelection true \
-    --UseEventWeight false \
-    --UseSpeciesWeight false \
+    --UseEventWeight true \
+    --UseSpeciesWeight true \
     --UseTrackWeight true \
     --TrackWeightSelection 2 \
     --TriggerChoice 1 \
-    --EventSelectionOption 1 \
-    --SpeciesCorrectionOption 0 \
+    --EventSelectionOption 2 \
+    --SpeciesCorrectionOption 2 \
     --ScaleFactor 1
 
 echo "Running PlotTrkPtVariantsWithRatioToUnweighted_Save..."
