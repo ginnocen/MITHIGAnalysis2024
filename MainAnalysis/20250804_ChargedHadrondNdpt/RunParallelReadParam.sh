@@ -10,8 +10,6 @@ DOUSEEVENTWEIGHT=false
 DOUSESPECIESWEIGHT=false
 DOUSETRACKWEIGHT=true
 TRACKWEIGHTSELECTION=2
-MINTRACKPT=0.4
-MINLEADINGTRACKPT=-1
 TRIGGERCHOICE=1
 EVENTSELECTIONOPTION=1
 SPECIESCORRECTIONOPTION=0
@@ -28,8 +26,6 @@ while [[ $# -gt 0 ]]; do
     --UseSpeciesWeight) DOUSESPECIESWEIGHT="$2"; shift 2 ;;
     --UseTrackWeight) DOUSETRACKWEIGHT="$2"; shift 2 ;;
     --TrackWeightSelection) TRACKWEIGHTSELECTION="$2"; shift 2 ;;
-    --MinTrackPt) MINTRACKPT="$2"; shift 2 ;;
-    --MinLeadingTrackPt) MINLEADINGTRACKPT="$2"; shift 2 ;;
     --TriggerChoice) TRIGGERCHOICE="$2"; shift 2 ;;
     --EventSelectionOption) EVENTSELECTIONOPTION="$2"; shift 2 ;;
     --SpeciesCorrectionOption) SPECIESCORRECTIONOPTION="$2"; shift 2 ;;
@@ -55,8 +51,6 @@ echo "DOUSEEVENTWEIGHT       = $DOUSEEVENTWEIGHT"
 echo "DOUSESPECIESWEIGHT     = $DOUSESPECIESWEIGHT"
 echo "DOUSETRACKWEIGHT       = $DOUSETRACKWEIGHT"
 echo "TRACKWEIGHTSELECTION   = $TRACKWEIGHTSELECTION"
-echo "MINTRACKPT             = $MINTRACKPT"
-echo "MINLEADINGTRACKPT      = $MINLEADINGTRACKPT"
 echo "TRIGGERCHOICE          = $TRIGGERCHOICE"
 echo "EVENTSELECTIONOPTION   = $EVENTSELECTIONOPTION"
 echo "SPECIESCORRECTIONOPTION= $SPECIESCORRECTIONOPTION"
@@ -92,21 +86,18 @@ while IFS= read -r INPUT; do
   echo "Launching job for $INPUT -> $OUTPUTFILE"
 
   ./ExecuteChargedHadrondNdpt \
+    --TriggerChoice "$TRIGGERCHOICE" \
+    --ScaleFactor "$SCALEFACTOR" \
     --Input "$INPUT" \
     --Output "$OUTPUTFILE" \
-    --IsData true \
+    --CollisionSystem "$COLLISIONSYSTEM" \
     --ApplyEventSelection "$DOAPPLYEVENTSELECTION" \
     --UseSpeciesWeight "$DOUSESPECIESWEIGHT" \
     --UseEventWeight "$DOUSEEVENTWEIGHT" \
     --UseTrackWeight "$DOUSETRACKWEIGHT" \
     --TrackWeightSelection "$TRACKWEIGHTSELECTION" \
-    --MinTrackPt "$MINTRACKPT" \
-    --MinLeadingTrackPt "$MINLEADINGTRACKPT" \
-    --TriggerChoice "$TRIGGERCHOICE" \
-    --CollisionSystem "$COLLISIONSYSTEM" \
     --EventSelectionOption "$EVENTSELECTIONOPTION" \
-    --SpeciesCorrectionOption "$SPECIESCORRECTIONOPTION" \
-    --ScaleFactor "$SCALEFACTOR" &
+    --SpeciesCorrectionOption "$SPECIESCORRECTIONOPTION" &
 
   ((counter++))
   wait_for_slot
