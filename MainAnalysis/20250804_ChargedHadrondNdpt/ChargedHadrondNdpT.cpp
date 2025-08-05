@@ -35,6 +35,19 @@ const Double_t pTBins_log[nPtBins_log + 1] = {
 
 bool checkError(const Parameters &par) { return false; }
 
+void NormalizeByBinWidth(TH1* hist) {
+    for (int i = 1; i <= hist->GetNbinsX(); ++i) {
+        double binContent = hist->GetBinContent(i);
+        double binError   = hist->GetBinError(i);
+        double binWidth   = hist->GetBinWidth(i);
+
+        // Normalize
+        hist->SetBinContent(i, binContent / binWidth);
+        hist->SetBinError(i, binError / binWidth);
+    }
+}
+
+
 //============================================================//
 // Data analyzer class
 //============================================================//
@@ -171,6 +184,16 @@ public:
 
   void writeHistograms(TFile *outf) {
     outf->cd();
+
+    NormalizeByBinWidth(hTrkPtNoEvt);
+    NormalizeByBinWidth(hTrkPtNoTrk);
+    NormalizeByBinWidth(hTrkPtNoPartSpecies);
+    NormalizeByBinWidth(hTrkPt);
+    NormalizeByBinWidth(hTrkPtUnweighted);
+    NormalizeByBinWidth(hTrkEta);
+    NormalizeByBinWidth(hTrkEtaUnweighted);
+
+
     smartWrite(hTrkPtNoEvt);
     smartWrite(hTrkPtNoTrk);
     smartWrite(hTrkPtNoPartSpecies);
