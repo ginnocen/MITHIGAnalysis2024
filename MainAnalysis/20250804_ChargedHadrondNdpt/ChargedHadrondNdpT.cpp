@@ -119,24 +119,22 @@ public:
       if (par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 3 &&
           MChargedHadronRAA->passHFAND_19_Offline)
         evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;
-
+        
       // track loop
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
         // get track selection option
-        float trkWeight =
-            0.0; // assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection below
+        float trkWeight = 0.0; //assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection below
 
-        if (par.UseTrackWeight) {
-          if (par.TrackSelectionOption == 1 && MChargedHadronRAA->trkPassChargedHadron_Loose->at(j))
-            trkWeight = MChargedHadronRAA->trackingEfficiency_Loose->at(j); // nonzero weight
-          else if (par.TrackSelectionOption == 2 && MChargedHadronRAA->trkPassChargedHadron_Nominal->at(j))
-            trkWeight = MChargedHadronRAA->trackingEfficiency_Nominal->at(j); // nonzero weight
-          else if (par.TrackSelectionOption == 3 && MChargedHadronRAA->trkPassChargedHadron_Tight->at(j))
-            trkWeight = MChargedHadronRAA->trackingEfficiency_Tight->at(j); // nonzero weight
+	    if (par.TrackSelectionOption == 1 && MChargedHadronRAA->trkPassChargedHadron_Loose->at(j) == false) continue;
+	    if (par.TrackSelectionOption == 2 && MChargedHadronRAA->trkPassChargedHadron_Nominal->at(j) == false) continue;
+	    if (par.TrackSelectionOption == 3 && MChargedHadronRAA->trkPassChargedHadron_Tight->at(j) == false) continue;
+
+	    if (par.UseTrackWeight)
+	    {
+          if (par.TrackSelectionOption == 1 ) trkWeight = MChargedHadronRAA->trackingEfficiency_Loose->at(j); 
+          if (par.TrackSelectionOption == 2 ) trkWeight = MChargedHadronRAA->trackingEfficiency_Nominal->at(j); 
+          if (par.TrackSelectionOption == 3 ) trkWeight = MChargedHadronRAA->trackingEfficiency_Tight->at(j); 
         }
-
-        if (trkWeight <= 0.01)
-          continue;
 
         float partSpeciesWeight = 1.;
 
