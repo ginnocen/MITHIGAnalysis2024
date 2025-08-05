@@ -5,7 +5,7 @@ LUMIAAtoPP=150000
 MODE="output_NeNeReferenceCentralValue"
 ./RunParallelReadParam.sh \
     --Output ${MODE} \
-    --Input NeNe_InputFileList_Reference.txt \
+    --Input NeNe_InputFileList.txt \
     --CollisionSystem true \
     --ApplyEventSelection true \
     --UseEventWeight false \
