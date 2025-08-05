@@ -14,9 +14,9 @@ CORRPATH=/afs/cern.ch/work/w/wangj/RECO2025/CMSSW_15_0_6/src/MITHIGAnalysis2024/
 IsData=True
 CollisionSystem=NeNe
 Fraction=1
-ApplyTriggerRejection=0
-ApplyEventRejection=false
-ApplyTrackRejection=false
+ApplyTriggerRejection=2
+ApplyEventRejection=true
+ApplyTrackRejection=true
 sampleType=-1
 DebugMode=false
 includeL1EMU=false
@@ -34,7 +34,7 @@ INPUTS=(
 OUTPUTPRIDIR="/eos/cms/store/group/phys_heavyions/$USER/NeNe2025"
 WORKDIR="$PWD"
 
-CORRFILES=$(ls $CORRPATH/* | grep -E 'OO|pp|NeNe') # I assume all the useful correction files have the name including OO, ppref or NeNe
+CORRFILES=$(ls $CORRPATH/* | grep -E 'OO|ppref|NeNe|NENE') # I assume all the useful correction files have the name including OO, ppref or NeNe
 
 # don't need to change things below if you are just user
 
