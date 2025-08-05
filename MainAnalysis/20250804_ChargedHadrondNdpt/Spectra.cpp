@@ -9,12 +9,11 @@
 #include <TSystem.h>
 #include <iostream>
 
-#include "CMS_lumi.C"
-#include "tdrstyle.C"
+#include "MITHIG_CMSStyle.h"
 
 int main(int argc, char *argv[]) {
 
-  setTDRStyle();
+  SetTDRStyle();
 
   if (argc != 8) {
     std::cout << "Wrong number of arguments!!!!!!!!!!!" << std::endl;
@@ -170,4 +169,5 @@ int main(int argc, char *argv[]) {
   canv2->SaveAs(Form("%s/Figure_001.png", plotfolder.Data()));
   canv2->SaveAs(Form("%s/Figure_001.C", plotfolder.Data()));
   return 0;
+
 }
