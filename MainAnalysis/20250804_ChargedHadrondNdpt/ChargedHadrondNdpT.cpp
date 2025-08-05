@@ -35,6 +35,19 @@ const Double_t pTBins_log[nPtBins_log + 1] = {
 
 bool checkError(const Parameters &par) { return false; }
 
+void NormalizeByBinWidth(TH1* hist) {
+    for (int i = 1; i <= hist->GetNbinsX(); ++i) {
+        double binContent = hist->GetBinContent(i);
+        double binError   = hist->GetBinError(i);
+        double binWidth   = hist->GetBinWidth(i);
+
+        // Normalize
+        hist->SetBinContent(i, binContent / binWidth);
+        hist->SetBinError(i, binError / binWidth);
+    }
+}
+
+
 //============================================================//
 // Data analyzer class
 //============================================================//
@@ -119,24 +132,22 @@ public:
       if (par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 3 &&
           MChargedHadronRAA->passHFAND_19_Offline)
         evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;
-
+        
       // track loop
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
         // get track selection option
-        float trkWeight =
-            0.0; // assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection below
+        float trkWeight = 0.0; //assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection below
 
-        if (par.UseTrackWeight) {
-          if (par.TrackSelectionOption == 1 && MChargedHadronRAA->trkPassChargedHadron_Loose->at(j))
-            trkWeight = MChargedHadronRAA->trackingEfficiency_Loose->at(j); // nonzero weight
-          else if (par.TrackSelectionOption == 2 && MChargedHadronRAA->trkPassChargedHadron_Nominal->at(j))
-            trkWeight = MChargedHadronRAA->trackingEfficiency_Nominal->at(j); // nonzero weight
-          else if (par.TrackSelectionOption == 3 && MChargedHadronRAA->trkPassChargedHadron_Tight->at(j))
-            trkWeight = MChargedHadronRAA->trackingEfficiency_Tight->at(j); // nonzero weight
+	    if (par.TrackSelectionOption == 1 && MChargedHadronRAA->trkPassChargedHadron_Loose->at(j) == false) continue;
+	    if (par.TrackSelectionOption == 2 && MChargedHadronRAA->trkPassChargedHadron_Nominal->at(j) == false) continue;
+	    if (par.TrackSelectionOption == 3 && MChargedHadronRAA->trkPassChargedHadron_Tight->at(j) == false) continue;
+
+	    if (par.UseTrackWeight)
+	    {
+          if (par.TrackSelectionOption == 1 ) trkWeight = MChargedHadronRAA->trackingEfficiency_Loose->at(j); 
+          if (par.TrackSelectionOption == 2 ) trkWeight = MChargedHadronRAA->trackingEfficiency_Nominal->at(j); 
+          if (par.TrackSelectionOption == 3 ) trkWeight = MChargedHadronRAA->trackingEfficiency_Tight->at(j); 
         }
-
-        if (trkWeight <= 0.01)
-          continue;
 
         float partSpeciesWeight = 1.;
 
@@ -173,6 +184,16 @@ public:
 
   void writeHistograms(TFile *outf) {
     outf->cd();
+
+    NormalizeByBinWidth(hTrkPtNoEvt);
+    NormalizeByBinWidth(hTrkPtNoTrk);
+    NormalizeByBinWidth(hTrkPtNoPartSpecies);
+    NormalizeByBinWidth(hTrkPt);
+    NormalizeByBinWidth(hTrkPtUnweighted);
+    NormalizeByBinWidth(hTrkEta);
+    NormalizeByBinWidth(hTrkEtaUnweighted);
+
+
     smartWrite(hTrkPtNoEvt);
     smartWrite(hTrkPtNoTrk);
     smartWrite(hTrkPtNoPartSpecies);
