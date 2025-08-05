@@ -5,7 +5,7 @@ LUMIAAtoPP=150000
 MODE="output_OOReferenceCentralValue"
 ./RunParallelReadParam.sh \
     --Output ${MODE} \
-    --Input OO_InputFileList_Reference.txt \
+    --Input OO_InputFileList.txt \
     --CollisionSystem true \
     --ApplyEventSelection true \
     --UseEventWeight false \
