@@ -2,12 +2,16 @@
 
 // DECLARE HELPERS
 TH1D* HistFromFile(const char* filename, const char* histname);
-void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* outputname);
+void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* system, const char* outputname);
 TH1D* Hist_Symmetrized_Errors(TH1D* hUp, TH1D* hCentral, TH1D* hDown);
 TH1D* Hist_Total_Systematic(vector<TH1D*> systematics);
-void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20);
+void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO");
+TString GenerateFilePath(const char* system, const char* variation);
 
-void CompareSystematics(int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, const char* outfilename = "trust.root"){
+/// START 
+void CompareSystematics(const char* system = "OO", int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, const char* outfilename = "systematics.root"){
+
+    cout << "STARTING SYSTEMATIC COMPARISON" << endl;
 
     // MAKE SYSTEMATIC HISTS
     vector<TH1D*> hSystematics;
@@ -18,12 +22,16 @@ void CompareSystematics(int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, co
     TH1D* hLooseSpecies = nullptr;
     TH1D* hTightSpecies = nullptr;
 
+ 
+
     /// HISTOGRAMS TO COMPARE FOR EACH SYSTEMATIC
-    TH1D* hCentral = HistFromFile("OOCentralValue/MergedOutput.root", "hTrkPt");    
+    TH1D* hCentral = HistFromFile(GenerateFilePath(system, "CentralValue"), "hTrkPt");    
     
     if(doTrack == 1){
-        hLooseTrack = HistFromFile("OOSystLooseTrack/MergedOutput.root", "hTrkPt");
-        hTightTrack = HistFromFile("OOSystTightTrack/MergedOutput.root", "hTrkPt");
+        cout << "TRACK WEIGHT SYSTEMATICS" << endl;
+
+        hLooseTrack = HistFromFile(GenerateFilePath(system, "SystLooseTrack"), "hTrkPt");
+        hTightTrack = HistFromFile(GenerateFilePath(system, "SystTightTrack"), "hTrkPt");
         if(hLooseTrack && hTightTrack){
             TH1D* hSystematic_Tracks = Hist_Symmetrized_Errors(hTightTrack, hCentral, hLooseTrack);
             hSystematic_Tracks->SetName("hSystematic_Tracks");
@@ -34,14 +42,15 @@ void CompareSystematics(int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, co
                 hCentral, 
                 "Track p_{T} (GeV/c)", 
                 "dN/dp_{T} (GeV/c)^{-1}",
-                 1, 1, 3, 400, 0.9, 1.1, 1e-3, 1e7, 
-                 "TrackWeightSystematic_Comparison.pdf");
+                 1, 1, 3, 400, 0.9, 1.1, 1e-5, 1e10, 
+                 system, "TrackWeightSystematic_Comparison.pdf");
         }
     }
 
     if(doEvtSel == 1){
-        hLooseEsel = HistFromFile("OOSystLooseEsel/MergedOutput.root", "hTrkPt");
-        hTightEsel = HistFromFile("OOSystTightEsel/MergedOutput.root", "hTrkPt");
+        cout << "EVENT SELECTION SYSTEMATICS" << endl;
+        hLooseEsel = HistFromFile(GenerateFilePath(system, "SystLooseEsel"), "hTrkPt");
+        hTightEsel = HistFromFile(GenerateFilePath(system, "SystTightEsel"), "hTrkPt");
         if(hLooseEsel && hTightEsel){
             TH1D* hSystematic_EvtSel = Hist_Symmetrized_Errors(hTightEsel, hCentral, hLooseEsel);
             hSystematic_EvtSel->SetName("hSystematic_EvtSel");
@@ -51,14 +60,15 @@ void CompareSystematics(int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, co
                 hCentral,
                  "Track p_{T} (GeV/c)", 
                  "dN/dp_{T} (GeV/c)^{-1}",
-                  1, 1, 3, 400, 0.9, 1.1, 1e-3, 1e7, 
-                  "EventSelectionSystematic_Comparison.pdf");
+                  1, 1, 3, 400, 0.9, 1.1, 1e-5, 1e10, 
+                  system, "EventSelectionSystematic_Comparison.pdf");
         }
     }
 
     if(doSpecies == 1){
-        hLooseSpecies = HistFromFile("OOSystLooseSpecies/MergedOutput.root", "hTrkPt");
-        hTightSpecies = HistFromFile("OOSystTightSpecies/MergedOutput.root", "hTrkPt");
+        cout << "SPECIES SELECTION SYSTEMATICS" << endl;
+        hLooseSpecies = HistFromFile(GenerateFilePath(system, "SystLooseSpecies"), "hTrkPt");
+        hTightSpecies = HistFromFile(GenerateFilePath(system, "SystTightSpecies"), "hTrkPt");
         if(hLooseSpecies && hTightSpecies){
             TH1D* hSystematic_Species = Hist_Symmetrized_Errors(hTightSpecies, hCentral, hLooseSpecies);
             hSystematic_Species->SetName("hSystematic_Species");
@@ -68,14 +78,13 @@ void CompareSystematics(int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, co
                 hCentral, 
                 "Track p_{T} (GeV/c)", 
                 "dN/dp_{T} (GeV/c)^{-1}",
-                 1, 1, 3, 400, 0.9, 1.1, 1e-3, 1e7, 
-                 "SpeciesSystematic_Comparison.pdf");
+                 1, 1, 3, 400, 0.9, 1.1, 1e-5, 1e10, 
+                 system, "SpeciesSystematic_Comparison.pdf");
         }
     }
 
-    
-
-
+    // CALCULATE TOTAL SYSTEMATIC
+    cout << "CALCULATING TOTAL SYSTEMATICS" << endl;
     TH1D* hSystematic_total = Hist_Total_Systematic(hSystematics);
     hSystematic_total->SetName("hSystematic_total");
     if(hSystematics.size() > 0){PlotUncerts(hSystematics, hSystematic_total, "Track p_{T} (GeV/c)", 0, 20);}
@@ -111,7 +120,7 @@ TH1D* HistFromFile(const char* filename, const char* histname){
 }
 
 /// HELPER TO DO RATIO PLOTS 
-void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* outputname){
+void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* system, const char* outputname){
 
     // Set CMS style
     SetTDRStyle();
@@ -207,8 +216,9 @@ void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D
     
     // Add CMS headers
     AddCMSHeader(pad1, "Preliminary");
-    AddUPCHeader(pad1, "5.36 TeV", "OO 9.0 nb^{-1}");
-    
+    if(strcmp(system, "OO") == 0){AddUPCHeader(pad1, "5.36 TeV", "OO 9.0 nb^{-1}");}
+    if(strcmp(system, "NeNe") == 0){AddUPCHeader(pad1, "5.36 TeV", "NeNe 1.0 nb^{-1}");}
+
     // Lower plot - draw ratios
     pad2->cd();
     
@@ -298,7 +308,7 @@ TH1D* Hist_Total_Systematic(vector<TH1D*> varhists){
 }
 
 /// PLOT UNCERTAINTIES
-void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20){
+void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO"){
 
     // Set CMS style
     SetTDRStyle();
@@ -395,8 +405,15 @@ void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Tr
     
     // Add CMS headers
     AddCMSHeader(c1, "Preliminary");
-    AddUPCHeader(c1, "5.36 TeV", "OO 9.0 nb^{-1}");
-    
+    if(strcmp(system, "OO") == 0){AddUPCHeader(c1, "5.36 TeV", "OO 9.0 nb^{-1}");}
+    else if(strcmp(system, "NeNe") == 0){AddUPCHeader(c1, "5.36 TeV", "NeNe 1.0 nb^{-1}");}
+
     // Save canvas
     c1->SaveAs("SystUncerts.pdf");
+}
+
+/// HELPER TO GENERATE FILE PATHS
+TString GenerateFilePath(const char* system, const char* variation){
+    TString filepath = Form("%s%s/MergedOutput.root", system, variation);
+    return filepath;
 }
