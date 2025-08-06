@@ -185,6 +185,12 @@ public:
   void writeHistograms(TFile *outf) {
     outf->cd();
 
+    hTrkPtNoEvt->Scale(1.0 / (4 * TMath::Pi()));
+    hTrkPtNoTrk->Scale(1.0 / (4 * TMath::Pi()));
+    hTrkPtNoPartSpecies->Scale(1.0 / (4 * TMath::Pi()));
+    hTrkPt->Scale(1.0 / (4 * TMath::Pi()));
+    hTrkPtUnweighted->Scale(1.0 / (4 * TMath::Pi()));
+	  
     NormalizeByBinWidth(hTrkPtNoEvt);
     NormalizeByBinWidth(hTrkPtNoTrk);
     NormalizeByBinWidth(hTrkPtNoPartSpecies);
