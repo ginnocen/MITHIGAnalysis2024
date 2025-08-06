@@ -282,9 +282,9 @@ int DrawWeight(
 ) {
     // Open ROOT files
     TFile* f_data = TFile::Open(DataOutput.c_str());
+    TFile* f_mc   = TFile::Open(MCoutput.c_str());
     TFile* f_mc_vz = TFile::Open(MCoutputVZ.c_str());
     TFile* f_mc_mult = TFile::Open(MCoutputMult.c_str());
-    TFile* f_mc   = TFile::Open(MCoutput.c_str());
     TFile* f_mc_pt = TFile::Open(MCoutputPt.c_str());
 
     if (!f_data || f_data->IsZombie()) {

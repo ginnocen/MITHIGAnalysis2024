@@ -13,46 +13,41 @@
 void SaveHists_allweights_evtbyevt(
     const std::string& inputFileNameMC,
     const std::string& branchName,
-    const std::string& ReweightFile,
     const std::string& cut = "",
     int nbins = 100,
     double xmin = NAN,
     double xmax = NAN,
     const std::string& outfilename = "",
     bool normalize = false,
-    bool VZweight = true,
-    bool Multweight = true)
+    bool VZweightBool = true,
+    bool MultweightBool = true,
+    bool Debug = false)
 {
 
-    TFile* f_reweight = TFile::Open(ReweightFile.c_str());
     TFile* f_mc = TFile::Open(inputFileNameMC.c_str());
 
-    if (!f_reweight || f_reweight->IsZombie() ||
-        !f_mc || f_mc->IsZombie()) {
+    if (!f_mc || f_mc->IsZombie()) {
         std::cerr << "Cannot open one or more files!" << std::endl;
         return;
     }
 
-    // Get weight histo
-    TH1D* hVzWeight = (TH1D*) f_reweight->Get("VZReweight");
-    TH1D* hMultWeight = (TH1D*) f_reweight->Get("MultReweight");
-    if (!hVzWeight || !hMultWeight) {
-        std::cerr << "Could not get reweight histogram!" << std::endl;
-        return;
-    }
-
     // Use MC tree for event loop
-    TTree* tree = (TTree*) f_mc->Get("Tree"); // update to correct name
+    TTree* tree = (TTree*) f_mc->Get("Tree"); 
     if (!tree) {
         std::cerr << "Tree not found in MC file!" << std::endl;
         return;
     }
 
-    float vz = 0;
-    int mult = 0;
+    float vz;
+    int mult;
+    float vzWeight;
+    float multWeight;
+    
     tree->SetBranchAddress("VZ", &vz);
     tree->SetBranchAddress("multiplicityEta2p4", &mult);
-
+    tree->SetBranchAddress("MC_VZReweight", &vzWeight);
+    tree->SetBranchAddress("MC_MultReweight", &multWeight);
+    
     /// Set y and x
     tree->Draw((branchName + ">>htempDATA(10000)").c_str(), cut.c_str(), "goff");
     TH1D* htempDATA = (TH1D*)gDirectory->Get("htempDATA");
@@ -72,13 +67,12 @@ void SaveHists_allweights_evtbyevt(
         120, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000
     };
 
-    const Int_t nPtBins_log = 26;
+    const Int_t nPtBins_log = 68; // Vipul's binning
     const Double_t pTBins_log[nPtBins_log + 1] = {
-        0.5, 0.603, 0.728, 0.879, 1.062, 1.284, 1.553, 1.878, 2.272, 2.749, 3.327, 4.027, 
-        4.872, 5.891, 7.117, 8.591, 10.36, 12.48, 15.03, 18.08, 21.73, 26.08, 31.28, 
-        37.48, 44.89, 53.73, 64.31
-    };
-
+        0.5,  0.6,  0.7,  0.8,  0.9,  1.0,  1.1,  1.2,  1.3,  1.4,   1.5,   1.6,  1.7,  1.8,  1.9, 2.0,  2.2,  2.4,
+        2.6,  2.8,  3.0,  3.2,  3.4,  3.6,  3.8,  4.0,  4.4,  4.8,   5.2,   5.6,  6.0,  6.4,  6.8, 7.2,  7.6,  8.0,
+        8.5,  9.0,  9.5,  10.0, 11.,  12.,  13.,  14.,  15.,  16.,   17.,   18.,  19.,  20.,  21., 22.6, 24.6, 26.6,
+        28.6, 32.6, 36.6, 42.6, 48.6, 54.6, 60.6, 74.0, 86.4, 103.6, 120.8, 140., 165., 250., 400.};
 
     TH1D* h_noWeight = nullptr;
     TH1D* h_weighted = nullptr;
@@ -118,19 +112,19 @@ void SaveHists_allweights_evtbyevt(
     for (Long64_t i = 0; i < nEntries; ++i) {
         tree->GetEntry(i);
         // Apply cut if specified
+        if (i% 50000 == 0) {
+            cout << "Processing entry " << i << " of " << nEntries << std::endl;
+        }
+       //cout << "VZ: " << vz << ", Mult: " << mult << std::endl;
         if (formula && !formula->EvalInstance()) continue;
+        if (!VZweightBool) vzWeight = 1.0;
+        if (!MultweightBool) multWeight = 1.0;
+       // cout << "VZ Bool: " << VZweightBool << ", Mult Bool: " << MultweightBool << std::endl; 
+       // cout << "VZ Weight: " << vzWeight << ", Mult Weight: " << multWeight << endl;
 
-        int bin_vz = hVzWeight->FindBin(vz);
-        int bin_mult = hMultWeight->FindBin(mult);
-
-        bin_vz = std::clamp(bin_vz, 1, hVzWeight->GetNbinsX());
-        bin_mult = std::clamp(bin_mult, 1, hMultWeight->GetNbinsX());
-
-        float vzWeight = hVzWeight->GetBinContent(bin_vz);
-        float multWeight = hMultWeight->GetBinContent(bin_mult);
-
-        if (!VZweight) vzWeight = 1.0;
-        if (!Multweight) multWeight = 1.0;
+        if (Debug && i == 100000){
+            break;
+        }
 
         float totalWeight = vzWeight * multWeight;
         float value = leaf->GetValue();
@@ -152,14 +146,9 @@ void SaveHists_allweights_evtbyevt(
 
     if (formula) delete formula;
 
-    cout << "Entries processed: " << nEntries << std::endl;
-
     if (normalize) {
-        cout << "no weight Integral:" << (h_weighted->Integral()) << endl;
-        cout << "weighted Integral:" << (h_weighted->Integral()) << endl;
         h_noWeight->Scale(1.0 / h_noWeight->Integral());
         h_weighted->Scale(1.0 / h_weighted->Integral());
-
     }
 
     cout << "Saving histograms to output file: " << outfilename << endl;
@@ -187,7 +176,6 @@ void SaveHists_allweights_evtbyevt(
 void SaveHists_allweights_vector(
     const std::string& inputFileNameMC,
     const std::string& branchName,
-    const std::string& ReweightFile,
     const std::string& cut = "",
     int nbins = 100,
     double xmin = NAN,
@@ -196,33 +184,14 @@ void SaveHists_allweights_vector(
     bool normalize = false,
     bool VZweight = true,
     bool Multweight = true,
-    bool TrkPtweight = true)
+    bool TrkPtweight = true,
+    bool Debug = false)
 {
 
-    TFile* f_reweight = TFile::Open(ReweightFile.c_str());
     TFile* f_mc = TFile::Open(inputFileNameMC.c_str());
 
-    if (!f_reweight || f_reweight->IsZombie() ||
-        !f_mc || f_mc->IsZombie()) {
+    if (!f_mc || f_mc->IsZombie()) {
         std::cerr << "Cannot open one or more files!" << std::endl;
-        return;
-    }
-
-    // Get weight histo
-    TH1D* hVzWeight = (TH1D*) f_reweight->Get("VZReweight");
-    TH1D* hMultWeight = (TH1D*) f_reweight->Get("MultReweight");
-    TH1D* hPtWeight = (TH1D*) f_reweight->Get("TrkPtReweight");
-
-    if (!hVzWeight) {
-        std::cerr << "Could not get reweight VZ histogram!" << std::endl;
-        return;
-    }
-    if (!hMultWeight) {
-        std::cerr << "Could not get reweight Mult histogram!" << std::endl;
-        return;
-    }
-    if (!hPtWeight) {
-        std::cerr << "Could not get reweight Pt histogram!" << std::endl;
         return;
     }
 
@@ -239,6 +208,10 @@ void SaveHists_allweights_vector(
     vector<bool>* trkPassChargedHadron_Nominal = nullptr;
     vector<float>* branch = nullptr;
 
+    float vzWeight = 1.0;
+    float multWeight = 1.0;
+    vector<float>* trkPtReweightVector = nullptr;
+
     tree->SetBranchAddress("VZ", &vz);
     tree->SetBranchAddress("multiplicityEta2p4", &mult);
     if (branchName != "trkPt") {
@@ -246,6 +219,10 @@ void SaveHists_allweights_vector(
     }
     tree->SetBranchAddress("trkPassChargedHadron_Nominal", &trkPassChargedHadron_Nominal);
     tree->SetBranchAddress(branchName.c_str(), &branch);
+
+    tree->SetBranchAddress("MC_VZReweight", &vzWeight);
+    tree->SetBranchAddress("MC_MultReweight", &multWeight);
+    tree->SetBranchAddress("MC_TrkPtReweight", &trkPtReweightVector);
 
     tree->Draw((branchName + ">>htempDATA(10000)").c_str(), cut.c_str(), "goff");
     TH1D* htempDATA = (TH1D*)gDirectory->Get("htempDATA");
@@ -265,11 +242,12 @@ void SaveHists_allweights_vector(
         120, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000
     };
 
-    const Int_t nPtBins_log = 26;
+    const Int_t nPtBins_log = 68; // Vipul's binning
     const Double_t pTBins_log[nPtBins_log + 1] = {
-        0.5, 0.603, 0.728, 0.879, 1.062, 1.284, 1.553, 1.878, 2.272, 2.749, 3.327, 4.027, 
-        4.872, 5.891, 7.117, 8.591, 10.36, 12.48, 15.03, 18.08, 21.73, 26.08, 31.28, 
-        37.48, 44.89, 53.73, 64.31
+        0.5,  0.6,  0.7,  0.8,  0.9,  1.0,  1.1,  1.2,  1.3,  1.4,   1.5,   1.6,  1.7,  1.8,  1.9, 2.0,  2.2,  2.4,
+        2.6,  2.8,  3.0,  3.2,  3.4,  3.6,  3.8,  4.0,  4.4,  4.8,   5.2,   5.6,  6.0,  6.4,  6.8, 7.2,  7.6,  8.0,
+        8.5,  9.0,  9.5,  10.0, 11.,  12.,  13.,  14.,  15.,  16.,   17.,   18.,  19.,  20.,  21., 22.6, 24.6, 26.6,
+        28.6, 32.6, 36.6, 42.6, 48.6, 54.6, 60.6, 74.0, 86.4, 103.6, 120.8, 140., 165., 250., 400.
     };
 
     TH1D* h_noWeight = nullptr;
@@ -309,38 +287,53 @@ void SaveHists_allweights_vector(
     
     Long64_t nEntries = tree->GetEntries();
     for (Long64_t i = 0; i < nEntries; ++i) {
+        if (i % 50000 == 0){ 
+            cout << "Processing entry " << i << " of " << nEntries << std::endl;
+        }
+
+        if (Debug && i == 100000){
+            break;
+        }
+
         tree->GetEntry(i);
+
         if (branchName == "trkPt") {
             trkPt = branch;
         }
         if (formula && !formula->EvalInstance()) continue;
-
-        int bin_vz = std::clamp(hVzWeight->FindBin(vz), 1, hVzWeight->GetNbinsX());
-        int bin_mult = std::clamp(hMultWeight->FindBin(mult), 1, hMultWeight->GetNbinsX());
-        float vzWeight = hVzWeight->GetBinContent(bin_vz);
-        float multWeight =  hMultWeight->GetBinContent(bin_mult);
         for (size_t j = 0; j < branch->size(); ++j) {
           // cout << "Processing entry " << i << ", index " << j << std::endl;
             if (trkPassChargedHadron_Nominal->at(j) != 1) continue; // Skip if track does not pass the cut
             if (trkPt->at(j) <= 3.0) continue; // Skip if track pt is less than 3.0 GeV/c
-            float pt = trkPt->at(j);
-            int bin_pt = std::clamp(hPtWeight->FindBin(pt), 1, hPtWeight->GetNbinsX());
-            
-            float trkWeight = hPtWeight->GetBinContent(bin_pt);
-            double binWidth = h_weighted->GetBinWidth(h_weighted->FindBin(pt));
+
+            float trkWeight = trkPtReweightVector->at(j);
 
             if (!VZweight) vzWeight = 1.0;
             if (!Multweight) multWeight = 1.0;
             if (!TrkPtweight) trkWeight = 1.0;
-
+            if (Debug && i % 10000 == 0) {
+                cout << "VZ Weight: " << vzWeight << ", Mult Weight: " << multWeight << ", TrkPt Weight: " << trkWeight << endl;
+            }
+            
             float totalWeight = vzWeight * multWeight * trkWeight;
 
-            h_noWeight->Fill(branch->at(j), 1.0 / binWidth);
-            h_weighted->Fill(branch->at(j), totalWeight / binWidth);
+            h_noWeight->Fill(branch->at(j), 1.0);
+            h_weighted->Fill(branch->at(j), totalWeight);
+
         }
     }    
 
     if (formula) delete formula;
+
+    for (int i = 1; i <= h_noWeight->GetNbinsX(); ++i) {
+        double width = h_noWeight->GetBinWidth(i);
+        if (width > 0) {
+            h_noWeight->SetBinContent(i, h_noWeight->GetBinContent(i) / width);
+            h_noWeight->SetBinError(i, h_noWeight->GetBinError(i) / width);
+            h_weighted->SetBinContent(i, h_weighted->GetBinContent(i) / width);
+            h_weighted->SetBinError(i, h_weighted->GetBinError(i) / width);
+        }
+    }
 
     cout << "Entries processed: " << nEntries << std::endl;
     if (normalize) {
@@ -388,7 +381,8 @@ void SaveHist_DatavsMC(
     double xmin = NAN,
     double xmax = NAN,
     const std::string& outRootFile = "SavedHistograms.root",
-    bool normalize = false)
+    bool normalize = false,
+    bool Debug = false)
 {
     TFile* inFileDATA = TFile::Open(inputFileNameDATA.c_str());
 
@@ -441,7 +435,12 @@ void SaveHist_DatavsMC(
     } else {
         histDATA = new TH1D(hname_data.c_str(), (branchName + " DATA MC Comparison").c_str(), nbins, xmin, xmax);
     }
-    TreeDATA->Draw((branchName + ">>" + hname_data).c_str(), cutDATA.c_str(), "goff");
+    // Draw only first 10000 events
+    if (Debug) {
+        TreeDATA->Draw((branchName + ">>" + hname_data).c_str(), cutDATA.c_str(), "goff", 10000);
+    } else {
+        TreeDATA->Draw((branchName + ">>" + hname_data).c_str(), cutDATA.c_str(), "goff");
+    }
     // Save to ROOT file
 
     cout << "Saving histograms to output file: " << outRootFile << endl;
@@ -484,7 +483,8 @@ void SaveHist_DatavsMC_Vector(
     double xmin = NAN,
     double xmax = NAN,
     const std::string& outRootFile = "SavedHistograms.root",
-    bool normalize = false)
+    bool normalize = false,
+    bool Debug = false)
 {
     cout << "BEGIN SAVING HIST FOR: " << branchName << endl;
     TFile* inFileDATA = TFile::Open(inputFileNameDATA.c_str());
@@ -547,13 +547,16 @@ void SaveHist_DatavsMC_Vector(
     // Loop over entries
     Long64_t nEntries = TreeDATA->GetEntries();
     for (Long64_t i = 0; i < nEntries; ++i) {
+        if (Debug && i == 100000) {
+            break; // Limit to first 100000 entries for debugging
+        }
         TreeDATA->GetEntry(i);
         if (branchName == "trkPt") {
             trkPt = dataVec; // Use trkPt vector if branch is "trkPt"
         }
         if (!formulaData->EvalInstance()) continue;
         if (!dataVec) continue;
-        for (int j = 0; j < dataVec->size(); ++j) {
+        for (size_t j = 0; j < dataVec->size(); ++j) {
             if (trkPassChargedHadron_Nominal->at(j) != 1 ) continue; // Skip if track does not pass the cut
             if (trkPt->at(j) <= 3.0) continue; // Skip if track pt is less than 3.0 GeV/c
             float val = dataVec->at(j);
@@ -598,12 +601,11 @@ void SaveHist_DatavsMC_Vector(
 
 }
 
-void PlotWithWeightNene(
+void PlotWithWeightNeneNew(
     std::string inFileDATA,
     std::string inFileHij,
     std::string cutDATA,
     std::string cutMC,
-    std::string ReweightFile,
     std::string MCoutputVZ,
     std::string MCoutputMult,
     std::string MCoutputPt,
@@ -651,7 +653,6 @@ void PlotWithWeightNene(
     };
 
 
-
 for (size_t i = 0; i < branches.size(); ++i) {
     cout << "Processing branch: " << branches[i] << endl;
     if (Debug && i == 1){
@@ -661,7 +662,6 @@ for (size_t i = 0; i < branches.size(); ++i) {
     SaveHists_allweights_evtbyevt(
         inFileHij,
         branch,
-        ReweightFile,
         cutMC,
         100,
         xmin[i],
@@ -669,12 +669,12 @@ for (size_t i = 0; i < branches.size(); ++i) {
         MCoutput,
         true,
         true,
-        true);
+        true,
+        Debug);
     
     SaveHists_allweights_evtbyevt(
         inFileHij,
         branch,
-        ReweightFile,
         cutMC,
         100,
         xmin[i],
@@ -682,12 +682,12 @@ for (size_t i = 0; i < branches.size(); ++i) {
         MCoutputVZ,
         true,
         true,
-        false);
+        false,
+        Debug);
 
  SaveHists_allweights_evtbyevt(
         inFileHij,
         branch,
-        ReweightFile,
         cutMC,
         100,
         xmin[i],
@@ -695,7 +695,8 @@ for (size_t i = 0; i < branches.size(); ++i) {
         MCoutputMult,
         true,
         false,
-        true);
+        true,
+        Debug);
 
    SaveHist_DatavsMC(
         inFileDATA, 
@@ -705,7 +706,8 @@ for (size_t i = 0; i < branches.size(); ++i) {
         xmin[i],
         xmax[i],
         DataOutput,
-        true);
+        true,
+        Debug);
     }
 
     std::vector<std::string> vectorbranches = {
@@ -731,14 +733,13 @@ for (size_t i = 0; i < branches.size(); ++i) {
  
 
     for (size_t i = 0; i < vectorbranches.size(); ++i) {
-        if (Debug && i == 0){
+        if (Debug && i == 1){
             break;
         }
         const auto& branch = vectorbranches[i];
         SaveHists_allweights_vector(
             inFileHij,
             branch,
-            ReweightFile,
             cutTrkMC,
             100,
             vectorxmin[i],
@@ -747,12 +748,12 @@ for (size_t i = 0; i < branches.size(); ++i) {
             true,
             true,
             true,
-            true);
+            true,
+            Debug);
 
         SaveHists_allweights_vector(
             inFileHij,
             branch,
-            ReweightFile,
             cutTrkMC,
             100,
             vectorxmin[i],
@@ -761,12 +762,12 @@ for (size_t i = 0; i < branches.size(); ++i) {
             true,
             true,
             false,
-            false);
+            false,
+            Debug);
 
         SaveHists_allweights_vector(
             inFileHij,
             branch,
-            ReweightFile,
             cutTrkMC,
             100,
             vectorxmin[i],
@@ -775,12 +776,12 @@ for (size_t i = 0; i < branches.size(); ++i) {
             true,
             false,
             true,
-            false);
+            false,
+            Debug);
 
         SaveHists_allweights_vector(
             inFileHij,
             branch,
-            ReweightFile,
             cutTrkMC,
             100,
             vectorxmin[i],
@@ -789,7 +790,8 @@ for (size_t i = 0; i < branches.size(); ++i) {
             true,
             false,
             false,
-            true);   
+            true,
+            Debug);   
 
         SaveHist_DatavsMC_Vector(
             inFileDATA, 
@@ -799,6 +801,7 @@ for (size_t i = 0; i < branches.size(); ++i) {
             vectorxmin[i],
             vectorxmax[i],
             DataOutput,
-            true);
+            true,
+            Debug);
     }
 }
