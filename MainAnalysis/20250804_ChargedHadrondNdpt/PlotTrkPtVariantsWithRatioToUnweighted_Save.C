@@ -27,9 +27,9 @@ void PlotTrkPtVariantsWithRatioToUnweighted_Save(const char *filename = "MergedO
   // Normalize all histograms per bin width
   for (TH1D *h : {hUnweighted, hNoEvt, hNoTrk, hNoPartSpecies, hFull}) {
     for (int i = 1; i <= h->GetNbinsX(); ++i) {
-      double width = h->GetBinWidth(i);
-      h->SetBinContent(i, h->GetBinContent(i) / width);
-      h->SetBinError(i, h->GetBinError(i) / width);
+      //double width = h->GetBinWidth(i);
+      //h->SetBinContent(i, h->GetBinContent(i) / width);
+      //h->SetBinError(i, h->GetBinError(i) / width);
     }
   }
 
