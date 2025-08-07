@@ -15,7 +15,12 @@ using namespace std;
 #include "ProgressBar.h"
 #include "parameter.h" // Parameters for the analysis
 #include "utilities.h" // Utility functions for the analysis
+#include <map>
+#include <vector>
+#include <utility> // for std::pair
 
+// Define the type for lumi section ranges
+using LumiRange = std::pair<int, int>;
 
 // Define binnings
 
@@ -34,6 +39,26 @@ const Double_t pTBins_log[nPtBins_log + 1] = {
     28.6, 32.6, 36.6, 42.6, 48.6, 54.6, 60.6, 74.0, 86.4, 103.6, 120.8, 140., 165., 250., 400.};
 
 bool checkError(const Parameters &par) { return false; }
+
+// The JSON-like structure in C++
+const std::map<int, std::vector<LumiRange>> goodLumis = {
+    {394269, {{37, 51}}},
+    {394271, {{1, 103}, {1, 173}}},
+    {394272, {{1, 356}, {668, 1141}}}
+};
+
+bool isEventAccepted(int run, int lumi) {
+    auto runIt = goodLumis.find(run);
+    if (runIt == goodLumis.end()) return false;
+
+    for (const auto& range : runIt->second) {
+        if (lumi >= range.first && lumi <= range.second)
+            return true;
+    }
+
+    return false;
+}
+
 
 void NormalizeByBinWidth(TH1* hist) {
     for (int i = 1; i <= hist->GetNbinsX(); ++i) {
@@ -102,6 +127,8 @@ public:
         Bar.Update(i);
         Bar.Print();
       }
+
+      if ( isEventAccepted(MChargedHadronRAA->Run, MChargedHadronRAA->Lumi) == false ) continue; //TODO valid for NeNe
 
       // check trigger
       if (par.CollisionType && par.TriggerChoice == 0 && MChargedHadronRAA->HLT_OxyZeroBias_v1 == false)
