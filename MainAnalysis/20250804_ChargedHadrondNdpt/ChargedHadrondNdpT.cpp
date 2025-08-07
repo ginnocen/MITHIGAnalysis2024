@@ -112,31 +112,28 @@ public:
       if (!(MChargedHadronRAA->passBaselineEventSelection))
         continue;
 
-      // event selection, only for OO/NeNe
-      if (par.CollisionType) {
-        if (par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_10_Offline))
-          continue;
-        if (par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_13_Offline))
-          continue;
-        if (par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_19_Offline))
-          continue;
+      // event selection and weighting
+      float evtWeight = 1.0;
+      if(par.CollisionType == true){
+        if(par.EventSelectionOption == 1){
+          if(par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_10_Offline)) {continue;}
+          else{evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Loose;}
+        }
+        if(par.EventSelectionOption == 2){
+          if(par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_13_Offline)) {continue;}
+          else{evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Nominal;}
+        }
+        if(par.EventSelectionOption == 3){
+          if(par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_19_Offline)) {continue;}
+          else{evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;}
+        } 
+
       }
 
-      float evtWeight = 1.0;
-      if (par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 1 &&
-          MChargedHadronRAA->passHFAND_10_Offline)
-        evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Loose;
-      if (par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 2 &&
-          MChargedHadronRAA->passHFAND_13_Offline)
-        evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Nominal;
-      if (par.CollisionType == true && par.ApplyEventSelection == 1 && par.EventSelectionOption == 3 &&
-          MChargedHadronRAA->passHFAND_19_Offline)
-        evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;
-        
       // track loop
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
         // get track selection option
-        float trkWeight = 0.0; //assume weight 0, i.e., the track only has nonzero weight if it satisfies the track selection below
+        float trkWeight = 1.0; //assume weight 1, i.e., the track only has non-1 weight if it satisfies the track selection below AND we use track weight
 
 	    if (par.TrackSelectionOption == 1 && MChargedHadronRAA->trkPassChargedHadron_Loose->at(j) == false) continue;
 	    if (par.TrackSelectionOption == 2 && MChargedHadronRAA->trkPassChargedHadron_Nominal->at(j) == false) continue;
