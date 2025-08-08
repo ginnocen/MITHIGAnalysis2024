@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
   // applying lumi scaling for NucleusNucleus
   NucleusNucleus->Scale(1. / lumiscale);
-
+  NucleusNucleusSyst->Scale(1. / lumiscale);
   // set up canvas and pads
   TCanvas *canv2 = new TCanvas("canv2", "canv2", 700, 800);
   canv2->SetBorderSize(0);
@@ -168,6 +168,59 @@ int main(int argc, char *argv[]) {
   canv2->SaveAs(Form("%s/Figure_001.pdf", plotfolder.Data()));
   canv2->SaveAs(Form("%s/Figure_001.png", plotfolder.Data()));
   canv2->SaveAs(Form("%s/Figure_001.C", plotfolder.Data()));
+
+    // Create a new ROOT file
+    TFile* outputFile = new TFile("Results/NucleusNucleus_raa_20250805_Unblinding.root", "RECREATE");
+
+
+// First create the ratio histograms
+TH1D *Unnormalized_RAA_NucleusNucleus = (TH1D *)NucleusNucleus->Clone("Unnormalized_RAA_NucleusNucleus");
+Unnormalized_RAA_NucleusNucleus->Reset();
+
+TH1D *Raa_Total_uncertainty_NucleusNucleus = (TH1D *)NucleusNucleus->Clone("Raa_Total_uncertainty_NucleusNucleus");
+Raa_Total_uncertainty_NucleusNucleus->Reset();
+
+int nBins = NucleusNucleus->GetNbinsX();
+
+for (int i = 1; i <= nBins; ++i) {
+    // Central values
+    double A     = NucleusNucleus->GetBinContent(i);
+    double B     = pp->GetBinContent(i);
+
+    // Statistical uncertainties (absolute)
+    double dA_stat = NucleusNucleus->GetBinError(i);
+    double dB_stat = pp->GetBinError(i);
+
+    // Systematic uncertainties
+    double dA_syst = NucleusNucleusSyst->GetBinError(i); // absolute
+    double relB_syst_percent = ppSyst->GetBinError(i);   // in percent
+    double dB_syst = (relB_syst_percent / 100.0) * B;     // convert to absolute
+
+    if (A > 0 && B > 0) {
+        double R = A / B;
+
+        // Statistical error propagation
+        double dR_stat = R * std::sqrt( (dA_stat / A)*(dA_stat / A) + (dB_stat / B)*(dB_stat / B) );
+
+        // Systematic error propagation
+        double dR_syst = R * std::sqrt( (dA_syst / A)*(dA_syst / A) + (dB_syst / 100.)*(dB_syst / 100.) );
+       
+        Unnormalized_RAA_NucleusNucleus->SetBinContent(i, R);
+        Unnormalized_RAA_NucleusNucleus->SetBinError(i, dR_stat);
+
+        Raa_Total_uncertainty_NucleusNucleus->SetBinContent(i, R);
+        Raa_Total_uncertainty_NucleusNucleus->SetBinError(i, dR_syst);}
+}
+
+
+
+
+    Raa_Total_uncertainty_NucleusNucleus->Write();
+    Unnormalized_RAA_NucleusNucleus->Write();
+    outputFile->Close();
+
+
   return 0;
+
 
 }
