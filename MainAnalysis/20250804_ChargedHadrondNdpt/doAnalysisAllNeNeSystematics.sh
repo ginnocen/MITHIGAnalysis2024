@@ -5,7 +5,7 @@ DOSYSTEMATIC_TRACK=true
 DOSYSTEMATIC_EVTSEL=true
 DOSYSTEMATIC_SPECIES=true
 
-INFILE="NeNe_04pds.txt"
+INFILE="NeNe_InputFileList.txt"
 
 
 
