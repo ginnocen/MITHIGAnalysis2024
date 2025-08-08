@@ -128,8 +128,12 @@ public:
         Bar.Print();
       }
 
-      if ( isEventAccepted(MChargedHadronRAA->Run, MChargedHadronRAA->Lumi) == false ) continue; //TODO valid for NeNe
+//if ( isEventAccepted(MChargedHadronRAA->Run, MChargedHadronRAA->Lumi) == false ) continue; //TODO valid for NeNe
 
+      int Run = MChargedHadronRAA->Run;
+      int lumi = MChargedHadronRAA->Lumi;
+      if ( ( (Run==394271 && lumi>=1 && lumi<=106) || (Run==394271 && lumi>=172 && lumi<=306) || (Run==394272 && lumi>=1 && lumi<=357) || (Run==394272 && lumi>=663 && lumi<=1135)) == false ) continue;
+		
       // check trigger
       if (par.CollisionType && par.TriggerChoice == 0 && MChargedHadronRAA->HLT_OxyZeroBias_v1 == false)
         continue;
