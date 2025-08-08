@@ -7,7 +7,7 @@ void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D
 TH1D* Hist_Symmetrized_Errors(TH1D* hUp, TH1D* hCentral, TH1D* hDown);
 TH1D* Hist_Total_Systematic(vector<TH1D*> systematics);
 TH1D* Hist_Smooth_Systematic(TH1D* hist, float lowx);
-void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO");
+void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO", const char* pdfname = "SystUncerts.pdf");
 TString GenerateFilePath(const char* system, const char* variation);
 
 
@@ -18,6 +18,7 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
 
     // MAKE SYSTEMATIC HISTS
     vector<TH1D*> hSystematics;
+    vector<TH1D*> hSystematics_smooth;
     TH1D* hLooseTrack = nullptr;
     TH1D* hTightTrack = nullptr;
     TH1D* hSansTrack = nullptr;
@@ -49,6 +50,12 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
             TH1D* hSystematic_Tracks = Hist_Symmetrized_Errors(hTightTrack, hCentral, hLooseTrack); 
             hSystematic_Tracks->SetName("hSystematic_Tracks");
             hSystematics.push_back(hSystematic_Tracks);
+
+            // SMOOTHED SYSTEMATIC
+            systfit smoother_tracks(hSystematic_Tracks, 5.0);
+            TH1D* hSystematic_Tracks_smooth = smoother_tracks.relerr_gaussian_smooth_adaptive(1.0);
+            hSystematic_Tracks_smooth->SetName("hSystematic_Tracks_smooth");
+            hSystematics_smooth.push_back(hSystematic_Tracks_smooth);
 
             //PLOTS WITH RATIOS
             RatioWithCentral( 
@@ -90,6 +97,12 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
             hSystematic_EvtSel->SetName("hSystematic_EvtSel");
             hSystematics.push_back(hSystematic_EvtSel);
 
+            // SMOOTHED SYSTEMATIC
+            systfit smoother_evtSel(hSystematic_EvtSel, 5.0);
+            TH1D* hSystematic_EvtSel_smooth = smoother_evtSel.relerr_gaussian_smooth_adaptive(1.0);
+            hSystematic_EvtSel_smooth->SetName("hSystematic_EvtSel_smooth");
+            hSystematics_smooth.push_back(hSystematic_EvtSel_smooth);
+
             //PLOTS WITH RATIOS
             RatioWithCentral(
                 {hLooseEsel, hTightEsel}, 
@@ -130,6 +143,12 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
             hSystematic_Species->SetName("hSystematic_Species");
             hSystematics.push_back(hSystematic_Species);
 
+            // SMOOTHED SYSTEMATIC
+            systfit smoother_species(hSystematic_Species, 5.0);
+            TH1D* hSystematic_Species_smooth = smoother_species.relerr_gaussian_smooth_adaptive(1.0);
+            hSystematic_Species_smooth->SetName("hSystematic_Species_smooth");
+            hSystematics_smooth.push_back(hSystematic_Species_smooth);
+
             //PLOTS WITH RATIOS
             RatioWithCentral(
                 {hLooseSpecies, hTightSpecies}, 
@@ -159,17 +178,17 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
     cout << "CALCULATING TOTAL SYSTEMATICS" << endl;
     TH1D* hSystematic_total = Hist_Total_Systematic(hSystematics);
     hSystematic_total->SetName("hSystematic_total");
-    hSystematics.push_back(hSystematic_total);
+    //hSystematics.push_back(hSystematic_total);
 
+    TH1D* smoothSystematic_total = Hist_Total_Systematic(hSystematics_smooth);
+    smoothSystematic_total->SetName("hSystematic_total_smooth");
+    //hSystematics_smooth.push_back(smoothSystematic_total);
 
-    // SMOOTH TOTAL SYSTEMATIC
-    systfit smoother(hSystematic_total, 15.0);
-    //TH1D* hSystematic_total_smooth = smoother.relerr_gaussian_smooth_flat(10.0);
-    TH1D* hSystematic_total_smooth = smoother.relerr_gaussian_smooth_adaptive(1.0);
 
     // GENERATE SYSTEMATICS PLOT
     if(hSystematics.size() > 0){
-        PlotUncerts(hSystematics, hSystematic_total_smooth ? hSystematic_total_smooth : hSystematic_total, "Track p_{T} (GeV/c)", 0, 7000, system);
+        PlotUncerts(hSystematics_smooth, smoothSystematic_total, "Track p_{T} (GeV/c)", 0, 7000, system, "SystUncerts_Smooth.pdf");
+        PlotUncerts(hSystematics, hSystematic_total, "Track p_{T} (GeV/c)", 0, 7000, system, "SystUncerts.pdf");
     }
 
     // WRITE SYSTEMATICS TO OUTPUT FILE
@@ -179,7 +198,10 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
         hSystematics[i]->Write();
     }
     hSystematic_total->Write();
-    if(hSystematic_total_smooth) hSystematic_total_smooth->Write();
+    for(int i = 0; i < hSystematics_smooth.size(); i++){
+        hSystematics_smooth[i]->Write();
+    }
+    smoothSystematic_total->Write();
     hCentral->Write();
     fOutput->Close();
 
@@ -393,7 +415,7 @@ TH1D* Hist_Total_Systematic(vector<TH1D*> varhists){
 }
 
 /// PLOT UNCERTAINTIES
-void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO"){
+void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO", const char* pdfname){
 
     // Set CMS style
     SetTDRStyle();
@@ -494,7 +516,7 @@ void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Tr
     legend->AddEntry(totalErrorGraph, "Total Systematic", "lp");
     for(int i = 0; i < errorGraphs.size(); i++){
         const char* label = (i < 3) ? labels[i] : Form("Systematic %d", i+1);
-        if(i == errorGraphs.size() - 1) label = "Total Systematic (unsmoothed)";
+        //if(i == errorGraphs.size() - 1) label = "Total Systematic (unsmoothed)";
         legend->AddEntry(errorGraphs[i], label, "lp");
     }
     legend->Draw();
@@ -505,7 +527,7 @@ void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Tr
     else if(strcmp(system, "NeNe") == 0){AddUPCHeader(c1, "5.36 TeV", "NeNe 1.0 nb^{-1}");}
 
     // Save canvas
-    c1->SaveAs("SystUncerts.pdf");
+    c1->SaveAs(pdfname);
 }
 
 /// HELPER TO GENERATE FILE PATHS
