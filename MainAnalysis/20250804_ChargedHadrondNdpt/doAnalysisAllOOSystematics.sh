@@ -1,15 +1,16 @@
 #!/bin/bash
 
 DOCENTRALVALUE=true    
-DOSYSTEMATIC_TRACK=true
-DOSYSTEMATIC_EVTSEL=true
-DOSYSTEMATIC_SPECIES=true
+DOSYSTEMATIC_TRACK=false
+DOSYSTEMATIC_EVTSEL=false
+DOSYSTEMATIC_SPECIES=false
 
 if [ "$DOCENTRALVALUE" = true ]; then
     echo "Running central value..."
 
     #default
     ./RunParallelReadParam.sh --Output systematic_variations/OOCentralValue --Input OO_InputFileList.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight true --UseSpeciesWeight true --UseTrackWeight true --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 2 --SpeciesCorrectionOption 2 --ScaleFactor 1
+    ./RunParallelReadParam.sh --Output systematic_variations/OOUncorrected --Input OO_InputFileList.txt --CollisionSystem true --ApplyEventSelection true --UseEventWeight false --UseSpeciesWeight false --UseTrackWeight false --TrackWeightSelection 2 --TriggerChoice 1 --EventSelectionOption 2 --SpeciesCorrectionOption 2 --ScaleFactor 1
 fi
 
 if [ "$DOSYSTEMATIC_TRACK" = true ]; then
