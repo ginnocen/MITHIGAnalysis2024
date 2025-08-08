@@ -147,15 +147,15 @@ public:
       if(par.CollisionType == true){
         if(par.EventSelectionOption == 1){
           if(par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_10_Offline)) {continue;}
-          else{evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Loose;}
+          else if(par.UseEventWeight == true){evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Loose;}
         }
         if(par.EventSelectionOption == 2){
           if(par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_13_Offline)) {continue;}
-          else{evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Nominal;}
+          else if(par.UseEventWeight == true){evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Nominal;}
         }
         if(par.EventSelectionOption == 3){
           if(par.ApplyEventSelection == 1 && !(MChargedHadronRAA->passHFAND_19_Offline)) {continue;}
-          else{evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;}
+          else if(par.UseEventWeight == true){evtWeight *= MChargedHadronRAA->eventEfficiencyWeight_Tight;}
         } 
 
       }

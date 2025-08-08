@@ -1,85 +1,176 @@
 #include "../MITHIG_CMSStyle.h"
+#include "smoothsystematics.C"
 
 // DECLARE HELPERS
 TH1D* HistFromFile(const char* filename, const char* histname);
-void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* system, const char* outputname);
+void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* centlabel, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* system, const char* outputname);
 TH1D* Hist_Symmetrized_Errors(TH1D* hUp, TH1D* hCentral, TH1D* hDown);
 TH1D* Hist_Total_Systematic(vector<TH1D*> systematics);
-void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO");
+TH1D* Hist_Smooth_Systematic(TH1D* hist, float lowx);
+void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO", const char* pdfname = "SystUncerts.pdf");
 TString GenerateFilePath(const char* system, const char* variation);
 
-/// START 
-void CompareSystematics(const char* system = "OO", int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, const char* outfilename = "systematics.root"){
+
+/// MAIN CODE!
+void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, const char* outfilename = "nenesystematics.root"){
 
     cout << "STARTING SYSTEMATIC COMPARISON" << endl;
 
     // MAKE SYSTEMATIC HISTS
     vector<TH1D*> hSystematics;
+    vector<TH1D*> hSystematics_smooth;
     TH1D* hLooseTrack = nullptr;
     TH1D* hTightTrack = nullptr;
+    TH1D* hSansTrack = nullptr;
     TH1D* hLooseEsel = nullptr;
     TH1D* hTightEsel = nullptr;
+    TH1D* hSansEsel = nullptr;
     TH1D* hLooseSpecies = nullptr;
     TH1D* hTightSpecies = nullptr;
-
- 
+    TH1D* hSansSpecies = nullptr;
 
     /// HISTOGRAMS TO COMPARE FOR EACH SYSTEMATIC
     TH1D* hCentral = HistFromFile(GenerateFilePath(system, "CentralValue"), "hTrkPt");    
-    
-    if(doTrack == 1){
-        cout << "TRACK WEIGHT SYSTEMATICS" << endl;
+    hCentral->SetName("hCentral");
 
+    TH1D* hUncorrected = HistFromFile(GenerateFilePath(system, "Uncorrected"), "hTrkPt");
+    hUncorrected->SetName("hUncorrected");
+
+
+    if(doTrack == 1){
+        // TRACK HISTOGRAMS
+        cout << "TRACK WEIGHT SYSTEMATICS" << endl;
         hLooseTrack = HistFromFile(GenerateFilePath(system, "SystLooseTrack"), "hTrkPt");
         hTightTrack = HistFromFile(GenerateFilePath(system, "SystTightTrack"), "hTrkPt");
-        if(hLooseTrack && hTightTrack){
-            TH1D* hSystematic_Tracks = Hist_Symmetrized_Errors(hTightTrack, hCentral, hLooseTrack);
+        hSansTrack = HistFromFile(GenerateFilePath(system, "SansTrackWeight"), "hTrkPt");
+
+        if(hLooseTrack && hTightTrack && hSansTrack){
+
+            //GENERATE SYSTEMATIC
+            TH1D* hSystematic_Tracks = Hist_Symmetrized_Errors(hTightTrack, hCentral, hLooseTrack); 
             hSystematic_Tracks->SetName("hSystematic_Tracks");
             hSystematics.push_back(hSystematic_Tracks);
-            RatioWithCentral(
+
+            // SMOOTHED SYSTEMATIC
+            systfit smoother_tracks(hSystematic_Tracks, 5.0);
+            TH1D* hSystematic_Tracks_smooth = smoother_tracks.relerr_gaussian_smooth_adaptive(1.0);
+            hSystematic_Tracks_smooth->SetName("hSystematic_Tracks_smooth");
+            hSystematics_smooth.push_back(hSystematic_Tracks_smooth);
+
+            //PLOTS WITH RATIOS
+            RatioWithCentral( 
                 {hLooseTrack, hTightTrack}, 
-                {"Loose Track Selection", "Tight Track Selection"}, 
+                {"DCA Significance < 5", "DCA Significance < 2"}, 
                 hCentral, 
+                "Central Value",
                 "Track p_{T} (GeV/c)", 
                 "dN/dp_{T} (GeV/c)^{-1}",
                  1, 1, 3, 400, 0.9, 1.1, 1e-5, 1e10, 
-                 system, "TrackWeightSystematic_Comparison.pdf");
+                 system, "TrackWeightSystematic_Comparison.pdf"
+            );
+        
+            RatioWithCentral(
+                {hLooseTrack, hTightTrack, hCentral},
+                {"DCA Significance < 5", "DCA Significance < 2", "Central Value"},
+                hSansTrack, 
+                "No Track Weight Correction",
+                "Track p_{T} (GeV/c)",
+                "dN/dp_{T} (GeV/c)^{-1}",
+                1, 1, 3, 400, 0.85, 1.15, 1e-5, 1e10,
+                system, "TrackWeight_compare_no_weights.pdf"
+            );
         }
     }
 
     if(doEvtSel == 1){
+
+        // EVENT SELECTION HISTOGRAMS
         cout << "EVENT SELECTION SYSTEMATICS" << endl;
         hLooseEsel = HistFromFile(GenerateFilePath(system, "SystLooseEsel"), "hTrkPt");
         hTightEsel = HistFromFile(GenerateFilePath(system, "SystTightEsel"), "hTrkPt");
-        if(hLooseEsel && hTightEsel){
+        hSansEsel = HistFromFile(GenerateFilePath(system, "SansEselWeight"), "hTrkPt");
+
+        if(hLooseEsel && hTightEsel && hSansEsel){
+
+            //GENERATE SYSTEMATIC
             TH1D* hSystematic_EvtSel = Hist_Symmetrized_Errors(hTightEsel, hCentral, hLooseEsel);
             hSystematic_EvtSel->SetName("hSystematic_EvtSel");
             hSystematics.push_back(hSystematic_EvtSel);
-            RatioWithCentral({hLooseEsel, hTightEsel}, 
-                {"Loose Event Selection", "Tight Event Selection"}, 
+
+            // SMOOTHED SYSTEMATIC
+            systfit smoother_evtSel(hSystematic_EvtSel, 5.0);
+            TH1D* hSystematic_EvtSel_smooth = smoother_evtSel.relerr_gaussian_smooth_adaptive(1.0);
+            hSystematic_EvtSel_smooth->SetName("hSystematic_EvtSel_smooth");
+            hSystematics_smooth.push_back(hSystematic_EvtSel_smooth);
+
+            //PLOTS WITH RATIOS
+            RatioWithCentral(
+                {hLooseEsel, hTightEsel}, 
+                {"Offline HF AND 10 GeV", "Offline HF AND 19 GeV"}, 
                 hCentral,
-                 "Track p_{T} (GeV/c)", 
-                 "dN/dp_{T} (GeV/c)^{-1}",
-                  1, 1, 3, 400, 0.9, 1.1, 1e-5, 1e10, 
-                  system, "EventSelectionSystematic_Comparison.pdf");
+                "Central Value",
+                "Track p_{T} (GeV/c)", 
+                "dN/dp_{T} (GeV/c)^{-1}",
+                1, 1, 3, 400, 0.9, 1.1, 1e-5, 1e10, 
+                system, "EventSelectionSystematic_Comparison.pdf"
+            );
+            
+            RatioWithCentral(
+                {hLooseEsel, hTightEsel, hCentral},
+                {"Offline HF AND 10 GeV", "Offline HF AND 19 GeV", "Central Value"},
+                hSansEsel,
+                "No Event Weight Correction",
+                "Track p_{T} (GeV/c)",
+                "dN/dp_{T} (GeV/c)^{-1}",
+                1, 1, 3, 400, 0.85, 1.15, 1e-5, 1e10,
+                system, "EventSelection_compare_no_weights.pdf"
+            );
         }
     }
 
     if(doSpecies == 1){
+
+        // SPECIES HISTOGRAMS
         cout << "SPECIES SELECTION SYSTEMATICS" << endl;
         hLooseSpecies = HistFromFile(GenerateFilePath(system, "SystLooseSpecies"), "hTrkPt");
         hTightSpecies = HistFromFile(GenerateFilePath(system, "SystTightSpecies"), "hTrkPt");
-        if(hLooseSpecies && hTightSpecies){
+        hSansSpecies = HistFromFile(GenerateFilePath(system, "SansSpeciesWeight"), "hTrkPt");
+
+        if(hLooseSpecies && hTightSpecies && hSansSpecies){
+
+            //GENERATE SYSTEMATIC
             TH1D* hSystematic_Species = Hist_Symmetrized_Errors(hTightSpecies, hCentral, hLooseSpecies);
             hSystematic_Species->SetName("hSystematic_Species");
             hSystematics.push_back(hSystematic_Species);
-            RatioWithCentral({hLooseSpecies, hTightSpecies}, 
-                {"Loose Species Selection", "Tight Species Selection"}, 
+
+            // SMOOTHED SYSTEMATIC
+            systfit smoother_species(hSystematic_Species, 5.0);
+            TH1D* hSystematic_Species_smooth = smoother_species.relerr_gaussian_smooth_adaptive(1.0);
+            hSystematic_Species_smooth->SetName("hSystematic_Species_smooth");
+            hSystematics_smooth.push_back(hSystematic_Species_smooth);
+
+            //PLOTS WITH RATIOS
+            RatioWithCentral(
+                {hLooseSpecies, hTightSpecies}, 
+                {"PPRef Species Selection", "dN/dEta = 100 Species Selection"}, 
                 hCentral, 
+                "Central Value",
                 "Track p_{T} (GeV/c)", 
                 "dN/dp_{T} (GeV/c)^{-1}",
                  1, 1, 3, 400, 0.9, 1.1, 1e-5, 1e10, 
-                 system, "SpeciesSystematic_Comparison.pdf");
+                 system, "SpeciesSystematic_Comparison.pdf"
+                );
+
+            RatioWithCentral(
+                {hLooseSpecies, hTightSpecies, hCentral},
+                {"PPRef Species Selection", "dN/dEta = 100 Species Selection", "Central Value"},
+                hSansSpecies,
+                "No Species Weight Correction",
+                "Track p_{T} (GeV/c)",
+                "dN/dp_{T} (GeV/c)^{-1}",
+                1, 1, 3, 400, 0.85, 1.15, 1e-5, 1e10,
+                system, "Species_compare_no_weights.pdf"
+            );
         }
     }
 
@@ -87,7 +178,18 @@ void CompareSystematics(const char* system = "OO", int doTrack = 1, int doEvtSel
     cout << "CALCULATING TOTAL SYSTEMATICS" << endl;
     TH1D* hSystematic_total = Hist_Total_Systematic(hSystematics);
     hSystematic_total->SetName("hSystematic_total");
-    if(hSystematics.size() > 0){PlotUncerts(hSystematics, hSystematic_total, "Track p_{T} (GeV/c)", 0, 20);}
+    //hSystematics.push_back(hSystematic_total);
+
+    TH1D* smoothSystematic_total = Hist_Total_Systematic(hSystematics_smooth);
+    smoothSystematic_total->SetName("hSystematic_total_smooth");
+    //hSystematics_smooth.push_back(smoothSystematic_total);
+
+
+    // GENERATE SYSTEMATICS PLOT
+    if(hSystematics.size() > 0){
+        PlotUncerts(hSystematics_smooth, smoothSystematic_total, "Track p_{T} (GeV/c)", 0, 7000, system, "SystUncerts_Smooth.pdf");
+        PlotUncerts(hSystematics, hSystematic_total, "Track p_{T} (GeV/c)", 0, 7000, system, "SystUncerts.pdf");
+    }
 
     // WRITE SYSTEMATICS TO OUTPUT FILE
     TFile* fOutput = new TFile(outfilename, "RECREATE");
@@ -96,6 +198,11 @@ void CompareSystematics(const char* system = "OO", int doTrack = 1, int doEvtSel
         hSystematics[i]->Write();
     }
     hSystematic_total->Write();
+    for(int i = 0; i < hSystematics_smooth.size(); i++){
+        hSystematics_smooth[i]->Write();
+    }
+    smoothSystematic_total->Write();
+    hCentral->Write();
     fOutput->Close();
 
 }
@@ -120,7 +227,21 @@ TH1D* HistFromFile(const char* filename, const char* histname){
 }
 
 /// HELPER TO DO RATIO PLOTS 
-void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* system, const char* outputname){
+void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* centlabel, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* system, const char* outputname){
+
+    // Check for null central histogram
+    if(!central){
+        cerr << "Error: Central histogram is null in RatioWithCentral" << endl;
+        return;
+    }
+
+    // Check for null histograms in variations vector
+    for(int i = 0; i < variations.size(); i++){
+        if(!variations[i]){
+            cerr << "Error: Variation histogram " << i << " is null in RatioWithCentral" << endl;
+            return;
+        }
+    }
 
     // Set CMS style
     SetTDRStyle();
@@ -153,15 +274,8 @@ void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D
     // Upper plot - draw spectra
     pad1->cd();
     
-    // Clone and normalize central histogram by bin width
+    // Clone central histogram (no bin width normalization)
     TH1D* centralNorm = (TH1D*)central->Clone("centralNorm");
-    for(int i = 1; i <= centralNorm->GetNbinsX(); i++){
-        double binWidth = centralNorm->GetBinWidth(i);
-        double binContent = centralNorm->GetBinContent(i);
-        double binError = centralNorm->GetBinError(i);
-        centralNorm->SetBinContent(i, binContent / binWidth);
-        centralNorm->SetBinError(i, binError / binWidth);
-    }
     
     // Style central histogram
     centralNorm->SetTitle("");
@@ -181,17 +295,10 @@ void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D
     
     centralNorm->Draw("lpe");
     
-    // Clone, normalize and draw variations
+    // Clone and draw variations (no bin width normalization)
     vector<TH1D*> variationsNorm;
     for(int i = 0; i < variations.size(); i++){
         TH1D* varNorm = (TH1D*)variations[i]->Clone(Form("varNorm_%d", i));
-        for(int j = 1; j <= varNorm->GetNbinsX(); j++){
-            double binWidth = varNorm->GetBinWidth(j);
-            double binContent = varNorm->GetBinContent(j);
-            double binError = varNorm->GetBinError(j);
-            varNorm->SetBinContent(j, binContent / binWidth);
-            varNorm->SetBinError(j, binError / binWidth);
-        }
         varNorm->SetLineColor(colors[i % colors.size()]);
         varNorm->SetMarkerColor(colors[i % colors.size()]);
         varNorm->SetLineWidth(2);
@@ -208,7 +315,7 @@ void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D
     legend->SetTextSize(legendSize);
     legend->SetBorderSize(0);
     legend->SetFillStyle(0);
-    legend->AddEntry(centralNorm, "Central", "lpe");
+    legend->AddEntry(centralNorm, centlabel, "lpe");
     for(int i = 0; i < variationsNorm.size(); i++){
         legend->AddEntry(variationsNorm[i], labels[i], "lpe");
     }
@@ -308,7 +415,7 @@ TH1D* Hist_Total_Systematic(vector<TH1D*> varhists){
 }
 
 /// PLOT UNCERTAINTIES
-void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO"){
+void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO", const char* pdfname){
 
     // Set CMS style
     SetTDRStyle();
@@ -321,85 +428,96 @@ void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Tr
     TCanvas* c1 = new TCanvas("c1", "Systematic Uncertainties", 800, 600);
     c1->SetMargin(marginLeft, marginRight, marginBottom, marginTop);
     c1->SetLogx();
+    c1->SetLogy();
     c1->SetGrid();
     
-    // Create histograms to hold the relative errors (%) vs pT
-    vector<TH1D*> errorHists;
+    // Create TGraphs to hold the relative errors (%) vs pT (excluding zero points)
+    vector<TGraph*> errorGraphs;
     for(int i = 0; i < varhists.size(); i++){
-        TH1D* errorHist = (TH1D*)varhists[i]->Clone(Form("error_%d", i));
-        errorHist->SetTitle("");
+        TGraph* errorGraph = new TGraph();
+        errorGraph->SetTitle("");
         
-        // Convert bin errors to relative errors in %
-        for(int bin = 1; bin <= errorHist->GetNbinsX(); bin++){
+        // Add only non-zero relative errors to the graph
+        for(int bin = 1; bin <= varhists[i]->GetNbinsX(); bin++){
             double binContent = varhists[i]->GetBinContent(bin);
             double binError = varhists[i]->GetBinError(bin);
             double relativeError = (binContent > 0) ? (binError / binContent) * 100.0 : 0.0;
-            errorHist->SetBinContent(bin, relativeError);
-            errorHist->SetBinError(bin, 0); // No error bars on the uncertainty plot
+            
+            if(relativeError > 0) { // Only add non-zero points
+                double binCenter = varhists[i]->GetBinCenter(bin);
+                errorGraph->SetPoint(errorGraph->GetN(), binCenter, relativeError);
+            }
         }
         
-        // Style the histogram
-        errorHist->SetLineColor(colors[i % colors.size()]);
-        errorHist->SetMarkerColor(colors[i % colors.size()]);
-        errorHist->SetMarkerStyle(mCircleFill);
-        errorHist->SetLineWidth(2);
-        errorHist->SetMarkerSize(1.0);
-        SetTH1Fonts(errorHist);
+        // Style the graph
+        errorGraph->SetLineColor(colors[i % colors.size()]);
+        errorGraph->SetMarkerColor(colors[i % colors.size()]);
+        errorGraph->SetMarkerStyle(mCircleFill);
+        errorGraph->SetLineWidth(2);
+        errorGraph->SetMarkerSize(1.0);
         
-        errorHists.push_back(errorHist);
+        errorGraphs.push_back(errorGraph);
     }
 
     
-    // Create total uncertainty histogram
-    TH1D* totalErrorHist = (TH1D*)tothist->Clone("totalError");
-    totalErrorHist->SetTitle("");
+    // Create total uncertainty graph (excluding zero points)
+    TGraph* totalErrorGraph = new TGraph();
+    totalErrorGraph->SetTitle("");
     
-    // Convert total bin errors to relative errors in %
-    for(int bin = 1; bin <= totalErrorHist->GetNbinsX(); bin++){
+    // Add only non-zero relative errors to the total graph
+    for(int bin = 1; bin <= tothist->GetNbinsX(); bin++){
         double binContent = tothist->GetBinContent(bin);
         double binError = tothist->GetBinError(bin);
         double relativeError = (binContent > 0) ? (binError / binContent) * 100.0 : 0.0;
-        totalErrorHist->SetBinContent(bin, relativeError);
-        totalErrorHist->SetBinError(bin, 0); // No error bars
+        
+        if(relativeError > 0) { // Only add non-zero points
+            double binCenter = tothist->GetBinCenter(bin);
+            totalErrorGraph->SetPoint(totalErrorGraph->GetN(), binCenter, relativeError);
+        }
     }
     
     // Style total uncertainty with thick black line
-    totalErrorHist->SetLineColor(cmsBlack);
-    totalErrorHist->SetMarkerColor(cmsBlack);
-    totalErrorHist->SetMarkerStyle(mSquareFill);
-    totalErrorHist->SetLineWidth(3);
-    totalErrorHist->SetMarkerSize(1.2);
-    SetTH1Fonts(totalErrorHist);
+    totalErrorGraph->SetLineColor(cmsBlack);
+    totalErrorGraph->SetMarkerColor(cmsBlack);
+    totalErrorGraph->SetMarkerStyle(mSquareFill);
+    totalErrorGraph->SetLineWidth(3);
+    totalErrorGraph->SetMarkerSize(1.2);
     
-    // Set up axes
-    totalErrorHist->GetXaxis()->SetTitle(xlabel);
-    totalErrorHist->GetYaxis()->SetTitle("Systematic Uncertainty (%)");
-    totalErrorHist->GetXaxis()->SetRangeUser(3.0, 400);
-    totalErrorHist->SetMinimum(0);
-    totalErrorHist->SetMaximum(20); // Adjust as needed
-    totalErrorHist->GetYaxis()->SetLabelSize(0.04);
-    totalErrorHist->GetYaxis()->SetTitleSize(0.05);
-    totalErrorHist->GetXaxis()->SetLabelSize(0.04);
-    totalErrorHist->GetXaxis()->SetTitleSize(0.05);
+    // Create a dummy histogram for axis setup
+    TH1F* axisFrame = new TH1F("axisFrame", "", 100, 3.0, 400);
+    axisFrame->GetXaxis()->SetTitle(xlabel);
+    axisFrame->GetYaxis()->SetTitle("Systematic Uncertainty (%)");
+    axisFrame->SetMinimum(1e-2);
+    axisFrame->SetMaximum(maxy);
+    axisFrame->GetYaxis()->SetLabelSize(0.04);
+    axisFrame->GetYaxis()->SetTitleSize(0.05);
+    axisFrame->GetXaxis()->SetLabelSize(0.04);
+    axisFrame->GetXaxis()->SetTitleSize(0.05);
+    axisFrame->SetStats(0);
+    SetTH1Fonts(axisFrame);
+    
+    // Draw axis frame first
+    axisFrame->Draw("AXIS");
     
     // Draw total uncertainty first (as reference)
-    totalErrorHist->Draw("lp");
+    totalErrorGraph->Draw("lp SAME");
     
     // Draw individual systematics
-    for(int i = 0; i < errorHists.size(); i++){
-        errorHists[i]->Draw("lp SAME");
+    for(int i = 0; i < errorGraphs.size(); i++){
+        errorGraphs[i]->Draw("lp SAME");
     }
     
     // Create legend
-    TLegend* legend = new TLegend(0.55, 0.65, 0.85, 0.88);  
+    TLegend* legend = new TLegend(0.45, 0.7, 0.85, 0.93);  
     legend->SetTextFont(42);
     legend->SetTextSize(legendSize);
     legend->SetBorderSize(0);
     legend->SetFillStyle(0);
-    legend->AddEntry(totalErrorHist, "Total Systematic", "lp");
-    for(int i = 0; i < errorHists.size(); i++){
+    legend->AddEntry(totalErrorGraph, "Total Systematic", "lp");
+    for(int i = 0; i < errorGraphs.size(); i++){
         const char* label = (i < 3) ? labels[i] : Form("Systematic %d", i+1);
-        legend->AddEntry(errorHists[i], label, "lp");
+        //if(i == errorGraphs.size() - 1) label = "Total Systematic (unsmoothed)";
+        legend->AddEntry(errorGraphs[i], label, "lp");
     }
     legend->Draw();
     
@@ -409,11 +527,12 @@ void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Tr
     else if(strcmp(system, "NeNe") == 0){AddUPCHeader(c1, "5.36 TeV", "NeNe 1.0 nb^{-1}");}
 
     // Save canvas
-    c1->SaveAs("SystUncerts.pdf");
+    c1->SaveAs(pdfname);
 }
 
 /// HELPER TO GENERATE FILE PATHS
 TString GenerateFilePath(const char* system, const char* variation){
     TString filepath = Form("%s%s/MergedOutput.root", system, variation);
+    cout << filepath << endl;
     return filepath;
 }
