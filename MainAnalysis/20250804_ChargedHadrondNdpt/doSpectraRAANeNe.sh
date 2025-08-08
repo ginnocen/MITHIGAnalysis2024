@@ -1,6 +1,20 @@
 #!/bin/bash
 
-LUMIAAtoPP=10793.05184615 # lumi in mb-1, matches the golden JSON file overlap with Lynn's JSON, divided by 60 (per PD lumi).
+LUMIAAtoPP=12226.08865
+
+#Lumi per PD computed with the following commands in lxplus9:
+
+#source /cvmfs/cms-bril.cern.ch/cms-lumi-pog/brilws-docker/brilws-env
+#brilcalc lumi -b "STABLE BEAMS" --normtag hfetLightIons25v01 --hltpath "HLT_MinimumBiasHF_OR_BptxAND_v1" -u /nb -i 'NeNe.json'
+#Where NeNe.json has this:
+#{
+#  "394271": [[1, 106], [172, 306]],
+#  "394272": [[1, 357], [663, 1135]]
+#}
+
+
+
+# lumi in mb-1, matches the golden JSON file overlap with Lynn's JSON, divided by 60 (per PD lumi).
 #85743.91 OO lumi, Jordan JSON
 
 echo "Running spectra macro..."
