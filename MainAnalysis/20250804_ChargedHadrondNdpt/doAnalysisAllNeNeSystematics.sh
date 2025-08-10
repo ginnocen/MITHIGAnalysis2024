@@ -45,7 +45,7 @@ if [ "$DOSYSTEMATIC_SPECIES" = true ]; then
 fi
 
 cd systematic_variations
-root -l -b -q "CompareSystematics.C(\"NeNe\", $DOSYSTEMATIC_TRACK, $DOSYSTEMATIC_EVTSEL, $DOSYSTEMATIC_SPECIES, \"nenesystematics.root\")"
+root -l -b -q "CompareSystematics.C(\"NeNe\", $DOSYSTEMATIC_TRACK, $DOSYSTEMATIC_EVTSEL, $DOSYSTEMATIC_SPECIES, \"nenesystematics.root\", \"adaptive\")"
 cd ..
 
 

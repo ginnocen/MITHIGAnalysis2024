@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --- Default parameters ---
-MAXCORES=40
+MAXCORES=30
 COLLISIONSYSTEM=true
 OUTPUTDIR="output_OOReference"
 INPUTLIST="OO_InputFileList_Reference.txt"
