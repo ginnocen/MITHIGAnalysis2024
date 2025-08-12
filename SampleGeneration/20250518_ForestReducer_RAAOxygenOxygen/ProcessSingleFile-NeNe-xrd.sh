@@ -7,9 +7,10 @@ ISDATA=${4}
 APPLYTRIGGERREJECTION=${5}
 APPLYEVENTREJECTION=${6}
 APPLYTRACKREJECTION=${7}
-SAMPLETYPE=${8}
-SERVER=${9}
-MAXCORES=${10}
+REJECTTRACKSBELOWPT=${8}
+SAMPLETYPE=${9}
+SERVER=${10}
+MAXCORES=${11}
 
 mkdir -p "${OUTPUT}/temp_inputs/"
 FILE="${OUTPUT}/temp_inputs/job_${COUNTER}.root"
@@ -20,12 +21,12 @@ wait
 ./Execute --Input "$FILE" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
    --IsData $ISDATA \
-   --CollisionSystem pp \
+   --CollisionSystem NeNe \
    --Fraction 1.0 \
    --ApplyTriggerRejection $APPLYTRIGGERREJECTION \
    --ApplyEventRejection $APPLYEVENTREJECTION \
    --ApplyTrackRejection $APPLYTRACKREJECTION \
-   --PFTree particleFlowAnalyser/pftree \
+   --rejectTracksBelowPt $REJECTTRACKSBELOWPT \
    --sampleType $SAMPLETYPE \
    --DebugMode false \
    --includeL1EMU false \
