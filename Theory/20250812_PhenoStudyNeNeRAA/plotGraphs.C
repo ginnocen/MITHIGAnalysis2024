@@ -19,7 +19,7 @@ void plotGraphs() {
   gStyle->SetOptStat(0);
 
   // Input files and labels
-  std::vector<std::string> filenames = {"pp_data.csv", "pPb_data.csv", "OO_data.csv", "ArAr_data.csv", "XeXe_data.csv"};
+  std::vector<std::string> filenames = {"inputs/pp_data.csv", "inputs/pPb_data.csv", "inputs/OO_data.csv", "inputs/ArAr_data.csv", "inputs/XeXe_data.csv"};
   std::vector<std::string> labels = {"pp", "pPb", "OO", "ArAr", "XeXe"};
 
   // Colors and markers for species
@@ -84,15 +84,15 @@ void plotGraphs() {
     graphs[i]->Draw("PL same");
     fits[i]->Draw("same");
   }
-  TLegend *leg1 = new TLegend(0.65, 0.65, 0.88, 0.88);
+  TLegend *leg1 = new TLegend(0.65, 0.35, 0.88, 0.58);
   for (size_t i = 0; i < graphs.size(); ++i)
     leg1->AddEntry(graphs[i], labels[i].c_str(), "lp");
   leg1->Draw();
   c1->Update();
   c1->SaveAs("Data_with_Exp_Fit.png");
   // pT values to evaluate
-  std::vector<double> pts = {20, 25, 30, 40, 50};
-  std::vector<int> ptCols = {kBlack, kRed, kBlue, kGreen + 2, kMagenta};
+  std::vector<double> pts = {10, 15, 20, 25, 30, 40, 50};
+  std::vector<int> ptCols = {kBlack, kRed, kBlue, kGreen + 2, kMagenta, kOrange, kCyan};
 
   // Second canvas: RAA vs species for each pT
   TCanvas *c2 = new TCanvas("c2", "RAA vs Species", 800, 600);
