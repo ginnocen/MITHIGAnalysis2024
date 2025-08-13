@@ -6,7 +6,8 @@ We will use LHAPDF installation already available on lxplus 9
 ```
 
 source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el9-gcc13-opt/setup.sh
-export LHAPDF_DATA_PATH=/cvmfs/sft.cern.ch/lcg/external/lhapdfsets/current:${HOME}/.local/share/LHAPDF
+export LHAPDF_DATA_PATH="$HOME/.local/share/LHAPDF:${LHAPDF_DATA_PATH:-}:/cvmfs/sft.cern.ch/lcg/external/lhapdfsets/current"
+
 ```
 To check that the installation is successful, do:
 
@@ -80,5 +81,6 @@ nnlojet-run init cmsOO_nuclearPb.run
 nnlojet-run submit CMSOO_NUCLEAR/ --job-max-runtime 5m
 
 ```
+
 
 
