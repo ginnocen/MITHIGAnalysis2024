@@ -1,0 +1,60 @@
+
+!###############################################!
+!##                                           ##!
+!##     _  ___  ____   ____     ____________  ##!
+!##    / |/ / |/ / /  / __ \__ / / __/_  __/  ##!
+!##   /    /    / /__/ /_/ / // / _/  / /     ##!
+!##  /_/|_/_/|_/____/\____/\___/___/ /_/      ##!
+!##                                           ##!
+!###############################################!
+
+PROCESS  Z
+  collider = pp  sqrts = 5360.0
+  jet = none[0]
+END_PROCESS
+
+RUN  CMSOO_NUCLEAR
+  PDF = EPPS21nlo_CT18Anlo_O16[0]
+  tcut = 1e-07
+  iseed = 1
+  warmup = 20000[7]
+  production = 100000[10]
+END_RUN
+
+PARAMETERS
+  MASS[Z] = 91.1876
+  WIDTH[Z] = 2.4955
+  MASS[W] = 80.377
+  WIDTH[W] = 2.085
+  CKM = FULL
+  SCHEME[ALPHA] = GF
+  SCHEME[WIDTH_V] = CMS
+  GF = 1.1663787e-05
+END_PARAMETERS
+
+SELECTORS
+  select abs_ylp  min = 0.0 max = 2.4
+  select abs_ylm  min = 0.0 max = 2.4
+  select ptl1  min = 20.0
+  select ptl2  min = 20.0
+  select mll  min = 60.0 max = 120.0
+  select abs_yz  min = 0.0 max = 2.1
+END_SELECTORS
+
+HISTOGRAMS
+  abs_yz > y_bin_3 [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1]
+  HISTOGRAM_SELECTORS
+      select mll  min = 60.0 max = 120.0
+  END_HISTOGRAM_SELECTORS
+
+END_HISTOGRAMS
+
+SCALES
+  mur = etz  muf = etz
+END_SCALES
+
+CHANNELS 
+  LO
+END_CHANNELS
+
+
