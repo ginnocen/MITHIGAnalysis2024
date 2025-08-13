@@ -56,5 +56,28 @@ source ~/.bashrc
 
 ## Now you are ready for running the production
 
+```
+cd nnlojet-v1.0.2/examples/Z
+```
 
+Copy the cms cards that are provided in the repository under "cardsCMS"
+and then you are ready to run 
+
+For each setup configure first the job (e.g. using cmsOO_proton.run)
+and then submit the job. 
+
+```
+nnlojet-run init cmsOO_proton.run
+nnlojet-run submit CMSOO_PROTON/ --job-max-runtime 5m
+```
+Below you can find analogous lines for other useful setups:
+
+```
+nnlojet-run init cmsOO_nuclear.run
+nnlojet-run submit CMSOO_NUCLEAR/ --job-max-runtime 5m
+
+nnlojet-run init cmsOO_nuclearPb.run
+nnlojet-run submit CMSOO_NUCLEAR/ --job-max-runtime 5m
+
+```
 
