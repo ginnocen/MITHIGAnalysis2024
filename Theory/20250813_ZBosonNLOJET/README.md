@@ -43,8 +43,8 @@ make install
 Add these lines to your bashrc 
 
 ```
-export PATH="$PATH:/afs/cern.ch/work/g/ginnocen/testZ/nnlojet-v1.0.2/install/bin"
-source "/afs/cern.ch/work/g/ginnocen/testZ/nnlojet-v1.0.2/install/share/nnlojet-completion.sh"
+export PATH="$PATH:<YOUR_PATH_IN_LXPLUS>/nnlojet-v1.0.2/install/bin"
+source "<YOUR_PATH_IN_LXPLUS>/nnlojet-v1.0.2/install/share/nnlojet-completion.sh"
 
 ```
 
@@ -80,4 +80,5 @@ nnlojet-run init cmsOO_nuclearPb.run
 nnlojet-run submit CMSOO_NUCLEAR/ --job-max-runtime 5m
 
 ```
+
 
