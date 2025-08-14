@@ -12,7 +12,6 @@ DO_MICROTREE=1
 DO_MASSFIT=1
 DO_PLOTS=1
 
-
 # MUST list nominal json first!
 MICROTREE_CFG_DIR="configs/microtree"
 MICROTREE_VERSION=""

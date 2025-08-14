@@ -3,22 +3,28 @@
 FILEPATH=${1}
 COUNTER=${2}
 OUTPUT=${3}
+ISDATA=${4}
 
-file="$FILEPATH"
+mkdir -p "${OUTPUT}/temp_inputs/"
+FILE="${OUTPUT}/temp_inputs/job_${COUNTER}.root"
+rm $FILE &> /dev/null
+cp $FILEPATH $FILE
+wait
 
-echo "Processing $file"
-./Execute --Input "$file" \
+echo "Processing $FILE"
+./Execute --Input "$FILE" \
     --Output "${OUTPUT}/output_${COUNTER}.root" \
     --Year 2023 \
+    --IsData $ISDATA \
     --ApplyTriggerRejection 2 \
     --ApplyEventRejection true \
     --ApplyZDCGapRejection true \
-    --ApplyDRejection or \
+    --ApplyDRejection no \
     --ZDCMinus1nThreshold 1000 \
     --ZDCPlus1nThreshold 1100 \
-    --IsData true \
     --HideProgressBar true
 wait
 
-sleep 0.1
+sleep 0.2
+rm $FILE
 wait

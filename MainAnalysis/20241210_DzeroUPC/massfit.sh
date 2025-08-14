@@ -25,6 +25,7 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
 	sigMeanRange=$(echo $MicroTree | jq -r '.sigMeanRange')
 	sigAlphaRange=$(echo $MicroTree | jq -r '.sigAlphaRange')
 	systMassWin=$(echo $MicroTree | jq -r '.systMassWin')
+	sampleLumiFraction=$(echo $MicroTree | jq -r '.sampleLumiFraction')
 	RstDir=$(dirname "$dataInput")
 	RstDir=${RstDir}/${FitDir}/
 	mkdir -p $RstDir
@@ -64,7 +65,7 @@ jq -c '.MicroTrees[]' $FitSettingCard | while read MicroTree; do
   echo '================================================' >> $RstDir/fit.log
   echo '= Getting corrected yields:' >> $RstDir/fit.log
   echo '================================================' >> $RstDir/fit.log
-  cmd="./CorrectedYields --rawYieldInput $RstDir/fit.root --effInput $effmcInput --Output $RstDir/correctedYields.md"
+  cmd="./CorrectedYields --rawYieldInput $RstDir/fit.root --effInput $effmcInput --Output $RstDir/correctedYields.md --sampleLumiFraction $sampleLumiFraction"
 
   echo "Executing >>>>>>"
   echo $cmd

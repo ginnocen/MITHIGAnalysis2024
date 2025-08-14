@@ -5,6 +5,7 @@ FILEPATH=${2}
 COUNTER=${3}
 OUTPUT=${4}
 MAXCORES=${5}
+ISDATA=${6}
 
 mkdir -p "${OUTPUT}/temp_inputs/"
 FILE="${OUTPUT}/temp_inputs/job_${COUNTER}.root"
@@ -19,10 +20,10 @@ echo "Processing $FILE"
     --ApplyTriggerRejection 2 \
     --ApplyEventRejection true \
     --ApplyZDCGapRejection true \
-    --ApplyDRejection or \
+    --ApplyDRejection no \
     --ZDCMinus1nThreshold 1000 \
     --ZDCPlus1nThreshold 1100 \
-    --IsData true \
+    --IsData $ISDATA \
     --HideProgressBar true
 wait
 

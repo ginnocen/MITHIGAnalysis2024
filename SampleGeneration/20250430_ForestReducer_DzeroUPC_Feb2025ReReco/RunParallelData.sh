@@ -2,15 +2,14 @@
 DATE=$(date +%Y%m%d)
 
 MAXCORES=40
-INPUT_ON_XRD=1
+INPUT_ON_XRD=0
 XRDSERV="root://xrootd.cmsaf.mit.edu/"
 
-TAG="Skim_2023Data_Feb2025ReReco_HIForward0"
+TAG="Skim_2023Data_Feb2025ReReco_HIForward11_HFFix"
 NAME="${DATE}_${TAG}"
-FILELIST="filelist_${TAG}.txt"
+FILELIST="filelist_2023Data_Feb2025ReReco_HIForward11_HFFix.txt"
 OUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/output_$NAME"
 MERGEDOUTPUT="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/$NAME.root"
-#MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT &> /dev/null
 
 # Function to monitor active processes
@@ -30,13 +29,12 @@ fi
 echo "File list: $FILELIST"
 rm -rf $OUTPUT &> /dev/null
 mkdir -p $OUTPUT
-# Loop through each file in the file list
 COUNTER=1
 while IFS= read -r FILEPATH; do
     if (( $INPUT_ON_XRD == 1 )); then
-        ./ProcessXRDSkim.sh $XRDSERV $FILEPATH $COUNTER $OUTPUT $MAXCORES &
+        ./ProcessXRDSkim.sh $XRDSERV $FILEPATH $COUNTER $OUTPUT $MAXCORES true &
     else
-        ./ProcessLocalSkim.sh $FILEPATH $COUNTER $OUTPUT &
+        ./ProcessLocalSkim.sh $FILEPATH $COUNTER $OUTPUT true &
     fi
     ((COUNTER++))
     wait_for_slot
