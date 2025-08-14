@@ -357,6 +357,7 @@ int main(int argc, char *argv[]) {
         if (MDzeroUPC.DpassCutSystDtrkPt != nullptr) MDzeroUPC.DpassCutSystDtrkPt->push_back(DpassCutSystDtrkPt_);
         if (MDzeroUPC.DpassCutSystDalpha != nullptr) MDzeroUPC.DpassCutSystDalpha->push_back(DpassCutSystDalpha_);
         if (MDzeroUPC.DpassCutSystDchi2cl != nullptr) MDzeroUPC.DpassCutSystDchi2cl->push_back(DpassCutSystDchi2cl_);
+        if (MDzeroUPC.DpassCutSystDchi2cl != nullptr) MDzeroUPC.DpassCutSystDchi2cl->push_back(DpassCutSystDchi2cl_);
         if (IsData == false) {
           MDzeroUPC.Dgen->push_back(MDzero.Dgen[iD]);
           bool isSignalGenMatched = MDzero.Dgen[iD] == 23333 && MDzero.Dgenpt[iD] > 0.;

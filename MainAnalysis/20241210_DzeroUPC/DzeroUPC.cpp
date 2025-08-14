@@ -225,7 +225,6 @@ public:
           if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY)
             continue;
           if (par.DoSystD==0 && MDzeroUPC->DpassCut23PAS->at(j) == false) continue;
-          // if (par.DoSystD==0 && MDzeroUPC->DpassCut23LowPt->at(j) == false) continue;
           if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpvSig->at(j) == false) continue;
           if (par.DoSystD==2 && MDzeroUPC->DpassCut23PASSystDtrkPt->at(j) == false) continue;
           if (par.DoSystD==3 && MDzeroUPC->DpassCut23PASSystDalpha->at(j) == false) continue;
