@@ -71,6 +71,21 @@ and then submit the job.
 nnlojet-run init cmsOO_proton.run
 nnlojet-run submit CMSOO_PROTON/ --job-max-runtime 5m
 ```
+
+ATTENTION: if you run into a python conflix try the following 
+
+```
+# keep the LCG view for compilers/libs if you need them
+source /cvmfs/sft.cern.ch/lcg/views/LCG_106/x86_64-el9-gcc13-opt/setup.sh
+
+# drop the Python parts LCG injected
+unset PYTHONHOME PYTHONPATH
+
+# now use the dokan venv
+source /afs/cern.ch/work/g/ginnocen/testZ/nnlojet-v1.0.2/install/dokan-venv/bin/activate
+
+nnlojet-run init cmsOO_proton.run
+```
 Below you can find analogous lines for other useful setups:
 
 ```
@@ -81,6 +96,7 @@ nnlojet-run init cmsOO_nuclearPb.run
 nnlojet-run submit CMSOO_NUCLEAR/ --job-max-runtime 5m
 
 ```
+
 
 
 
