@@ -100,6 +100,34 @@ public:
   void analyze(Parameters &par) {
     outf->cd();
 
+    TF1 *correctionFactor_ppRefLike = new TF1("correctionFactor_ppRefLike",
+                                          "0.991543 - [0]*exp([1]*x + [2]*x*x)",
+                                          3.0, 200.0);
+
+    correctionFactor_ppRefLike->SetParameters(-0.0796242, 0.00923081, -0.0409613);
+    correctionFactor_ppRefLike->SetParNames("p0", "p1", "p2");
+
+    TF1 *correctionFactor_dNdeta100 = new TF1("correctionFactor_dNdeta100", 
+                                          "0.99796 - [0]*exp([1]*x + [2]*x*x)", 
+                                          3.0, 200.0);
+
+    // Set parameter initial values from your fit results
+    correctionFactor_dNdeta100->SetParameters(-0.160674, -0.133007, -0.0221863);
+
+    // Name the parameters for clarity
+    correctionFactor_dNdeta100->SetParNames("p0", "p1", "p2");
+
+
+    TF1 *correctionFactor_dNdeta40 = new TF1("correctionFactor_dNdeta40", 
+                                         "0.99796 - [0]*exp([1]*x + [2]*x*x)", 
+                                         3.0, 200.0);
+
+    // Set parameter initial values from your fit results
+    correctionFactor_dNdeta40->SetParameters(-0.136137, -0.104656, -0.0285181);
+    // Name the parameters for clarity
+    correctionFactor_dNdeta40->SetParNames("p0", "p1", "p2");
+    TFile *fileEventWeight = TFile::Open("../../CommonCode/root/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root");
+
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", nPtBins_log, pTBins_log);
     hTrkPtNoEvt = new TH1D(Form("hTrkPt%sNoEvt", title.c_str()), "", nPtBins_log, pTBins_log);
     hTrkPtNoTrk = new TH1D(Form("hTrkPt%sNoTrk", title.c_str()), "", nPtBins_log, pTBins_log);
@@ -132,7 +160,9 @@ public:
 
       int Run = MChargedHadronRAA->Run;
       int lumi = MChargedHadronRAA->Lumi;
-      if ( ( (Run==394271 && lumi>=1 && lumi<=106) || (Run==394271 && lumi>=172 && lumi<=306) || (Run==394272 && lumi>=1 && lumi<=357) || (Run==394272 && lumi>=663 && lumi<=1135)) == false ) continue;
+//     comment out if you want to use our "forest x golden" json
+//      if ( ( (Run==394271 && lumi>=1 && lumi<=106) || (Run==394271 && lumi>=172 && lumi<=306) || (Run==394272 && lumi>=1 && lumi<=357) || (Run==394272 && lumi>=663 && lumi<=1135)) == false ) continue;
+
 		
       // check trigger
       if (par.CollisionType && par.TriggerChoice == 0 && MChargedHadronRAA->HLT_OxyZeroBias_v1 == false)
@@ -177,32 +207,35 @@ public:
         }
 
         float partSpeciesWeight = 1.;
-
-        if (par.UseSpeciesWeight && MChargedHadronRAA->trkPt->at(j) < 20.0) {
+        if (par.UseSpeciesWeight && MChargedHadronRAA->trkPt->at(j) < 200.0) {
           if (par.SpeciesCorrectionOption == 1)
-            partSpeciesWeight = MChargedHadronRAA->TrkSpeciesWeight_pp->at(j); // ppRef
+            partSpeciesWeight = correctionFactor_ppRefLike->Eval(MChargedHadronRAA->trkPt->at(j));
           else if (par.SpeciesCorrectionOption == 2)
-            partSpeciesWeight = MChargedHadronRAA->TrkSpeciesWeight_dNdEta40->at(j); // default in OO
+            partSpeciesWeight = correctionFactor_dNdeta40->Eval(MChargedHadronRAA->trkPt->at(j));
           else if (par.SpeciesCorrectionOption == 3)
-            partSpeciesWeight = MChargedHadronRAA->TrkSpeciesWeight_dNdEta100->at(j); //  variation, central OO-like
+            partSpeciesWeight = correctionFactor_dNdeta100->Eval(MChargedHadronRAA->trkPt->at(j));
         }
 
+	int binEvtWeight = histEventWeight->FindBin(MChargedHadronRAA->trkPt->at(j));;
+	evtWeight = histEventWeight->GetBinContent(binEvtWeight); //pT-dependent weight, for the moment keeping central-value since we are dropping the EvtSel variations
+
+        double lumiWeight = 1; //weight to "stitch" spectra"
         // eta hist before applying eta cut
-        hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), trkWeight * evtWeight * partSpeciesWeight);
-        hTrkEtaUnweighted->Fill(MChargedHadronRAA->trkEta->at(j));
+        hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), trkWeight * evtWeight * partSpeciesWeight*lumiWeight);
+        hTrkEtaUnweighted->Fill(MChargedHadronRAA->trkEta->at(j),lumiWeight);
         // apply eta cut (last track selection)
         if (fabs(MChargedHadronRAA->trkEta->at(j)) > 1.0)
           continue;
 
         // fill dN/dpT
         double pT = MChargedHadronRAA->trkPt->at(j);
-        if (par.CollisionType == false)
-          evtWeight = 1.0; // event weight = 1 for ppRef, placeholder.
-        hTrkPtNoEvt->Fill(MChargedHadronRAA->trkPt->at(j), evtWeight / pT);
-        hTrkPtNoTrk->Fill(MChargedHadronRAA->trkPt->at(j), trkWeight / pT);
-        hTrkPtNoPartSpecies->Fill(MChargedHadronRAA->trkPt->at(j), partSpeciesWeight / pT);
-        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j), trkWeight * evtWeight * partSpeciesWeight / pT);
-        hTrkPtUnweighted->Fill(MChargedHadronRAA->trkPt->at(j), 1. / pT);
+	if ( pT < 10.0) lumiWeight = 4; //15 PDs with AllPt, 45 PDs for highPt.
+        if (par.CollisionType == false)  evtWeight = 1.0; // event weight = 1 for ppRef, placeholder.
+        hTrkPtNoEvt->Fill(MChargedHadronRAA->trkPt->at(j), (lumiWeight*evtWeight) / pT);
+        hTrkPtNoTrk->Fill(MChargedHadronRAA->trkPt->at(j), lumiWeight*trkWeight / pT);
+        hTrkPtNoPartSpecies->Fill(MChargedHadronRAA->trkPt->at(j), lumiWeight*partSpeciesWeight / pT);
+        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j), lumiWeight*trkWeight * evtWeight * partSpeciesWeight/pT);
+        hTrkPtUnweighted->Fill(MChargedHadronRAA->trkPt->at(j), lumiWeight / pT);
 
       } // end of track loop
     } // end of event loop
