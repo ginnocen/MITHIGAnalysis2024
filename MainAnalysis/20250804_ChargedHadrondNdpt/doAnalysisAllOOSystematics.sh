@@ -43,7 +43,7 @@ if [ "$DOSYSTEMATIC_SPECIES" = true ]; then
 fi
 
 cd systematic_variations
-root -l -b -q "CompareSystematics.C(\"OO\", $DOSYSTEMATIC_TRACK, $DOSYSTEMATIC_EVTSEL, $DOSYSTEMATIC_SPECIES, \"oosystematics.root\")"
+root -l -b -q "CompareSystematics.C(\"OO\", $DOSYSTEMATIC_TRACK, $DOSYSTEMATIC_EVTSEL, $DOSYSTEMATIC_SPECIES, \"oosystematics.root\", \"adaptive\")"
 cd ..
 
 echo "Systematic variations done! :)" 

@@ -4,7 +4,7 @@
 // DECLARE HELPERS
 TH1D* HistFromFile(const char* filename, const char* histname);
 void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D* central, const char* centlabel, const char* xlabel, const char* ylabel, int logx, int logy, float xmin, float xmax, float ymin_ratio, float ymax_ratio, float ymin_spec, float ymax_spec, const char* system, const char* outputname);
-TH1D* Hist_Symmetrized_Errors(TH1D* hUp, TH1D* hCentral, TH1D* hDown);
+TH1D* Hist_Symmetrized_Errors(TH1D* hUp, TH1D* hCentral, TH1D* hDown, float xignore);
 TH1D* Hist_Total_Systematic(vector<TH1D*> systematics);
 TH1D* Hist_Smooth_Systematic(TH1D* hist, float lowx);
 void PlotUncerts(vector<TH1D*> varhists, TH1D* tothist, const char* xlabel = "Track p_{T} (GeV/c)", float miny = 0, float maxy = 20, const char* system = "OO", const char* pdfname = "SystUncerts.pdf");
@@ -12,13 +12,13 @@ TString GenerateFilePath(const char* system, const char* variation);
 
 
 /// MAIN CODE!
-void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, const char* outfilename = "nenesystematics.root"){
-
+void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtSel = 1, int doSpecies = 1, const char* outfilename = "nenesystematics_adaptive.root", std::string smoothtype = "adaptive"){
+    
     cout << "STARTING SYSTEMATIC COMPARISON" << endl;
 
     // MAKE SYSTEMATIC HISTS
     vector<TH1D*> hSystematics;
-    vector<TH1D*> hSystematics_smooth;
+    vector<TH1D*> hSystematics_smooth;  
     TH1D* hLooseTrack = nullptr;
     TH1D* hTightTrack = nullptr;
     TH1D* hSansTrack = nullptr;
@@ -47,13 +47,17 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
         if(hLooseTrack && hTightTrack && hSansTrack){
 
             //GENERATE SYSTEMATIC
-            TH1D* hSystematic_Tracks = Hist_Symmetrized_Errors(hTightTrack, hCentral, hLooseTrack); 
+            TH1D* hSystematic_Tracks = Hist_Symmetrized_Errors(hTightTrack, hCentral, hLooseTrack, -1); 
             hSystematic_Tracks->SetName("hSystematic_Tracks");
             hSystematics.push_back(hSystematic_Tracks);
 
             // SMOOTHED SYSTEMATIC
-            systfit smoother_tracks(hSystematic_Tracks, 5.0);
-            TH1D* hSystematic_Tracks_smooth = smoother_tracks.relerr_gaussian_smooth_adaptive(1.0);
+            systfit smoother_tracks(hSystematic_Tracks, 5.0, -1);
+            TH1D* hSystematic_Tracks_smooth = nullptr;
+            if(smoothtype == "adaptive"){hSystematic_Tracks_smooth = smoother_tracks.relerr_gaussian_smooth_adaptive(1.0);}
+            else if(smoothtype == "flat"){hSystematic_Tracks_smooth = smoother_tracks.relerr_gaussian_smooth_flat(10.0);}
+            else if(smoothtype == "poly"){hSystematic_Tracks_smooth = smoother_tracks.relerr_polyfit_log(3);}
+            else {hSystematic_Tracks_smooth = hSystematic_Tracks;}
             hSystematic_Tracks_smooth->SetName("hSystematic_Tracks_smooth");
             hSystematics_smooth.push_back(hSystematic_Tracks_smooth);
 
@@ -93,13 +97,17 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
         if(hLooseEsel && hTightEsel && hSansEsel){
 
             //GENERATE SYSTEMATIC
-            TH1D* hSystematic_EvtSel = Hist_Symmetrized_Errors(hTightEsel, hCentral, hLooseEsel);
+            TH1D* hSystematic_EvtSel = Hist_Symmetrized_Errors(hTightEsel, hCentral, hLooseEsel, 10);
             hSystematic_EvtSel->SetName("hSystematic_EvtSel");
             hSystematics.push_back(hSystematic_EvtSel);
 
             // SMOOTHED SYSTEMATIC
-            systfit smoother_evtSel(hSystematic_EvtSel, 5.0);
-            TH1D* hSystematic_EvtSel_smooth = smoother_evtSel.relerr_gaussian_smooth_adaptive(1.0);
+            systfit smoother_evtSel(hSystematic_EvtSel, 5.0, 10);
+            TH1D* hSystematic_EvtSel_smooth = nullptr;
+            if(smoothtype == "adaptive"){hSystematic_EvtSel_smooth = smoother_evtSel.relerr_gaussian_smooth_adaptive(1.0);}
+            else if(smoothtype == "flat"){hSystematic_EvtSel_smooth = smoother_evtSel.relerr_gaussian_smooth_flat(10.0);}
+            else if(smoothtype == "poly"){hSystematic_EvtSel_smooth = smoother_evtSel.relerr_polyfit_log(3);}
+            else {hSystematic_EvtSel_smooth = hSystematic_EvtSel;}
             hSystematic_EvtSel_smooth->SetName("hSystematic_EvtSel_smooth");
             hSystematics_smooth.push_back(hSystematic_EvtSel_smooth);
 
@@ -139,13 +147,17 @@ void CompareSystematics(const char* system = "NeNe", int doTrack = 1, int doEvtS
         if(hLooseSpecies && hTightSpecies && hSansSpecies){
 
             //GENERATE SYSTEMATIC
-            TH1D* hSystematic_Species = Hist_Symmetrized_Errors(hTightSpecies, hCentral, hLooseSpecies);
+            TH1D* hSystematic_Species = Hist_Symmetrized_Errors(hTightSpecies, hCentral, hLooseSpecies, -1);
             hSystematic_Species->SetName("hSystematic_Species");
             hSystematics.push_back(hSystematic_Species);
 
             // SMOOTHED SYSTEMATIC
-            systfit smoother_species(hSystematic_Species, 5.0);
-            TH1D* hSystematic_Species_smooth = smoother_species.relerr_gaussian_smooth_adaptive(1.0);
+            systfit smoother_species(hSystematic_Species, 5.0, 20);
+            TH1D* hSystematic_Species_smooth = nullptr;
+            if(smoothtype == "adaptive"){hSystematic_Species_smooth = smoother_species.relerr_gaussian_smooth_adaptive(1.0);}
+            else if(smoothtype == "flat"){hSystematic_Species_smooth = smoother_species.relerr_gaussian_smooth_flat(10.0);}
+            else if(smoothtype == "poly"){hSystematic_Species_smooth = smoother_species.relerr_polyfit_log(3);}
+            else {hSystematic_Species_smooth = hSystematic_Species;}
             hSystematic_Species_smooth->SetName("hSystematic_Species_smooth");
             hSystematics_smooth.push_back(hSystematic_Species_smooth);
 
@@ -387,13 +399,15 @@ void RatioWithCentral(vector<TH1D*> variations, vector<const char*> labels, TH1D
 }
 
 /// HELPER TO GET SYSTEMATIC 
-TH1D* Hist_Symmetrized_Errors(TH1D* histhi, TH1D* histcentral, TH1D* histlo){
+TH1D* Hist_Symmetrized_Errors(TH1D* histhi, TH1D* histcentral, TH1D* histlo, float xignore){
     TH1D* histSym = (TH1D*)histcentral->Clone("histSym");
     for(int i = 0; i < histSym->GetNbinsX(); i++){
         double centralValue = histcentral->GetBinContent(i+1);
         double highValue = histhi->GetBinContent(i+1);
         double lowValue = histlo->GetBinContent(i+1);
+        double binCenter = histSym->GetBinCenter(i+1);
         double error = max(0.0, max(fabs(highValue - centralValue), fabs(centralValue - lowValue)));
+        if(xignore > 0 && binCenter > xignore){error = 0;}
         histSym->SetBinError(i+1, error);
     }
 
