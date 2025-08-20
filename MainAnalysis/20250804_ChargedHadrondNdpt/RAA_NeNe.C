@@ -9,8 +9,8 @@
 #include "TBox.h"
 
 void RAA_NeNe(){
-  float lowPtLumi = 261927.26;
-  float highPtLumi = 1571563.58;
+  float lowPtLumi = 1.;//261927.26;
+  float highPtLumi = 1.;//1571563.58;
 
   setTDRStyle();
 
@@ -22,15 +22,15 @@ void RAA_NeNe(){
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
 
-  TFile * f = TFile::Open("ResultsUIC/pp_OO_raa_20250729_Unblinding_Final_v3.root","read");
-  //get raa data
-  TH1D * data = (TH1D*)f->Get("Unnormalized_RAA");
 
+  TFile * f = TFile::Open("ResultsUIC/pp_OO_raa_systematics_20250813-2.root","read");
+  //get raa data
+  TH1D * data = (TH1D*)f->Get("normalized_RAA");
 
   //load data
-  TFile * fNucleusNucleus = TFile::Open("Results/NucleusNucleus_raa_20250805_Unblinding.root","read");
+  TFile * fNucleusNucleus = TFile::Open("Results/NeNeOverPPRatio.root","read");
   //get raa data
-  TH1D * dataNucleusNucleus = (TH1D*)fNucleusNucleus->Get("Unnormalized_RAA_NucleusNucleus");
+  TH1D * dataNucleusNucleus = (TH1D*)fNucleusNucleus->Get("normalized_RAA_NucleusNucleus");
  
   //for testing, comment for actual data 
   //for(int i = 0; i<data->GetSize(); i++){
@@ -39,10 +39,10 @@ void RAA_NeNe(){
   //}
 
   //A squared scaling
-  data->Scale(1.0/256.0);
+//  data->Scale(1.0/256.0);
   data->Print("All");
 
-  dataNucleusNucleus->Scale(1.0/400.0);
+//  dataNucleusNucleus->Scale(1.0/400.0);
   dataNucleusNucleus->Print("All");
   
 
@@ -50,7 +50,7 @@ void RAA_NeNe(){
   TH1D * raaSyst = (TH1D*)f->Get("Raa_Total_uncertainty");
   TH1D * raaSystNucleusNucleus = (TH1D*)fNucleusNucleus->Get("Raa_Total_uncertainty_NucleusNucleus");
 
-  raaSystNucleusNucleus->Scale(1.0/400.0);
+//  raaSystNucleusNucleus->Scale(1.0/400.0);
 
   //set up canvas and pads
   TCanvas * canv2 = new TCanvas("canv2","canv2",800,800);
@@ -162,15 +162,19 @@ void RAA_NeNe(){
 
 
   dataNucleusNucleus->SetMarkerStyle(20);
-  dataNucleusNucleus->SetMarkerSize(0.8);
+  dataNucleusNucleus->SetMarkerSize(1);
 
   dataNucleusNucleus->SetLineColor(kViolet+2);
   dataNucleusNucleus->SetMarkerColor(kViolet+2);
 
-  raaSystNucleusNucleus->SetFillColorAlpha(kViolet-9, 0.5);
+  raaSystNucleusNucleus->SetFillColorAlpha(kViolet-9, 0.8);
   raaSystNucleusNucleus->SetLineColor(0);
+  raaSystNucleusNucleus->SetMarkerSize(1);
+  raaSystNucleusNucleus->SetMarkerStyle(20);
   raaSystNucleusNucleus->SetMarkerColor(kViolet+2);
   raaSystNucleusNucleus->SetMarkerColor(kViolet+2);
+  raaSystNucleusNucleus->GetXaxis()->SetRangeUser(3,100);
+  dataNucleusNucleus->GetXaxis()->SetRangeUser(3,100);
 
 
 
@@ -185,13 +189,15 @@ void RAA_NeNe(){
   //raa->SetLineColor(kBlack);
   //raa->GetXaxis()->SetRangeUser(3,100);
   //raa->Draw("p same");
-
+  gme->SetFillColor(TColor::GetColor("#5790fc"));
   //legends
-  TLegend * specLeg = new TLegend(0.6,0.75,1,0.9);
+  TLegend * specLeg = new TLegend(0.4,0.75,1,0.9);
   specLeg->SetTextFont(42);
   specLeg->SetTextSize(0.05);
   specLeg->SetFillStyle(0);
   specLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
+  specLeg->AddEntry(gme, "OO (HIN-25-008)", "p f" );
+  specLeg->AddEntry(raaSystNucleusNucleus, "NeNe", "p f");
   specLeg->SetFillStyle(0);
   specLeg->Draw("same"); 
 
