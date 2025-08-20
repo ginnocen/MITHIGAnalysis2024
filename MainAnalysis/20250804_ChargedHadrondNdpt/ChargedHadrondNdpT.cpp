@@ -2,6 +2,7 @@
 #include <TCut.h>
 #include <TFile.h>
 #include <TH1F.h>
+#include <TF1.h>
 #include <TH1D.h>
 #include <TH2D.h>
 #include <TH3D.h>
