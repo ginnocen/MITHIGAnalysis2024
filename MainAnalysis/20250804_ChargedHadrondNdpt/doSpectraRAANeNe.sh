@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LUMIAAtoPP=12226.08865
+LUMIAAtoPP=806882.576415303 #lumi for golden json, NeNe, meant to be used for 60 PDs normalization.
 
 #Lumi per PD computed with the following commands in lxplus9:
 
