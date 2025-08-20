@@ -1,6 +1,7 @@
 #include <TCanvas.h>
 #include <TCut.h>
 #include <TFile.h>
+#include <TH1F.h>
 #include <TH1D.h>
 #include <TH2D.h>
 #include <TH3D.h>
@@ -127,7 +128,7 @@ public:
     // Name the parameters for clarity
     correctionFactor_dNdeta40->SetParNames("p0", "p1", "p2");
     TFile *fileEventWeight = TFile::Open("../../CommonCode/root/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root");
-
+    TH1D *histEventWeight = dynamic_cast<TH1D*>(fileEventWeight->Get("pTCorrection"));
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", nPtBins_log, pTBins_log);
     hTrkPtNoEvt = new TH1D(Form("hTrkPt%sNoEvt", title.c_str()), "", nPtBins_log, pTBins_log);
     hTrkPtNoTrk = new TH1D(Form("hTrkPt%sNoTrk", title.c_str()), "", nPtBins_log, pTBins_log);
