@@ -1,3 +1,8 @@
+#include <fstream>
+#include <string>
+#include <vector>
+#include <TChain.h>
+
 float fill_value(float value = 1.0, int doreweight = 1) {
     if (doreweight == 1) {
         return value;
@@ -17,29 +22,46 @@ float VZWeight(TH1D* VZ, float vzentry){
     return weight;
 }
 
+TChain* createDataChain(const char* dataSource) {
+    TChain* chain = new TChain("Tree");
+    string source(dataSource);
+    if (source.find(".txt") != string::npos) {
+        ifstream infile(dataSource);
+        string line;
+        while (getline(infile, line)) {
+            if (!line.empty() && line[0] != '#') {
+                chain->Add(line.c_str());
+            }
+        }
+    }
+    return chain;
+}
+
 void MultReweight(
                 TCut Datacut,
                 TCut MCcut,
-                const char* dataskim = "/data00/bakovacs/OOsamples/Skims/20250705_OO_394153_PhysicsIonPhysics0_074244.root",
+                const char* dataSource = "datafiles.txt",
                 const char* ooskim = "/data00/OOsamples/Skims20250704/skim_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root",
                 const char* ooskim_arg = "/data00/OOsamples/Skims20250704/20250704_HiForest_250520_Pythia_Angantyr_OO_OO_5362GeV_250626.root",
                 int doreweight = 1
                 ){
     
     cout << "STARTING MULTIPLICITY REWEIGHT" << endl;
+    
+    // Enable ROOT multithreading for faster processing
+    ROOT::EnableImplicitMT();
 
     //////// READ FILES - GET VZ REWEIGHTED HISTOGRAMS ////////
-    TFile* fData = TFile::Open(dataskim); 
+    TChain* chainData = createDataChain(dataSource);
     TFile* fOO = TFile::Open(ooskim);
     TFile* fOO_Arg = TFile::Open(ooskim_arg);
     TFile* fVZReweight = TFile::Open("../VZReweight/VZReweight.root");
 
     cout << "PROCESSING FILES:" << endl;
-    cout << "Data: " << dataskim << endl;
+    cout << "Data: " << dataSource << endl;
     cout << "OO: " << ooskim << endl;
     cout << "OO Arg: " << ooskim_arg << endl;
 
-    TTree* tData = (TTree*)fData->Get("Tree");
     TTree* tOO = (TTree*)fOO->Get("Tree");
     TTree* tOO_Arg = (TTree*)fOO_Arg->Get("Tree");
 
@@ -66,8 +88,8 @@ void MultReweight(
     cout << MCcut.GetTitle() << endl;
 
     // OBTAIN DATA HISTOGRAM
-    histfromtree(tData, Datacut, hDataMult, "multiplicityEta2p4");
-    hDataMult->Scale(1.0/hDataMult->Integral());
+    cout << "Creating data histogram from TChain with " << chainData->GetEntries() << " entries..." << endl;
+    histfromtree(chainData, Datacut, hDataMult, "multiplicityEta2p4");
 
     // OBTAIN HIJING HISTOGRAM 
     TTreeFormula* mcCutFormula = new TTreeFormula("mcCutFormula", MCcut, tOO);
@@ -220,8 +242,5 @@ void MultReweight(
     c->SaveAs("MultReweight.pdf");
     c2->SaveAs("MultDistributions.pdf");
 
-
     cout << "DONE WITH MULT REWEIGHT" << endl;
-
 }
-

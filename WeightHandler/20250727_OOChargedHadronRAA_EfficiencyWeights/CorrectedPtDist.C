@@ -1,30 +1,72 @@
 
+#include <fstream>
+#include <string>
+#include <vector>
+#include <cmath>
+#include <ROOT/RDataFrame.hxx>
+
 float getweight(float value, TH1D* hist) {
+    if(!hist) {
+        cout << "WARNING: Null histogram!" << endl;
+        return 1.0;
+    }
     int bin = hist->FindBin(value);
-    float weight = 1.0/(hist->GetBinContent(bin));
+    float binContent = hist->GetBinContent(bin);
+    if(binContent <= 0) {
+        cout << "WARNING: Zero/negative bin content for value " << value << ", using mult=999 weight" << endl;
+        int bin999 = hist->FindBin(999);
+        float binContent999 = hist->GetBinContent(bin999);
+        return binContent999 > 0 ? 1.0/binContent999 : 1.0;
+    }
+    float weight = 1.0/binContent;
+    if(!std::isfinite(weight)) {
+        cout << "WARNING: Non-finite weight for value " << value << ", using mult=999 weight" << endl;
+        int bin999 = hist->FindBin(999);
+        float binContent999 = hist->GetBinContent(bin999);
+        return binContent999 > 0 ? 1.0/binContent999 : 1.0;
+    }
     return weight;
+}
+
+TChain* createDataChain(const char* dataSource) {
+    TChain* chain = new TChain("Tree");
+    string source(dataSource);
+    if (source.find(".txt") != string::npos) {
+        ifstream infile(dataSource);
+        string line;
+        int fileCount = 0;
+        while (getline(infile, line)) {
+            // Skip empty lines and comments
+            if (!line.empty() && line[0] != '#') {
+                chain->Add(line.c_str());
+                fileCount++;
+            }
+        }
+    }
+    return chain;
 }
 
 void CorrectedPtDist(
                 TCut Datacut,
-                const char* dataskim = "/data00/bakovacs/OOsamples/Skims/20250705_OO_394153_PhysicsIonPhysics0_074244.root",
+                const char* dataSource = "datafiles.txt",
                 const char* efficiencyfile = "hists/output.root",
                 const char* effhistname = "hMult_Eff",
                 int useMultiplicity = 1
                 ) {
                   
     cout << "STARTING TRACK PT CORRECTION DISTRIBUTIONS" << endl;
+    
+    // Disable multithreading for debugging
+    // ROOT::EnableImplicitMT();
 
     ///// OPEN FILES             
-    TFile* fData = TFile::Open(dataskim);
-    TTree* TData = (TTree*)fData->Get("Tree");
+    TChain* chainData = createDataChain(dataSource);
     TFile* fEff = TFile::Open(efficiencyfile);
     TH1D* hEff = (TH1D*)fEff->Get(effhistname);
 
-    const Int_t nPtBins_log = 68;
+    const Int_t nPtBins_log = 48;
     const Double_t pTBins_log[nPtBins_log + 1] = {
-        0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.2,2.4,
-        2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0,4.4,4.8,5.2,5.6,6.0,6.4,6.8,7.2,7.6,8.0,
+        3.0,3.2,3.4,3.6,3.8,4.0,4.4,4.8,5.2,5.6,6.0,6.4,6.8,7.2,7.6,8.0,
         8.5,9.0,9.5,10.0,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.6,24.6,
         26.6,28.6,32.6,36.6,42.6,48.6,54.6,60.6,74.0,86.4,103.6,120.8,140.,165.,
         250.,400.
@@ -41,34 +83,86 @@ void CorrectedPtDist(
     TH1D* hUncorrected = new TH1D("hUncorrected", "Uncorrected p_{T} Distribution", nPtBins_log, pTBins_log);
     hCorrected->Sumw2();
     hUncorrected->Sumw2();
-    int multiplicity = 0;
-    float leadingpT = 0;
-    vector<float>* trkPt = nullptr;
-    TData->SetBranchAddress("trkPt", &trkPt);
-    TData->SetBranchAddress("leadingPtEta1p0_sel", &leadingpT);
-    TData->SetBranchAddress("multiplicityEta2p4", &multiplicity);
-
-    TTreeFormula* CutFormula = new TTreeFormula("CutFormula", Datacut, TData);
-    for(int i = 0; i < TData->GetEntries(); i++) {
-        if(i%10000 == 0) {
-            cout << "Processing entry " << i << "/" << TData->GetEntries() << endl;
-        }
-        TData->GetEntry(i);
-        if(!CutFormula->EvalInstance()) continue;
-
+    
+    // Simple RDataFrame approach - no TTreeFormula
+    ROOT::RDataFrame df(*chainData);
+    
+    // Convert TCut to simple string filter
+    std::string cutStr = Datacut.GetTitle();
+    cout << "Applying cut: " << cutStr << endl;
+    
+    auto dfFiltered = df.Filter(cutStr);
+    
+    cout << "Processing entries..." << endl;
+    
+    // Add debugging counters
+    int totalEvents = 0;
+    int totalTracks = 0;
+    int passedTracks = 0;
+    
+    // Simple lambda to fill histograms
+    dfFiltered.Foreach([&](const ROOT::RVec<float>& trkPt, const ROOT::RVec<bool>& trkPass, int mult, float leadingPt) {
+        totalEvents++;
+        
         float weight = 1.0;
         if(useMultiplicity) {
-            weight = getweight((float)multiplicity, hEff);
-        }
-        else{
-            weight = getweight(leadingpT, hEff);
+            weight = getweight((float)mult, hEff);
+        } else {
+            weight = getweight(leadingPt, hEff);
         }
         
-        for(float pt : *trkPt) {
-            hUncorrected->Fill(pt, 1);
-            hCorrected->Fill(pt, weight);
+        // Better weight printing with validation - only print if problematic
+        if(std::isfinite(weight) && weight > 0) {
+            // Check if weight is suspiciously low (should be > 1 for efficiency corrections)
+            if(weight < 1.0) {
+                cout << "WARNING: Weight < 1.0: " << weight << " (mult=" << mult << ", leadingPt=" << leadingPt << ")" << endl;
+            }
+        } else {
+            cout << "Invalid weight: " << weight << " (mult=" << mult << ", leadingPt=" << leadingPt << "), using mult=999 fallback" << endl;
+           
+            weight = getweight(999, hEff);
         }
 
+        // Apply track quality cuts
+        for(size_t i = 0; i < trkPt.size(); i++) {
+            totalTracks++;
+            // Only fill if track passes quality cut
+            if(i < trkPass.size() && trkPass[i]) {
+                passedTracks++;
+                
+                // DEBUG: Print weight for first few tracks
+                if(passedTracks <= 5) {
+                    cout << "Track " << passedTracks << ": pT=" << trkPt[i] << ", weight=" << weight << endl;
+                }
+                
+                // Fill both histograms with same track
+                hUncorrected->Fill(trkPt[i], 1.0);
+                hCorrected->Fill(trkPt[i], weight);
+                
+                // Additional check for problematic weights
+                if(!std::isfinite(weight) || weight <= 0) {
+                    cout << "ERROR: Filling with bad weight " << weight << " for track pT " << trkPt[i] << endl;
+                }
+            }
+        }
+    }, {"trkPt", "trkPassChargedHadron_Nominal", "multiplicityEta2p4", "leadingPtEta1p0_sel"});
+    
+    cout << "DEBUGGING TRACK FILLING:" << endl;
+    cout << "Total events processed: " << totalEvents << endl;
+    cout << "Total tracks: " << totalTracks << endl;  
+    cout << "Tracks passing quality cuts: " << passedTracks << endl;
+
+    // Debug: Print some statistics before creating ratio
+    cout << "DEBUG: Histogram statistics before ratio:" << endl;
+    cout << "Corrected entries: " << hCorrected->GetEntries() << ", integral: " << hCorrected->Integral() << endl;
+    cout << "Uncorrected entries: " << hUncorrected->GetEntries() << ", integral: " << hUncorrected->Integral() << endl;
+    
+    // Check a few bins at low pT
+    for(int i = 1; i <= 5; i++) {
+        double corrContent = hCorrected->GetBinContent(i);
+        double uncorrContent = hUncorrected->GetBinContent(i);
+        double ratio = uncorrContent > 0 ? corrContent/uncorrContent : 0;
+        cout << "Bin " << i << " (pT=" << hCorrected->GetBinCenter(i) << "): corr=" << corrContent << ", uncorr=" << uncorrContent << ", ratio=" << ratio << endl;
     }
 
     TH1D* hRatio = (TH1D*)hCorrected->Clone("hRatio");
