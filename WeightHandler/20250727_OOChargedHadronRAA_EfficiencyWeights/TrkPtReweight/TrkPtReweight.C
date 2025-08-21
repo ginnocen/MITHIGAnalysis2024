@@ -1,3 +1,9 @@
+#include <fstream>
+#include <string>
+#include <vector>
+#include <TChain.h>
+#include <ROOT/RDataFrame.hxx>
+
 float fill_value(float value = 1.0, int doreweight = 1) {
     if (doreweight == 1) {
         return value;
@@ -18,30 +24,80 @@ float MultWeight(TH1D* multHist, int multEntry){
     return weight;
 }
 
+bool passCut(TChain* chain, Long64_t entry, TTreeFormula* formula) {
+    Long64_t localEntry = chain->LoadTree(entry);
+    if (localEntry < 0) return false; 
+    formula->UpdateFormulaLeaves();
+    chain->GetEntry(entry);
+    return formula->EvalInstance();
+}
+
+TChain* createDataChain(const char* dataSource) {
+    TChain* chain = new TChain("Tree");
+    string source(dataSource);
+    
+    cout << "Creating TChain from: " << dataSource << endl;
+    
+    if (source.find(".txt") != string::npos) {
+        ifstream infile(dataSource);
+        if (!infile.is_open()) {
+            cout << "ERROR: Cannot open file: " << dataSource << endl;
+            return nullptr;
+        }
+        string line;
+        int fileCount = 0;
+        while (getline(infile, line)) {
+            if (!line.empty() && line[0] != '#') {
+                cout << "Adding file: " << line << endl;
+                int result = chain->Add(line.c_str());
+                cout << "  -> Result: " << result << " entries" << endl;
+                fileCount++;
+            }
+        }
+        cout << "Added " << fileCount << " files to chain" << endl;
+    } else {
+        cout << "Adding single file: " << source << endl;
+        int result = chain->Add(source.c_str());
+        cout << "  -> Result: " << result << " entries" << endl;
+    }
+    
+    cout << "TChain has " << chain->GetEntries() << " total entries from " << chain->GetNtrees() << " files" << endl;
+    
+    if (chain->GetEntries() == 0) {
+        cout << "ERROR: TChain is empty!" << endl;
+        delete chain;
+        return nullptr;
+    }
+    
+    return chain;
+}
+
 void TrkPtReweight(
                 TCut Datacut,
                 TCut MCcut,
-                const char* dataskim = "/data00/bakovacs/OOsamples/Skims/20250705_OO_394153_PhysicsIonPhysics0_074244.root",
+                const char* dataSource = "datafiles.txt",
                 const char* ooskim = "/data00/OOsamples/Skims20250704/skim_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root",
                 const char* ooskim_arg = "/data00/OOsamples/Skims20250704/20250704_HiForest_250520_Pythia_Angantyr_OO_OO_5362GeV_250626.root",
                 int doreweight = 1
                  ){
 
     cout << "STARTING TRACK PT REWEIGHT" << endl;
+    
+    // Enable ROOT multithreading for faster processing
+    ROOT::EnableImplicitMT();
 
     //////// READ FILES - GET VZ REWEIGHTED HISTOGRAMS ////////
-    TFile* fData = TFile::Open(dataskim); 
+    TChain* chainData = createDataChain(dataSource);
     TFile* fOO = TFile::Open(ooskim);
     TFile* fOO_Arg = TFile::Open(ooskim_arg);
     TFile* fVZReweight = TFile::Open("../VZReweight/VZReweight.root");
     TFile* fMultReweight = TFile::Open("../MultReweight/MultReweight.root");
 
     cout << "PROCESSING FILES:" << endl;
-    cout << "Data: " << dataskim << endl;
+    cout << "Data: " << dataSource << endl;
     cout << "OO: " << ooskim << endl;
     cout << "OO Arg: " << ooskim_arg << endl;
 
-    TTree* tData = (TTree*)fData->Get("Tree");
     TTree* tOO = (TTree*)fOO->Get("Tree");
     TTree* tOO_Arg = (TTree*)fOO_Arg->Get("Tree");
 
@@ -58,10 +114,9 @@ void TrkPtReweight(
     cout << MCcut.GetTitle() << endl;
 
     ///////// OBTAIN HISTOGRAMS FOR TRACK PT INFO ////////
-    const Int_t nPtBins_log = 68;
-    const Double_t pTBins_log[nPtBins_log + 1] = {
-        0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0,2.2,2.4,
-        2.6,2.8,3.0,3.2,3.4,3.6,3.8,4.0,4.4,4.8,5.2,5.6,6.0,6.4,6.8,7.2,7.6,8.0,
+    const Int_t nPtBins_log = 48;
+    const Double_t pTBins_log[nPtBins_log+ 1] = {
+        3.0,3.2,3.4,3.6,3.8,4.0,4.4,4.8,5.2,5.6,6.0,6.4,6.8,7.2,7.6,8.0,
         8.5,9.0,9.5,10.0,11.,12.,13.,14.,15.,16.,17.,18.,19.,20.,21.,22.6,24.6,
         26.6,28.6,32.6,36.6,42.6,48.6,54.6,60.6,74.0,86.4,103.6,120.8,140.,165.,
         250.,400.
@@ -78,73 +133,117 @@ void TrkPtReweight(
     TH1D* hMCTrkPt = new TH1D("hMCTrkPt", "HIJING Track p_{T}", nPtBins_log, pTBins_log);
     TH1D* hMCARGTrkPt = new TH1D("hMCARGTrkPt", "Angantyr Track p_{T}", nPtBins_log, pTBins_log);
 
-    // OBTAIN DATA HISTOGRAM
-    TTreeFormula* dataCutFormula = new TTreeFormula("dataCutFormula", Datacut, tData);
-    vector<float>* trackPt = nullptr;
-    tData->SetBranchAddress("trkPt", &trackPt);
-    vector<bool>* trackpass = nullptr;
-    tData->SetBranchAddress("trkPassChargedHadron_Nominal", &trackpass); 
-    for(int i = 0; i< tData->GetEntries(); i++){
-        if(i % 1000 == 0) {cout << i*1.0 / tData->GetEntries() * 100.0 << "% PROCESSED FOR DATA TRACK PT HIST \r";}
-        tData->GetEntry(i);
-        if(dataCutFormula->EvalInstance() == 0) continue;
-        if(!trackPt || trackPt->empty()) continue;
-        for(size_t j = 0; j < trackPt->size(); j++) {
-            if(trackpass && j < trackpass->size() && trackpass->at(j)){
-                hDataTrkPt->Fill(trackPt->at(j), fill_value(1.0, doreweight));
+    // OBTAIN DATA HISTOGRAM using RDataFrame
+    ROOT::RDataFrame dfData(*chainData);
+    
+    // Convert TCut to string for RDataFrame
+    std::string dataCutStr = Datacut.GetTitle();
+    
+    auto dfDataFiltered = dfData.Filter(dataCutStr);
+    
+    // Check if the branch exists
+    bool hasDataTrackPass = chainData->GetBranch("trkPassChargedHadron_Nominal") != nullptr;
+    
+    auto fillDataHist = [&](const ROOT::RVec<float>& trkPt, const ROOT::RVec<bool>& trkPass) {
+        if(trkPt.empty()) return;
+        for(size_t j = 0; j < trkPt.size(); j++) {
+            bool passTrack = hasDataTrackPass ? (j < trkPass.size() && trkPass[j]) : true; // Default to true if branch doesn't exist
+            if(passTrack) {
+                hDataTrkPt->Fill(trkPt[j], fill_value(1.0, doreweight));
             }
         }
+    };
+    
+    if(hasDataTrackPass) {
+        dfDataFiltered.Foreach(fillDataHist, {"trkPt", "trkPassChargedHadron_Nominal"});
+    } else {
+        cout << "WARNING: trkPassChargedHadron_Nominal branch not found in data, filling all tracks" << endl;
+        auto fillDataHistNoPass = [&](const ROOT::RVec<float>& trkPt) {
+            if(trkPt.empty()) return;
+            for(size_t j = 0; j < trkPt.size(); j++) {
+                hDataTrkPt->Fill(trkPt[j], fill_value(1.0, doreweight));
+            }
+        };
+        dfDataFiltered.Foreach(fillDataHistNoPass, {"trkPt"});
     }
     hDataTrkPt->Scale(1.0/hDataTrkPt->Integral());
 
-    // OBTAIN HIJING HISTOGRAM 
-    TTreeFormula* mcCutFormula = new TTreeFormula("mcCutFormula", MCcut, tOO);
-    vector<float>* trackPt_mc = nullptr;
-    tOO->SetBranchAddress("trkPt", &trackPt_mc);
-    vector<bool>* trackpass_mc = nullptr;
-    tOO->SetBranchAddress("trkPassChargedHadron_Nominal", &trackpass_mc);
-    int multiplicityEta2p4_mc;
-    tOO->SetBranchAddress("multiplicityEta2p4", &multiplicityEta2p4_mc);
-    float VZ_mc;
-    tOO->SetBranchAddress("VZ", &VZ_mc);
-    for(int i = 0; i < tOO->GetEntries(); i++){
-        if(i % 1000 == 0) cout << i*1.0 / tOO->GetEntries() * 100.0 << "% PROCESSED FOR HIJING TRACK PT HIST \r";
-        tOO->GetEntry(i);
-        if(mcCutFormula->EvalInstance() == 0) continue;
-        if(!trackPt_mc || trackPt_mc->empty()) continue;
-        float multWeight = MultWeight(multReweight, multiplicityEta2p4_mc);
-        float vzWeight = VZWeight(vzReweight, VZ_mc);
-        for(size_t j = 0; j < trackPt_mc->size(); j++) {
-            if(trackpass_mc && j < trackpass_mc->size() && trackpass_mc->at(j)) {
-                hMCTrkPt->Fill(trackPt_mc->at(j), fill_value(multWeight * vzWeight, doreweight));
+    // OBTAIN HIJING HISTOGRAM using RDataFrame
+    ROOT::RDataFrame dfMC(*tOO);
+    
+    // Convert TCut to string for RDataFrame
+    std::string mcCutStr = MCcut.GetTitle();
+    
+    auto dfMCFiltered = dfMC.Filter(mcCutStr);
+    
+    // Check if the branch exists
+    bool hasMCTrackPass = tOO->GetBranch("trkPassChargedHadron_Nominal") != nullptr;
+    
+    auto fillMCHist = [&](const ROOT::RVec<float>& trkPt, const ROOT::RVec<bool>& trkPass, int mult, float vz) {
+        if(trkPt.empty()) return;
+        float multWeight = MultWeight(multReweight, mult);
+        float vzWeight = VZWeight(vzReweight, vz);
+        for(size_t j = 0; j < trkPt.size(); j++) {
+            bool passTrack = hasMCTrackPass ? (j < trkPass.size() && trkPass[j]) : true; // Default to true if branch doesn't exist
+            if(passTrack) {
+                hMCTrkPt->Fill(trkPt[j], fill_value(multWeight * vzWeight, doreweight));
             }
         }
+    };
+    
+    if(hasMCTrackPass) {
+        dfMCFiltered.Foreach(fillMCHist, {"trkPt", "trkPassChargedHadron_Nominal", "multiplicityEta2p4", "VZ"});
+    } else {
+        cout << "WARNING: trkPassChargedHadron_Nominal branch not found in MC, filling all tracks" << endl;
+        auto fillMCHistNoPass = [&](const ROOT::RVec<float>& trkPt, int mult, float vz) {
+            if(trkPt.empty()) return;
+            float multWeight = MultWeight(multReweight, mult);
+            float vzWeight = VZWeight(vzReweight, vz);
+            for(size_t j = 0; j < trkPt.size(); j++) {
+                hMCTrkPt->Fill(trkPt[j], fill_value(multWeight * vzWeight, doreweight));
+            }
+        };
+        dfMCFiltered.Foreach(fillMCHistNoPass, {"trkPt", "multiplicityEta2p4", "VZ"});
     }
     hMCTrkPt->Scale(1.0/hMCTrkPt->Integral());
     cout << endl;
 
-    // OBTAIN ANGANTYR HISTOGRAM using cut formula with VZ reweighting
-    TTreeFormula* mcArgCutFormula = new TTreeFormula("mcArgCutFormula", MCcut, tOO_Arg);
-    vector<float>* trackPt_mc_arg = nullptr;
-    tOO_Arg->SetBranchAddress("trkPt", &trackPt_mc_arg);
-    vector<bool>* trackpass_mc_arg = nullptr;
-    tOO_Arg->SetBranchAddress("trkPassChargedHadron_Nominal", &trackpass_mc_arg);
-    int multiplicityEta2p4_arg;
-    float VZ_arg;
-    tOO_Arg->SetBranchAddress("VZ", &VZ_arg);
-    tOO_Arg->SetBranchAddress("multiplicityEta2p4", &multiplicityEta2p4_arg);
-    for(int i = 0; i < tOO_Arg->GetEntries(); i++){
-        if(i % 1000 == 0) cout << i*1.0 / tOO_Arg->GetEntries() * 100.0 << "% PROCESSED FOR ANGANTYR TRACK PT HIST \r";
-        tOO_Arg->GetEntry(i);
-        if(mcArgCutFormula->EvalInstance() == 0) continue;
-        if(!trackPt_mc_arg || trackPt_mc_arg->empty()) continue;
-        float multWeight = MultWeight(multReweight_Arg, multiplicityEta2p4_arg);
-        float vzWeight = VZWeight(vzReweight_Arg, VZ_arg);
-        for(size_t j = 0; j < trackPt_mc_arg->size(); j++) {
-            if(trackpass_mc_arg && j < trackpass_mc_arg->size() && trackpass_mc_arg->at(j)) {
-                hMCARGTrkPt->Fill(trackPt_mc_arg->at(j), fill_value(multWeight * vzWeight, doreweight));
+    // OBTAIN ANGANTYR HISTOGRAM using RDataFrame
+    ROOT::RDataFrame dfMCArg(*tOO_Arg);
+    
+    // Convert TCut to string for RDataFrame  
+    std::string mcArgCutStr = MCcut.GetTitle();
+    
+    auto dfMCArgFiltered = dfMCArg.Filter(mcArgCutStr);
+    
+    // Check if the branch exists
+    bool hasMCArgTrackPass = tOO_Arg->GetBranch("trkPassChargedHadron_Nominal") != nullptr;
+    
+    auto fillMCArgHist = [&](const ROOT::RVec<float>& trkPt, const ROOT::RVec<bool>& trkPass, int mult, float vz) {
+        if(trkPt.empty()) return;
+        float multWeight = MultWeight(multReweight_Arg, mult);
+        float vzWeight = VZWeight(vzReweight_Arg, vz);
+        for(size_t j = 0; j < trkPt.size(); j++) {
+            bool passTrack = hasMCArgTrackPass ? (j < trkPass.size() && trkPass[j]) : true; // Default to true if branch doesn't exist
+            if(passTrack) {
+                hMCARGTrkPt->Fill(trkPt[j], fill_value(multWeight * vzWeight, doreweight));
             }
         }
+    };
+    
+    if(hasMCArgTrackPass) {
+        dfMCArgFiltered.Foreach(fillMCArgHist, {"trkPt", "trkPassChargedHadron_Nominal", "multiplicityEta2p4", "VZ"});
+    } else {
+        cout << "WARNING: trkPassChargedHadron_Nominal branch not found in Angantyr MC, filling all tracks" << endl;
+        auto fillMCArgHistNoPass = [&](const ROOT::RVec<float>& trkPt, int mult, float vz) {
+            if(trkPt.empty()) return;
+            float multWeight = MultWeight(multReweight_Arg, mult);
+            float vzWeight = VZWeight(vzReweight_Arg, vz);
+            for(size_t j = 0; j < trkPt.size(); j++) {
+                hMCARGTrkPt->Fill(trkPt[j], fill_value(multWeight * vzWeight, doreweight));
+            }
+        };
+        dfMCArgFiltered.Foreach(fillMCArgHistNoPass, {"trkPt", "multiplicityEta2p4", "VZ"});
     }
     hMCARGTrkPt->Scale(1.0/hMCARGTrkPt->Integral());
     cout << endl;
@@ -262,7 +361,6 @@ void TrkPtReweight(
     c2->SaveAs("TrkPTDistributions.pdf");
 
     // Close input files
-    fData->Close();
     fOO->Close();
     fOO_Arg->Close();
     fVZReweight->Close();

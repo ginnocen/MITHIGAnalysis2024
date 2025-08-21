@@ -3,7 +3,7 @@
 void FileSaver(
     TCut TCutData,
     TCut TCutMC,
-    const char* DataFile,
+    const char* DataSource,
     const char* OOFile,
     const char* OOFile_Arg,
     const char* EfficiencyFile = "hists/output.root",
@@ -63,7 +63,7 @@ void FileSaver(
     TNamed* cutMC = new TNamed("MCCut", TCutMC.GetTitle());
     TNamed* ooFile = new TNamed("OOFile", OOFile);
     TNamed* ooFile_Arg = new TNamed("OOFile_Arg", OOFile_Arg);
-    TNamed* dataFile = new TNamed("DataFile", DataFile);
+    TNamed* dataSource = new TNamed("DataSource", DataSource);
     TNamed* effFile = new TNamed("EfficiencyFile", EfficiencyFile);
     TNamed* effHistName = new TNamed("EfficiencyHistName", EfficiencyHistName);
     
@@ -71,7 +71,7 @@ void FileSaver(
     cutMC->Write();
     ooFile->Write();
     ooFile_Arg->Write();
-    dataFile->Write();
+    dataSource->Write();
     effFile->Write();
     effHistName->Write();
 

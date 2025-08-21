@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MODE="output_hipileup"
+MODE="output_lowpileup_2"
 ./RunParallelReadParam.sh \
     --Output ${MODE} \
     --Input ../NeNe_InputFileList.txt \
@@ -14,4 +14,3 @@ MODE="output_hipileup"
     --EventSelectionOption 2 \
     --SpeciesCorrectionOption 2 \
     --ScaleFactor 1
-    

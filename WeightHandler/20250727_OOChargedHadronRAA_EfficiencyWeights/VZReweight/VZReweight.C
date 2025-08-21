@@ -1,7 +1,29 @@
+#include <fstream>
+#include <string>
+#include <vector>
+#include <TChain.h>
+
 void histfromtree(TTree* T, TCut t, TH1D* h, const char* branch){
      cout << T->GetEntries(t) << endl;
      T->Project(h->GetName(), branch, t);
      h->Scale(1.0/h->Integral());
+}
+
+TChain* createDataChain(const char* dataSource) {
+    TChain* chain = new TChain("Tree");
+    string source(dataSource);
+    if (source.find(".txt") != string::npos) {
+        ifstream infile(dataSource);
+        string line;
+        int fileCount = 0;
+        while (getline(infile, line)) {
+            if (!line.empty() && line[0] != '#') {
+                fileCount++;
+                int result = chain->Add(line.c_str());
+            }
+        }
+    }
+    return chain;
 }
 
 TCut parseVZcut(TCut cut) {
@@ -38,25 +60,28 @@ TCut parseVZcut(TCut cut) {
 void VZReweight(
                 TCut Datacut,
                 TCut MCcut,
-                const char* dataskim = "/data00/bakovacs/OOsamples/Skims/20250705_OO_394153_PhysicsIonPhysics0_074244.root",
+                const char* dataSource = "datafiles.txt",
                 const char* ooskim = "/data00/OOsamples/Skims20250704/skim_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root",
                 const char* ooskim_arg = "/data00/OOsamples/Skims20250704/20250704_HiForest_250520_Pythia_Angantyr_OO_OO_5362GeV_250626.root",
                 int doreweight = 1
                ){
     
     cout << "STARTING VZ REWEIGHT" << endl;
+    
+    // Enable ROOT multithreading for faster processing
+    ROOT::EnableImplicitMT();
 
-    //////// READ FILES ////////
-    TFile* fData = TFile::Open(dataskim); // CHANGE IF NEEDED
+    ///// READ FILES /////
+    TChain* chainData = createDataChain(dataSource);
+    //chainData->GetListOfBranches()->Print();
     TFile* fOO = TFile::Open(ooskim); 
     TFile* fOO_Arg = TFile::Open(ooskim_arg); 
     
     cout << "PROCESSING FILES:" << endl;
-    cout << "Data: " << dataskim << endl;
+    cout << "Data: " << dataSource << endl;
     cout << "OO: " << ooskim << endl;
     cout << "OO Arg: " << ooskim_arg << endl;
 
-    TTree* tData = (TTree*)fData->Get("Tree");
     TTree* tOO = (TTree*)fOO->Get("Tree");
     TTree* tOO_Arg = (TTree*)fOO_Arg->Get("Tree");
 
@@ -75,7 +100,7 @@ void VZReweight(
     cout << "Applying VZ shift correction to data: " << vzShift << " cm" << endl;
     
     TH1D* hDataVZ = new TH1D("hDataVZ", "VZ Distribution Data (shift corrected)", 50, -30, 30);
-    histfromtree(tData, cut_DATA, hDataVZ, Form("VZ + %f", vzShift));
+    histfromtree(chainData, cut_DATA, hDataVZ, Form("VZ + %f", vzShift));
 
     TH1D* hMCVZ = new TH1D("hMCVZ", "VZ Distribution MC", 50, -30, 30);
     histfromtree(tOO, cut_MC, hMCVZ, "VZ");
@@ -163,8 +188,5 @@ void VZReweight(
     c->SaveAs("VZReweight.pdf");
     c2->SaveAs("VZDistributions.pdf");
 
-
     cout << "DONE WITH VZ REWEIGHT" << endl;
-
 }
-
