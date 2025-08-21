@@ -5,9 +5,26 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
+#include <TChain.h>
 
 using namespace std;
 using namespace ROOT;
+
+TChain* createDataChain(const char* dataSource) {
+    TChain* chain = new TChain("Tree");
+    string source(dataSource);
+    if (source.find(".txt") != string::npos) {
+        ifstream infile(dataSource);
+        string line;
+        while (getline(infile, line)) {
+            if (!line.empty() && line[0] != '#') {
+                chain->Add(line.c_str());
+            }
+        } 
+    }
+    return chain;
+}
 
 //// CREATE RDATAFRAMES /////
 ROOT::RDF::RNode MakeFrame(const char* filename, TH1D* VZReweight, TH1D* MultReweight, TH1D* TrackPtReweight, int doVZweight = 1, int doMultweight = 1, int doTrackPtweight = 1) {
@@ -15,6 +32,70 @@ ROOT::RDF::RNode MakeFrame(const char* filename, TH1D* VZReweight, TH1D* MultRew
     TFile* file = TFile::Open(filename);
     TTree* tree = (TTree*)file->Get("Tree");
     RDataFrame df(*tree);
+    
+    // VZ REWEIGHTING
+    ROOT::RDF::RNode df_weighted = df;
+    if (doVZweight && VZReweight) {
+        df_weighted = df_weighted.Define("VZWeight", 
+            [VZReweight](float VZ) { 
+                int bin = VZReweight->FindBin(VZ); 
+                return VZReweight->GetBinContent(bin);
+            }, {"VZ"});
+    }
+    else {
+        df_weighted = df_weighted.Define("VZWeight", "1.0");
+    }
+
+    // MULTIPLICITY REWEIGHTING
+    if (doMultweight && MultReweight) {
+        df_weighted = df_weighted.Define("MultWeight",
+            [MultReweight](int mult) { 
+                int bin = MultReweight->FindBin(mult); 
+                return MultReweight->GetBinContent(bin);
+            }, {"multiplicityEta2p4"});
+    }
+    else {
+        df_weighted = df_weighted.Define("MultWeight", "1.0");
+    }
+
+    // LEADING TRACK PT REWEIGHTING
+    if(doTrackPtweight && TrackPtReweight) {
+        df_weighted = df_weighted.Define("leadingTrkPtWeight",
+            [TrackPtReweight](float leadingtrackpT) {
+                int bin = TrackPtReweight->FindBin(leadingtrackpT);
+                return TrackPtReweight->GetBinContent(bin);
+            }, {"leadingPtEta1p0_sel"});
+    }
+
+    // TRACK PT REWEIGHTING 
+    if (doTrackPtweight && TrackPtReweight) {
+        df_weighted = df_weighted.Define("trkPtWeights",
+            [TrackPtReweight](const vector<float>& trkPt) {
+                vector<float> weights;
+                weights.reserve(trkPt.size());
+                for (float pt : trkPt) {
+                    int bin = TrackPtReweight->FindBin(pt);
+                    weights.push_back(TrackPtReweight->GetBinContent(bin));
+                }
+                return weights;
+            }, {"trkPt"});
+    }
+    else {
+        // UNIT WEIGHT VECTOR
+        df_weighted = df_weighted.Define("trkPtWeights",
+            [](const vector<float>& trkPt) {
+                vector<float> weights(trkPt.size(), 1.0);
+                return weights;
+            }, {"trkPt"});
+    }
+
+    return df_weighted;
+}
+
+//// CREATE RDATAFRAMES FROM TCHAIN /////
+ROOT::RDF::RNode MakeFrame(TChain* chain, TH1D* VZReweight, TH1D* MultReweight, TH1D* TrackPtReweight, int doVZweight = 1, int doMultweight = 1, int doTrackPtweight = 1) {
+    
+    RDataFrame df(*chain);
     
     // VZ REWEIGHTING
     ROOT::RDF::RNode df_weighted = df;
@@ -153,7 +234,7 @@ TH1D* CalculateEfficiency(TH1D* hPass, TH1D* hTotal, const char* name, const cha
 
 void histmaker(TCut Datacut,
                 TCut MCcut,
-                const char* dataskim = "/data00/bakovacs/OOsamples/Skims/20250705_OO_394153_PhysicsIonPhysics0_074244.root",
+                const char* dataSource = "datafiles.txt",
                 const char* ooskim = "/data00/OOsamples/Skims20250704/skim_HiForest_250520_Hijing_MinimumBias_b015_OO_5362GeV_250518.root",
                 const char* ooskim_arg = "/data00/OOsamples/Skims20250704/20250704_HiForest_250520_Pythia_Angantyr_OO_OO_5362GeV_250626.root",
                 int doVZweight = 1,
@@ -162,8 +243,8 @@ void histmaker(TCut Datacut,
                 const char* outfilename = "hists/output.root"
            ) {
 
-
     cout << "STARTING MULTIPLICITY REWEIGHT" << endl;
+    
     //// GET REWEIGHT HISTOGRAMS ////
     TFile* fVZReweight = TFile::Open("VZReweight/VZReweight.root");
     TH1D* vzReweight = (TH1D*)fVZReweight->Get("VZReweight");
@@ -178,7 +259,8 @@ void histmaker(TCut Datacut,
     TH1D* TrkPtReweight_Arg = (TH1D*)fTrkPtReweight->Get("TrkPtReweight_Arg");
 
     //// CREATE RDATAFRAMES
-    auto dfData = MakeFrame(dataskim, vzReweight, multReweight, TrkPtReweight, doVZweight, doMultweight, doTrackPtweight);
+    TChain* chainData = createDataChain(dataSource);
+    auto dfData = MakeFrame(chainData, vzReweight, multReweight, TrkPtReweight, doVZweight, doMultweight, doTrackPtweight);
     auto dfOO = MakeFrame(ooskim, vzReweight, multReweight, TrkPtReweight, doVZweight, doMultweight, doTrackPtweight);
     auto dfOO_Arg = MakeFrame(ooskim_arg, vzReweight_Arg, multReweight_Arg, TrkPtReweight_Arg, doVZweight, doMultweight, doTrackPtweight);
 
@@ -206,6 +288,7 @@ void histmaker(TCut Datacut,
         3.327, 4.027, 4.872, 5.891, 7.117, 8.591, 10.36, 12.48, 
         15.03, 18.08, 21.73, 26.08, 31.28, 37.48, 44.89, 53.73, 64.31
     };*/
+
     // MULTIPLICITY ----- OTHER HISTOGRAMS EASILY ADDABLE
     TH1D* hDataMult_raw = new TH1D("hDataMult_raw", "Data Multiplicity Raw", nMultBins, multBins);
     TH1D* hDataMult_baseline = new TH1D("hDataMult_baseline", "Data Multiplicity with Baseline", nMultBins, multBins);
@@ -231,6 +314,7 @@ void histmaker(TCut Datacut,
     TCut baselineDATA("HLT_OxyZeroBias_v1 && (VZ > -15 && VZ < 15) && (PVFilter == 1) && (ClusterCompatibilityFilter == 1)");
     TCut leadpt5DATA(("HLT_OxyZeroBias_v1 && (leadingPtEta1p0_sel > 5) && " + string(Datacut.GetTitle())).c_str());
 
+    // FILL THE HISTOGRAMS
     FillHist(dfData, "multiplicityEta2p4", 0, 0, 0, hDataMult_raw, rawDATA);
     FillHist(dfData, "multiplicityEta2p4", 0, 0, 0, hDataMult_baseline, baselineDATA);
     FillHist(dfData, "multiplicityEta2p4", 0, 0, 0, hDataMult_ESEL, Datacut);
@@ -241,17 +325,17 @@ void histmaker(TCut Datacut,
     FillHist(dfOO, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Mult_ESEL, MCcut);
     FillHist(dfOO, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Mult_leadpT5, leadpt5);
 
-    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_raw, raw);
-    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_baseline, baseline);
-    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_ESEL, MCcut);
-    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_leadpT5, leadpt5);
+    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_raw, raw);
+    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_baseline, baseline);
+    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_ESEL, MCcut);
+    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_leadpT5, leadpt5);
 
     cout << "DONE FILLING HISTOGRAMS" << endl; 
 
     // CALCULATE EFFICIENCY BEFORE BIN WIDTH SCALING
     TH1D* hDataMult_Eff = CalculateEfficiency(hDataMult_ESEL, hDataMult_raw, "hDataMult_Eff", "Data Multiplicity Efficiency");
     TH1D* hOO_Mult_Eff = CalculateEfficiency(hOO_Mult_ESEL, hOO_Mult_raw, "hOO_Mult_Eff", "HIJING Multiplicity Efficiency");
-    TH1D* hOO_Arg_Mult_Eff = CalculateEfficiency(hOO_Arg_Mult_ESEL, hOO_Arg_Mult_raw, "hOO_Arg_Mult_Eff", "Angantyr Multiplicity Efficiency");
+    //TH1D* hOO_Arg_Mult_Eff = CalculateEfficiency(hOO_Arg_Mult_ESEL, hOO_Arg_Mult_raw, "hOO_Arg_Mult_Eff", "Angantyr Multiplicity Efficiency");
 
     // RESCALE HISTOGRAMS AFTER EFFICIENCY CALCULATION
     BinWidthScale(hDataMult_raw);
@@ -264,10 +348,10 @@ void histmaker(TCut Datacut,
     BinWidthScale(hOO_Mult_ESEL);
     BinWidthScale(hOO_Mult_leadpT5);
 
-    BinWidthScale(hOO_Arg_Mult_raw);
-    BinWidthScale(hOO_Arg_Mult_baseline);
-    BinWidthScale(hOO_Arg_Mult_ESEL);
-    BinWidthScale(hOO_Arg_Mult_leadpT5);
+    //BinWidthScale(hOO_Arg_Mult_raw);
+    //BinWidthScale(hOO_Arg_Mult_baseline);
+    //BinWidthScale(hOO_Arg_Mult_ESEL);
+    //BinWidthScale(hOO_Arg_Mult_leadpT5);
 
     // WRITE HISTOGRAMS TO FILE
     TFile* outFile = TFile::Open(outfilename, "RECREATE");
@@ -283,10 +367,10 @@ void histmaker(TCut Datacut,
     hOO_Arg_Mult_raw->Write();
     hOO_Arg_Mult_baseline->Write();
     hOO_Arg_Mult_ESEL->Write();
-    hOO_Arg_Mult_leadpT5->Write();
-    hDataMult_Eff->Write();
-    hOO_Mult_Eff->Write();
-    hOO_Arg_Mult_Eff->Write();  
+    //hOO_Arg_Mult_leadpT5->Write();
+    //hDataMult_Eff->Write();
+    //hOO_Mult_Eff->Write();
+    //hOO_Arg_Mult_Eff->Write();  
 
     outFile->Close();
 }

@@ -164,8 +164,13 @@ public:
       int lumi = MChargedHadronRAA->Lumi;
 //     comment out if you want to use our "forest x golden" json
 //      if ( ( (Run==394271 && lumi>=1 && lumi<=106) || (Run==394271 && lumi>=172 && lumi<=306) || (Run==394272 && lumi>=1 && lumi<=357) || (Run==394272 && lumi>=663 && lumi<=1135)) == false ) continue;
+     
+
       //if(Run != 394270 || lumi > 10){continue;}
-      if(Run != 394270 || lumi < 30 || lumi > 90){continue;}
+      //if(Run != 394270 || lumi < 30 || lumi > 90){continue;}
+      //if(Run != 394272 || lumi > 357){continue;}
+      if(Run != 394272 || lumi < 663){continue;}
+
 
       // check trigger
       if (par.CollisionType && par.TriggerChoice == 0 && MChargedHadronRAA->HLT_OxyZeroBias_v1 == false)
