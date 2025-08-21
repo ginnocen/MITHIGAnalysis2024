@@ -34,8 +34,6 @@ void plotGraphs() {
   //gStyle->SetOptTitle(0);
 
   // Input files and labels
-  std::vector<std::string> filenames = {"inputs/pp_data.csv", "inputs/pPb_data.csv", "inputs/OO_data.csv", "inputs/ArAr_data.csv", "inputs/XeXe_data.csv"};
-  std::vector<std::string> labels = {"pp", "pPb", "OO", "ArAr", "XeXe"};
   std::vector<std::string> filenames = {"pp_data.csv", "pPb_data.csv", "OO_data.csv", "ArAr_data.csv", "XeXe_data.csv", "PbPb_data.csv"};
   std::vector<std::string> labels = {"pp", "pPb", "OO", "ArAr", "XeXe", "PbPb"};
 
@@ -103,7 +101,6 @@ void plotGraphs() {
     graphs[i]->Draw("PL same");
     fits[i]->Draw("same");
   }
-  TLegend *leg1 = new TLegend(0.65, 0.35, 0.88, 0.58);
   TLegend *leg1 = new TLegend(0.65, 0.15, 0.88, 0.4);
   for (size_t i = 0; i < graphs.size(); ++i)
     leg1->AddEntry(graphs[i], labels[i].c_str(), "lp");
