@@ -325,17 +325,17 @@ void histmaker(TCut Datacut,
     FillHist(dfOO, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Mult_ESEL, MCcut);
     FillHist(dfOO, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Mult_leadpT5, leadpt5);
 
-    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_raw, raw);
-    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_baseline, baseline);
-    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_ESEL, MCcut);
-    //FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_leadpT5, leadpt5);
+    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_raw, raw);
+    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_baseline, baseline);
+    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_ESEL, MCcut);
+    FillHist(dfOO_Arg, "multiplicityEta2p4", doVZweight, doMultweight, 0, hOO_Arg_Mult_leadpT5, leadpt5);
 
     cout << "DONE FILLING HISTOGRAMS" << endl; 
 
     // CALCULATE EFFICIENCY BEFORE BIN WIDTH SCALING
     TH1D* hDataMult_Eff = CalculateEfficiency(hDataMult_ESEL, hDataMult_raw, "hDataMult_Eff", "Data Multiplicity Efficiency");
     TH1D* hOO_Mult_Eff = CalculateEfficiency(hOO_Mult_ESEL, hOO_Mult_raw, "hOO_Mult_Eff", "HIJING Multiplicity Efficiency");
-    //TH1D* hOO_Arg_Mult_Eff = CalculateEfficiency(hOO_Arg_Mult_ESEL, hOO_Arg_Mult_raw, "hOO_Arg_Mult_Eff", "Angantyr Multiplicity Efficiency");
+    TH1D* hOO_Arg_Mult_Eff = CalculateEfficiency(hOO_Arg_Mult_ESEL, hOO_Arg_Mult_raw, "hOO_Arg_Mult_Eff", "Angantyr Multiplicity Efficiency");
 
     // RESCALE HISTOGRAMS AFTER EFFICIENCY CALCULATION
     BinWidthScale(hDataMult_raw);
@@ -348,10 +348,10 @@ void histmaker(TCut Datacut,
     BinWidthScale(hOO_Mult_ESEL);
     BinWidthScale(hOO_Mult_leadpT5);
 
-    //BinWidthScale(hOO_Arg_Mult_raw);
-    //BinWidthScale(hOO_Arg_Mult_baseline);
-    //BinWidthScale(hOO_Arg_Mult_ESEL);
-    //BinWidthScale(hOO_Arg_Mult_leadpT5);
+    BinWidthScale(hOO_Arg_Mult_raw);
+    BinWidthScale(hOO_Arg_Mult_baseline);
+    BinWidthScale(hOO_Arg_Mult_ESEL);
+    BinWidthScale(hOO_Arg_Mult_leadpT5);
 
     // WRITE HISTOGRAMS TO FILE
     TFile* outFile = TFile::Open(outfilename, "RECREATE");
@@ -367,10 +367,10 @@ void histmaker(TCut Datacut,
     hOO_Arg_Mult_raw->Write();
     hOO_Arg_Mult_baseline->Write();
     hOO_Arg_Mult_ESEL->Write();
-    //hOO_Arg_Mult_leadpT5->Write();
-    //hDataMult_Eff->Write();
-    //hOO_Mult_Eff->Write();
-    //hOO_Arg_Mult_Eff->Write();  
+    hOO_Arg_Mult_leadpT5->Write();
+    hDataMult_Eff->Write();
+    hOO_Mult_Eff->Write();
+    hOO_Arg_Mult_Eff->Write();  
 
     outFile->Close();
 }
