@@ -17,18 +17,18 @@ OOFile_Arg="/data00/kdeverea/OOsamples/Skims/output_20250724_Skim_MinBias_Pythia
 MCCUT="(VZ > -15 && VZ < 15) && \
     (PVFilter == 1) && \
     (ClusterCompatibilityFilter == 1) && \
-    (HFEMaxPlus > 13.000000 && HFEMaxMinus > 13.000000)"
+    (HFEMaxPlus > 19.000000 && HFEMaxMinus > 19.000000)"
 
 
 DATACUT="(VZ > -15 && VZ < 15) && \
     (PVFilter == 1) && \
     (ClusterCompatibilityFilter == 1) && \
-    (HFEMaxPlus > 13.000000 && HFEMaxMinus > 13.000000) && \
+    (HFEMaxPlus > 19.000000 && HFEMaxMinus > 19.000000) && \
     (HLT_MinimumBiasHF_OR_BptxAND_v1)" 
 
 
-HISTOGRAMS_DESTINATION="hists/nene_output_13.root"
-EFFICIENCY_DESTINATION="hists/NENERAA_MULT_EFFICIENCY_HIJING_HF13AND.root"
+HISTOGRAMS_DESTINATION="hists/nene_output_19.root"
+EFFICIENCY_DESTINATION="hists/NENERAA_MULT_EFFICIENCY_HIJING_HF19AND.root"
 
 #### REWEIGHTING #####
 # last argument is 1 to compile histogram while considering previous weighting 0 to ignore
