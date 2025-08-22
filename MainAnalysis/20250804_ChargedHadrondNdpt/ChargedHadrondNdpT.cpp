@@ -128,7 +128,16 @@ public:
     correctionFactor_dNdeta40->SetParameters(-0.136137, -0.104656, -0.0285181);
     // Name the parameters for clarity
     correctionFactor_dNdeta40->SetParNames("p0", "p1", "p2");
-    TFile *fileEventWeight = TFile::Open("../../CommonCode/root/OORAA_MULT_EFFICIENCY_HIJING_HF13AND.root");
+    TFile *fileEventWeight = nullptr;
+    if(par.EventSelectionOption == 1){
+      fileEventWeight = TFile::Open("../../CommonCode/root/NENERAA_MULT_EFFICIENCY_HIJING_HF10AND.root");
+    }
+    if(par.EventSelectionOption == 2){
+      fileEventWeight = TFile::Open("../../CommonCode/root/NENERAA_MULT_EFFICIENCY_HIJING_HF13AND.root");
+    }
+    if(par.EventSelectionOption == 3){
+      fileEventWeight = TFile::Open("../../CommonCode/root/NENERAA_MULT_EFFICIENCY_HIJING_HF19AND.root");
+    }
     TH1D *histEventWeight = dynamic_cast<TH1D*>(fileEventWeight->Get("pTCorrection"));
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", nPtBins_log, pTBins_log);
     hTrkPtNoEvt = new TH1D(Form("hTrkPt%sNoEvt", title.c_str()), "", nPtBins_log, pTBins_log);
@@ -218,8 +227,12 @@ public:
             partSpeciesWeight = correctionFactor_dNdeta100->Eval(MChargedHadronRAA->trkPt->at(j));
         }
 
-	int binEvtWeight = histEventWeight->FindBin(MChargedHadronRAA->trkPt->at(j));;
-	evtWeight = histEventWeight->GetBinContent(binEvtWeight); //pT-dependent weight, for the moment keeping central-value since we are dropping the EvtSel variations
+        if(par.UseEventWeight == 1){
+          int binEvtWeight = histEventWeight->FindBin(MChargedHadronRAA->trkPt->at(j));;
+          evtWeight = histEventWeight->GetBinContent(binEvtWeight); //pT-dependent weight, for the moment keeping central-value since we are dropping the EvtSel variations
+        } else {
+          evtWeight = 1.0;
+        }
 
         double lumiWeight = 1; //weight to "stitch" spectra"
         // eta hist before applying eta cut
