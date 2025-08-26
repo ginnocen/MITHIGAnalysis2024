@@ -115,7 +115,7 @@ void fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA_Pow1-3.root", int op
   leg->AddEntry(fitfunc, Form("Fit: 1 + m (A^{1/3} - 1), m = %.3f #pm %.3f", m, dm), "l");
   leg->Draw();
 
-  TLatex *latex = new TLatex(0.3, 0.15, Form("#chi^{2}/NDF = %.2f #pm %.2f", chi2 / ndf, TMath::Sqrt(chi2) / ndf));
+  TLatex *latex = new TLatex(0.3, 0.15, Form("#chi^{2}/NDF = %.2f", chi2 / ndf));
   latex->SetNDC();
   latex->SetTextSize(0.05);
   latex->SetTextFont(42);
