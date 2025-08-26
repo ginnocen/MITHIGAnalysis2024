@@ -1,3 +1,3 @@
-rm *.png
-rm *.jpg
-rm *.pdf
+rm -f *.png
+rm -f *.jpg
+rm -f *.pdf
