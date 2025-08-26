@@ -1,4 +1,4 @@
-// Minimal legend/. adjustments + "Charged hadron R_{AA}" everywhere,
+// Minimal legend adjustments + "Charged hadron R_{AA}" everywhere,
 // note about uncertainties, and BOLD pT range in the legend.
 
 // const int nPt = 13;
