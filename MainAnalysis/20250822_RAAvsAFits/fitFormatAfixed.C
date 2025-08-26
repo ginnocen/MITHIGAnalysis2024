@@ -5,8 +5,9 @@ const int nPt = 13;
 double pLow[nPt] = {4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
 double pHigh[nPt] = {5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
 
-void fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA_Pow1-3.root", int option = 1) {
+void fit(int ptbin = 3, int option = 1) {
 
+  TString filename = Form ("ptBinned_RAAVsA_Pow%d-3.root", option);
   // Input
   TFile *fileinput = TFile::Open(filename);
   if (!fileinput || fileinput->IsZombie()) {
@@ -27,28 +28,24 @@ void fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA_Pow1-3.root", int op
   if (option == 1) {
     xrangemindraw = 1.0;
     xrangemaxdraw = 7.0;
-    xrangeminfit = 1.0;
+    xrangeminfit = 1.5; //I am excluding the point at A=1 cause it is already forced to 1 in the fit function
     xrangemaxfit = 6.0;
   } else if (option == 2) {
     xrangemindraw = 1.0;
     xrangemaxdraw = 45.0;
-    xrangeminfit = 1.0;
+    xrangeminfit = 1.5; //I am excluding the point at A=1 cause it is already forced to 1 in the fit function
     xrangemaxfit = 40.0;
-  } else if (option == 3) {
-    xrangemindraw = 1.0;
-    xrangemaxdraw = 220.0;
-    xrangeminfit = 1.0;
-    xrangemaxfit = 210.0;
   } else {
-    std::cerr << "Invalid option value. Use 1, 2, or 3." << std::endl;
+    std::cerr << "Invalid option value. Use 1, 2" << std::endl;
   }
   // Fit
-
+  // the fit function already assumes the graph to be plotted as a function of A^(1/3) or A^(2/3)
+  // it is therefore a simple linear function with intercept fixed to 1
   TF1 *fitfunc = new TF1("fitfunc", "1 + [0]*(x-1)", xrangeminfit, xrangemaxfit);
   fitfunc->SetLineColor(kRed + 1);
   fitfunc->SetLineWidth(6);
   fitfunc->SetLineStyle(2); // dashed
-  TFitResultPtr r = g->Fit(fitfunc, "S R0");
+  TFitResultPtr r = g->Fit(fitfunc, "S R0"); // "S" for getting fit results, "R" for fit range, "0" to not draw
 
   // Axes (note the Y title)
   TH2F *hempty =
@@ -112,7 +109,7 @@ void fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA_Pow1-3.root", int op
   double dm = fitfunc->GetParError(0);
   double chi2 = fitfunc->GetChisquare();
   int ndf = fitfunc->GetNDF();
-  leg->AddEntry(fitfunc, Form("Fit: 1 + m (A^{1/3} - 1), m = %.3f #pm %.3f", m, dm), "l");
+  leg->AddEntry(fitfunc, Form("Fit: 1 + m (A^{%d/3} - 1), m = %.3f #pm %.3f", option, m, dm), "l");
   leg->Draw();
 
   TLatex *latex = new TLatex(0.3, 0.15, Form("#chi^{2}/NDF = %.2f", chi2 / ndf));
@@ -135,7 +132,7 @@ void fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA_Pow1-3.root", int op
 
 void loopall() {
   for (int ptbin = 0; ptbin < nPt; ptbin++) {
-    fit(ptbin, "ptBinned_RAAVsA_Pow1-3.root", 1);
-    fit(ptbin, "ptBinned_RAAVsA_Pow2-3.root", 2);
+    fit(ptbin, 1);
+    fit(ptbin, 2);
   }
 }
