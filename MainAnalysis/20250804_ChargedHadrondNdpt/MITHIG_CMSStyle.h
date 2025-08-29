@@ -222,12 +222,7 @@ void AddCMSHeader(
     latex.DrawLatex(
       l + (1 - l - r) * 0.05,
       1 - (t + (1 - t - b) * 0.05),
-      "#font[61]{#scale[1.25]{CMS}}"
-    );
-    latex.DrawLatex(
-      l + (1 - l - r) * 0.05,
-      1 - (t + (1 - t - b) * 0.05) - 1.25 * textSize,
-      Form("#font[52]{%s}", subheader.Data())
+      Form("#font[61]{#scale[1.25]{CMS}} #font[52]{%s}", subheader.Data())
     );
   }
   else {
