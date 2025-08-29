@@ -63,18 +63,18 @@ void RAA_NeNe_dataVsTheory(){
   canv2->SetLogx();
 
   //dummy histogram to define the frame
-  TH1D * ppSpecD = new TH1D("specDummy1","",3,2,120);
-  //TH1D * ppSpecD = new TH1D("specDummy1","",3,0.5,120);
-  ppSpecD->GetYaxis()->SetTitle("R_{AA}");
+  TH1D * ppSpecD = new TH1D("specDummy1","",3,2,140);
+  //TH1D * ppSpecD = new TH1D("specDummy1","",3,0.5,140);
+  ppSpecD->GetYaxis()->SetTitle("Charged Particle R_{AA}");
   ppSpecD->GetYaxis()->SetTitleOffset(1.4);
   ppSpecD->GetYaxis()->SetTitleSize(0.045);
   ppSpecD->GetYaxis()->SetLabelSize(0.04);
   ppSpecD->GetYaxis()->CenterTitle();
   ppSpecD->GetYaxis()->SetLabelOffset(0.004);
  
-  ppSpecD->GetYaxis()->SetRangeUser(0.4,1.6);
+  ppSpecD->GetYaxis()->SetRangeUser(0.3,1.08);
 
-  ppSpecD->GetXaxis()->SetRangeUser(0.5,120);
+  ppSpecD->GetXaxis()->SetRangeUser(0.5,140);
   ppSpecD->GetXaxis()->SetTitleFont(42);
   ppSpecD->GetXaxis()->SetTitle("p_{T} (GeV)");
   ppSpecD->GetXaxis()->SetTitleSize(0.045);
@@ -84,7 +84,7 @@ void RAA_NeNe_dataVsTheory(){
   ppSpecD->Draw();
 
   float normUncert = 0.075;
-  TBox * b = new TBox(2.2,1-normUncert,2.4, 1+normUncert);
+  TBox * b = new TBox(115,1-normUncert,120, 1+normUncert);
   b->SetFillStyle(1001);
   b->SetFillColor(kGray);
   b->Draw("same");
@@ -194,7 +194,8 @@ void RAA_NeNe_dataVsTheory(){
     TFile* f1 = TFile::Open("../../Theory/20250819_OONeNePredictions/20250821_CUJET/MinBias_CUJET.root");
     TFile* f2 = TFile::Open("../../Theory/20250819_OONeNePredictions/20250820_Zakharov/MinBias_Zakharov.root");
     TFile* f3 = TFile::Open("../../Theory/20250819_OONeNePredictions/20250819_FaradayHorowitz/MinBias.root");
-
+    TFile* f4 = TFile::Open("../../Theory/20250828_OONeNePredictions/MinBias_SimpleModel.root");
+    
     // === Fetch graphs from MinBias.root ===
     TGraphAsymmErrors* gNeNe     = (TGraphAsymmErrors*) f1->Get("NeNeMinBias");
     TGraphAsymmErrors* gOO       = (TGraphAsymmErrors*) f1->Get("OOMinBias");
@@ -211,6 +212,14 @@ void RAA_NeNe_dataVsTheory(){
     TGraphAsymmErrors* gOOFaraday   = (TGraphAsymmErrors*) f3->Get("OOMinBias");
     gOOFaraday->SetName("OOMinBias_Faraday");
 
+    // === Fetch graphs from MinBias_SimpleModel.root ===
+    TGraphAsymmErrors* gNeNePGCM = (TGraphAsymmErrors*) f4->Get("NeNe_PGCM");
+    TGraphAsymmErrors* gOOPGCM  = (TGraphAsymmErrors*) f4->Get("OO_PGCM");
+    TGraphAsymmErrors* gOONLEFT = (TGraphAsymmErrors*) f4->Get("OO_NLEFT");
+    TGraphAsymmErrors* gNeNeNLEFT = (TGraphAsymmErrors*) f4->Get("NeNe_NLEFT");
+
+
+    
   
     gOO->SetLineColor(kCyan+3);
     gOO->SetLineWidth(3);
@@ -250,14 +259,30 @@ void RAA_NeNe_dataVsTheory(){
     gNeNeFaraday->SetLineWidth(4);
     gNeNeFaraday->SetFillColorAlpha(kMagenta-9, 0.4);
 
+    gNeNePGCM->SetLineColor(kRed-3);
+    gNeNePGCM->SetLineWidth(4);
+    gNeNePGCM->SetFillColorAlpha(kRed-3, 0.4);
 
+    gOOPGCM->SetLineColor(kBlue-5);
+    gOOPGCM->SetLineWidth(4);
+    gOOPGCM->SetFillColorAlpha(kBlue-5, 0.4);
 
+   
+
+    gOONLEFT->SetLineColor(kOrange+8);
+    gOONLEFT->SetLineWidth(4);
+    gOONLEFT->SetFillColorAlpha(kOrange+8, 0.4);
+
+    gNeNeNLEFT->SetLineColor(kTeal+4);
+    gNeNeNLEFT->SetLineWidth(4);
+    gNeNeNLEFT->SetFillColorAlpha(kTeal+4, 0.4);
+    
     //
     //
     // CHANGE THE MODE TO CHANGE WHICH PLOTS GETS PRODUCED.
     //
     //
-    int mode = 3; // 0 = faraday, 1 = CUJET, 2 = mQGP, 3 = no mQGP
+    int mode = 4; // 0 = faraday, 1 = CUJET, 2 = mQGP, 3 = no mQGP, 4 = SimpleModel PGCM, 5 = SimpleModel NLEFT
     if(mode == 0){
      gOOFaraday->Draw("LE3 same");     // axis + line + filled area
      gNeNeFaraday->Draw("Le3 SAME"); // line + filled area on same plot
@@ -275,6 +300,14 @@ void RAA_NeNe_dataVsTheory(){
       gOO_z->Draw("le3 SAME"); 
       gNeNe_z->Draw("le3 SAME"); 
     }
+    else if(mode == 4){
+      gNeNePGCM->Draw("le3 SAME");
+      gOOPGCM->Draw("le3 SAME");
+    }
+    else if(mode == 5){
+      gNeNeNLEFT->Draw("le3 SAME");
+      gOONLEFT->Draw("le3 SAME");
+    }
     else{
       std::cout << "Warning: Mode not recognized." << std::endl;
     }
@@ -283,18 +316,25 @@ void RAA_NeNe_dataVsTheory(){
   gme->Draw("PZs s=0.01 same;X");
   gme->SetFillColor(TColor::GetColor("#5790fc"));
   //legends
-  TLegend * specLeg = new TLegend(0.2,0.55,0.5,0.84);
+  TLatex *eta = new TLatex(0.26,0.7,"|#eta| < 1");
+  eta->SetTextFont(42);
+  eta->SetTextSize(0.05);
+  eta->SetNDC(true);
+  TLegend * specLeg; 
+  if( mode < 2) specLeg = new TLegend(0.39,0.17,0.78,0.38);
+  else if(mode == 2) specLeg = new TLegend(0.17,0.17,0.78,0.38);
+  else specLeg = new TLegend(0.17,0.17,0.78,0.35);
   specLeg->SetTextFont(42);
-  specLeg->SetTextSize(0.05);
-  if(mode == 3)specLeg->SetTextSize(0.047);
+  specLeg->SetTextSize(0.045);
   specLeg->SetFillStyle(0);
-  if(mode < 2)specLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
-  else specLeg->AddEntry((TObject*)0,"          | #eta | < 1",""); 
+  // if(mode < 2)specLeg->AddEntry((TObject*)0,"|#eta| < 1",""); 
+  // else specLeg->AddEntry((TObject*)0,"          | #eta | < 1",""); 
   specLeg->AddEntry(gme, "OO data (HIN-25-008)", "p f" );
   specLeg->AddEntry(raaSystNucleusNucleus, "NeNe data", "p f");
   if(mode == 0){
     specLeg->AddEntry(gOOFaraday,        "Faraday & Horowitz, OO",       "lf");
     specLeg->AddEntry(gNeNeFaraday,      "Faraday & Horowitz, NeNe",     "lf");
+
   }
   else if(mode == 1){
     // CUJET
@@ -305,18 +345,27 @@ void RAA_NeNe_dataVsTheory(){
    specLeg->AddEntry(gOO_mQGP,   "LCPI + mQGP, OO (Zakharov)",   "lf");
    specLeg->AddEntry(gNeNe_mQGP, "LCPI + mQGP, NeNe (Zakharov)", "lf");
   }
-    else if(mode == 3){
+  else if(mode == 3){
    specLeg->AddEntry(gOO_z,   "LCPI + no mQGP, OO (Zakharov)",   "lf");
    specLeg->AddEntry(gNeNe_z, "LCPI + no mQGP, NeNe (Zakharov)", "lf");
+  }
+  else if(mode == 4){
+   specLeg->AddEntry(gOOPGCM,   "OO, PGCM",   "lf");
+   specLeg->AddEntry(gNeNePGCM, "NeNe, PGCM", "lf");
+  }
+  else if(mode == 5){
+   specLeg->AddEntry(gOONLEFT,   "OO, NLEFT",   "lf");
+   specLeg->AddEntry(gNeNeNLEFT, "NeNe, NLEFT", "lf");
   }
   else{
     std::cout << "Warning: Mode not recognized." << std::endl;
   }
   
-  
+
 
   specLeg->SetFillStyle(0);
   specLeg->Draw("same"); 
+  eta->Draw("same"); 
 
   //int iPeriod = 0;
   lumi_sqrtS = "0.8 nb^{-1} (5.36 TeV NeNe), 1.07 pb^{-1} (5.36 TeV pp)";
@@ -348,6 +397,16 @@ void RAA_NeNe_dataVsTheory(){
     canv2->SaveAs("plots/Figure_002_theory_Zakharov_nomQGP.pdf");
     canv2->SaveAs("plots/Figure_002_theory_Zakharov_nomQGP.png");
     canv2->SaveAs("plots/Figure_002_theory_Zakharov_nomQGP.C");
+  }
+  else if(mode == 4){
+    canv2->SaveAs("plots/Figure_002_theory_PGCM.pdf");
+    canv2->SaveAs("plots/Figure_002_theory_PGCM.png");
+    canv2->SaveAs("plots/Figure_002_theory_PGCM.C");
+  }
+  else if(mode == 5){
+    canv2->SaveAs("plots/Figure_002_theory_NLEFT.pdf");
+    canv2->SaveAs("plots/Figure_002_theory_NLEFT.png");
+    canv2->SaveAs("plots/Figure_002_theory_NLEFT.C");
   }
   else{
     std::cout << "Warning: Mode not recognized." << std::endl;
