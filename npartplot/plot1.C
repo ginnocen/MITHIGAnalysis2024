@@ -61,9 +61,10 @@ void plot1(){
     TBox* NeNebox_pt2 = new TBox(12.7-0.5, getSmallSystemSystematic(4,2).y - getSmallSystemSystematic(4,2).eyl, 12.7+0.5,  getSmallSystemSystematic(4,2).y + getSmallSystemSystematic(4,2).eyh);
     TBox* NeNebox_pt3 = new TBox(12.7-0.5, getSmallSystemSystematic(9,2).y - getSmallSystemSystematic(9,2).eyl, 12.7+0.5,  getSmallSystemSystematic(9,2).y + getSmallSystemSystematic(9,2).eyh);
 
-    TBox* pPbbox_pt1 = new TBox(7.7230000-0.5, getpPbSystematic(14).y - getpPbSystematic(14).eyl, 7.7230000+0.5,  getpPbSystematic(14).y + getpPbSystematic(14).eyh);
-    TBox* pPbbox_pt2 = new TBox(7.7230000-0.5, getpPbSystematic(19).y - getpPbSystematic(19).eyl, 7.7230000+0.5,  getpPbSystematic(19).y + getpPbSystematic(19).eyh);
-    TBox* pPbbox_pt3 = new TBox(7.7230000-0.5, getpPbSystematic(23).y - getpPbSystematic(23).eyl, 7.7230000+0.5,  getpPbSystematic(23).y + getpPbSystematic(23).eyh);
+    TBox* pPbbox_pt1 = new TBox(7.7230000-0.5, getpPbSystematic(17).y - getpPbSystematic(17).eyl, 7.7230000+0.5,  getpPbSystematic(17).y + getpPbSystematic(17).eyh);
+    TBox* pPbbox_pt2 = new TBox(7.7230000-0.5, getpPbSystematic(21).y - getpPbSystematic(21).eyl, 7.7230000+0.5,  getpPbSystematic(21).y + getpPbSystematic(21).eyh);
+    TBox* pPbbox_pt3 = new TBox(7.7230000-0.5, getpPbSystematic(26).y - getpPbSystematic(26).eyl, 7.7230000+0.5,  getpPbSystematic(26).y + getpPbSystematic(26).eyh);
+    cout << " " << getpPbSystematic(17).y << " " << getpPbSystematic(21).y << " " << getpPbSystematic(26).y << endl;
 
     vector<TBox*> XeXeboxes_pt1(6);
     vector<TBox*> XeXeboxes_pt2(6);
@@ -75,29 +76,29 @@ void plot1(){
 
     for(int i = 0; i<6; i++){
 
-        gXeXe_pt1->SetPoint(i, nparts_XeXe[i], getXeXeSystematic(14,i).y);
-        gXeXe_pt1->SetPointError(i, 0, 0, getXeXeStatistical(14,i).eyl, getXeXeStatistical(14,i).eyh);
-        XeXeboxes_pt1[i] = new TBox(nparts_XeXe[i]-nparts_XeXe_errorsdown[i], getXeXeSystematic(14,i).y - getXeXeSystematic(14,i).eyl, nparts_XeXe[i]+nparts_XeXe_errorsup[i], getXeXeSystematic(14,i).y + getXeXeSystematic(14,i).eyh);
+        gXeXe_pt1->SetPoint(i, nparts_XeXe[i], getXeXeSystematic(17,i).y);
+        gXeXe_pt1->SetPointError(i, 0, 0, getXeXeStatistical(17,i).eyl, getXeXeStatistical(17,i).eyh);
+        XeXeboxes_pt1[i] = new TBox(nparts_XeXe[i]-nparts_XeXe_errorsdown[i], getXeXeSystematic(17,i).y - getXeXeSystematic(17,i).eyl, nparts_XeXe[i]+nparts_XeXe_errorsup[i], getXeXeSystematic(17,i).y + getXeXeSystematic(17,i).eyh);
 
-        gPbPb_pt1->SetPoint(i, npartx_PbPb[i], getPbPbSystematic(14,i).y);
-        gPbPb_pt1->SetPointError(i, 0, 0, getPbPbStatistical(14,i).eyl, getPbPbStatistical(14,i).eyh);
-        PbPbboxes_pt1[i] = new TBox(npartx_PbPb[i]-npartx_PbPb_errorsdown[i], getPbPbSystematic(14,i).y - getPbPbSystematic(14,i).eyl, npartx_PbPb[i]+npartx_PbPb_errorsup[i], getPbPbSystematic(14,i).y + getPbPbSystematic(14,i).eyh);
+        gPbPb_pt1->SetPoint(i, npartx_PbPb[i], getPbPbSystematic(15,i).y);
+        gPbPb_pt1->SetPointError(i, 0, 0, getPbPbStatistical(15,i).eyl, getPbPbStatistical(15,i).eyh);
+        PbPbboxes_pt1[i] = new TBox(npartx_PbPb[i]-npartx_PbPb_errorsdown[i], getPbPbSystematic(15,i).y - getPbPbSystematic(15,i).eyl, npartx_PbPb[i]+npartx_PbPb_errorsup[i], getPbPbSystematic(15,i).y + getPbPbSystematic(15,i).eyh);
 
-        gXeXe_pt2->SetPoint(i, nparts_XeXe[i], getXeXeSystematic(19,i).y);
-        gXeXe_pt2->SetPointError(i, 0 , 0, getXeXeStatistical(19,i).eyl, getXeXeStatistical(19,i).eyh);
-        XeXeboxes_pt2[i] = new TBox(nparts_XeXe[i]-nparts_XeXe_errorsdown[i], getXeXeSystematic(19,i).y - getXeXeSystematic(19,i).eyl, nparts_XeXe[i]+nparts_XeXe_errorsup[i], getXeXeSystematic(19,i).y + getXeXeSystematic(19,i).eyh);
+        gXeXe_pt2->SetPoint(i, nparts_XeXe[i], getXeXeSystematic(21,i).y);
+        gXeXe_pt2->SetPointError(i, 0 , 0, getXeXeStatistical(21,i).eyl, getXeXeStatistical(21,i).eyh);
+        XeXeboxes_pt2[i] = new TBox(nparts_XeXe[i]-nparts_XeXe_errorsdown[i], getXeXeSystematic(21,i).y - getXeXeSystematic(21,i).eyl, nparts_XeXe[i]+nparts_XeXe_errorsup[i], getXeXeSystematic(21,i).y + getXeXeSystematic(21,i).eyh);
 
         gPbPb_pt2->SetPoint(i, npartx_PbPb[i], getPbPbSystematic(19,i).y);
         gPbPb_pt2->SetPointError(i, 0, 0, getPbPbStatistical(19,i).eyl, getPbPbStatistical(19,i).eyh);
         PbPbboxes_pt2[i] = new TBox(npartx_PbPb[i]-npartx_PbPb_errorsdown[i], getPbPbSystematic(19,i).y - getPbPbSystematic(19,i).eyl, npartx_PbPb[i]+npartx_PbPb_errorsup[i], getPbPbSystematic(19,i).y + getPbPbSystematic(19,i).eyh);
 
-        gXeXe_pt3->SetPoint(i, nparts_XeXe[i], getXeXeSystematic(23,i).y);
-        gXeXe_pt3->SetPointError(i, 0, 0, getXeXeStatistical(23,i).eyl, getXeXeStatistical(23,i).eyh);
-        XeXeboxes_pt3[i] = new TBox(nparts_XeXe[i]-nparts_XeXe_errorsdown[i], getXeXeSystematic(23,i).y - getXeXeSystematic(23,i).eyl, nparts_XeXe[i]+nparts_XeXe_errorsup[i], getXeXeSystematic(23,i).y + getXeXeSystematic(23,i).eyh);
+        gXeXe_pt3->SetPoint(i, nparts_XeXe[i], getXeXeSystematic(26,i).y);
+        gXeXe_pt3->SetPointError(i, 0, 0, getXeXeStatistical(26,i).eyl, getXeXeStatistical(26,i).eyh);
+        XeXeboxes_pt3[i] = new TBox(nparts_XeXe[i]-nparts_XeXe_errorsdown[i], getXeXeSystematic(26,i).y - getXeXeSystematic(26,i).eyl, nparts_XeXe[i]+nparts_XeXe_errorsup[i], getXeXeSystematic(26,i).y + getXeXeSystematic(26,i).eyh);
 
-        gPbPb_pt3->SetPoint(i, npartx_PbPb[i], getPbPbSystematic(23,i).y);
-        gPbPb_pt3->SetPointError(i, 0, 0, getPbPbStatistical(23,i).eyl, getPbPbStatistical(23,i).eyh);
-        PbPbboxes_pt3[i] = new TBox(npartx_PbPb[i]-npartx_PbPb_errorsdown[i], getPbPbSystematic(23,i).y - getPbPbSystematic(23,i).eyl, npartx_PbPb[i]+npartx_PbPb_errorsup[i], getPbPbSystematic(23,i).y + getPbPbSystematic(23,i).eyh);
+        gPbPb_pt3->SetPoint(i, npartx_PbPb[i], getPbPbSystematic(24,i).y);
+        gPbPb_pt3->SetPointError(i, 0, 0, getPbPbStatistical(24,i).eyl, getPbPbStatistical(24,i).eyh);
+        PbPbboxes_pt3[i] = new TBox(npartx_PbPb[i]-npartx_PbPb_errorsdown[i], getPbPbSystematic(24,i).y - getPbPbSystematic(24,i).eyl, npartx_PbPb[i]+npartx_PbPb_errorsup[i], getPbPbSystematic(24,i).y + getPbPbSystematic(24,i).eyh);
 
     }
 
@@ -408,20 +409,20 @@ void plot1(){
     line->Draw();
 
     
-    TLatex* latex_eta = new TLatex(60, 0.8, "|#eta| < 1");
-    latex_eta->SetTextSize(0.035); // smallish font
+    TLatex* latex_eta = new TLatex(60, 0.86, "|#eta| < 1");
+    latex_eta->SetTextSize(0.032); // smallish font
     latex_eta->SetTextFont(42);
     latex_eta->Draw();
-    TLatex* latex_pt1 = new TLatex(60, 0.9, "4.8 < p_{T} < 5.6 GeV");
-    latex_pt1->SetTextSize(0.035); // smallish font
+    TLatex* latex_pt1 = new TLatex(60, 0.93, "4.8 < p_{T} < 5.6 GeV");
+    latex_pt1->SetTextSize(0.032); // smallish font
     latex_pt1->SetTextFont(42);
     latex_pt1->Draw();
-    TLatex* latex_pt2 = new TLatex(60, 0.9, "9.6 < p_{T} < 12.0 GeV");
-    latex_pt2->SetTextSize(0.035); // smallish font
+    TLatex* latex_pt2 = new TLatex(60, 0.93, "9.6 < p_{T} < 12.0 GeV");
+    latex_pt2->SetTextSize(0.032); // smallish font
     latex_pt2->SetTextFont(42);
     latex_pt2->Draw();
-    TLatex* latex_pt3 = new TLatex(60, 0.9, "28.8 < p_{T} < 35.2 GeV");
-    latex_pt3->SetTextSize(0.035); // smallish font
+    TLatex* latex_pt3 = new TLatex(60, 0.93, "28.8 < p_{T} < 35.2 GeV");
+    latex_pt3->SetTextSize(0.032); // smallish font
     latex_pt3->SetTextFont(42);
     latex_pt3->Draw();
 
