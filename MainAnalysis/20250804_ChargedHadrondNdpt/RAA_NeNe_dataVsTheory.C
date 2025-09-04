@@ -65,14 +65,14 @@ void RAA_NeNe_dataVsTheory(){
   //dummy histogram to define the frame
   TH1D * ppSpecD = new TH1D("specDummy1","",3,2,140);
   //TH1D * ppSpecD = new TH1D("specDummy1","",3,0.5,140);
-  ppSpecD->GetYaxis()->SetTitle("Charged Particle R_{AA}");
+  ppSpecD->GetYaxis()->SetTitle("Charged particle R_{AA}");
   ppSpecD->GetYaxis()->SetTitleOffset(1.4);
   ppSpecD->GetYaxis()->SetTitleSize(0.045);
   ppSpecD->GetYaxis()->SetLabelSize(0.04);
   ppSpecD->GetYaxis()->CenterTitle();
   ppSpecD->GetYaxis()->SetLabelOffset(0.004);
  
-  ppSpecD->GetYaxis()->SetRangeUser(0.3,1.08);
+  ppSpecD->GetYaxis()->SetRangeUser(0.3,1.1);
 
   ppSpecD->GetXaxis()->SetRangeUser(0.5,140);
   ppSpecD->GetXaxis()->SetTitleFont(42);
@@ -195,6 +195,8 @@ void RAA_NeNe_dataVsTheory(){
     TFile* f2 = TFile::Open("../../Theory/20250819_OONeNePredictions/20250820_Zakharov/MinBias_Zakharov.root");
     TFile* f3 = TFile::Open("../../Theory/20250819_OONeNePredictions/20250819_FaradayHorowitz/MinBias.root");
     TFile* f4 = TFile::Open("../../Theory/20250828_OONeNePredictions/MinBias_SimpleModel.root");
+    TFile* f5 = TFile::Open("../../Theory/20250904_OONeNePredictions/MinBias_TrajectumJEWELhadRAA.root");
+    TFile* f6 = TFile::Open("../../Theory/20250904_OONeNePredictions/MinBias_TrajectumPathLength.root");
     
     // === Fetch graphs from MinBias.root ===
     TGraphAsymmErrors* gNeNe     = (TGraphAsymmErrors*) f1->Get("NeNeMinBias");
@@ -218,8 +220,26 @@ void RAA_NeNe_dataVsTheory(){
     TGraphAsymmErrors* gOONLEFT = (TGraphAsymmErrors*) f4->Get("OO_NLEFT");
     TGraphAsymmErrors* gNeNeNLEFT = (TGraphAsymmErrors*) f4->Get("NeNe_NLEFT");
 
-
+    // === Fetch graphs from MinBias_TrajectumJEWELhadRAA.root ===
+    TGraphAsymmErrors* gNeNePGCM_JEWEL = (TGraphAsymmErrors*) f5->Get("NeNe_PGCM");
+    gNeNePGCM_JEWEL->SetName("gNeNePGCM_JEWEL"); 
+    TGraphAsymmErrors* gOOPGCM_JEWEL  = (TGraphAsymmErrors*) f5->Get("OO_PGCM");
+    gOOPGCM_JEWEL->SetName("gOOPGCM_JEWEL"); 
+    TGraphAsymmErrors* gOONLEFT_JEWEL = (TGraphAsymmErrors*) f5->Get("OO_NLEFT");
+    gOONLEFT_JEWEL->SetName("gOONLEFT_JEWEL"); 
+    TGraphAsymmErrors* gNeNeNLEFT_JEWEL = (TGraphAsymmErrors*) f5->Get("NeNe_NLEFT");
+    gNeNeNLEFT_JEWEL->SetName("gNeNeNLEFT_JEWEL"); 
     
+    
+    // === Fetch graphs from MinBias_TrajectumPathLength.root ===
+    TGraphAsymmErrors* gNeNePGCM_PATH = (TGraphAsymmErrors*) f6->Get("NeNe_PGCM");
+    gNeNePGCM_PATH->SetName("gNeNePGCM_PATH"); 
+    TGraphAsymmErrors* gOOPGCM_PATH  = (TGraphAsymmErrors*) f6->Get("OO_PGCM");
+    gOOPGCM_PATH->SetName("gOOPGCM_PATH"); 
+    TGraphAsymmErrors* gOONLEFT_PATH = (TGraphAsymmErrors*) f6->Get("OO_NLEFT");
+    gOONLEFT_PATH->SetName("gOONLEFT_PATH"); 
+    TGraphAsymmErrors* gNeNeNLEFT_PATH = (TGraphAsymmErrors*) f6->Get("NeNe_NLEFT");
+    gNeNeNLEFT_PATH->SetName("gNeNeNLEFT_PATH"); 
   
     gOO->SetLineColor(kCyan+3);
     gOO->SetLineWidth(3);
@@ -267,7 +287,25 @@ void RAA_NeNe_dataVsTheory(){
     gOOPGCM->SetLineWidth(4);
     gOOPGCM->SetFillColorAlpha(kBlue-5, 0.4);
 
-   
+    gNeNePGCM_JEWEL->SetLineColor(kMagenta+3);
+    gNeNePGCM_JEWEL->SetLineWidth(4);
+    gNeNePGCM_JEWEL->SetLineStyle(2);
+    gNeNePGCM_JEWEL->SetFillColorAlpha(kMagenta+3, 0.4);
+
+    gOOPGCM_JEWEL->SetLineColor(kCyan+1);
+    gOOPGCM_JEWEL->SetLineWidth(4);
+    gOOPGCM_JEWEL->SetLineStyle(2);
+    gOOPGCM_JEWEL->SetFillColorAlpha(kCyan+1, 0.4);
+    
+    gNeNePGCM_PATH->SetLineColor(kPink+5);
+    gNeNePGCM_PATH->SetLineWidth(4);
+    gNeNePGCM_PATH->SetLineStyle(9);
+    gNeNePGCM_PATH->SetFillColorAlpha(kPink+5, 0.4);
+
+    gOOPGCM_PATH->SetLineColor(kSpring+4);
+    gOOPGCM_PATH->SetLineWidth(4);
+    gOOPGCM_PATH->SetLineStyle(9);
+    gOOPGCM_PATH->SetFillColorAlpha(kSpring+4, 0.4);
 
     gOONLEFT->SetLineColor(kOrange+8);
     gOONLEFT->SetLineWidth(4);
@@ -277,12 +315,32 @@ void RAA_NeNe_dataVsTheory(){
     gNeNeNLEFT->SetLineWidth(4);
     gNeNeNLEFT->SetFillColorAlpha(kTeal+4, 0.4);
     
+    gOONLEFT_JEWEL->SetLineColor(kGreen-5);
+    gOONLEFT_JEWEL->SetLineWidth(4);
+    gOONLEFT_JEWEL->SetLineStyle(2);
+    gOONLEFT_JEWEL->SetFillColorAlpha(kGreen-5, 0.4);
+
+    gNeNeNLEFT_JEWEL->SetLineColor(kRed-7);
+    gNeNeNLEFT_JEWEL->SetLineWidth(4);
+    gNeNeNLEFT_JEWEL->SetLineStyle(2);
+    gNeNeNLEFT_JEWEL->SetFillColorAlpha(kRed-7, 0.4);
+    
+    gOONLEFT_PATH->SetLineColor(kGreen);
+    gOONLEFT_PATH->SetLineWidth(4);
+    gOONLEFT_PATH->SetLineStyle(9);
+    gOONLEFT_PATH->SetFillColorAlpha(kGreen, 0.4);
+
+    gNeNeNLEFT_PATH->SetLineColor(kRed);
+    gNeNeNLEFT_PATH->SetLineWidth(4);
+    gNeNeNLEFT_PATH->SetLineStyle(9);
+    gNeNeNLEFT_PATH->SetFillColorAlpha(kRed, 0.4);
+    
     //
     //
     // CHANGE THE MODE TO CHANGE WHICH PLOTS GETS PRODUCED.
     //
     //
-    int mode = 4; // 0 = faraday, 1 = CUJET, 2 = mQGP, 3 = no mQGP, 4 = SimpleModel PGCM, 5 = SimpleModel NLEFT
+    int mode = 9; // 0 = faraday, 1 = CUJET, 2 = mQGP, 3 = no mQGP, 4 = SimpleModel PGCM, 5 = SimpleModel NLEFT, 6 = Trajectum JEWEL PGCM, 7 = Trajectum JEWEL NLEFT, 8 = Trajectum Path Length PGCM, 9 = Trajectum Path Length NLEFT 
     if(mode == 0){
      gOOFaraday->Draw("LE3 same");     // axis + line + filled area
      gNeNeFaraday->Draw("Le3 SAME"); // line + filled area on same plot
@@ -308,6 +366,22 @@ void RAA_NeNe_dataVsTheory(){
       gNeNeNLEFT->Draw("le3 SAME");
       gOONLEFT->Draw("le3 SAME");
     }
+    else if(mode == 6){
+      gNeNePGCM_JEWEL->Draw("le3 SAME");
+      gOOPGCM_JEWEL->Draw("le3 SAME");
+    }
+    else if(mode == 7){
+      gNeNeNLEFT_JEWEL->Draw("le3 SAME");
+      gOONLEFT_JEWEL->Draw("le3 SAME");
+    }
+    else if(mode == 8){
+      gNeNePGCM_PATH->Draw("le3 SAME");
+      gOOPGCM_PATH->Draw("le3 SAME");
+    }
+    else if(mode == 9){
+      gNeNeNLEFT_PATH->Draw("le3 SAME");
+      gOONLEFT_PATH->Draw("le3 SAME");
+    }
     else{
       std::cout << "Warning: Mode not recognized." << std::endl;
     }
@@ -321,7 +395,7 @@ void RAA_NeNe_dataVsTheory(){
   eta->SetTextSize(0.05);
   eta->SetNDC(true);
   TLegend * specLeg; 
-  if( mode < 2) specLeg = new TLegend(0.39,0.17,0.78,0.38);
+  if( mode < 2) specLeg = new TLegend(0.39,0.17,0.78,0.36);
   else if(mode == 2) specLeg = new TLegend(0.17,0.17,0.78,0.38);
   else specLeg = new TLegend(0.17,0.17,0.78,0.35);
   specLeg->SetTextFont(42);
@@ -350,12 +424,28 @@ void RAA_NeNe_dataVsTheory(){
    specLeg->AddEntry(gNeNe_z, "LCPI + no mQGP, NeNe (Zakharov)", "lf");
   }
   else if(mode == 4){
-   specLeg->AddEntry(gOOPGCM,   "OO, PGCM",   "lf");
-   specLeg->AddEntry(gNeNePGCM, "NeNe, PGCM", "lf");
+   specLeg->AddEntry(gOOPGCM,   "Simple model PGCM, OO",   "lf");
+   specLeg->AddEntry(gNeNePGCM, "Simple model PGCM, NeNe", "lf");
   }
   else if(mode == 5){
-   specLeg->AddEntry(gOONLEFT,   "OO, NLEFT",   "lf");
-   specLeg->AddEntry(gNeNeNLEFT, "NeNe, NLEFT", "lf");
+   specLeg->AddEntry(gOONLEFT,   "Simple model NLEFT, OO",   "lf");
+   specLeg->AddEntry(gNeNeNLEFT, "Simple model NLEFT, NeNe", "lf");
+  }
+  else if(mode == 6){
+   specLeg->AddEntry(gOOPGCM_JEWEL,   "Trajectum JEWEL PGCM, OO",   "lf");
+   specLeg->AddEntry(gNeNePGCM_JEWEL, "Trajectum JEWEL PGCM, NeNe", "lf");
+  }
+  else if(mode == 7){
+   specLeg->AddEntry(gOONLEFT_JEWEL,   "Trajectum JEWEL NLEFT, OO",   "lf");
+   specLeg->AddEntry(gNeNeNLEFT_JEWEL, "Trajectum JEWEL NLEFT, NeNe", "lf");
+  }
+  else if(mode == 8){
+   specLeg->AddEntry(gOOPGCM_PATH,   "Path length PGCM, OO",   "lf");
+   specLeg->AddEntry(gNeNePGCM_PATH, "Path length PGCM, NeNe", "lf");
+  }
+  else if(mode == 9){
+   specLeg->AddEntry(gOONLEFT_PATH,   "Path length NLEFT, OO",   "lf");
+   specLeg->AddEntry(gNeNeNLEFT_PATH, "Path length NLEFT, NeNe", "lf");
   }
   else{
     std::cout << "Warning: Mode not recognized." << std::endl;
@@ -407,6 +497,26 @@ void RAA_NeNe_dataVsTheory(){
     canv2->SaveAs("plots/Figure_002_theory_NLEFT.pdf");
     canv2->SaveAs("plots/Figure_002_theory_NLEFT.png");
     canv2->SaveAs("plots/Figure_002_theory_NLEFT.C");
+  }
+  else if(mode == 6){
+    canv2->SaveAs("plots/Figure_004_theory_PGCM_JEWEL.pdf");
+    canv2->SaveAs("plots/Figure_004_theory_PGCM_JEWEL.png");
+    canv2->SaveAs("plots/Figure_004_theory_PGCM_JEWEL.C");
+  }
+  else if(mode == 7){
+    canv2->SaveAs("plots/Figure_004_theory_NLEFT_JEWEL.pdf");
+    canv2->SaveAs("plots/Figure_004_theory_NLEFT_JEWEL.png");
+    canv2->SaveAs("plots/Figure_004_theory_NLEFT_JEWEL.C");
+  }
+  else if(mode == 8){
+    canv2->SaveAs("plots/Figure_004_theory_PGCM_PATH.pdf");
+    canv2->SaveAs("plots/Figure_004_theory_PGCM_PATH.png");
+    canv2->SaveAs("plots/Figure_004_theory_PGCM_PATH.C");
+  }
+  else if(mode == 9){
+    canv2->SaveAs("plots/Figure_004_theory_NLEFT_PATH.pdf");
+    canv2->SaveAs("plots/Figure_004_theory_NLEFT_PATH.png");
+    canv2->SaveAs("plots/Figure_004_theory_NLEFT_PATH.C");
   }
   else{
     std::cout << "Warning: Mode not recognized." << std::endl;
