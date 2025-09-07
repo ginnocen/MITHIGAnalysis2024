@@ -22,7 +22,7 @@ void RAA_NeNe_dataVsTheory(){
   gStyle->SetPadTickY(1);
   gStyle->SetPadTickX(1);
 
-  TFile * f = TFile::Open("ResultsUIC/pp_OO_raa_systematics_20250813-2.root","read");
+  TFile * f = TFile::Open("ResultsUIC/pp_OO_raa_20250904.root","read");
   //get raa data
   TH1D * data = (TH1D*)f->Get("normalized_RAA");
 
@@ -63,8 +63,8 @@ void RAA_NeNe_dataVsTheory(){
   canv2->SetLogx();
 
   //dummy histogram to define the frame
-  TH1D * ppSpecD = new TH1D("specDummy1","",3,2,140);
-  //TH1D * ppSpecD = new TH1D("specDummy1","",3,0.5,140);
+  TH1D * ppSpecD = new TH1D("specDummy1","",3,2,150);
+  //TH1D * ppSpecD = new TH1D("specDummy1","",3,0.5,150);
   ppSpecD->GetYaxis()->SetTitle("Charged particle R_{AA}");
   ppSpecD->GetYaxis()->SetTitleOffset(1.4);
   ppSpecD->GetYaxis()->SetTitleSize(0.045);
@@ -74,7 +74,7 @@ void RAA_NeNe_dataVsTheory(){
  
   ppSpecD->GetYaxis()->SetRangeUser(0.3,1.1);
 
-  ppSpecD->GetXaxis()->SetRangeUser(0.5,140);
+  ppSpecD->GetXaxis()->SetRangeUser(0.5,150);
   ppSpecD->GetXaxis()->SetTitleFont(42);
   ppSpecD->GetXaxis()->SetTitle("p_{T} (GeV)");
   ppSpecD->GetXaxis()->SetTitleSize(0.045);
@@ -83,11 +83,17 @@ void RAA_NeNe_dataVsTheory(){
   ppSpecD->GetXaxis()->CenterTitle();
   ppSpecD->Draw();
 
-  float normUncert = 0.075;
-  TBox * b = new TBox(115,1-normUncert,120, 1+normUncert);
+  float normUncertNeNe = 0.0566;
+  TBox * b = new TBox(120,1-normUncertNeNe,130, 1+normUncertNeNe);
   b->SetFillStyle(1001);
-  b->SetFillColor(kGray);
+  b->SetFillColorAlpha(kViolet-9, 0.8);
   b->Draw("same");
+  
+  float normUncertOO = 0.05;
+  TBox * b2 = new TBox(110,1-normUncertOO,120, 1+normUncertOO);
+  b2->SetFillStyle(1001);
+  b2->SetFillColorAlpha(TColor::GetColor("#5790fc"), 0.8);
+  b2->Draw("same");
 
   // Create TGraphMultiErrors
   const int N = data->GetNbinsX();
@@ -153,7 +159,7 @@ void RAA_NeNe_dataVsTheory(){
   gme->GetAttFill(1)->SetFillStyle(1001);
   gme->Draw("PZs s=0.01 same;2 s=1");
   
-  TLine * l = new TLine(2,1,120,1);
+  TLine * l = new TLine(2,1,150,1);
   l->SetLineStyle(2);
   l->Draw("same");
   
@@ -458,7 +464,7 @@ void RAA_NeNe_dataVsTheory(){
   eta->Draw("same"); 
 
   //int iPeriod = 0;
-  lumi_sqrtS = "0.8 nb^{-1} (5.36 TeV NeNe), 1.07 pb^{-1} (5.36 TeV pp)";
+  lumi_sqrtS = "0.76 nb^{-1} (NeNe), 6.05 nb^{-1} (OO), 5.36 TeV";//"0.76 nb^{-1} (5.36 TeV NeNe), 1.02 pb^{-1} (5.36 TeV pp)";
   //writeExtraText = true;  
   //extraText  = "Preliminary";
   CMS_lumi( canv2, 0,11);
