@@ -54,4 +54,18 @@ void scrapechecker(){
 
     }
 
+
+    TFile* f2 = TFile::Open("data/pPb.root");
+    TDirectoryFile* dir4 = (TDirectoryFile*)f2->Get("Table 16");
+
+    dir4->cd();
+
+    cout << "POINT " << "19.    " << "20.    " << "21.    " << "22.    " << "23.    " << "24.    " << endl;
+
+    for(int i = 0; i < hist2->GetNbinsX(); i++){
+
+        cout << i << " " << hist2->GetBinContent(i) << " " << hist2->GetBinError(i) << " " << endl;
+
+    }
+
 }

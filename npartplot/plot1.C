@@ -33,12 +33,13 @@ void plot1(){
     TGraphAsymmErrors* pPbpointpt2 = new TGraphAsymmErrors(1);
     TGraphAsymmErrors* pPbpointpt3 = new TGraphAsymmErrors(1);
 
-    pPbpointpt1->SetPoint(0, 7.7230000, getpPbSystematic(14).y);
-    pPbpointpt2->SetPoint(0, 7.7230000, getpPbSystematic(19).y);
-    pPbpointpt3->SetPoint(0, 7.7230000, getpPbSystematic(23).y);
-    pPbpointpt1->SetPointError(0, 0, 0, getpPbStatistical(14).eyl, getpPbStatistical(14).eyh);
-    pPbpointpt2->SetPointError(0, 0, 0, getpPbStatistical(19).eyl, getpPbStatistical(19).eyh);
-    pPbpointpt3->SetPointError(0, 0, 0, getpPbStatistical(23).eyl, getpPbStatistical(23).eyh);
+    pPbpointpt1->SetPoint(0, 7.7230000, getpPbSystematic(17).y);
+    pPbpointpt2->SetPoint(0, 7.7230000, getpPbSystematic(21).y);
+    pPbpointpt3->SetPoint(0, 7.7230000, getpPbSystematic(26).y);
+    pPbpointpt1->SetPointError(0, 0, 0, getpPbStatistical(17).eyl, getpPbStatistical(17).eyh);
+    pPbpointpt2->SetPointError(0, 0, 0, getpPbStatistical(21).eyl, getpPbStatistical(21).eyh);
+    pPbpointpt3->SetPointError(0, 0, 0, getpPbStatistical(26).eyl, getpPbStatistical(26).eyh);
+    cout << "pPb: " << getpPbSystematic(17).y << " " << getpPbSystematic(21).y << " " << getpPbSystematic(26).y << endl;
 
     OOpointpt1->SetPoint(0, 10.8, getSmallSystemSystematic(0,1).y);
     OOpointpt2->SetPoint(0, 10.8, getSmallSystemSystematic(4,1).y);
@@ -108,13 +109,15 @@ void plot1(){
     hPbPb->SetMarkerColor(cmsYellow);
     hPbPb->SetFillStyle(1001);
     hPbPb->SetLineWidth(0);
-    
+    hPbPb->SetMarkerSize(1.3);
+
     TH1D*hXeXe = new TH1D("h", "Histogram", 100, 0, 200);
     hXeXe->SetFillColorAlpha(cmsRed, 0.19);
     hXeXe->SetMarkerStyle(33);
     hXeXe->SetMarkerColor(cmsRed);
     hXeXe->SetFillStyle(1001);
     hXeXe->SetLineWidth(0);
+    hXeXe->SetMarkerSize(1.3);
 
     TH1D* hOO = new TH1D("h", "Histogram", 100, 0, 200);
     hOO->SetFillColorAlpha(cmsBlue, 0.19);
@@ -122,6 +125,7 @@ void plot1(){
     hOO->SetMarkerColor(cmsBlue);
     hOO->SetFillStyle(1001);
     hOO->SetLineWidth(0);
+    hOO->SetMarkerSize(1.3);
 
     TH1D* hNeNe = new TH1D("h", "Histogram", 100, 0, 200);
     hNeNe->SetFillColorAlpha(cmsViolet, 0.19);
@@ -129,6 +133,7 @@ void plot1(){
     hNeNe->SetMarkerColor(cmsViolet);
     hNeNe->SetFillStyle(1001);
     hNeNe->SetLineWidth(0);
+    hNeNe->SetMarkerSize(1.3);
 
     TH1D* hpPb = new TH1D("h", "Histogram", 100, 0, 200);
     hpPb->SetFillColorAlpha(cmsTeal, 0.19);
@@ -136,25 +141,26 @@ void plot1(){
     hpPb->SetMarkerColor(cmsTeal);
     hpPb->SetFillStyle(1001);
     hpPb->SetLineWidth(0);
+    hpPb->SetMarkerSize(1.3);
 
-    TLegend* L = new TLegend(0.42,0.64,0.88,0.88);
+    TLegend* L = new TLegend(0.41,0.64,0.86,0.88);
     L->SetTextSize(0.035);
     /*L->AddEntry(gPbPb_pt2, "PbPb (5.02 TeV) 404 #mub^{-1}");
     L->AddEntry(gXeXe_pt2, "XeXe (5.44 TeV) 3.42 #mub^{-1}");
     L->AddEntry(OOpointpt2, "OO (5.02 TeV) 6.0 nb^{-1}");
     L->AddEntry(NeNepointpt2, "NeNe (5.02 TeV) 0.8 nb^{-1}");
     L->AddEntry(pPbpointpt2, "pPb (5.02 TeV) 35 nb^{-1}");*/
-    L->AddEntry(hPbPb, "PbPb (5.02 TeV) 404 #mub^{-1}");
-    L->AddEntry(hXeXe, "XeXe (5.44 TeV) 3.42 #mub^{-1}");
-    L->AddEntry(hNeNe, "NeNe (5.36 TeV) 0.8 nb^{-1}");
-    L->AddEntry(hOO, "OO (5.36 TeV) 6.0 nb^{-1}");
-    L->AddEntry(hpPb, "pPb (5.02 TeV) 35 nb^{-1}");
+    L->AddEntry(hPbPb, "PbPb (5.02 TeV)");
+    L->AddEntry(hXeXe, "XeXe (5.44 TeV)");
+    L->AddEntry(hNeNe, "NeNe (5.36 TeV) Min-Bias");
+    L->AddEntry(hOO, "OO (5.36 TeV) Min-Bias");
+    L->AddEntry(hpPb, "pPb (5.02 TeV) Min-Bias");
     L->SetBorderSize(0);
     L->SetFillColor(0);
 
     gPbPb_pt1->SetTitle("");
     gPbPb_pt1->GetXaxis()->SetTitle("#LT N_{part} #GT");
-    gPbPb_pt1->GetYaxis()->SetTitle("R_{AA}");
+    gPbPb_pt1->GetYaxis()->SetTitle("Charged particle R_{AA}");
     gPbPb_pt1->GetYaxis()->SetRangeUser(0.0, 1.6);
     gPbPb_pt1->GetXaxis()->SetRangeUser(6, 500.0);
     gPbPb_pt1->GetXaxis()->SetTitleSize(0.050);
@@ -174,7 +180,7 @@ void plot1(){
 
     gPbPb_pt2->SetTitle("");
     gPbPb_pt2->GetXaxis()->SetTitle("#LT N_{part} #GT");
-    gPbPb_pt2->GetYaxis()->SetTitle("R_{AA}");
+    gPbPb_pt2->GetYaxis()->SetTitle("Charged particle R_{AA}");
     gPbPb_pt2->GetYaxis()->SetRangeUser(0.0, 1.6);
     gPbPb_pt2->GetXaxis()->SetRangeUser(6, 500.0);
     gPbPb_pt2->GetXaxis()->SetTitleSize(0.050);
@@ -193,7 +199,7 @@ void plot1(){
 
     gPbPb_pt3->SetTitle("");
     gPbPb_pt3->GetXaxis()->SetTitle("#LT N_{part} #GT");
-    gPbPb_pt3->GetYaxis()->SetTitle("R_{AA}");
+    gPbPb_pt3->GetYaxis()->SetTitle("Charged particle R_{AA}");
     gPbPb_pt3->GetYaxis()->SetRangeUser(0.0, 1.6);
     gPbPb_pt3->GetXaxis()->SetRangeUser(6, 500.0);
     gPbPb_pt3->GetXaxis()->SetTitleSize(0.050);
@@ -460,7 +466,7 @@ void plot1(){
     NeNebox_pt1->Draw("SAME");
     pPbbox_pt1->Draw("SAME");
     line->Draw();
-    AddCMSHeader(c, true);
+    AddCMSHeader(c, "Preliminary", true);
     c->Update(); // Ensure canvas updates
     c->SaveAs("npart_plot_pt1.pdf");
 
@@ -485,7 +491,7 @@ void plot1(){
     NeNebox_pt2->Draw("SAME");
     pPbbox_pt2->Draw("SAME");
     line->Draw();
-    AddCMSHeader(c, true);
+    AddCMSHeader(c, "Preliminary", true);
     c->Update(); // Ensure canvas updates
     c->SaveAs("npart_plot_pt2.pdf");
 
@@ -509,7 +515,7 @@ void plot1(){
     NeNebox_pt3->Draw("SAME");
     pPbbox_pt3->Draw("SAME");
     line->Draw();
-    AddCMSHeader(c, true);
+    AddCMSHeader(c, "Preliminary", true);
     c->Update(); // Ensure canvas updates
     c->SaveAs("npart_plot_pt3.pdf");
 

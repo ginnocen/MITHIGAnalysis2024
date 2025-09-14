@@ -159,17 +159,18 @@ void plot3(){
     fitDisplay->SetLineColorAlpha(kBlack, 0.2);
     fitDisplay->SetLineWidth(3);
     fitDisplay->SetLineStyle(2);
-    fitDisplay->Draw("same");
+    //fitDisplay->Draw("same");
 
     TLegend* L = new TLegend(0.65,0.12,0.88,0.47);
-    L->SetTextSize(0.027);
+    L->SetTextSize(0.035);
     L->AddEntry(fitDisplay, "Loglinear Fit", "l");
     L->SetBorderSize(0);
     L->SetFillStyle(0);
-    L->Draw();
+    //L->Draw();
 
 
     // Add TLatex with fit parameters
+    /*
     TLatex* fitText = new TLatex();
     fitText->SetNDC();
     fitText->SetTextFont(42);
@@ -186,14 +187,15 @@ void plot3(){
     
     fitText->DrawLatex(0.63, 0.24, Form("Fit: N_{coll} = %.2f #times N_{part}^{%.3f}", coeff, b));
     fitText->DrawLatex(0.63, 0.20, Form("#chi^{2}/ndf = %.2f/%d = %.2f", chi2, ndf, chi2/ndf));
+    */
 
 
-    TLegend*L2 = new TLegend(0.15,0.65,0.5,0.81);
-    L2->AddEntry(gPbPb, "PbPb  404  #mub^{-1} (5.02 TeV)", "p");
-    L2->AddEntry(gXeXe, "XeXe  3.5  #mub^{-1} (5.44 TeV)", "p");
-    L2->AddEntry(gNeNe, "NeNe  0.8 nb^{-1} (5.36 TeV)", "p");
-    L2->AddEntry(gOO, "OO  6.0 nb^{-1} (5.36 TeV)", "p");
-    L2->AddEntry(gpPb, "pPb  35 nb^{-1} (5.02 TeV)", "p");
+    TLegend*L2 = new TLegend(0.15,0.7,0.6,0.88);
+    L2->AddEntry(gPbPb, "PbPb (5.02 TeV)", "p");
+    L2->AddEntry(gXeXe, "XeXe (5.44 TeV)", "p");
+    L2->AddEntry(gNeNe, "NeNe (5.36 TeV)", "p");
+    L2->AddEntry(gOO, "OO (5.36 TeV)", "p");
+    L2->AddEntry(gpPb, "pPb (5.02 TeV)", "p");
     L2->SetBorderSize(0);
     L2->SetFillStyle(0);
     L2->Draw();
@@ -303,7 +305,14 @@ void plot3(){
     latex15->SetTextColor(cmsTeal);
     latex15->Draw();
 
-    AddCMSHeader(c, true);
+    //AddCMSHeader(c, true);
+    TLatex* preliminary = new TLatex(0.315, 0.82, "#it{preliminary}");
+    preliminary->SetNDC();
+    preliminary->SetTextFont(42);
+    preliminary->SetTextSize(0.035);
+    preliminary->SetTextColor(kBlack);
+    //preliminary->Draw();
+
     c->SaveAs("plot3.pdf");
 
 
