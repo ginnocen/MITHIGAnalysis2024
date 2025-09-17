@@ -1109,7 +1109,7 @@ public:
    int Run;
    long long Event;
    int Lumi;
-   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16, isGammaN; 
    
    // particle flow info
    std::vector<float> *PT;

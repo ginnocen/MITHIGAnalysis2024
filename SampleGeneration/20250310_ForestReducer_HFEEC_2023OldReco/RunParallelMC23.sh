@@ -1,10 +1,10 @@
 #!/bin/bash
 MAXCORES=40
 
-NAME="20250602_ForestHFJetMC23_D0Tagged_v2_pthat0_BeamB_SmallSample"
+NAME="20250602_ForestHFJetMC23_D0Tagged_v2_pthat5_BeamA_SmallSample"
 OUTPUT="output"
 counter=0
-filelist="/data/HFJetUPCanalysis/InputLists/2023MCpromptReco_pthat0_BeamB.txt"
+filelist="/data/HFJetUPCanalysis/InputLists/2023MCpromptReco_pthat5NewJEC_BeamA_SmallSample.txt"
 MERGEDOUTPUT="/data/HFJetUPCanalysis/MCSkims23/$NAME.root"
 #MERGEDOUTPUT="$NAME.root"
 rm $MERGEDOUTPUT
@@ -42,7 +42,7 @@ while IFS= read -r file; do
             --MaxJetEta 2.4 \
             --IsData false \
             --PFTree particleFlowAnalyser/pftree \
-            --Fraction 0.1 &
+            --Fraction 1.0 &
     ((counter++))
     wait_for_slot
 done < "$filelist"
