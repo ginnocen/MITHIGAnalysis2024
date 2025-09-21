@@ -4,17 +4,14 @@ DATE=$(date +%Y%m%d)
 source clean.sh
 
 MAXCORES=40  # too many parallel cores can cause event loss, increase with caution!
-NFILES=5 # number of files to cap the processing at, if -1 processess all files
-DOGENLEVEL=0
+NFILES=1 # number of files to cap the processing at, if -1 processess all files
 ISDATA=1
+APPLYTRIGGERREJECTION=0 #  trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
+APPLYEVENTREJECTION=0
+APPLYTRACKREJECTION=0
+REJECTTRACKSBELOWPT=0.4
 SAMPLETYPE=-1 # 0 for HIJING 00, 1 for Starlight SD, 2 for Starlight DD, 4 for HIJING alpha-O, -1 for data
-SAVETRIGGERBITS=1 # 0 for not HLT saved, 1 for HLT OO, 2 for HLT pO
-DEBUGMODE=1
-INCLUDEPPSANDFSC=0
-INCLUDEPF=0
-
-INPUT_ON_XRD=1 # set to 1 if input files are on xrd, 0 if they are local
-#XRDSERV="root://xrootd.cmsaf.mit.edu/" # mit t2 server
+INPUT_ON_XRD=1 # 0 for local files, 1 for xrd files
 XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/group...
 
 # ============================================================
@@ -24,23 +21,49 @@ XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/g
 #PATHSAMPLE="/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest/IonPhysics0/crab_OO_IonPhysics0_LowPtV2/250711_104114/0000"
 
 # set your output directory here
-#OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0004"
-#MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/${NAME}_0004.root"
+#OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME/0004"
 
 
 # ============================================================
 # OO data, high pT PD
 # ============================================================
-NAME="${DATE}_Skim_OO_IonPhysics5_HighPtV2_250711_104159_40files"
-PATHSAMPLE="/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest/IonPhysics5/crab_OO_IonPhysics5_HighPtV2/250711_104159/0000"
+#NAME="${DATE}_Skim_OO_IonPhysics5_HighPtV2_250711_104159_40files"
+#PATHSAMPLE="/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest/IonPhysics5/crab_OO_IonPhysics5_HighPtV2/250711_104159/0000"
 
 # set your output directory here
-OUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0000"
-MERGEDOUTPUT="/data00/kdeverea/OOsamples/Skims/output_$NAME/0000.root"
+#OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME/0000"
 
 
+# ============================================================
+# OO HIJING official
+# ============================================================
+#NAME="${DATE}_Skim_MinBias_OO_5p36TeV_hijing"
+#PATHSAMPLE="/eos/cms/store/group/phys_heavyions/xirong/Run3_OxygenRAA/MCForest/MinBias_OO_5p36TeV_hijing/crab_OO_HIJING_5362GeV_new2/250724_211743/0000"
 
-rm $MERGEDOUTPUT &> /dev/null
+# set your output directory here
+#OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME/0000"
+
+
+# ============================================================
+# OO PYTIHA+HIJING embeded official
+# ============================================================
+#NAME="${DATE}_Skim_MinBias_OO_5p36TeV_hijingpythia"
+#PATHSAMPLE="/eos/cms/store/group/phys_heavyions/kdeverea/Run3_OO_2025MC/QCD-dijet_Pthat-15_TuneCP5_OO_5p36TeV_pythia8/crab_Run3_OO_pythiahijing_official/250807_164006/0001"
+
+# set your output directory here
+#OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME/0001"
+
+
+# ============================================================
+# OO Data, EmptyBX
+# ============================================================
+NAME="${DATE}_Skim_OO_5p36TeV_EmptyBX"
+PATHSAMPLE="/eos/cms/store/group/phys_heavyions/jdlang/Run3_OxygenRAA/PromptForest_EmptyBX/EmptyBX/crab_OO_EmptyBX/250807_200807/0000"
+
+# set your output directory here
+OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME/0000"
+
+
 
 # Function to monitor active processes
 wait_for_slot() {
@@ -50,7 +73,6 @@ wait_for_slot() {
     done
 }
 
-echo "Forest sample path: $PATHSAMPLE"
 rm -rf $OUTPUT &> /dev/null
 mkdir -p $OUTPUT
 
@@ -63,11 +85,11 @@ for FILEPATH in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep 'HiForest'); do
     fi
 
     if (( $INPUT_ON_XRD == 1 )); then
-        echo ./ProcessSingleFile-OO-xrd.sh "$FILEPATH" $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $SAVETRIGGERBITS $DEBUGMODE $INCLUDEPPSANDFSC $INCLUDEPF $XRDSERV $MAXCORES &
-        ./ProcessSingleFile-OO-xrd.sh "$FILEPATH" $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $SAVETRIGGERBITS $DEBUGMODE $INCLUDEPPSANDFSC $INCLUDEPF $XRDSERV $MAXCORES &
+        echo ./ProcessSingleFile-OO-xrd.sh $FILEPATH $COUNTER $OUTPUT $ISDATA $APPLYTRIGGERREJECTION $APPLYEVENTREJECTION $APPLYTRACKREJECTION $REJECTTRACKSBELOWPT $SAMPLETYPE $XRDSERV $MAXCORES &
+        ./ProcessSingleFile-OO-xrd.sh $FILEPATH $COUNTER $OUTPUT $ISDATA $APPLYTRIGGERREJECTION $APPLYEVENTREJECTION $APPLYTRACKREJECTION $REJECTTRACKSBELOWPT $SAMPLETYPE $XRDSERV $MAXCORES &
     else
-        echo ./ProcessSingleFile-OO.sh "$FILEPATH" $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $SAVETRIGGERBITS $DEBUGMODE $INCLUDEPPSANDFSC $INCLUDEPF &
-        ./ProcessSingleFile-OO.sh "$FILEPATH" $COUNTER $OUTPUT $DOGENLEVEL $ISDATA $SAMPLETYPE $SAVETRIGGERBITS $DEBUGMODE $INCLUDEPPSANDFSC $INCLUDEPF &
+        echo ./ProcessSingleFile-OO.sh $FILEPATH $COUNTER $OUTPUT $ISDATA $APPLYTRIGGERREJECTION $APPLYEVENTREJECTION $APPLYTRACKREJECTION $REJECTTRACKSBELOWPT $SAMPLETYPE &
+        ./ProcessSingleFile-OO.sh $FILEPATH $COUNTER $OUTPUT $ISDATA $APPLYTRIGGERREJECTION $APPLYEVENTREJECTION $APPLYTRACKREJECTION $REJECTTRACKSBELOWPT $SAMPLETYPE &
     fi
 
     wait_for_slot
@@ -75,6 +97,4 @@ for FILEPATH in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep 'HiForest'); do
 done
 wait
 
-hadd $MERGEDOUTPUT $OUTPUT/output_*.root
-echo "All done!"
-echo "Merged output file: $MERGEDOUTPUT"
+echo "Processing COMPLETE"

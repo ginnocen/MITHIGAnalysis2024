@@ -3,33 +3,29 @@
 FILEPATH=${1}
 COUNTER=${2}
 OUTPUT=${3}
-DOGENLEVEL=${4}
-ISDATA=${5}
-SAMPLETYPE=${6}
-SAVETRIGGERBITS=${7}
-DEBUGMODE=${8}
-INCLUDEPPSANDFSC=${9}
-INCLUDEPF=${10}
+ISDATA=${4}
+APPLYTRIGGERREJECTION=${5}
+APPLYEVENTREJECTION=${6}
+APPLYTRACKREJECTION=${7}
+REJECTTRACKSBELOWPT=${8}
+SAMPLETYPE=${9}
 
-file="$FILEPATH"
-
-CORRPATH=${ProjectBase}/CommonCode/root/
-
-./Execute --Input "$file" \
+./Execute --Input "$FILEPATH" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
    --IsData $ISDATA \
+   --CollisionSystem OO \
    --Fraction 1.0 \
-   --ApplyTriggerRejection true \
-   --ApplyEventRejection false \
-   --ApplyTrackRejection true \
+   --ApplyTriggerRejection $APPLYTRIGGERREJECTION \
+   --ApplyEventRejection $APPLYEVENTREJECTION \
+   --ApplyTrackRejection $APPLYTRACKREJECTION \
+   --rejectTracksBelowPt $REJECTTRACKSBELOWPT \
+   --PFTree particleFlowAnalyser/pftree \
    --sampleType $SAMPLETYPE \
-   --DebugMode $DEBUGMODE \
-   --includeFSCandPPSMode $INCLUDEPPSANDFSC \
-   --saveTriggerBitsMode $SAVETRIGGERBITS \
-   --TrackEfficiencyPath $CORRPATH \
-   --HideProgressBar false \
-
+   --DebugMode false \
+   --includeL1EMU false \
+   --CorrectionPath ${ProjectBase}/CommonCode/root/ \
+   --HideProgressBar true
 wait
 
-sleep 0.1
+sleep 0.2
 wait

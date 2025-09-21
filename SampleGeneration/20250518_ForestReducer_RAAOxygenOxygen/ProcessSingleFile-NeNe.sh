@@ -7,24 +7,18 @@ ISDATA=${4}
 APPLYTRIGGERREJECTION=${5}
 APPLYEVENTREJECTION=${6}
 APPLYTRACKREJECTION=${7}
-SAMPLETYPE=${8}
-SERVER=${9}
-MAXCORES=${10}
+REJECTTRACKSBELOWPT=${8}
+SAMPLETYPE=${9}
 
-mkdir -p "${OUTPUT}/temp_inputs/"
-FILE="${OUTPUT}/temp_inputs/job_${COUNTER}.root"
-rm $FILE &> /dev/null
-xrdcp -N --parallel $MAXCORES -t 2 $SERVER$FILEPATH $FILE
-wait
-
-./Execute --Input "$FILE" \
+./Execute --Input "$FILEPATH" \
    --Output ${OUTPUT}/output_${COUNTER}.root \
    --IsData $ISDATA \
-   --CollisionSystem pp \
+   --CollisionSystem NeNe \
    --Fraction 1.0 \
    --ApplyTriggerRejection $APPLYTRIGGERREJECTION \
    --ApplyEventRejection $APPLYEVENTREJECTION \
    --ApplyTrackRejection $APPLYTRACKREJECTION \
+   --rejectTracksBelowPt $REJECTTRACKSBELOWPT \
    --PFTree particleFlowAnalyser/pftree \
    --sampleType $SAMPLETYPE \
    --DebugMode false \
@@ -34,5 +28,4 @@ wait
 wait
 
 sleep 0.2
-rm $FILE
 wait
