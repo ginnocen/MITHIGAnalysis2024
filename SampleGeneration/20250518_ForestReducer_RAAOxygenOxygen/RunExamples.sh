@@ -36,8 +36,8 @@ mkdir -p Output/
    --DebugMode true \
    --TrackEfficiencyPath ${ProjectBase}/CommonCode/root/
 
-./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_alphaO_10k.root\
-   --Output ${PATHSKIMSAMPLE}/skim_20250606_HiForestMiniAOD_alphaO_10k.root \
+./Execute --Input ${PATHSAMPLE}/HiForestMiniAOD_alphaO_06172025.root \
+   --Output ${PATHSKIMSAMPLE}/skim_20250606_HiForestMiniAOD_alphaO_06172025.root \
    --DoGenLevel false \
    --Year 2025 \
    --Fraction 1. \

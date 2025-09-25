@@ -1,0 +1,6 @@
+#./ExecutePlotUPCEEC --Input "output_Data_EEC_TrackPtCut020_NoHardScaleCut.root","output_MC_pthat5_BeamAandBcombined_TrackPtCut020_NoHardScaleCut.root" --tag "Matching" --PtHat 0
+#./ExecutePlotUPCEEC --Input "output_Data_EEC_TrackPtCut020_HardScaleCut50100.root","output_MC_pthat0_BeamAandBcombined_TrackPtCut020_HardScaleCut50100.root" --tag "Matching" --PtHat 0
+# ./ExecutePlotUPCEEC --Input "output_Data_EEC_TrackPtCut020_HardScaleCut5_100.root","output_MC_pthat5_BeamAandBcombined_TrackPtCut020_5_100.root" --tag "WithCut5_100"  --PtHat 5
+# ./ExecutePlotUPCEEC --Input "output_Data_EEC_TrackPtCut020_HardScaleCut10_15.root","output_MC_pthat5_BeamAandBcombined_TrackPtCut020_10_15.root" --tag "WithCut10_15"  --PtHat 5
+# ./ExecutePlotUPCEEC --Input "output_Data_EEC_TrackPtCut020_HardScaleCut30_50.root","output_MC_pthat5_BeamAandBcombined_TrackPtCut020_30_50.root" --tag "WithCut30_50"  --PtHat 5
+./ExecutePlotUPCEEC --Input "output_Data_EEC_TrackPtCut020_HardScaleCut5_100_WithGammaNTest.root","output_MC_pthat5_BeamAandBcombined_TrackPtCut020_5_100_WithGammaNTest.root" --tag "WithCut5_100_WithGammaNTest"  --PtHat 5

@@ -17,6 +17,8 @@ int main(int argc, char *argv[]);
 double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
 bool isMuonSelected(SingleMuTreeMessenger *M, int i);
+bool isGenMuonSelected(SingleMuTreeMessenger *M, int i);
+bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int mu1, int mu2);
 //int isOnia(float mass);
 std::vector<int> mu_trackmatch(float dr_cut, JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
 
@@ -338,7 +340,7 @@ int main(int argc, char *argv[]) {
           trkMatchSta_v.clear();
         }
 
-        bool isJetTagged = false;
+        bool isJetMuonTagged = false;
         float muPt1 = -999.;
         float muPt2 = -999.;
         float muEta1 = -999.;
@@ -369,17 +371,15 @@ int main(int argc, char *argv[]) {
         float muDphi = -999.;
         float muDR = -999.;
         // variable to identify the highest pt dimuon pair
-        float maxmumuPt = 0.;
+        float maxmumuPt = -999;
         int maxMu1Index = -1;
         int maxMu2Index = -1;
 
         int nSingleMu = MSingleMu.SingleMuPT->size();
         for (int isinglemu1 = 0; isinglemu1 < nSingleMu; isinglemu1++) {
-          if (isMuonSelected(&MSingleMu, isinglemu1) == false)
-            continue;
+          if (isMuonSelected(&MSingleMu, isinglemu1) == false) continue;
           for (int isinglemu2 = isinglemu1 + 1; isinglemu2 < nSingleMu; isinglemu2++) {
-            if (isMuonSelected(&MSingleMu, isinglemu2) == false)
-              continue;
+            if (isMuonSelected(&MSingleMu, isinglemu2) == false) continue;
             // if (charge1 == charge2)
             // continue;
             float jetEta = MJet.JetEta[ijet];
@@ -415,7 +415,8 @@ int main(int argc, char *argv[]) {
         } // end loop over single muon 1
 
         if (maxmumuPt > 0. && maxMu1Index >= 0 && maxMu2Index >= 0) {
-          isJetTagged = true;
+          //cout << " reco pair at entry " << iE << endl;
+          isJetMuonTagged = true;
   
           muPt1 = MSingleMu.SingleMuPT->at(maxMu1Index);
           muPt2 = MSingleMu.SingleMuPT->at(maxMu2Index);
@@ -460,7 +461,7 @@ int main(int argc, char *argv[]) {
           muDR = sqrt(muDeta * muDeta + muDphi * muDphi);
         } // end if dimuon pair found
 
-        MMuMuJet.IsMuMuTagged->push_back(isJetTagged);
+        MMuMuJet.IsMuMuTagged->push_back(isJetMuonTagged);
         MMuMuJet.muPt1->push_back(muPt1);
         MMuMuJet.muPt2->push_back(muPt2);
         MMuMuJet.muEta1->push_back(muEta1);
@@ -502,40 +503,170 @@ int main(int argc, char *argv[]) {
         mt1.clear();
         mt2.clear();
 
-        MMuMuJet.MuMuWeight = tnp_weight_trk_pbpb(muEta1, 0) * tnp_weight_trk_pbpb(muEta2, 0) *
-                              tnp_weight_muid_pbpb(muPt1, muEta1, 0) * tnp_weight_muid_pbpb(muPt2, muEta2, 0);
+        // Gen muon info 
 
-        MMuMuJet.ExtraMuWeight[0] = tnp_weight_trk_pbpb(muEta1, -1) / tnp_weight_trk_pbpb(muEta1, 0) *
-                                    tnp_weight_trk_pbpb(muEta2, -1) / tnp_weight_trk_pbpb(muEta2, 0);
-        MMuMuJet.ExtraMuWeight[1] = tnp_weight_trk_pbpb(muEta1, -2) / tnp_weight_trk_pbpb(muEta1, 0) *
-                                    tnp_weight_trk_pbpb(muEta2, -2) / tnp_weight_trk_pbpb(muEta2, 0);
-        MMuMuJet.ExtraMuWeight[2] = tnp_weight_muid_pbpb(muPt1, muEta1, -1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
-                                    tnp_weight_muid_pbpb(muPt2, muEta2, -1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-        MMuMuJet.ExtraMuWeight[3] = tnp_weight_muid_pbpb(muPt1, muEta1, -2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
-                                    tnp_weight_muid_pbpb(muPt2, muEta2, -2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-        MMuMuJet.ExtraMuWeight[4] = tnp_weight_trg_pbpb(muPt1, muEta1,0, -1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
-                                    tnp_weight_trg_pbpb(muPt2, muEta2,0, -1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
+	      bool GenIsJetMuonTagged = false;
+        float GenMuPt1 = -999;
+        float GenMuPt2 = -999;
+	      float GenMuEta1 = -999; 
+        float GenMuEta2 = -999; 
+        float GenMuPhi1 = -999;
+        float GenMuPhi2 = -999; 
 
-        MMuMuJet.ExtraMuWeight[5] = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1,0, muEta1, 0) *
-                                    tnp_weight_trg_pbpb(muPt2, muEta2,0, -2) / tnp_weight_trg_pbpb(muPt2,0, muEta2, 0);
+        float GenMuMuMass = -999;
+        float GenMuMuEta = -999;
+        float GenMuMuY = -999;
+        float GenMuMuPhi = -999;
+        float GenMuMuPt = -999;
 
-        MMuMuJet.ExtraMuWeight[6] = tnp_weight_trk_pbpb(muEta1, 1) / tnp_weight_trk_pbpb(muEta1, 0) *
-                                    tnp_weight_trk_pbpb(muEta2, 1) / tnp_weight_trk_pbpb(muEta2, 0);
+        float GenMuDeta = -999 ;
+        float GenMuDphi = -999 ;
+        float GenMuDR = -999;
 
-        MMuMuJet.ExtraMuWeight[7] = tnp_weight_trk_pbpb(muEta1, 2) / tnp_weight_trk_pbpb(muEta1, 0) *
-                                    tnp_weight_trk_pbpb(muEta2, 2) / tnp_weight_trk_pbpb(muEta2, 0);
-        MMuMuJet.ExtraMuWeight[8] = tnp_weight_muid_pbpb(muPt1, muEta1, 1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
-                                    tnp_weight_muid_pbpb(muPt2, muEta2, 1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-        MMuMuJet.ExtraMuWeight[9] = tnp_weight_muid_pbpb(muPt1, muEta1, 2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
-                                    tnp_weight_muid_pbpb(muPt2, muEta2, 2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
+        float maxGenmumuPt = -999;
+        int maxGenMu1Index = -1;
+        int maxGenMu2Index = -1;
 
-        MMuMuJet.ExtraMuWeight[10] = tnp_weight_trg_pbpb(muPt1, muEta1,0, 1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
-                                     tnp_weight_trg_pbpb(muPt2, muEta2,0, 1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
+        int nGenSingleMu = MSingleMu.GenSingleMuPT->size(); 
+        
+        for(int igen1 = 0; igen1 < nGenSingleMu; igen1++){ 
+          if(isGenMuonSelected(&MSingleMu, igen1) == false) continue;
+            for(int igen2 = igen1 + 1; igen2 < nGenSingleMu; igen2++){
+              if(isGenMuonSelected(&MSingleMu, igen2) == false) continue;
 
-        MMuMuJet.ExtraMuWeight[11] = tnp_weight_trg_pbpb(muPt1, muEta1,0, 2) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
-                                     tnp_weight_trg_pbpb(muPt2, muEta2,0, 2) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
+              //TLorentzVector VGenMu1, VGenMu2;
+              //VGenMu1.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen1),MSingleMu.GenSingleMuEta->at(igen1),MSingleMu.GenSingleMuPhi->at(igen1),M_MU);
+              //VGenMu2.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen2),MSingleMu.GenSingleMuEta->at(igen2),MSingleMu.GenSingleMuPhi->at(igen2),M_MU);
+
+              float jetEta = MJet.JetEta[ijet];
+              float jetPhi = MJet.JetPhi[ijet];
+              float dPhiMu1Jet_ = DeltaPhi(MSingleMu.GenSingleMuPhi->at(igen1), jetPhi);
+              float dEtaMu1Jet_ = MSingleMu.GenSingleMuEta->at(igen1) - jetEta;
+              float dPhiMu2Jet_ = DeltaPhi(MSingleMu.GenSingleMuPhi->at(igen2), jetPhi);
+              float dEtaMu2Jet_ = MSingleMu.GenSingleMuEta->at(igen2) - jetEta;
+              float dRMu1Jet = sqrt(dPhiMu1Jet_*dPhiMu1Jet_ + dEtaMu1Jet_*dEtaMu1Jet_);
+              float dRMu2Jet = sqrt(dPhiMu2Jet_*dPhiMu2Jet_ + dEtaMu2Jet_*dEtaMu2Jet_);
+              if (dRMu1Jet > 0.3) continue;
+              if (dRMu2Jet > 0.3) continue;
+
+              TLorentzVector GenMu1, GenMu2;
+              GenMu1.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen1), MSingleMu.GenSingleMuEta->at(igen1), MSingleMu.GenSingleMuPhi->at(igen1), M_MU);
+              GenMu2.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen2), MSingleMu.GenSingleMuEta->at(igen2), MSingleMu.GenSingleMuPhi->at(igen2), M_MU);
+
+              TLorentzVector GenMuMu = GenMu1 + GenMu2;
+               //cout << dRMu1Jet << " " << dRMu2Jet << " " << GenMuMu.Pt() << endl;
+
+              if (GenMuMu.Pt() > maxGenmumuPt) {
+                maxGenmumuPt = GenMuMu.Pt();
+                maxGenMu1Index = igen1;
+                maxGenMu2Index = igen2;
+              } // end if dimuon pT larger than current max
+            
+            }
+          }
+
+        if(maxGenmumuPt > 0. && maxGenMu1Index >= 0 && maxGenMu2Index >= 0){
+          //cout << "gen pair at entry " << iE << endl;
+          GenIsJetMuonTagged = true;
+          
+          GenMuPt1 = MSingleMu.GenSingleMuPT->at(maxGenMu1Index);
+          GenMuPt2 = MSingleMu.GenSingleMuPT->at(maxGenMu2Index);
+          GenMuEta1 = MSingleMu.GenSingleMuEta->at(maxGenMu1Index); 
+          GenMuEta2 = MSingleMu.GenSingleMuEta->at(maxGenMu2Index); 
+          GenMuPhi1 = MSingleMu.GenSingleMuPhi->at(maxGenMu1Index);
+          GenMuPhi2 = MSingleMu.GenSingleMuPhi->at(maxGenMu2Index); 
+
+          TLorentzVector Mu1, Mu2;
+          Mu1.SetPtEtaPhiM(GenMuPt1, GenMuEta1, GenMuPhi1, M_MU);
+          Mu2.SetPtEtaPhiM(GenMuPt2, GenMuEta2, GenMuPhi2, M_MU);
+
+          TLorentzVector MuMu = Mu1 + Mu2;
+          GenMuMuMass = MuMu.M();
+          GenMuMuEta = MuMu.Eta();
+          GenMuMuY = MuMu.Rapidity();
+          GenMuMuPhi = MuMu.Phi();
+          GenMuMuPt = MuMu.Pt();
+
+          GenMuDeta = GenMuEta1 - GenMuEta2;
+          GenMuDphi = DeltaPhi(GenMuPhi1, GenMuPhi2);
+          GenMuDR = sqrt(GenMuDeta * GenMuDeta + GenMuDphi * GenMuDphi);
+          
+        } // end if dimuon pair found
+
+        if(GenIsJetMuonTagged && isJetMuonTagged){
+          MMuMuJet.mumuIsGenMatched->push_back(isDimuonGenMatched(&MSingleMu, maxGenMu1Index, maxGenMu2Index, maxMu1Index, maxMu2Index));
+        }
+        else{
+          MMuMuJet.mumuIsGenMatched->push_back(false);
+        }
+        
+
+        MMuMuJet.GenIsMuMuTagged->push_back(GenIsJetMuonTagged);
+        MMuMuJet.GenMuMuMass->push_back(GenMuMuMass);
+        MMuMuJet.GenMuMuPt->push_back(GenMuMuPt);
+        MMuMuJet.GenMuMuPhi->push_back(GenMuMuPhi);
+        MMuMuJet.GenMuMuEta->push_back(GenMuMuEta);
+        MMuMuJet.GenMuMuY->push_back(GenMuMuY);
+
+        MMuMuJet.GenMuPt1->push_back(GenMuPt1);
+        MMuMuJet.GenMuPt2->push_back(GenMuPt2);
+        MMuMuJet.GenMuEta1->push_back(GenMuEta1);
+        MMuMuJet.GenMuEta2->push_back(GenMuEta2);
+        MMuMuJet.GenMuPhi1->push_back(GenMuPhi1);
+        MMuMuJet.GenMuPhi2->push_back(GenMuPhi2);
+
+        MMuMuJet.GenMuDeta->push_back(GenMuDeta);
+        MMuMuJet.GenMuDphi->push_back(GenMuDphi);
+        //MMuMuJet.GenMuDR->push_back(sqrt(GenMuDeta * GenMuDeta + GenMuDphi * GenMuDphi));
+        MMuMuJet.GenMuDR->push_back(GenMuDR);
+        
+        ////// EXTRA MUON WEIGHT //////)
+
+        if(nSingleMu > 0){
+          MMuMuJet.MuMuWeight = tnp_weight_trk_pbpb(muEta1, 0) * tnp_weight_trk_pbpb(muEta2, 0) *
+                                tnp_weight_muid_pbpb(muPt1, muEta1, 0) * tnp_weight_muid_pbpb(muPt2, muEta2, 0);
+
+          MMuMuJet.ExtraMuWeight[0] = tnp_weight_trk_pbpb(muEta1, -1) / tnp_weight_trk_pbpb(muEta1, 0) *
+                                      tnp_weight_trk_pbpb(muEta2, -1) / tnp_weight_trk_pbpb(muEta2, 0);
+          MMuMuJet.ExtraMuWeight[1] = tnp_weight_trk_pbpb(muEta1, -2) / tnp_weight_trk_pbpb(muEta1, 0) *
+                                      tnp_weight_trk_pbpb(muEta2, -2) / tnp_weight_trk_pbpb(muEta2, 0);
+          MMuMuJet.ExtraMuWeight[2] = tnp_weight_muid_pbpb(muPt1, muEta1, -1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+                                      tnp_weight_muid_pbpb(muPt2, muEta2, -1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
+          MMuMuJet.ExtraMuWeight[3] = tnp_weight_muid_pbpb(muPt1, muEta1, -2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+                                      tnp_weight_muid_pbpb(muPt2, muEta2, -2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
+          MMuMuJet.ExtraMuWeight[4] = tnp_weight_trg_pbpb(muPt1, muEta1,0, -1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+                                      tnp_weight_trg_pbpb(muPt2, muEta2,0, -1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
+
+          MMuMuJet.ExtraMuWeight[5] = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1,0, muEta1, 0) *
+                                      tnp_weight_trg_pbpb(muPt2, muEta2,0, -2) / tnp_weight_trg_pbpb(muPt2,0, muEta2, 0);
+
+          MMuMuJet.ExtraMuWeight[6] = tnp_weight_trk_pbpb(muEta1, 1) / tnp_weight_trk_pbpb(muEta1, 0) *
+                                      tnp_weight_trk_pbpb(muEta2, 1) / tnp_weight_trk_pbpb(muEta2, 0);
+
+          MMuMuJet.ExtraMuWeight[7] = tnp_weight_trk_pbpb(muEta1, 2) / tnp_weight_trk_pbpb(muEta1, 0) *
+                                      tnp_weight_trk_pbpb(muEta2, 2) / tnp_weight_trk_pbpb(muEta2, 0);
+          MMuMuJet.ExtraMuWeight[8] = tnp_weight_muid_pbpb(muPt1, muEta1, 1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+                                      tnp_weight_muid_pbpb(muPt2, muEta2, 1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
+          MMuMuJet.ExtraMuWeight[9] = tnp_weight_muid_pbpb(muPt1, muEta1, 2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+                                      tnp_weight_muid_pbpb(muPt2, muEta2, 2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
+
+          MMuMuJet.ExtraMuWeight[10] = tnp_weight_trg_pbpb(muPt1, muEta1,0, 1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+                                      tnp_weight_trg_pbpb(muPt2, muEta2,0, 1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
+
+          MMuMuJet.ExtraMuWeight[11] = tnp_weight_trg_pbpb(muPt1, muEta1,0, 2) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+                                      tnp_weight_trg_pbpb(muPt2, muEta2,0, 2) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
+        }
 
       } // end loop over jets
+
+      for(int i = 0; i< MJet.GenCount; i++){
+        MMuMuJet.GenJetPT->push_back(MJet.GenPT[i]);
+        MMuMuJet.GenJetEta->push_back(MJet.GenEta[i]);
+        MMuMuJet.GenJetPhi->push_back(MJet.GenPhi[i]);
+        MMuMuJet.GenJetMatchIdx->push_back(MJet.GenMatchIndex[i]);
+      }
+
+
       MMuMuJet.FillEntry();
     } // end loop over events
 
@@ -618,6 +749,59 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
     return false;
 
   return true;
+}
+
+bool isGenMuonSelected(SingleMuTreeMessenger *M, int i) {
+  if (M == nullptr)
+    return false;
+  if (M->Tree == nullptr)
+    return false;
+  if (M->GenSingleMuPT->at(i) < 3.5)
+    return false;
+  if (fabs(M->GenSingleMuEta->at(i)) > 2.3)
+    return false;
+  //if (M->SingleMuIsTracker->at(i) == 0 || M->SingleMuIsGlobal->at(i) == 0 || M->SingleMuHybridSoft->at(i) == 0 ||
+  //  M->SingleMuIsGood->at(i) == 0)
+  //  return false;
+
+  return true;
+}
+
+bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int reco1, int reco2) {
+  if (M == nullptr)
+    return false;
+  if (M->Tree == nullptr)
+    return false;
+
+  float deta11 = M->GenSingleMuEta->at(gen1) - M->SingleMuEta->at(reco1);  
+  float dphi11 = DeltaPhi(M->GenSingleMuPhi->at(gen1), M->SingleMuPhi->at(reco1));
+  float dr11 = sqrt(dphi11 * dphi11 + deta11 * deta11);
+  bool chargematch11 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco1) < 0);
+
+  float deta22 = M->GenSingleMuEta->at(gen2) - M->SingleMuEta->at(reco2);  
+  float dphi22 = DeltaPhi(M->GenSingleMuPhi->at(gen2), M->SingleMuPhi->at(reco2));
+  float dr22 = sqrt(dphi22 * dphi22 + deta22 * deta22);
+  bool chargematch22 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco2) < 0);
+
+  float deta12 = M->GenSingleMuEta->at(gen1) - M->SingleMuEta->at(reco2);  
+  float dphi12 = DeltaPhi(M->GenSingleMuPhi->at(gen1), M->SingleMuPhi->at(reco2));
+  float dr12 = sqrt(dphi12 * dphi12 + deta12 * deta12);
+  bool chargematch12 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco2) < 0);
+
+  float deta21 = M->GenSingleMuEta->at(gen2) - M->SingleMuEta->at(reco1);  
+  float dphi21 = DeltaPhi(M->GenSingleMuPhi->at(gen2), M->SingleMuPhi->at(reco1));
+  float dr21 = sqrt(dphi21 * dphi21 + deta21 * deta21);
+  bool chargematch21 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco1) < 0);
+
+  if((dr11 < 0.03) && (dr22 < 0.03) && !chargematch11 && !chargematch22){
+    return true;
+  }
+  if((dr12 < 0.03) && (dr21 < 0.03) && !chargematch12 && !chargematch21){
+    return true;
+  }
+
+
+  return false;
 }
 
 /*int isOnia(float mass){

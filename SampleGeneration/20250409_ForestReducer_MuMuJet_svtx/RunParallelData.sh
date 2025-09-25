@@ -1,12 +1,26 @@
 #!/bin/bash
 MAXCORES=40
+SAMPLEID=0
+source clean.sh
 
-NAME="SkimData2018PbPb_Version20241201_v4_ForestVersion_20241023_v220241023_v2"
-OUTPUT="output"
+echo "Running on sample ID: $SAMPLEID"
+
+if [ "$SAMPLEID" -eq 0 ]; then
+    NAMEData="/data00/g2ccbar/data2018/skim_06022025_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8/"
+    FOLDER="/data00/g2ccbar/data2018/minBiasForest_02022025/mb0" 
+fi
+echo "Running on sample: $NAMEData"
+echo "Running on folder: $FOLDER"
+
+OUTPUTData="outputData"
 counter=0
-filelist="/data/NewSkims_gtoccbar/InputList/20241023_DataPbPb2018gtoccbar_v2.txt"
-MERGEDOUTPUT="/data/NewSkims_gtoccbar/$NAME.root"
-rm $MERGEDOUTPUT
+filelistData="filelist.txt"
+MERGEDOUTPUTData="$NAMEData"
+MERGEDOUTPUTDataFILE="$NAMEData/mergedfile.root"
+
+rm -rf $MERGEDOUTPUTData
+mkdir $MERGEDOUTPUTData
+cp ./RunParallelData.sh $MERGEDOUTPUTData/.
 
 # Function to monitor active processes
 wait_for_slot() {
@@ -16,29 +30,32 @@ wait_for_slot() {
     done
 }
 
+ls $FOLDER/HiForestMiniAOD_*.root > $filelistData
+echo "File list created successfully: $filelistData"
 
 # Check if the filelist is empty
-if [[ ! -s "$filelist" ]]; then
+if [[ ! -s "$filelistData" ]]; then
     echo "No matching files found in Samples directory."
     exit 1
 fi
 
-echo "File list created successfully: $filelist"
-rm -rf $OUTPUT
-mkdir $OUTPUT
+echo "File list created successfully: $filelistData"
+rm -rf $OUTPUTData
+mkdir $OUTPUTData
 # Loop through each file in the file list
 while IFS= read -r file; do
             echo "Processing $file"
             ./Execute --Input "$file" \
             --IsData true \
             --IsPP false \
-            --Output "$OUTPUT/output_$counter.root" \
-            --MinJetPT 40 --Fraction 1.0 & 
+            --svtx false \
+            --Output "$OUTPUTData/output_$counter.root" \
+            --MinJetPT 0 --Fraction 1.0 & 
     ((counter++))
     wait_for_slot
-done < "$filelist"
+done < "$filelistData"
 wait 
 
-hadd $MERGEDOUTPUT $OUTPUT/output_*.root
-echo "All done!"
-echo "Merged output file: $MERGEDOUTPUT"
+hadd $MERGEDOUTPUTDataFILE $OUTPUTData/output_*.root
+echo "All done Data!"
+echo "Merged output file: $MERGEDOUTPUTMCFILE"

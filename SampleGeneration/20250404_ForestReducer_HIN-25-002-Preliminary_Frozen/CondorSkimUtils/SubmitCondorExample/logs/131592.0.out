@@ -1,0 +1,128 @@
+WARN $TMPDIR(/var/lib/condor/execute/dir_1958397/glide_lIHD0R/execute/dir_3663281) is not a writable directory setting $TMPDIR = $PWD
+>>> hostname
+cmspilot-3388057.0-red-c1621.unl.edu
+>>> OS info
+Linux cmspilot-3388057.0-red-c1621.unl.edu 6.9.9-1.el8.elrepo.x86_64 #1 SMP PREEMPT_DYNAMIC Thu Jul 11 10:50:59 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux
+>>> VOMS info
+/DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=jdlang/CN=869448/CN=Jordan Lang/CN=906809935
+/srv/x509up_u239432
+cms
+>>> Setting up ROOT through LCG
+>>> Running cpptest.cc
+   ------------------------------------------------------------------
+  | Welcome to ROOT 6.32.02                        https://root.cern |
+  | (c) 1995-2024, The ROOT Team; conception: R. Brun, F. Rademakers |
+  | Built for linuxx8664gcc on Jun 19 2024, 05:05:49                 |
+  | From heads/master@tags/v6-32-02                                  |
+  | With g++ (GCC) 13.1.0                                            |
+  | Try '.help'/'.?', '.demo', '.license', '.credits', '.quit'/'.q'  |
+   ------------------------------------------------------------------
+
+
+Processing cpptest.cc...
+--- Starting cpptest.cc
+Reading event 0
+Reading event 100
+Reading event 200
+Reading event 300
+Reading event 400
+Reading event 500
+Reading event 600
+Reading event 700
+Reading event 800
+Reading event 900
+Reading event 1000
+Reading event 1100
+Reading event 1200
+Reading event 1300
+Reading event 1400
+Reading event 1500
+Reading event 1600
+Reading event 1700
+Reading event 1800
+Reading event 1900
+Reading event 2000
+Reading event 2100
+Reading event 2200
+Reading event 2300
+Reading event 2400
+Reading event 2500
+Reading event 2600
+Reading event 2700
+Reading event 2800
+Reading event 2900
+Reading event 3000
+Reading event 3100
+Reading event 3200
+Reading event 3300
+Reading event 3400
+Reading event 3500
+Reading event 3600
+Reading event 3700
+Reading event 3800
+Reading event 3900
+Reading event 4000
+Reading event 4100
+Reading event 4200
+Reading event 4300
+Reading event 4400
+Reading event 4500
+Reading event 4600
+Reading event 4700
+Reading event 4800
+Reading event 4900
+Reading event 5000
+Reading event 5100
+Reading event 5200
+Reading event 5300
+Reading event 5400
+Reading event 5500
+Reading event 5600
+Reading event 5700
+Reading event 5800
+Reading event 5900
+Reading event 6000
+Reading event 6100
+Reading event 6200
+Reading event 6300
+Reading event 6400
+Reading event 6500
+Reading event 6600
+Reading event 6700
+Reading event 6800
+Reading event 6900
+Reading event 7000
+Reading event 7100
+Reading event 7200
+Reading event 7300
+Reading event 7400
+Reading event 7500
+Reading event 7600
+Reading event 7700
+Reading event 7800
+Reading event 7900
+Reading event 8000
+Reading event 8100
+Reading event 8200
+Reading event 8300
+Reading event 8400
+Reading event 8500
+Reading event 8600
+Reading event 8700
+Reading event 8800
+Reading event 8900
+Reading event 9000
+Reading event 9100
+Reading event 9200
+Reading event 9300
+Reading event 9400
+Reading event 9500
+Reading event 9600
+Reading event 9700
+Reading event 9800
+Reading event 9900
+(int) 0
+cpptest_output.root
+>>> Transferring output to T2_MIT
+/store/jdlang//cpptest_output.root
+>>> Done!

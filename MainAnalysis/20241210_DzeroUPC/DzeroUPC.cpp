@@ -208,7 +208,13 @@ public:
       // Check if the event passes the selection criteria
       if (eventSelection(MDzeroUPC, par)) {
         if (!par.IsData && isSigMCEvt) hNumEvtEff->Fill(1, GptGyWeight*MultWeight);
-
+        bool doTrkFilter = false;
+        if (MDzeroUPC->Dtrk1PtErr != nullptr &&
+            MDzeroUPC->Dtrk2PtErr != nullptr &&
+            MDzeroUPC->Dtrk1PixelHit != nullptr &&
+            MDzeroUPC->Dtrk1StripHit != nullptr &&
+            MDzeroUPC->Dtrk2PixelHit != nullptr &&
+            MDzeroUPC->Dtrk2StripHit != nullptr) doTrkFilter = true;
         for (unsigned long j = 0; j < MDzeroUPC->Dalpha->size(); j++) {
           if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT)
             continue;
@@ -218,13 +224,27 @@ public:
             continue;
           if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY)
             continue;
-          // if (MDzeroUPC->DpassCut23PAS->at(j) == false)
           if (par.DoSystD==0 && MDzeroUPC->DpassCut23PAS->at(j) == false) continue;
           // if (par.DoSystD==0 && MDzeroUPC->DpassCut23LowPt->at(j) == false) continue;
           if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpvSig->at(j) == false) continue;
           if (par.DoSystD==2 && MDzeroUPC->DpassCut23PASSystDtrkPt->at(j) == false) continue;
           if (par.DoSystD==3 && MDzeroUPC->DpassCut23PASSystDalpha->at(j) == false) continue;
           if (par.DoSystD==4 && MDzeroUPC->DpassCut23PASSystDchi2cl->at(j) == false) continue;
+//          if (par.DoSystD==0 && MDzeroUPC->DpassCutDefault->at(j) == false) continue;
+//          if (par.DoSystD==1 && MDzeroUPC->DpassCutSystDsvpvSig->at(j) == false) continue;
+//          if (par.DoSystD==2 && MDzeroUPC->DpassCutSystDtrkPt->at(j) == false) continue;
+//          if (par.DoSystD==3 && MDzeroUPC->DpassCutSystDalpha->at(j) == false) continue;
+//          if (par.DoSystD==4 && MDzeroUPC->DpassCutSystDchi2cl->at(j) == false) continue;
+          if (doTrkFilter) {
+            if (
+              (MDzeroUPC->Dtrk1PtErr->at(j) / MDzeroUPC->Dtrk1Pt->at(j)) > 0.1 ||
+              (MDzeroUPC->Dtrk2PtErr->at(j) / MDzeroUPC->Dtrk2Pt->at(j)) > 0.1
+            ) continue;
+//            if (
+//              (MDzeroUPC->Dtrk1PixelHit->at(j) + MDzeroUPC->Dtrk1StripHit->at(j)) < 11 ||
+//              (MDzeroUPC->Dtrk2PixelHit->at(j) + MDzeroUPC->Dtrk2StripHit->at(j)) < 11
+//            ) continue;
+          }
 
           hDmass->Fill((*MDzeroUPC->Dmass)[j]);
           if (!par.IsData) {

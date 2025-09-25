@@ -1,0 +1,135 @@
+{
+    "FitDir": "MassFit",
+    "MicroTrees": [
+        {
+            "dataInput": "rapGapScan/pt1-2_y-1-1_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt1-2_y-1-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt1-2_y-1-1_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y-2--1_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y-2--1_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y-1-0_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y-1-0_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y0-1_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y0-1_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y1-2_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y1-2_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y-2--1_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y-2--1_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y-1-0_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y-1-0_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y0-1_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y0-1_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y1-2_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y1-2_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y-2--1_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y-2--1_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y-1-0_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y-1-0_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y0-1_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y0-1_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y1-2_IsGammaN1_DoSystRapGap72/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y1-2_IsGammaN1_DoSystRapGap72/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt1-2_y-1-1_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt1-2_y-1-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt1-2_y-1-1_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y-2--1_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y-2--1_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y-1-0_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y-1-0_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y0-1_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y0-1_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt2-5_y1-2_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt2-5_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt2-5_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt2-5_y1-2_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y-2--1_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y-2--1_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y-1-0_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y-1-0_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y0-1_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y0-1_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt5-8_y1-2_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt5-8_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt5-8_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt5-8_y1-2_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y-2--1_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y-2--1_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y-1-0_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y-1-0_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y0-1_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y0-1_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y-1-0_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y0-1_IsGammaN0_DoSystRapGap71/MC.root"
+        },
+        {
+            "dataInput": "rapGapScan/pt8-12_y1-2_IsGammaN0_DoSystRapGap71/Data.root",
+            "fitmcInputs": "rapGapScan/pt8-12_y1-2_IsGammaN1_DoSystRapGap72/MC_inclusive.root,rapGapScan/pt8-12_y-2--1_IsGammaN1_DoSystRapGap72/MC_inclusive.root",
+            "effmcInput": "rapGapScan/pt8-12_y1-2_IsGammaN0_DoSystRapGap71/MC.root"
+        }
+    ]
+}
