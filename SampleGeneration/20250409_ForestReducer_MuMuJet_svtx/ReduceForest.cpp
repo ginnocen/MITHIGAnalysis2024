@@ -51,6 +51,7 @@ int main(int argc, char *argv[]) {
   MuMuJetMessenger MMuMuJet;
   MMuMuJet.SetBranch(&Tree);
 
+  std::vector<float> ExtraMuWeight_v(12, 1.0);
   std::vector<int> svtxJetId_v;
   std::vector<int> svtxNtrk_v;
   std::vector<float> svtxdl_v;
@@ -621,41 +622,45 @@ int main(int argc, char *argv[]) {
         MMuMuJet.GenMuDR->push_back(GenMuDR);
         
         ////// EXTRA MUON WEIGHT //////)
+        ExtraMuWeight_v.assign(12, 1.0);
+        float MuMuWeight_val = 1.0;
 
-        if(nSingleMu > 0){
-          MMuMuJet.MuMuWeight = tnp_weight_trk_pbpb(muEta1, 0) * tnp_weight_trk_pbpb(muEta2, 0) *
+        if(isJetMuonTagged){
+          MuMuWeight_val = tnp_weight_trk_pbpb(muEta1, 0) * tnp_weight_trk_pbpb(muEta2, 0) *
                                 tnp_weight_muid_pbpb(muPt1, muEta1, 0) * tnp_weight_muid_pbpb(muPt2, muEta2, 0);
 
-          MMuMuJet.ExtraMuWeight[0] = tnp_weight_trk_pbpb(muEta1, -1) / tnp_weight_trk_pbpb(muEta1, 0) *
+          ExtraMuWeight_v.at(0) = tnp_weight_trk_pbpb(muEta1, -1) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, -1) / tnp_weight_trk_pbpb(muEta2, 0);
-          MMuMuJet.ExtraMuWeight[1] = tnp_weight_trk_pbpb(muEta1, -2) / tnp_weight_trk_pbpb(muEta1, 0) *
+          ExtraMuWeight_v.at(1) = tnp_weight_trk_pbpb(muEta1, -2) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, -2) / tnp_weight_trk_pbpb(muEta2, 0);
-          MMuMuJet.ExtraMuWeight[2] = tnp_weight_muid_pbpb(muPt1, muEta1, -1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          ExtraMuWeight_v.at(2) = tnp_weight_muid_pbpb(muPt1, muEta1, -1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, -1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-          MMuMuJet.ExtraMuWeight[3] = tnp_weight_muid_pbpb(muPt1, muEta1, -2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          ExtraMuWeight_v.at(3) = tnp_weight_muid_pbpb(muPt1, muEta1, -2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, -2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-          MMuMuJet.ExtraMuWeight[4] = tnp_weight_trg_pbpb(muPt1, muEta1,0, -1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+          ExtraMuWeight_v.at(4) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, -1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
 
-          MMuMuJet.ExtraMuWeight[5] = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1,0, muEta1, 0) *
+          ExtraMuWeight_v.at(5) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1,0, muEta1, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, -2) / tnp_weight_trg_pbpb(muPt2,0, muEta2, 0);
 
-          MMuMuJet.ExtraMuWeight[6] = tnp_weight_trk_pbpb(muEta1, 1) / tnp_weight_trk_pbpb(muEta1, 0) *
+          ExtraMuWeight_v.at(6) = tnp_weight_trk_pbpb(muEta1, 1) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, 1) / tnp_weight_trk_pbpb(muEta2, 0);
 
-          MMuMuJet.ExtraMuWeight[7] = tnp_weight_trk_pbpb(muEta1, 2) / tnp_weight_trk_pbpb(muEta1, 0) *
+          ExtraMuWeight_v.at(7) = tnp_weight_trk_pbpb(muEta1, 2) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, 2) / tnp_weight_trk_pbpb(muEta2, 0);
-          MMuMuJet.ExtraMuWeight[8] = tnp_weight_muid_pbpb(muPt1, muEta1, 1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          ExtraMuWeight_v.at(8) = tnp_weight_muid_pbpb(muPt1, muEta1, 1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, 1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-          MMuMuJet.ExtraMuWeight[9] = tnp_weight_muid_pbpb(muPt1, muEta1, 2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          ExtraMuWeight_v.at(9) = tnp_weight_muid_pbpb(muPt1, muEta1, 2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, 2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
 
-          MMuMuJet.ExtraMuWeight[10] = tnp_weight_trg_pbpb(muPt1, muEta1,0, 1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+          ExtraMuWeight_v.at(10) = tnp_weight_trg_pbpb(muPt1, muEta1,0, 1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, 1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
 
-          MMuMuJet.ExtraMuWeight[11] = tnp_weight_trg_pbpb(muPt1, muEta1,0, 2) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+          ExtraMuWeight_v.at(11) = tnp_weight_trg_pbpb(muPt1, muEta1,0, 2) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, 2) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
         }
+        MMuMuJet.MuMuWeight->push_back(MuMuWeight_val);
+        MMuMuJet.ExtraMuWeight->push_back(ExtraMuWeight_v);
 
       } // end loop over jets
 

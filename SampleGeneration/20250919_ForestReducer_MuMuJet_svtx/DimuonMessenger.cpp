@@ -34,6 +34,8 @@ DimuonJetMessenger::~DimuonJetMessenger()
    if(Initialized == true && WriteMode == true)
    {
 
+      delete ExtraMuWeight;
+      
       delete svtxJetId;
       delete svtxNtrk;
       delete svtxdl;
@@ -77,6 +79,9 @@ bool DimuonJetMessenger::Initialize()
       return false;
 
    Initialized = true;
+
+   ExtraMuWeight = nullptr;
+
    svtxJetId = nullptr;
    svtxNtrk = nullptr;
    svtxdl = nullptr;
@@ -121,8 +126,6 @@ bool DimuonJetMessenger::Initialize()
    Tree->SetBranchAddress("NCollWeight", &NCollWeight);
    Tree->SetBranchAddress("EventWeight", &EventWeight);
    Tree->SetBranchAddress("PTHat", &PTHat);
-   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
-   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
    Tree->SetBranchAddress("NPU", &NPU);
    Tree->SetBranchAddress("JetPT", &JetPT);
    Tree->SetBranchAddress("JetEta", &JetEta);
@@ -159,6 +162,8 @@ bool DimuonJetMessenger::Initialize()
    Tree->SetBranchAddress("muDeta", &muDeta);
    Tree->SetBranchAddress("muDphi", &muDphi);
    Tree->SetBranchAddress("muDR", &muDR);
+   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
+   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
 
    Tree->SetBranchAddress("GenMuPt1", &GenMuPt1);
    Tree->SetBranchAddress("GenMuPt2", &GenMuPt2);
@@ -243,6 +248,8 @@ bool DimuonJetMessenger::SetBranch(TTree *T)
    Initialized = true;
    WriteMode = true;
 
+   ExtraMuWeight = new std::vector<float>(12,1.0);
+
    svtxJetId = new std::vector<int>();
    svtxNtrk = new std::vector<int>();
    svtxdl = new std::vector<float>();
@@ -289,8 +296,6 @@ bool DimuonJetMessenger::SetBranch(TTree *T)
    Tree->Branch("NCollWeight", &NCollWeight,  "NCollWeight/F");
    Tree->Branch("EventWeight", &EventWeight,  "EventWeight/F");
    Tree->Branch("PTHat", &PTHat,  "PTHat/F");
-   Tree->Branch("ExtraMuWeight", &ExtraMuWeight, "ExtraMuWeight[12]/F");
-   Tree->Branch("MuMuWeight", &MuMuWeight, "MuMuWeight/F");
    Tree->Branch("NPU", &NPU, "NPU/I");
    Tree->Branch("JetPT", &JetPT);
    Tree->Branch("JetEta", &JetEta);
@@ -327,6 +332,8 @@ bool DimuonJetMessenger::SetBranch(TTree *T)
    Tree->Branch("muDeta", &muDeta);
    Tree->Branch("muDphi", &muDphi);
    Tree->Branch("muDR", &muDR);
+   Tree->Branch("ExtraMuWeight", &ExtraMuWeight);
+   Tree->Branch("MuMuWeight", &MuMuWeight);
 
    Tree->Branch("GenMuPt1", &GenMuPt1);
    Tree->Branch("GenMuPt2", &GenMuPt2);
@@ -446,6 +453,8 @@ void DimuonJetMessenger::Clear()
     muDeta = -999;
     muDphi = -999;
     muDR = -999;
+    ExtraMuWeight->assign(12, 1.0);
+   MuMuWeight = 1;
 
    GenMuPt1 = -999;
    GenMuPt2 = -999;
@@ -472,11 +481,6 @@ void DimuonJetMessenger::Clear()
     svtxIdx_mu2 = -1;
     trkIdx_mu1 = -1;
     trkIdx_mu2 = -1;
-
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = 1;
-
-   MuMuWeight = 1;
 
    svtxJetId->clear();
    svtxNtrk->clear();
@@ -548,6 +552,8 @@ void DimuonJetMessenger::Clear_Jet()
     muDeta = -999;
     muDphi = -999;
     muDR = -999;
+    ExtraMuWeight->assign(12, 1.0);
+   MuMuWeight = 1;
 
    GenMuPt1 = -999;
    GenMuPt2 = -999;
@@ -574,11 +580,6 @@ void DimuonJetMessenger::Clear_Jet()
     svtxIdx_mu2 = -1;
     trkIdx_mu1 = -1;
     trkIdx_mu2 = -1;
-
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = 1;
-
-   MuMuWeight = 1;
 
    svtxJetId->clear();
    svtxNtrk->clear();
@@ -631,8 +632,7 @@ void DimuonJetMessenger::CopyNonTrack(DimuonJetMessenger &M)
    nsvtx        = M.nsvtx;
    ntrk         = M.ntrk;
 
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = M.ExtraMuWeight[i];
+   if(ExtraMuWeight != nullptr && M.ExtraMuWeight != nullptr) *ExtraMuWeight = *(M.ExtraMuWeight);
 
    MuMuWeight   = M.MuMuWeight;
    JetPT        = M.JetPT;

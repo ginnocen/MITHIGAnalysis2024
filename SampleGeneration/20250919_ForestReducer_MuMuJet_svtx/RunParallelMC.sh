@@ -51,7 +51,7 @@ while IFS= read -r file; do
             --IsPP false \
             --svtx true \
             --Output "$OUTPUTMC/output_$counter.root" \
-            --MinJetPT 30 --Fraction 1.0 & 
+            --MinJetPT 0 --Fraction 1.0 & 
     ((counter++))
     wait_for_slot
 done < "$filelistMC"

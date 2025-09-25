@@ -33,8 +33,6 @@ public:
    float NCollWeight;
    float EventWeight;
    float PTHat;
-   float ExtraMuWeight[12];
-   float MuMuWeight;
    int NPU;
 
    // JET PROPERTIES
@@ -77,6 +75,8 @@ public:
    float muDeta;
    float muDphi;
    float muDR;
+   std::vector<float> *ExtraMuWeight; // size 12
+   float MuMuWeight;
 
    //GEN MUON INFO
    float GenMuPt1;

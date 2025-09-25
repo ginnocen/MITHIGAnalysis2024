@@ -1176,8 +1176,6 @@ public:
    float NCollWeight;
    float EventWeight;
    float PTHat;
-   float ExtraMuWeight[12];
-   float MuMuWeight;
    int NPU;
    std::vector<float> *JetPT;
    std::vector<float> *JetEta;
@@ -1218,8 +1216,8 @@ public:
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
-
-   //
+   std::vector<std::vector<float>> *ExtraMuWeight;
+   std::vector<float> *MuMuWeight; 
 
    std::vector<float> *GenMuPt1;
    std::vector<float> *GenMuPt2;
