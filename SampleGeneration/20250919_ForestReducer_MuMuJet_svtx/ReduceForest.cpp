@@ -9,6 +9,7 @@ using namespace std;
 #include "CommonFunctions.h"
 #include "Messenger.h"
 #include "ProgressBar.h"
+#include "DimuonMessenger.h"
 
 #include "tnp_weight_lowptPbPb.h"
 
@@ -39,7 +40,7 @@ int main(int argc, char *argv[]) {
 
   int Year = CL.GetInt("Year", 2018);
   double Fraction = CL.GetDouble("Fraction", 1.00);
-  double MinJetPT = CL.GetDouble("MinJetPT", 40);
+  double MinJetPT = CL.GetDouble("MinJetPT", 30);
   string PFJetCollection = CL.Get("PFJetCollection", "akCs3PFJetAnalyzer/t");
   string PFTreeName = IsPP ? "pfcandAnalyzer/pfTree" : "particleFlowAnalyser/pftree";
   PFTreeName = CL.Get("PFTree", PFTreeName);
@@ -47,42 +48,15 @@ int main(int argc, char *argv[]) {
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for MuMu tagged jet analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
+  TTree GenTree("GenTree", Form("Gen Tree for MuMu tagged jet analysis (%s)", VersionString.c_str()));
 
-  MuMuJetMessenger MMuMuJet;
+  DimuonJetMessenger MMuMuJet;
+  GenDimuonJetMessenger MGenMuMuJet;
   MMuMuJet.SetBranch(&Tree);
+  MGenMuMuJet.SetBranch(&GenTree);
 
-  std::vector<float> ExtraMuWeight_v(12, 1.0);
-  std::vector<int> svtxJetId_v;
-  std::vector<int> svtxNtrk_v;
-  std::vector<float> svtxdl_v;
-  std::vector<float> svtxdls_v;
-  std::vector<float> svtxdl2d_v;
-  std::vector<float> svtxdls2d_v;
-  std::vector<float> svtxm_v;
-  std::vector<float> svtxmcorr_v;
-  std::vector<float> svtxpt_v;
-  std::vector<float> svtxnormchi2_v;
-  std::vector<float> svtxchi2_v;
-
-  std::vector<int> trkJetId_v;
-  std::vector<int> trkSvtxId_v;
-  std::vector<float> trkPt_v;
-  std::vector<float> trkEta_v;
-  std::vector<float> trkPhi_v;
-  std::vector<float> trkIp3d_v;
-  std::vector<float> trkIp3dSig_v;
-  std::vector<float> trkIp2d_v;
-  std::vector<float> trkIp2dSig_v;
-  std::vector<float> trkDistToAxis_v;
-  std::vector<float> trkDistToAxisSig_v;
-  std::vector<float> trkIpProb3d_v;
-  std::vector<float> trkIpProb2d_v;
-  std::vector<float> trkDz_v;
-  std::vector<int> trkPdgId_v;
-  std::vector<int> trkMatchSta_v;
-
-  std::vector<int> mt2;
   std::vector<int> mt1;
+  std::vector<int> mt2;
 
   for (string InputFileName : InputFileNames) {
 
@@ -128,36 +102,51 @@ int main(int argc, char *argv[]) {
       MTrigger.GetEntry(iE);
       MJet.GetEntry(iE);
       MMuMuJet.Clear();
+      MGenMuMuJet.Clear();
 
       ////////////////////////////////////////
       ////////// Global event stuff //////////
       ////////////////////////////////////////
 
       MMuMuJet.Run = MEvent.Run;
+      MGenMuMuJet.Run = MEvent.Run;
       MMuMuJet.Lumi = MEvent.Lumi;
+      MGenMuMuJet.Lumi = MEvent.Lumi;
       MMuMuJet.Event = MEvent.Event;
+      MGenMuMuJet.Event = MEvent.Event;
       MMuMuJet.hiBin = MEvent.hiBin;
+      MGenMuMuJet.hiBin = MEvent.hiBin;
       //if(hiBin/2.0 > cent_high || hiBin/2.0 < cent_low) {continue;}
       MMuMuJet.hiHF = MEvent.hiHF;
+      MGenMuMuJet.hiHF = MEvent.hiHF;
       MMuMuJet.NPU = 0;
-      if (MEvent.npus->size() == 9)
+      MGenMuMuJet.NPU = 0;
+      if (MEvent.npus->size() == 9){
         MMuMuJet.NPU = MEvent.npus->at(5);
-      else if (MEvent.npus->size() > 1)
+        MGenMuMuJet.NPU = MEvent.npus->at(5);
+      } else if (MEvent.npus->size() > 1) {
         MMuMuJet.NPU = MEvent.npus->at(0);
-      else
+        MGenMuMuJet.NPU = MEvent.npus->at(0);
+      } else {
         MMuMuJet.NPU = 0;
+        MGenMuMuJet.NPU = 0;
+      }
 
       MMuMuJet.nsvtx = MJet.nsvtx;
       MMuMuJet.ntrk = MJet.ntrk;
 
       MMuMuJet.PTHat = MEvent.pthat;
+      MGenMuMuJet.PTHat = MEvent.pthat;
       MMuMuJet.EventWeight = MEvent.weight;
+      MGenMuMuJet.EventWeight = MEvent.weight;
       MMuMuJet.NCollWeight = FindNColl(MMuMuJet.hiBin);
+      MGenMuMuJet.NCollWeight = FindNColl(MGenMuMuJet.hiBin);
       ////////////////////////////
       ////////// Vertex //////////
       ////////////////////////////
 
       MMuMuJet.NVertex = 0;
+      MGenMuMuJet.NVertex = 0;
       int BestVertex = -1;
       for (int i = 0; i < (IsPP ? MTrackPP.nVtx : MTrack.VX->size()); i++) {
         if (IsPP == true && (BestVertex < 0 || MTrackPP.sumPtVtx[i] > MTrackPP.sumPtVtx[BestVertex]))
@@ -166,6 +155,7 @@ int main(int argc, char *argv[]) {
           BestVertex = i;
 
         MMuMuJet.NVertex = MMuMuJet.NVertex + 1;
+        MGenMuMuJet.NVertex = MGenMuMuJet.NVertex + 1;
       }
 
       if (BestVertex >= 0) {
@@ -175,6 +165,13 @@ int main(int argc, char *argv[]) {
         MMuMuJet.VXError = IsPP ? MTrackPP.xVtxErr[BestVertex] : MTrack.VXError->at(BestVertex);
         MMuMuJet.VYError = IsPP ? MTrackPP.yVtxErr[BestVertex] : MTrack.VYError->at(BestVertex);
         MMuMuJet.VZError = IsPP ? MTrackPP.zVtxErr[BestVertex] : MTrack.VZError->at(BestVertex);
+
+        MGenMuMuJet.VX = MMuMuJet.VX;
+        MGenMuMuJet.VY = MMuMuJet.VY;
+        MGenMuMuJet.VZ = MMuMuJet.VZ;
+        MGenMuMuJet.VXError = MMuMuJet.VXError;
+        MGenMuMuJet.VYError = MMuMuJet.VYError;
+        MGenMuMuJet.VZError = MMuMuJet.VZError;
       }
 
       /////////////////////////////////////
@@ -222,123 +219,68 @@ int main(int argc, char *argv[]) {
                           MJet.JetPFCHF[ijet] > 0. && MJet.JetPFCHM[ijet] > 0. && MJet.JetPFCEF[ijet] < 0.80;
         if (!passPurity)
           continue;
-        
-        MMuMuJet.MJTHadronFlavor->push_back(MJet.MJTHadronFlavor[ijet]);
-        MMuMuJet.MJTNcHad->push_back(MJet.MJTNcHad[ijet]);
-        MMuMuJet.MJTNbHad->push_back(MJet.MJTNbHad[ijet]);
-        MMuMuJet.JetPT->push_back(MJet.JetPT[ijet]);
-        MMuMuJet.JetEta->push_back(MJet.JetEta[ijet]);
-        MMuMuJet.JetPhi->push_back(MJet.JetPhi[ijet]);
+
+        MMuMuJet.MJTHadronFlavor = MJet.MJTHadronFlavor[ijet];
+        MMuMuJet.MJTNcHad = MJet.MJTNcHad[ijet];
+        MMuMuJet.MJTNbHad = MJet.MJTNbHad[ijet];
+        MMuMuJet.JetPT = MJet.JetPT[ijet];
+        MMuMuJet.JetEta = MJet.JetEta[ijet];
+        MMuMuJet.JetPhi = MJet.JetPhi[ijet];
 
         if (svtx) {
 
           // ADD SVTX INFORMATION
 
-          MMuMuJet.jtNsvtx->push_back(MJet.jtNsvtx[ijet]);
-          MMuMuJet.jtNtrk->push_back(MJet.jtNtrk[ijet]);
-          MMuMuJet.jtptCh->push_back(MJet.jtptCh[ijet]);
+          MMuMuJet.jtNsvtx = MJet.jtNsvtx[ijet];
+          MMuMuJet.jtNtrk = MJet.jtNtrk[ijet];
+          MMuMuJet.jtptCh = MJet.jtptCh[ijet];
 
           for (int isvtx = 0; isvtx < MJet.nsvtx; isvtx++) {
 
             if (MJet.svtxJetId[isvtx] == ijet) {
 
-              // cout << MJet.svtxJetId[isvtx] << endl;
-              svtxJetId_v.push_back(MJet.svtxJetId[isvtx]);
-              svtxNtrk_v.push_back(MJet.svtxNtrk[isvtx]);
-              svtxdl_v.push_back(MJet.svtxdl[isvtx]);
-              svtxdls_v.push_back(MJet.svtxdls[isvtx]);
-              svtxdl2d_v.push_back(MJet.svtxdl2d[isvtx]);
-              svtxdls2d_v.push_back(MJet.svtxdls2d[isvtx]);
-              svtxm_v.push_back(MJet.svtxm[isvtx]);
-              svtxmcorr_v.push_back(MJet.svtxmcorr[isvtx]);
-              svtxpt_v.push_back(MJet.svtxpt[isvtx]);
-              svtxnormchi2_v.push_back(MJet.svtxnormchi2[isvtx]);
-              svtxchi2_v.push_back(MJet.svtxchi2[isvtx]);
+              MMuMuJet.svtxJetId->push_back(MJet.svtxJetId[isvtx]);
+              MMuMuJet.svtxNtrk->push_back(MJet.svtxNtrk[isvtx]);
+              MMuMuJet.svtxdl->push_back(MJet.svtxdl[isvtx]);
+              MMuMuJet.svtxdls->push_back(MJet.svtxdls[isvtx]);
+              MMuMuJet.svtxdl2d->push_back(MJet.svtxdl2d[isvtx]);
+              MMuMuJet.svtxdls2d->push_back(MJet.svtxdls2d[isvtx]);
+              MMuMuJet.svtxm->push_back(MJet.svtxm[isvtx]);
+              MMuMuJet.svtxmcorr->push_back(MJet.svtxmcorr[isvtx]);
+              MMuMuJet.svtxpt->push_back(MJet.svtxpt[isvtx]);
+              MMuMuJet.svtxnormchi2->push_back(MJet.svtxnormchi2[isvtx]);
+              MMuMuJet.svtxchi2->push_back(MJet.svtxchi2[isvtx]);
+
+
             }
           }
-
-          MMuMuJet.svtxJetId->push_back(svtxJetId_v);
-          MMuMuJet.svtxNtrk->push_back(svtxNtrk_v);
-          MMuMuJet.svtxdl->push_back(svtxdl_v);
-          MMuMuJet.svtxdls->push_back(svtxdls_v);
-          MMuMuJet.svtxdl2d->push_back(svtxdl2d_v);
-          MMuMuJet.svtxdls2d->push_back(svtxdls2d_v);
-          MMuMuJet.svtxm->push_back(svtxm_v);
-          MMuMuJet.svtxmcorr->push_back(svtxmcorr_v);
-          MMuMuJet.svtxpt->push_back(svtxpt_v);
-          MMuMuJet.svtxnormchi2->push_back(svtxnormchi2_v);
-          MMuMuJet.svtxchi2->push_back(svtxchi2_v);
 
           for (int itrk = 0; itrk < MJet.ntrk; itrk++) {
             if (MJet.trkJetId[itrk] == ijet) {
 
               // ADD TRACK INFORMATION
 
-              // cout << "ping " << MJet.trkJetId[itrk] << " " << MJet.trkSvtxId[itrk] << endl;
-              trkJetId_v.push_back(MJet.trkJetId[itrk]);
-              trkSvtxId_v.push_back(MJet.trkSvtxId[itrk]);
-              trkPt_v.push_back(MJet.trkPt[itrk]);
-              trkEta_v.push_back(MJet.trkEta[itrk]);
-              trkPhi_v.push_back(MJet.trkPhi[itrk]);
-              trkIp3d_v.push_back(MJet.trkIp3d[itrk]);
-              trkIp3dSig_v.push_back(MJet.trkIp3dSig[itrk]);
-              trkIp2d_v.push_back(MJet.trkIp2d[itrk]);
-              trkIp2dSig_v.push_back(MJet.trkIp2dSig[itrk]);
-              trkDistToAxis_v.push_back(MJet.trkDistToAxis[itrk]);
-              trkDistToAxisSig_v.push_back(MJet.trkDistToAxisSig[itrk]);
-              trkIpProb3d_v.push_back(MJet.trkIpProb3d[itrk]);
-              trkIpProb2d_v.push_back(MJet.trkIpProb2d[itrk]);
-              trkDz_v.push_back(MJet.trkDz[itrk]);
-              trkPdgId_v.push_back(MJet.trkPdgId[itrk]);
-              trkMatchSta_v.push_back(MJet.trkMatchSta[itrk]);
+              MMuMuJet.trkJetId->push_back(MJet.trkJetId[itrk]);
+              MMuMuJet.trkSvtxId->push_back(MJet.trkSvtxId[itrk]);
+              MMuMuJet.trkPt->push_back(MJet.trkPt[itrk]);
+              MMuMuJet.trkEta->push_back(MJet.trkEta[itrk]);
+              MMuMuJet.trkPhi->push_back(MJet.trkPhi[itrk]);
+              MMuMuJet.trkIp3d->push_back(MJet.trkIp3d[itrk]);
+              MMuMuJet.trkIp3dSig->push_back(MJet.trkIp3dSig[itrk]);
+              MMuMuJet.trkIp2d->push_back(MJet.trkIp2d[itrk]);
+              MMuMuJet.trkIp2dSig->push_back(MJet.trkIp2dSig[itrk]);
+              MMuMuJet.trkDistToAxis->push_back(MJet.trkDistToAxis[itrk]);
+              MMuMuJet.trkDistToAxisSig->push_back(MJet.trkDistToAxisSig[itrk]);
+              MMuMuJet.trkIpProb3d->push_back(MJet.trkIpProb3d[itrk]);
+              MMuMuJet.trkIpProb2d->push_back(MJet.trkIpProb2d[itrk]);
+              MMuMuJet.trkDz->push_back(MJet.trkDz[itrk]);
+              MMuMuJet.trkPdgId->push_back(MJet.trkPdgId[itrk]);
+              MMuMuJet.trkMatchSta->push_back(MJet.trkMatchSta[itrk]);
+
+              
             }
           }
 
-          MMuMuJet.trkJetId->push_back(trkJetId_v);
-          MMuMuJet.trkSvtxId->push_back(trkSvtxId_v);
-          MMuMuJet.trkPt->push_back(trkPt_v);
-          MMuMuJet.trkEta->push_back(trkEta_v);
-          MMuMuJet.trkPhi->push_back(trkPhi_v);
-          MMuMuJet.trkIp3d->push_back(trkIp3d_v);
-          MMuMuJet.trkIp3dSig->push_back(trkIp3dSig_v);
-          MMuMuJet.trkIp2d->push_back(trkIp2d_v);
-          MMuMuJet.trkIp2dSig->push_back(trkIp2dSig_v);
-          MMuMuJet.trkDistToAxis->push_back(trkDistToAxis_v);
-          MMuMuJet.trkDistToAxisSig->push_back(trkDistToAxisSig_v);
-          MMuMuJet.trkIpProb3d->push_back(trkIpProb3d_v);
-          MMuMuJet.trkIpProb2d->push_back(trkIpProb2d_v);
-          MMuMuJet.trkDz->push_back(trkDz_v);
-          MMuMuJet.trkPdgId->push_back(trkPdgId_v);
-          MMuMuJet.trkMatchSta->push_back(trkMatchSta_v);
-
-          svtxJetId_v.clear();
-          svtxNtrk_v.clear();
-          svtxdl_v.clear();
-          svtxdls_v.clear();
-          svtxdl2d_v.clear();
-          svtxdls2d_v.clear();
-          svtxm_v.clear();
-          svtxmcorr_v.clear();
-          svtxpt_v.clear();
-          svtxnormchi2_v.clear();
-          svtxchi2_v.clear();
-
-          trkJetId_v.clear();
-          trkSvtxId_v.clear();
-          trkPt_v.clear();
-          trkEta_v.clear();
-          trkPhi_v.clear();
-          trkIp3d_v.clear();
-          trkIp3dSig_v.clear();
-          trkIp2d_v.clear();
-          trkIp2dSig_v.clear();
-          trkDistToAxis_v.clear();
-          trkDistToAxisSig_v.clear();
-          trkIpProb3d_v.clear();
-          trkIpProb2d_v.clear();
-          trkDz_v.clear();
-          trkPdgId_v.clear();
-          trkMatchSta_v.clear();
         }
 
         bool isJetMuonTagged = false;
@@ -462,49 +404,49 @@ int main(int argc, char *argv[]) {
           muDR = sqrt(muDeta * muDeta + muDphi * muDphi);
         } // end if dimuon pair found
 
-        MMuMuJet.IsMuMuTagged->push_back(isJetMuonTagged);
-        MMuMuJet.muPt1->push_back(muPt1);
-        MMuMuJet.muPt2->push_back(muPt2);
-        MMuMuJet.muEta1->push_back(muEta1);
-        MMuMuJet.muEta2->push_back(muEta2);
-        MMuMuJet.muPhi1->push_back(muPhi1);
-        MMuMuJet.muPhi2->push_back(muPhi2);
-        MMuMuJet.muCharge1->push_back(muCharge1);
-        MMuMuJet.muCharge2->push_back(muCharge2);
-        MMuMuJet.muDiDxy1->push_back(muDiDxy1);
-        MMuMuJet.muDiDxy1Err->push_back(muDiDxy1Err);
-        MMuMuJet.muDiDxy2->push_back(muDiDxy2);
-        MMuMuJet.muDiDxy2Err->push_back(muDiDxy2Err);
-        MMuMuJet.muDiDz1->push_back(muDiDz1);
-        MMuMuJet.muDiDz1Err->push_back(muDiDz1Err);
-        MMuMuJet.muDiDz2->push_back(muDiDz2);
-        MMuMuJet.muDiDz2Err->push_back(muDiDz2Err);
-        MMuMuJet.muDiDxy1Dxy2->push_back(muDiDxy1Dxy2);
-        MMuMuJet.muDiDxy1Dxy2Err->push_back(muDiDxy1Dxy2Err);
-        MMuMuJet.mumuMass->push_back(mumuMass);
-        MMuMuJet.mumuEta->push_back(mumuEta);
-        MMuMuJet.mumuY->push_back(mumuY);
-        MMuMuJet.mumuPhi->push_back(mumuPhi);
-        MMuMuJet.mumuPt->push_back(mumuPt);
-        //MMuMuJet.mumuisOnia->push_back(mumuisOnia);
-        MMuMuJet.DRJetmu1->push_back(dRJetMu1);
-        MMuMuJet.DRJetmu2->push_back(dRJetMu2);
-        MMuMuJet.muDeta->push_back(muDeta);
-        MMuMuJet.muDphi->push_back(muDphi);
-        MMuMuJet.muDR->push_back(muDR);
+        MMuMuJet.IsMuMuTagged = isJetMuonTagged;
+        MMuMuJet.muPt1= muPt1;
+        MMuMuJet.muPt2= muPt2;
+        MMuMuJet.muEta1= muEta1;
+        MMuMuJet.muEta2= muEta2;
+        MMuMuJet.muPhi1= muPhi1;
+        MMuMuJet.muPhi2= muPhi2;
+        MMuMuJet.muCharge1= muCharge1;
+        MMuMuJet.muCharge2= muCharge2;
+        MMuMuJet.muDiDxy1= muDiDxy1;
+        MMuMuJet.muDiDxy1Err= muDiDxy1Err;
+        MMuMuJet.muDiDxy2= muDiDxy2;
+        MMuMuJet.muDiDxy2Err= muDiDxy2Err;
+        MMuMuJet.muDiDz1= muDiDz1;
+        MMuMuJet.muDiDz1Err= muDiDz1Err;
+        MMuMuJet.muDiDz2= muDiDz2;
+        MMuMuJet.muDiDz2Err= muDiDz2Err;
+        MMuMuJet.muDiDxy1Dxy2= muDiDxy1Dxy2;
+        MMuMuJet.muDiDxy1Dxy2Err= muDiDxy1Dxy2Err;
+        MMuMuJet.mumuMass= mumuMass;
+        MMuMuJet.mumuEta= mumuEta;
+        MMuMuJet.mumuY= mumuY;
+        MMuMuJet.mumuPhi= mumuPhi;
+        MMuMuJet.mumuPt= mumuPt;
+        //MMuMuJet.mumuisOnia= mumuisOnia;
+        MMuMuJet.DRJetmu1= dRJetMu1;
+        MMuMuJet.DRJetmu2= dRJetMu2;
+        MMuMuJet.muDeta= muDeta;
+        MMuMuJet.muDphi= muDphi;
+        MMuMuJet.muDR= muDR;
 
         mt1 = mu_trackmatch(dr_cut, &MJet, ijet, muPt1, muEta1, muPhi1);
         mt2 = mu_trackmatch(dr_cut, &MJet, ijet, muPt2, muEta2, muPhi2);
 
-        MMuMuJet.trkIdx_mu1->push_back(mt1[0]);
-        MMuMuJet.trkIdx_mu2->push_back(mt2[0]);
-        MMuMuJet.svtxIdx_mu1->push_back(mt1[1]);
-        MMuMuJet.svtxIdx_mu2->push_back(mt2[1]);
+        MMuMuJet.trkIdx_mu1 = mt1[0];
+        MMuMuJet.trkIdx_mu2 = mt2[0];
+        MMuMuJet.svtxIdx_mu1 = mt1[1];
+        MMuMuJet.svtxIdx_mu2 = mt2[1];
 
         mt1.clear();
         mt2.clear();
 
-        // Gen muon info 
+        // Gen muon info  
 
 	      bool GenIsJetMuonTagged = false;
         float GenMuPt1 = -999;
@@ -592,87 +534,80 @@ int main(int argc, char *argv[]) {
           GenMuDphi = DeltaPhi(GenMuPhi1, GenMuPhi2);
           GenMuDR = sqrt(GenMuDeta * GenMuDeta + GenMuDphi * GenMuDphi);
           
-        } // end if dimuon pair found
+        } // end if dimuon pair found ll 
 
         if(GenIsJetMuonTagged && isJetMuonTagged){
-          MMuMuJet.mumuIsGenMatched->push_back(isDimuonGenMatched(&MSingleMu, maxGenMu1Index, maxGenMu2Index, maxMu1Index, maxMu2Index));
+          MMuMuJet.mumuIsGenMatched = isDimuonGenMatched(&MSingleMu, maxGenMu1Index, maxGenMu2Index, maxMu1Index, maxMu2Index);
         }
         else{
-          MMuMuJet.mumuIsGenMatched->push_back(false);
+          MMuMuJet.mumuIsGenMatched = false;
         }
         
 
-        MMuMuJet.GenIsMuMuTagged->push_back(GenIsJetMuonTagged);
-        MMuMuJet.GenMuMuMass->push_back(GenMuMuMass);
-        MMuMuJet.GenMuMuPt->push_back(GenMuMuPt);
-        MMuMuJet.GenMuMuPhi->push_back(GenMuMuPhi);
-        MMuMuJet.GenMuMuEta->push_back(GenMuMuEta);
-        MMuMuJet.GenMuMuY->push_back(GenMuMuY);
+        MMuMuJet.GenIsMuMuTagged = GenIsJetMuonTagged;
+        MMuMuJet.GenMuMuMass = GenMuMuMass;
+        MMuMuJet.GenMuMuPt = GenMuMuPt;
+        MMuMuJet.GenMuMuPhi = GenMuMuPhi;
+        MMuMuJet.GenMuMuEta = GenMuMuEta;
+        MMuMuJet.GenMuMuY = GenMuMuY;
 
-        MMuMuJet.GenMuPt1->push_back(GenMuPt1);
-        MMuMuJet.GenMuPt2->push_back(GenMuPt2);
-        MMuMuJet.GenMuEta1->push_back(GenMuEta1);
-        MMuMuJet.GenMuEta2->push_back(GenMuEta2);
-        MMuMuJet.GenMuPhi1->push_back(GenMuPhi1);
-        MMuMuJet.GenMuPhi2->push_back(GenMuPhi2);
+        MMuMuJet.GenMuPt1 = GenMuPt1;
+        MMuMuJet.GenMuPt2 = GenMuPt2;
+        MMuMuJet.GenMuEta1 = GenMuEta1;
+        MMuMuJet.GenMuEta2 = GenMuEta2;
+        MMuMuJet.GenMuPhi1 = GenMuPhi1;
+        MMuMuJet.GenMuPhi2 = GenMuPhi2;
 
-        MMuMuJet.GenMuDeta->push_back(GenMuDeta);
-        MMuMuJet.GenMuDphi->push_back(GenMuDphi);
+        MMuMuJet.GenMuDeta = GenMuDeta;
+        MMuMuJet.GenMuDphi = GenMuDphi;
         //MMuMuJet.GenMuDR->push_back(sqrt(GenMuDeta * GenMuDeta + GenMuDphi * GenMuDphi));
-        MMuMuJet.GenMuDR->push_back(GenMuDR);
-        
+        MMuMuJet.GenMuDR = GenMuDR;
+
         ////// EXTRA MUON WEIGHT //////)
-        ExtraMuWeight_v.assign(12, 1.0);
-        float MuMuWeight_val = 1.0;
-
+        MMuMuJet.MuMuWeight = 1.0;
+        MMuMuJet.ExtraMuWeight->assign(12, 1.0); // 12 sources of systematics
         if(isJetMuonTagged){
-          MuMuWeight_val = tnp_weight_trk_pbpb(muEta1, 0) * tnp_weight_trk_pbpb(muEta2, 0) *
+          MMuMuJet.MuMuWeight = tnp_weight_trk_pbpb(muEta1, 0) * tnp_weight_trk_pbpb(muEta2, 0) *
                                 tnp_weight_muid_pbpb(muPt1, muEta1, 0) * tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-
-          ExtraMuWeight_v.at(0) = tnp_weight_trk_pbpb(muEta1, -1) / tnp_weight_trk_pbpb(muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(0) = tnp_weight_trk_pbpb(muEta1, -1) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, -1) / tnp_weight_trk_pbpb(muEta2, 0);
-          ExtraMuWeight_v.at(1) = tnp_weight_trk_pbpb(muEta1, -2) / tnp_weight_trk_pbpb(muEta1, 0) *
-                                      tnp_weight_trk_pbpb(muEta2, -2) / tnp_weight_trk_pbpb(muEta2, 0);
-          ExtraMuWeight_v.at(2) = tnp_weight_muid_pbpb(muPt1, muEta1, -1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(1) = tnp_weight_trk_pbpb(muEta1, -2) / tnp_weight_trk_pbpb(muEta1, 0) *
+                                      tnp_weight_trk_pbpb(muEta2, -2) / tnp_weight_trk_pbpb(muEta2, 0);      
+          MMuMuJet.ExtraMuWeight->at(2) = tnp_weight_muid_pbpb(muPt1, muEta1, -1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, -1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-          ExtraMuWeight_v.at(3) = tnp_weight_muid_pbpb(muPt1, muEta1, -2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(3) = tnp_weight_muid_pbpb(muPt1, muEta1, -2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, -2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-          ExtraMuWeight_v.at(4) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+          MMuMuJet.ExtraMuWeight->at(4) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, -1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
-
-          ExtraMuWeight_v.at(5) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1,0, muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(5) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1,0, muEta1, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, -2) / tnp_weight_trg_pbpb(muPt2,0, muEta2, 0);
-
-          ExtraMuWeight_v.at(6) = tnp_weight_trk_pbpb(muEta1, 1) / tnp_weight_trk_pbpb(muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(6) = tnp_weight_trk_pbpb(muEta1, 1) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, 1) / tnp_weight_trk_pbpb(muEta2, 0);
-
-          ExtraMuWeight_v.at(7) = tnp_weight_trk_pbpb(muEta1, 2) / tnp_weight_trk_pbpb(muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(7) = tnp_weight_trk_pbpb(muEta1, 2) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, 2) / tnp_weight_trk_pbpb(muEta2, 0);
-          ExtraMuWeight_v.at(8) = tnp_weight_muid_pbpb(muPt1, muEta1, 1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(8) = tnp_weight_muid_pbpb(muPt1, muEta1, 1) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, 1) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-          ExtraMuWeight_v.at(9) = tnp_weight_muid_pbpb(muPt1, muEta1, 2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
+          MMuMuJet.ExtraMuWeight->at(9) = tnp_weight_muid_pbpb(muPt1, muEta1, 2) / tnp_weight_muid_pbpb(muPt1, muEta1, 0) *
                                       tnp_weight_muid_pbpb(muPt2, muEta2, 2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
-
-          ExtraMuWeight_v.at(10) = tnp_weight_trg_pbpb(muPt1, muEta1,0, 1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+          MMuMuJet.ExtraMuWeight->at(10) = tnp_weight_trg_pbpb(muPt1, muEta1,0, 1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, 1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
-
-          ExtraMuWeight_v.at(11) = tnp_weight_trg_pbpb(muPt1, muEta1,0, 2) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
+          MMuMuJet.ExtraMuWeight->at(11) = tnp_weight_trg_pbpb(muPt1, muEta1,0, 2) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, 2) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
-        }
-        MMuMuJet.MuMuWeight->push_back(MuMuWeight_val);
-        MMuMuJet.ExtraMuWeight->push_back(ExtraMuWeight_v);
+          }
 
+         MMuMuJet.FillEntry();
       } // end loop over jets
 
       for(int i = 0; i< MJet.GenCount; i++){
-        MMuMuJet.GenJetPT->push_back(MJet.GenPT[i]);
-        MMuMuJet.GenJetEta->push_back(MJet.GenEta[i]);
-        MMuMuJet.GenJetPhi->push_back(MJet.GenPhi[i]);
-        MMuMuJet.GenJetMatchIdx->push_back(MJet.GenMatchIndex[i]);
+        MGenMuMuJet.GenJetPT = MJet.GenPT[i];
+        MGenMuMuJet.GenJetEta = MJet.GenEta[i];
+        MGenMuMuJet.GenJetPhi = MJet.GenPhi[i];
+        MGenMuMuJet.GenJetMatchIdx = MJet.GenMatchIndex[i];
+        MGenMuMuJet.FillEntry();
       }
 
-
-      MMuMuJet.FillEntry();
+      
+      
     } // end loop over events
 
     Bar.Update(EntryCount);
@@ -684,6 +619,7 @@ int main(int argc, char *argv[]) {
 
   OutputFile.cd();
   Tree.Write();
+  GenTree.Write();
   InfoTree.Write();
 
   OutputFile.Close();

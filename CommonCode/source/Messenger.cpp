@@ -4367,6 +4367,8 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete muDeta;
       delete muDphi;
       delete muDR;
+      delete ExtraMuWeight;
+      delete MuMuWeight;
 
       delete GenMuPt1;
       delete GenMuPt2;
@@ -4477,6 +4479,8 @@ bool MuMuJetMessenger::Initialize()
    muDeta = nullptr;
    muDphi = nullptr;
    muDR = nullptr;
+   ExtraMuWeight = nullptr;
+   MuMuWeight = nullptr;
 
    GenMuPt1 = nullptr;
    GenMuPt2 = nullptr;
@@ -4550,8 +4554,6 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("NCollWeight", &NCollWeight);
    Tree->SetBranchAddress("EventWeight", &EventWeight);
    Tree->SetBranchAddress("PTHat", &PTHat);
-   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
-   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
    Tree->SetBranchAddress("NPU", &NPU);
    Tree->SetBranchAddress("JetPT", &JetPT);
    Tree->SetBranchAddress("JetEta", &JetEta);
@@ -4592,6 +4594,8 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("muDeta", &muDeta);
    Tree->SetBranchAddress("muDphi", &muDphi);
    Tree->SetBranchAddress("muDR", &muDR);
+   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
+   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
 
    Tree->SetBranchAddress("GenMuPt1", &GenMuPt1);
    Tree->SetBranchAddress("GenMuPt2", &GenMuPt2);
@@ -4716,6 +4720,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    muDeta = new std::vector<float>();
    muDphi = new std::vector<float>();
    muDR = new std::vector<float>();
+   ExtraMuWeight = new std::vector<std::vector<float>>();
+   MuMuWeight = new std::vector<float>();
 
    GenMuPt1 = new std::vector<float>();
    GenMuPt2 = new std::vector<float>();
@@ -4790,8 +4796,6 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("NCollWeight", &NCollWeight,  "NCollWeight/F");
    Tree->Branch("EventWeight", &EventWeight,  "EventWeight/F");
    Tree->Branch("PTHat", &PTHat,  "PTHat/F");
-   Tree->Branch("ExtraMuWeight", &ExtraMuWeight, "ExtraMuWeight[12]/F");
-   Tree->Branch("MuMuWeight", &MuMuWeight, "MuMuWeight/F");
    Tree->Branch("NPU", &NPU, "NPU/I");
    Tree->Branch("JetPT", &JetPT);
    Tree->Branch("JetEta", &JetEta);
@@ -4832,6 +4836,8 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("muDeta", &muDeta);
    Tree->Branch("muDphi", &muDphi);
    Tree->Branch("muDR", &muDR);
+   Tree->Branch("ExtraMuWeight", &ExtraMuWeight);
+   Tree->Branch("MuMuWeight", &MuMuWeight);
 
    Tree->Branch("GenMuPt1", &GenMuPt1);
    Tree->Branch("GenMuPt2", &GenMuPt2);
@@ -4916,11 +4922,6 @@ void MuMuJetMessenger::Clear()
    ntrk = 0;
    NPU = 0;
 
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = 1;
-
-   MuMuWeight = 1;
-
    JetPT->clear();
    JetEta->clear();
    JetPhi->clear();
@@ -4960,6 +4961,8 @@ void MuMuJetMessenger::Clear()
    muDeta->clear();
    muDphi->clear();
    muDR->clear();
+   ExtraMuWeight->clear();
+   MuMuWeight->clear();
 
    GenMuPt1->clear();
    GenMuPt2->clear();
@@ -5039,11 +5042,6 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    nsvtx        = M.nsvtx;
    ntrk         = M.ntrk;
 
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = M.ExtraMuWeight[i];
-
-   MuMuWeight   = M.MuMuWeight;
-
    if(JetPT != nullptr && M.JetPT != nullptr)   *JetPT = *(M.JetPT);
    if(JetEta != nullptr && M.JetEta != nullptr)   *JetEta = *(M.JetEta);
    if(JetPhi != nullptr && M.JetPhi != nullptr)   *JetPhi = *(M.JetPhi);
@@ -5083,6 +5081,8 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(muDeta != nullptr && M.muDeta != nullptr)   *muDeta = *(M.muDeta);
    if(muDphi != nullptr && M.muDphi != nullptr)   *muDphi = *(M.muDphi);
    if(muDR != nullptr && M.muDR != nullptr)   *muDR = *(M.muDR);
+   if(ExtraMuWeight != nullptr && M.ExtraMuWeight != nullptr)   *ExtraMuWeight = *(M.ExtraMuWeight);
+   if(MuMuWeight != nullptr && M.MuMuWeight != nullptr)   *MuMuWeight = *(M.MuMuWeight);
 
    if(GenMuPt1 != nullptr && M.GenMuPt1 != nullptr)   *GenMuPt1 = *(M.GenMuPt1);
    if(GenMuPt2 != nullptr && M.GenMuPt2 != nullptr)   *GenMuPt2 = *(M.GenMuPt2);
