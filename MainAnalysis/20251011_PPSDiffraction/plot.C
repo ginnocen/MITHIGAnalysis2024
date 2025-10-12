@@ -8,6 +8,8 @@
 #include <algorithm> // for std::min
 #include <iostream>
 #include <vector>
+#include "/home/xirong/MITHIGAnalysis2024/CommonCode/include/MITHIG_CMSStyle.h"
+
 
 void plot() {
 
@@ -21,6 +23,12 @@ void plot() {
   TH1F *hNtrPPS = (TH1F *)f->Get("hNtrPPS");
 
   TCanvas *cChargedTracks = new TCanvas("cChargedTracks", "cChargedTracks", 1000, 850);
+
+  TPad* padChargedTracks = (TPad*) cChargedTracks->GetPad(0);
+  padChargedTracks->cd();
+
+  SetTDRStyle();
+
   cChargedTracks->SetLogy();
   hNtrNoPPS->Rebin(4);
   hNtrPPS->Rebin(4);
@@ -34,6 +42,11 @@ void plot() {
   hNtrNoPPS->SetMaximum(0.5);
   hNtrNoPPS->Draw("same");
   hNtrPPS->Draw("same");
+
+  AddCMSHeader(padChargedTracks);
+  AddUPCHeader(padChargedTracks,"5.36TeV","pO");
+  padChargedTracks->Update();
+
   TLegend *legend = new TLegend(0.4, 0.7, 0.9, 0.9);
   legend->SetBorderSize(0);
   legend->SetFillStyle(0);
