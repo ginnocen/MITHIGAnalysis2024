@@ -16,7 +16,7 @@
 using namespace std;
 using namespace RooFit;
 
-int getCorrectedYields(string rawYieldInput, string effInput, string outputMD)
+int getCorrectedYields(string rawYieldInput, string effInput, string outputMD, float sampleLumiFraction=1.)
 {
 
   TFile rawYieldFile(rawYieldInput.c_str());
@@ -118,6 +118,8 @@ int getCorrectedYields(string rawYieldInput, string effInput, string outputMD)
   float lumitrigger = (parTriggerChoice==1)? lumipathinvnbZDCOR : // ZDCOR
                       (parTriggerChoice==2)? lumipathinvnbZDC   : // ZDCXORJet8
                       -999; // [WARN] Check this
+  if (sampleLumiFraction <= 0.) sampleLumiFraction = 1.;
+  lumitrigger = lumitrigger * sampleLumiFraction;
   float triggereff = 1.; // [WARN] Change this
   double cross = yield / (eff * lumitrigger * triggereff *
                           particle_antiparticlefactor * BR *

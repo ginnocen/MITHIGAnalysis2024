@@ -1,5 +1,15 @@
 #!/bin/bash
 
+MAXCORES=40
+
+# Process for limiting parallel processes
+wait_for_slot() {
+    while (( $(jobs -r | wc -l) >= MAXCORES )); do
+        # Wait a bit before checking again
+        sleep 1
+    done
+}
+
 SampleSettingCard=${1}
 MicroTreeDir=$(jq -r '.MicroTreeDir' $SampleSettingCard)
 mkdir -p $MicroTreeDir
@@ -22,6 +32,8 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 	GptGyWeightFileName=$(echo $MicroTree | jq -r '.GptGyWeightFileName')
 	DoMultReweighting=$(echo $MicroTree | jq -r '.DoMultReweighting')
 	MultWeightFileName=$(echo $MicroTree | jq -r '.MultWeightFileName')
+	DoPID=$(echo $MicroTree | jq -r '.DoPID')
+	DoTrackFilter=$(echo $MicroTree | jq -r '.DoTrackFilter')
 	mkdir -p $MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/
 	Output=$MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/${MicroTreeBaseName}
 
@@ -39,6 +51,8 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 			[ $GptGyWeightFileName != null ] && cmd="$cmd --GptGyWeightFileName $GptGyWeightFileName"
 			[ $DoMultReweighting != null ] && cmd="$cmd --DoMultReweighting $DoMultReweighting"
 			[ $MultWeightFileName != null ] && cmd="$cmd --MultWeightFileName $MultWeightFileName"
+			[ $DoPID != null ] && cmd="$cmd --DoPID $DoPID"
+			[ $DoTrackFilter != null ] && cmd="$cmd --DoTrackFilter $DoTrackFilter"
 
 	echo "Executing >>>>>>"
 	echo $cmd
@@ -48,6 +62,7 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 	echo $cmd > $MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/${MicroTreeLogName}
 	( $cmd >> $MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/${MicroTreeLogName} ) &
 	sleep 0.1
+  wait_for_slot
 done
 
 sleep 1

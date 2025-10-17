@@ -440,6 +440,7 @@ public:
    float Dtrk1Pt[DZEROCOUNTMAX];
    float Dtrk1PtErr[DZEROCOUNTMAX];
    float Dtrk1Eta[DZEROCOUNTMAX];
+   float Dtrk1P[DZEROCOUNTMAX];
    float Dtrk1dedx[DZEROCOUNTMAX];
    float Dtrk1MassHypo[DZEROCOUNTMAX];
    float Dtrk1PixelHit[DZEROCOUNTMAX];
@@ -448,6 +449,7 @@ public:
    float Dtrk2Pt[DZEROCOUNTMAX];
    float Dtrk2PtErr[DZEROCOUNTMAX];
    float Dtrk2Eta[DZEROCOUNTMAX];
+   float Dtrk2P[DZEROCOUNTMAX];
    float Dtrk2dedx[DZEROCOUNTMAX];
    float Dtrk2MassHypo[DZEROCOUNTMAX];
    float Dtrk2PixelHit[DZEROCOUNTMAX];
@@ -923,6 +925,10 @@ public:
    std::vector<float> *Dtrk1MassHypo;
    std::vector<float> *Dtrk1PixelHit;
    std::vector<float> *Dtrk1StripHit;
+   std::vector<float> *Dtrk1P;
+   std::vector<float> *Dtrk1PionScore;
+   std::vector<float> *Dtrk1KaonScore;
+   std::vector<float> *Dtrk1ProtScore;
    std::vector<float> *Dtrk2Pt;
    std::vector<float> *Dtrk2PtErr;
    std::vector<float> *Dtrk2Eta;
@@ -930,6 +936,10 @@ public:
    std::vector<float> *Dtrk2MassHypo;
    std::vector<float> *Dtrk2PixelHit;
    std::vector<float> *Dtrk2StripHit;
+   std::vector<float> *Dtrk2P;
+   std::vector<float> *Dtrk2PionScore;
+   std::vector<float> *Dtrk2KaonScore;
+   std::vector<float> *Dtrk2ProtScore;
    std::vector<float> *Dchi2cl;
    std::vector<float> *DsvpvDistance;
    std::vector<float> *DsvpvDisErr;
@@ -945,7 +955,8 @@ public:
    std::vector<bool> *DpassCut23PASSystDtrkPt;
    std::vector<bool> *DpassCut23PASSystDalpha;
    std::vector<bool> *DpassCut23PASSystDchi2cl;
-   std::vector<bool> *DpassCutDefault;
+   std::vector<bool> *DpassCutNominal;
+   std::vector<bool> *DpassCutLoose;
    std::vector<bool> *DpassCutSystDsvpvSig;
    std::vector<bool> *DpassCutSystDtrkPt;
    std::vector<bool> *DpassCutSystDalpha;

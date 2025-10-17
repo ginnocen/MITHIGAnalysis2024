@@ -1,28 +1,15 @@
 #!/bin/bash
 
-#PT_Y_BINS=(
-#  #ptmin #ptmax #ymin #ymax
-#  0   1   -1    0
-#  0   1    0    1
-#  1   2   -1    0
-#  1   2    0    1
-#  2   3   -1    0
-#  2   3    0    1
-#  3   4   -1    0
-#  3   4    0    1
-#  4   5   -1    0
-#  4   5    0    1
-#  0   2   -2.4 -2
-#  0   2   -2   -1
-#  0   2    1    2
-#  0   2    2    2.4
-#  2   5   -2.4 -2
-#  2   5   -2   -1
-#  2   5    1    2
-#  2   5    2    2.4
-#)
-
 PT_Y_BINS=(
+#ptmin #ptmax #ymin #ymax
+  0   1   -2   -1
+  0   1   -1    0
+  0   1    0    1
+  0   1    1    2
+  1   2   -2   -1
+  1   2   -1    0
+  1   2    0    1
+  1   2    1    2
   2   5   -2   -1
   2   5   -1    0
   2   5    0    1
@@ -32,19 +19,25 @@ PT_Y_BINS=(
 MAKE_MICROTREE_CFGS=1
 MAKE_MASSFIT_CFGS=1
 MAKE_PLOT_CFGS=1
+DO_PID=1
+DO_TRACKFILTER=1
 DO_REWEIGHTING=0
 USE_GAMMAN_FOR_NGAMMA=1
 MERGER_MIRROR_YBINS=1
 
-SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250528_Skim_2023Data_Feb2025ReReco_NEW_HIForward01235679.root"
-#SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250528_Skim_2023Data_Feb2025ReReco_OLD_HIForward01235679.root"
-#SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250508_Skim_2023Data_Jan2024ReReco_HIForward0.root"
-#SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250527_Skim_2023Data_Jan2024ReReco_HIForward0_Unfiltered.root"
-#SKIM_DATA="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsData/20250312_ForestDfinderData23Skim_v4.root"
-SKIM_MC_FORCED_D0_A="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250306_v4_Pthat0_ForceD0DecayD0Filtered_MassWindow040_BeamA/mergedfile.root"
-SKIM_MC_FORCED_D0_B="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250306_v4_Pthat0_ForceD0DecayD0Filtered_MassWindow040_BeamB/mergedfile.root"
+LUMI_FRACTION=0.1
+
+#SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250623_Skim_2023Data_Feb2025ReReco_HIForward10_HFFix.root"
+SKIM_DATA="/data00/jdlang/UPCD0LowPtAnalysis/SkimsData/20250623_Skim_2023Data_Feb2025ReReco_HIForward10-11.root"
+
+SKIM_MC_FORCED_D0_A="/data00/jdlang/UPCD0LowPtAnalysis/SkimsMC/20250619_Skim_2023MC_Feb2025ReReco_PhotonBeamA_forcedDecays_PID.root"
+SKIM_MC_FORCED_D0_B="/data00/jdlang/UPCD0LowPtAnalysis/SkimsMC/20250619_Skim_2023MC_Feb2025ReReco_PhotonBeamB_forcedDecays_PID.root"
+#SKIM_MC_FORCED_D0_A="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250306_v4_Pthat0_ForceD0DecayD0Filtered_MassWindow040_BeamA/mergedfile.root"
+#SKIM_MC_FORCED_D0_B="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250306_v4_Pthat0_ForceD0DecayD0Filtered_MassWindow040_BeamB/mergedfile.root"
+
 SKIM_MC_INCLUSIVE_A="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root"
 SKIM_MC_INCLUSIVE_B="/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root"
+
 GPT_GY_WEIGHT_DIR="../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights"
 MULT_WEIGHT_DIR="../../WeightHandler/20250305_DzeroUPC_multiplicityWeight/Weights"
 
@@ -97,6 +90,8 @@ make_microtree_config() {
   local doSystD=${8}
   local doSystRapGap=${9}
   local doReweighting=${10}
+  local doPID=${11}
+  local doTrackFilter=${12}
   echo "Making MicroTree Config: $(basename $configOutput)"
   # Make header
   if [[ ! -e "$configOutput" ]]; then
@@ -118,6 +113,9 @@ EOF
     elif [[ "$microtreeRoot" == "MC_inclusive.root" ]]; then
       (( $isGammaN == 1 )) && input=$SKIM_MC_INCLUSIVE_A || input=$SKIM_MC_INCLUSIVE_B
       (( $USE_GAMMAN_FOR_NGAMMA == 1 && $isGammaN == 0 )) && input=$SKIM_MC_INCLUSIVE_A
+      # FIXME: Hacks for old MC files:
+      doPID=0
+      doTrackFilter=0
     fi
     local comma=""
     [[ $doReweighting -eq 1 && "$microtreeRoot" == "MC.root" ]] && comma=","
@@ -134,7 +132,9 @@ cat >> $configOutput <<EOF
       "TriggerChoice": 1,
       "IsData": $isData,
       "DoSystD": $doSystD,
-      "DoSystRapGap": $doSystRapGap$comma
+      "DoSystRapGap": $doSystRapGap,
+      "DoTrackFilter": $doTrackFilter,
+      "DoPID": $doPID$comma
 EOF
     # Add reweighting (if needed)
     if [[ $doReweighting -eq 1 && "$microtreeRoot" == "MC.root" ]]; then
@@ -179,6 +179,7 @@ make_massfit_config() {
   local doSystSiglAlpha=${11}
   local doSystSiglMean=${12}
   local doSystMassWindow=${13}
+  local sampleLumiFraction=${14}
   
   fileString="pt${ptmin}-${ptmax}_y${ymin}-${ymax}_IsGammaN${isGammaN}"
   yminMirror=$(( -1 * $ymax ))
@@ -224,7 +225,8 @@ cat >> $configOutput <<EOF
       "doPkpp": $doPkpp,
       "sigAlphaRange": $sigAlphaRange,
       "sigMeanRange": $sigMeanRange,
-      "systMassWin": "$massWindow"
+      "systMassWin": "$massWindow",
+      "sampleLumiFraction": $sampleLumiFraction
 EOF
   # Close brackets:
   if (( $isLastEntry == 1 )); then
@@ -299,47 +301,49 @@ for (( isGammaN=1 ; isGammaN >= 0 ; isGammaN-- )); do
     echo "isGammaN: $isGammaN, $ptmin < Dpt < $ptmax, $ymin < Dy < $ymax"
     if [[ "$MAKE_MICROTREE_CFGS" -eq "1" ]]; then
       make_microtree_config $MICROTREE_fullAnalysis $ptmin $ptmax $ymin $ymax\
-        $isGammaN $isLastEntry 0 0 $DO_REWEIGHTING
+        $isGammaN $isLastEntry 0 0 $DO_REWEIGHTING $DO_PID $DO_TRACKFILTER
       make_microtree_config $MICROTREE_systDalpha $ptmin $ptmax $ymin $ymax\
-        $isGammaN $isLastEntry 3 0 $DO_REWEIGHTING
+        $isGammaN $isLastEntry 3 0 $DO_REWEIGHTING $DO_PID $DO_TRACKFILTER
       make_microtree_config $MICROTREE_systDchi2cl $ptmin $ptmax $ymin $ymax\
-        $isGammaN $isLastEntry 4 0 $DO_REWEIGHTING
+        $isGammaN $isLastEntry 4 0 $DO_REWEIGHTING $DO_PID $DO_TRACKFILTER
       make_microtree_config $MICROTREE_systDsvpv $ptmin $ptmax $ymin $ymax\
-        $isGammaN $isLastEntry 1 0 $DO_REWEIGHTING
+        $isGammaN $isLastEntry 1 0 $DO_REWEIGHTING $DO_PID $DO_TRACKFILTER
       make_microtree_config $MICROTREE_systDtrkPt $ptmin $ptmax $ymin $ymax\
-        $isGammaN $isLastEntry 2 0 $DO_REWEIGHTING
+        $isGammaN $isLastEntry 2 0 $DO_REWEIGHTING $DO_PID $DO_TRACKFILTER
       make_microtree_config $MICROTREE_systRapGapLoose $ptmin $ptmax\
-        $ymin $ymax $isGammaN $isLastEntry 0 -1 $DO_REWEIGHTING
+        $ymin $ymax $isGammaN $isLastEntry 0 -1\
+        $DO_REWEIGHTING $DO_PID $DO_TRACKFILTER
       make_microtree_config $MICROTREE_systRapGapTight $ptmin $ptmax\
-        $ymin $ymax $isGammaN $isLastEntry 0 1 $DO_REWEIGHTING
+        $ymin $ymax $isGammaN $isLastEntry 0 1\
+        $DO_REWEIGHTING $DO_PID $DO_TRACKFILTER
     fi
     if [[ "$MAKE_MASSFIT_CFGS" -eq "1" ]]; then
       make_massfit_config $MASSFIT_fullAnalysis "fullAnalysis" "MassFit"\
-        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0
+        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systDalpha "systDalpha" "MassFit"\
-        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0
+        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systDchi2cl "systDchi2cl" "MassFit"\
-        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0
+        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systDsvpv "systDsvpv" "MassFit"\
-        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0
+        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systDtrkPt "systDtrkPt" "MassFit"\
-        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0
+        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systRapGapLoose "systRapGapLoose" "MassFit"\
-        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0
+        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systRapGapTight "systRapGapTight" "MassFit"\
-        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0
+        $ptmin $ptmax $ymin $ymax $isGammaN $isLastEntry 0 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systFitPkBg "fullAnalysis"\
         "MassFit_systFitPkBg" $ptmin $ptmax $ymin $ymax $isGammaN\
-        $isLastEntry 1 0 0 0
+        $isLastEntry 1 0 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systFitSiglAlpha "fullAnalysis"\
         "MassFit_systFitSiglAlpha" $ptmin $ptmax $ymin $ymax $isGammaN\
-        $isLastEntry 0 1 0 0
+        $isLastEntry 0 1 0 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systFitSiglMean "fullAnalysis"\
         "MassFit_systFitSiglMean" $ptmin $ptmax $ymin $ymax $isGammaN\
-        $isLastEntry 0 0 1 0
+        $isLastEntry 0 0 1 0 $LUMI_FRACTION
       make_massfit_config $MASSFIT_systFitMassWindow "fullAnalysis"\
         "MassFit_systFitMassWindow" $ptmin $ptmax $ymin $ymax $isGammaN\
-        $isLastEntry 0 0 0 1
+        $isLastEntry 0 0 0 1 $LUMI_FRACTION
     fi
   done
   if [[ "$MAKE_PLOT_CFGS" -eq "1" ]]; then
