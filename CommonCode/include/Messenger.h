@@ -609,6 +609,11 @@ public:
    std::vector<bool> *SingleMuIsGlobal;
    std::vector<bool> *SingleMuIsTracker;
    std::vector<bool> *SingleMuHybridSoft;
+   
+   std::vector<float> *GenSingleMuPT;
+   std::vector<float> *GenSingleMuEta;
+   std::vector<float> *GenSingleMuPhi;
+   std::vector<int> *GenSingleMuPID;
 
 public:
    SingleMuTreeMessenger(TFile &File, std::string TreeName = "muonAnalyzer/MuonTree");
@@ -641,7 +646,7 @@ public:
    std::vector<float> *TrackEta;
    std::vector<float> *TrackPhi;
    std::vector<char>  *TrackCharge;
-   std::vector<int>   *TrackPDFID;
+   std::vector<int>   *TrackPDGId;
    std::vector<char>  *TrackNHits;
    std::vector<char>  *TrackNPixHits;
    std::vector<char>  *TrackNLayers;
@@ -913,6 +918,7 @@ public:
    std::vector<float> *Dphi;
    std::vector<float> *Dy;
    std::vector<float> *Dmass;
+   std::vector<float> *Dtrk1P;
    std::vector<float> *Dtrk1Pt;
    std::vector<float> *Dtrk1PtErr;
    std::vector<float> *Dtrk1Eta;
@@ -920,10 +926,10 @@ public:
    std::vector<float> *Dtrk1MassHypo;
    std::vector<float> *Dtrk1PixelHit;
    std::vector<float> *Dtrk1StripHit;
-   std::vector<float> *Dtrk1P;
    std::vector<float> *Dtrk1PionScore;
    std::vector<float> *Dtrk1KaonScore;
    std::vector<float> *Dtrk1ProtScore;
+   std::vector<float> *Dtrk2P;
    std::vector<float> *Dtrk2Pt;
    std::vector<float> *Dtrk2PtErr;
    std::vector<float> *Dtrk2Eta;
@@ -931,7 +937,6 @@ public:
    std::vector<float> *Dtrk2MassHypo;
    std::vector<float> *Dtrk2PixelHit;
    std::vector<float> *Dtrk2StripHit;
-   std::vector<float> *Dtrk2P;
    std::vector<float> *Dtrk2PionScore;
    std::vector<float> *Dtrk2KaonScore;
    std::vector<float> *Dtrk2ProtScore;
@@ -955,6 +960,8 @@ public:
    std::vector<bool> *DpassCutSystDsvpvSig;
    std::vector<bool> *DpassCutSystDtrkPt;
    std::vector<bool> *DpassCutSystDalpha;
+   std::vector<bool> *DpassCutSystDdtheta;
+   std::vector<bool> *DpassCutSystDalphaOnly;
    std::vector<bool> *DpassCutSystDchi2cl;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;
@@ -1115,7 +1122,7 @@ public:
    int Run;
    long long Event;
    int Lumi;
-   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16, isGammaN;
    
    // particle flow info
    std::vector<float> *PT;
@@ -1182,14 +1189,16 @@ public:
    float NCollWeight;
    float EventWeight;
    float PTHat;
-   float ExtraMuWeight[12];
-   float MuMuWeight;
    int NPU;
-   //std::vectors
    std::vector<float> *JetPT;
    std::vector<float> *JetEta;
    std::vector<float> *JetPhi;
    std::vector<bool> *IsMuMuTagged;
+   std::vector<float> *GenJetPT;
+   std::vector<float> *GenJetEta;
+   std::vector<float> *GenJetPhi;
+   std::vector<int> *GenJetMatchIdx;
+   std::vector<bool> *GenIsMuMuTagged;
    std::vector<float> *muPt1;
    std::vector<float> *muPt2;
    std::vector<float> *muEta1;
@@ -1213,12 +1222,33 @@ public:
    std::vector<float> *mumuY;
    std::vector<float> *mumuPhi;
    std::vector<float> *mumuPt;
+   std::vector<bool> *mumuIsGenMatched;
    //std::vector<int> *mumuisOnia;
    std::vector<float> *DRJetmu1;
    std::vector<float> *DRJetmu2;
    std::vector<float> *muDeta;
    std::vector<float> *muDphi;
    std::vector<float> *muDR;
+   std::vector<std::vector<float>> *ExtraMuWeight;
+   std::vector<float> *MuMuWeight;
+
+   std::vector<float> *GenMuPt1;
+   std::vector<float> *GenMuPt2;
+   std::vector<float> *GenMuEta1;
+   std::vector<float> *GenMuEta2;
+   std::vector<float> *GenMuPhi1;
+   std::vector<float> *GenMuPhi2;
+   std::vector<float> *GenMuMuMass;
+   std::vector<float> *GenMuMuEta;
+   std::vector<float> *GenMuMuY;
+   std::vector<float> *GenMuMuPhi;
+   std::vector<float> *GenMuMuPt;
+   std::vector<float> *GenMuDeta;
+   std::vector<float> *GenMuDphi;
+   std::vector<float> *GenMuDR;
+
+   //
+
    std::vector<int> *MJTHadronFlavor;
    std::vector<int> *MJTNcHad;
    std::vector<int> *MJTNbHad;

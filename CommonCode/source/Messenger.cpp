@@ -1844,6 +1844,11 @@ bool SingleMuTreeMessenger::Initialize(){
     SingleMuIsTracker = nullptr;
     SingleMuHybridSoft = nullptr;
 
+    GenSingleMuPT = nullptr;
+    GenSingleMuEta = nullptr;
+    GenSingleMuPhi = nullptr;
+    GenSingleMuPID = nullptr;
+
     Tree->SetBranchAddress("recoPt", &SingleMuPT);
     Tree->SetBranchAddress("recoEta", &SingleMuEta);
     Tree->SetBranchAddress("recoPhi", &SingleMuPhi);
@@ -1856,6 +1861,12 @@ bool SingleMuTreeMessenger::Initialize(){
     Tree->SetBranchAddress("recoIsGlobal", &SingleMuIsGlobal);
     Tree->SetBranchAddress("recoIsTracker", &SingleMuIsTracker);
     Tree->SetBranchAddress("recoIDHybridSoft", &SingleMuHybridSoft);
+
+    Tree->SetBranchAddress("genPt", &GenSingleMuPT);
+    Tree->SetBranchAddress("genEta", &GenSingleMuEta);
+    Tree->SetBranchAddress("genPhi", &GenSingleMuPhi);
+    Tree->SetBranchAddress("genPID", &GenSingleMuPID);
+
     return true;
 }
 
@@ -1915,7 +1926,7 @@ bool PbPbTrackTreeMessenger::Initialize()
    TrackEta = nullptr;
    TrackPhi = nullptr;
    TrackCharge = nullptr;
-   TrackPDFID = nullptr;
+   TrackPDGId = nullptr;
    TrackNHits = nullptr;
    TrackNPixHits = nullptr;
    TrackNLayers = nullptr;
@@ -1955,7 +1966,7 @@ bool PbPbTrackTreeMessenger::Initialize()
    Tree->SetBranchAddress("trkEta", &TrackEta);
    Tree->SetBranchAddress("trkPhi", &TrackPhi);
    Tree->SetBranchAddress("trkCharge", &TrackCharge);
-   Tree->SetBranchAddress("trkPDFId", &TrackPDFID);
+   Tree->SetBranchAddress("trkPDGId", &TrackPDGId);
    Tree->SetBranchAddress("trkNHits", &TrackNHits);
    Tree->SetBranchAddress("trkNPixHits", &TrackNPixHits);
    Tree->SetBranchAddress("trkNLayers", &TrackNLayers);
@@ -3089,9 +3100,12 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete DpassCutSystDsvpvSig;
       delete DpassCutSystDtrkPt;
       delete DpassCutSystDalpha;
+      delete DpassCutSystDdtheta;
+      delete DpassCutSystDalphaOnly;
       delete DpassCutSystDchi2cl;
       delete Dy;
       delete Dmass;
+      delete Dtrk1P;
       delete Dtrk1Pt;
       delete Dtrk1PtErr;
       delete Dtrk1Eta;
@@ -3099,10 +3113,10 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dtrk1MassHypo;
       delete Dtrk1PixelHit;
       delete Dtrk1StripHit;
-      delete Dtrk1P;
       delete Dtrk1PionScore;
       delete Dtrk1KaonScore;
       delete Dtrk1ProtScore;
+      delete Dtrk2P;
       delete Dtrk2Pt;
       delete Dtrk2PtErr;
       delete Dtrk2Eta;
@@ -3110,7 +3124,6 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dtrk2MassHypo;
       delete Dtrk2PixelHit;
       delete Dtrk2StripHit;
-      delete Dtrk2P;
       delete Dtrk2PionScore;
       delete Dtrk2KaonScore;
       delete Dtrk2ProtScore;
@@ -3161,9 +3174,12 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    DpassCutSystDsvpvSig = nullptr;
    DpassCutSystDtrkPt = nullptr;
    DpassCutSystDalpha = nullptr;
+   DpassCutSystDdtheta = nullptr;
+   DpassCutSystDalphaOnly = nullptr;
    DpassCutSystDchi2cl = nullptr;
    Dy = nullptr;
    Dmass = nullptr;
+   Dtrk1P = nullptr;
    Dtrk1Pt = nullptr;
    Dtrk1PtErr = nullptr;
    Dtrk1Eta = nullptr;
@@ -3171,10 +3187,10 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dtrk1MassHypo = nullptr;
    Dtrk1PixelHit = nullptr;
    Dtrk1StripHit = nullptr;
-   Dtrk1P = nullptr;
    Dtrk1PionScore = nullptr;
    Dtrk1KaonScore = nullptr;
    Dtrk1ProtScore = nullptr;
+   Dtrk2P = nullptr;
    Dtrk2Pt = nullptr;
    Dtrk2PtErr = nullptr;
    Dtrk2Eta = nullptr;
@@ -3182,7 +3198,6 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dtrk2MassHypo = nullptr;
    Dtrk2PixelHit = nullptr;
    Dtrk2StripHit = nullptr;
-   Dtrk2P = nullptr;
    Dtrk2PionScore = nullptr;
    Dtrk2KaonScore = nullptr;
    Dtrk2ProtScore = nullptr;
@@ -3236,6 +3251,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Dpt", &Dpt);
    Tree->SetBranchAddress("Dy", &Dy);
    Tree->SetBranchAddress("Dmass", &Dmass);
+   if(Tree->GetBranch("Dtrk1P")) Tree->SetBranchAddress("Dtrk1P", &Dtrk1P);
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
    if(Tree->GetBranch("Dtrk1PtErr")) Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
    if(Tree->GetBranch("Dtrk1Eta")) Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
@@ -3243,11 +3259,10 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    if(Tree->GetBranch("Dtrk1MassHypo")) Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
    if(Tree->GetBranch("Dtrk1PixelHit")) Tree->SetBranchAddress("Dtrk1PixelHit", &Dtrk1PixelHit);
    if(Tree->GetBranch("Dtrk1StripHit")) Tree->SetBranchAddress("Dtrk1StripHit", &Dtrk1StripHit);
-   if(Tree->GetBranch("Dtrk1P")) Tree->SetBranchAddress("Dtrk1P", &Dtrk1P);
    if(Tree->GetBranch("Dtrk1PionScore")) Tree->SetBranchAddress("Dtrk1PionScore", &Dtrk1PionScore);
    if(Tree->GetBranch("Dtrk1KaonScore")) Tree->SetBranchAddress("Dtrk1KaonScore", &Dtrk1KaonScore);
    if(Tree->GetBranch("Dtrk1ProtScore")) Tree->SetBranchAddress("Dtrk1ProtScore", &Dtrk1ProtScore);
-   
+   if(Tree->GetBranch("Dtrk2P")) Tree->SetBranchAddress("Dtrk2P", &Dtrk2P);
    Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
    if(Tree->GetBranch("Dtrk2PtErr")) Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
    if(Tree->GetBranch("Dtrk2Eta")) Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
@@ -3255,7 +3270,6 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    if(Tree->GetBranch("Dtrk2MassHypo")) Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
    if(Tree->GetBranch("Dtrk2PixelHit")) Tree->SetBranchAddress("Dtrk2PixelHit", &Dtrk2PixelHit);
    if(Tree->GetBranch("Dtrk2StripHit")) Tree->SetBranchAddress("Dtrk2StripHit", &Dtrk2StripHit);
-   if(Tree->GetBranch("Dtrk2P")) Tree->SetBranchAddress("Dtrk2P", &Dtrk2P);
    if(Tree->GetBranch("Dtrk2PionScore")) Tree->SetBranchAddress("Dtrk2PionScore", &Dtrk2PionScore);
    if(Tree->GetBranch("Dtrk2KaonScore")) Tree->SetBranchAddress("Dtrk2KaonScore", &Dtrk2KaonScore);
    if(Tree->GetBranch("Dtrk2ProtScore")) Tree->SetBranchAddress("Dtrk2ProtScore", &Dtrk2ProtScore);
@@ -3275,11 +3289,13 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("DpassCut23PASSystDalpha", &DpassCut23PASSystDalpha);
    Tree->SetBranchAddress("DpassCut23PASSystDchi2cl", &DpassCut23PASSystDchi2cl);
    if(Tree->GetBranch("DpassCutNominal")) Tree->SetBranchAddress("DpassCutNominal", &DpassCutNominal);
-   if(Tree->GetBranch("DpassCutDefault")) Tree->SetBranchAddress("DpassCutDefault", &DpassCutNominal); // for backwards compatibility
+   if(Tree->GetBranch("DpassCutDefault")) Tree->SetBranchAddress("DpassCutDefault", &DpassCutNominal); // Cuts for backwards compatibility
    if(Tree->GetBranch("DpassCutLoose")) Tree->SetBranchAddress("DpassCutLoose", &DpassCutLoose);
    if(Tree->GetBranch("DpassCutSystDsvpvSig")) Tree->SetBranchAddress("DpassCutSystDsvpvSig", &DpassCutSystDsvpvSig);
    if(Tree->GetBranch("DpassCutSystDtrkPt")) Tree->SetBranchAddress("DpassCutSystDtrkPt", &DpassCutSystDtrkPt);
    if(Tree->GetBranch("DpassCutSystDalpha")) Tree->SetBranchAddress("DpassCutSystDalpha", &DpassCutSystDalpha);
+   if(Tree->GetBranch("DpassCutSystDalphaOnly")) Tree->SetBranchAddress("DpassCutSystDalphaOnly", &DpassCutSystDalphaOnly);
+   if(Tree->GetBranch("DpassCutSystDdtheta")) Tree->SetBranchAddress("DpassCutSystDdtheta", &DpassCutSystDdtheta);
    if(Tree->GetBranch("DpassCutSystDchi2cl")) Tree->SetBranchAddress("DpassCutSystDchi2cl", &DpassCutSystDchi2cl);
    Tree->SetBranchAddress("Dgen", &Dgen);
    Tree->SetBranchAddress("DisSignalCalc", &DisSignalCalc);
@@ -3332,6 +3348,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    DpassCutSystDsvpvSig = new std::vector<bool>();
    DpassCutSystDtrkPt = new std::vector<bool>();
    DpassCutSystDalpha = new std::vector<bool>();
+   DpassCutSystDalphaOnly = new std::vector<bool>();
+   DpassCutSystDdtheta = new std::vector<bool>();
    DpassCutSystDchi2cl = new std::vector<bool>();
    Dy = new std::vector<float>();
    Dmass = new std::vector<float>();
@@ -3453,6 +3471,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("DpassCutSystDsvpvSig",  &DpassCutSystDsvpvSig);
    Tree->Branch("DpassCutSystDtrkPt",    &DpassCutSystDtrkPt);
    Tree->Branch("DpassCutSystDalpha",    &DpassCutSystDalpha);
+   Tree->Branch("DpassCutSystDalphaOnly",&DpassCutSystDalphaOnly);
+   Tree->Branch("DpassCutSystDdtheta",   &DpassCutSystDdtheta);
    Tree->Branch("DpassCutSystDchi2cl",   &DpassCutSystDchi2cl);
    Tree->Branch("Dgen",                  &Dgen);
    Tree->Branch("DisSignalCalc",         &DisSignalCalc);
@@ -3546,6 +3566,8 @@ void DzeroUPCTreeMessenger::Clear()
    DpassCutSystDsvpvSig->clear();
    DpassCutSystDtrkPt->clear();
    DpassCutSystDalpha->clear();
+   DpassCutSystDalphaOnly->clear();
+   DpassCutSystDdtheta->clear();
    DpassCutSystDchi2cl->clear();
    Dgen->clear();
    DisSignalCalc->clear();
@@ -3634,6 +3656,8 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(DpassCutSystDsvpvSig != nullptr && M.DpassCutSystDsvpvSig != nullptr)   *DpassCutSystDsvpvSig = *(M.DpassCutSystDsvpvSig);
    if(DpassCutSystDtrkPt != nullptr && M.DpassCutSystDtrkPt != nullptr)   *DpassCutSystDtrkPt = *(M.DpassCutSystDtrkPt);
    if(DpassCutSystDalpha != nullptr && M.DpassCutSystDalpha != nullptr)   *DpassCutSystDalpha = *(M.DpassCutSystDalpha);
+   if(DpassCutSystDalphaOnly != nullptr && M.DpassCutSystDalphaOnly != nullptr)   *DpassCutSystDalphaOnly = *(M.DpassCutSystDalphaOnly);
+   if(DpassCutSystDdtheta != nullptr && M.DpassCutSystDdtheta != nullptr)   *DpassCutSystDdtheta = *(M.DpassCutSystDdtheta);
    if(DpassCutSystDchi2cl != nullptr && M.DpassCutSystDchi2cl != nullptr)   *DpassCutSystDchi2cl = *(M.DpassCutSystDchi2cl);
    if(Dgen != nullptr && M.Dgen != nullptr)   *Dgen = *(M.Dgen);
    if(DisSignalCalc != nullptr && M.DisSignalCalc != nullptr)   *DisSignalCalc = *(M.DisSignalCalc);
@@ -4180,7 +4204,8 @@ bool UPCEECTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
    Tree->SetBranchAddress("isL1ZDCXORJet12", &isL1ZDCXORJet12);
    Tree->SetBranchAddress("isL1ZDCXORJet16", &isL1ZDCXORJet16);
-   Tree->SetBranchAddress("trkPt", &trkPt); 
+   Tree->SetBranchAddress("isGammaN", &isGammaN);
+   Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkEta", &trkEta); 
    Tree->SetBranchAddress("trkPhi", &trkPhi);
    Tree->SetBranchAddress("pfEnergy", &pfEnergy); 
@@ -4262,6 +4287,7 @@ bool UPCEECTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/O");
    Tree->Branch("isL1ZDCXORJet12",       &isL1ZDCXORJet12, "isL1ZDCXORJet12/O");
    Tree->Branch("isL1ZDCXORJet16",       &isL1ZDCXORJet16, "isL1ZDCXORJet16/O");
+   Tree->Branch("isGammaN",              &isGammaN, "isGammaN/O");
    Tree->Branch("Nch",                   &Nch, "Nch/I");
    Tree->Branch("trkPt",                 &trkPt); 
    Tree->Branch("trkEta",                &trkEta);
@@ -4305,6 +4331,7 @@ void UPCEECTreeMessenger::Clear()
    isL1ZDCXORJet8 = false;
    isL1ZDCXORJet12 = false;
    isL1ZDCXORJet16 = false;
+   isGammaN = false;
    Nch = -999;
    trkPt->clear(); 
    trkEta->clear(); 
@@ -4385,6 +4412,11 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete JetEta;
       delete JetPhi;
       delete IsMuMuTagged;
+      delete GenJetPT;
+      delete GenJetEta;
+      delete GenJetPhi;
+      delete GenJetMatchIdx;
+      delete GenIsMuMuTagged;
       delete muPt1;
       delete muPt2;
       delete muEta1;
@@ -4408,12 +4440,31 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete mumuY;
       delete mumuPhi;
       delete mumuPt;
+      delete mumuIsGenMatched;
       //delete mumuisOnia;
       delete DRJetmu1;
       delete DRJetmu2;
       delete muDeta;
       delete muDphi;
       delete muDR;
+      delete ExtraMuWeight;
+      delete MuMuWeight;
+
+      delete GenMuPt1;
+      delete GenMuPt2;
+      delete GenMuEta1;
+      delete GenMuEta2;
+      delete GenMuPhi1;
+      delete GenMuPhi2;
+      delete GenMuMuMass;
+      delete GenMuMuEta;
+      delete GenMuMuY;
+      delete GenMuMuPhi;
+      delete GenMuMuPt;
+      delete GenMuDeta;
+      delete GenMuDphi;
+      delete GenMuDR;
+
       delete MJTHadronFlavor;
       delete MJTNcHad;
       delete MJTNbHad;
@@ -4473,6 +4524,11 @@ bool MuMuJetMessenger::Initialize()
    JetEta = nullptr;
    JetPhi = nullptr;
    IsMuMuTagged = nullptr;
+   GenJetPT = nullptr;
+   GenJetEta = nullptr;
+   GenJetPhi = nullptr;
+   GenJetMatchIdx = nullptr;
+   GenIsMuMuTagged = nullptr;
    muPt1 = nullptr;
    muPt2 = nullptr;
    muEta1 = nullptr;
@@ -4496,12 +4552,32 @@ bool MuMuJetMessenger::Initialize()
    mumuY = nullptr;
    mumuPhi = nullptr;
    mumuPt = nullptr;
+   mumuIsGenMatched = nullptr;
    //mumuisOnia = nullptr;
    DRJetmu1 = nullptr;
    DRJetmu2 = nullptr;
    muDeta = nullptr;
    muDphi = nullptr;
    muDR = nullptr;
+   ExtraMuWeight = nullptr;
+   MuMuWeight = nullptr;
+
+   GenMuPt1 = nullptr;
+   GenMuPt2 = nullptr;
+   GenMuEta1 = nullptr;
+   GenMuEta2 = nullptr;
+   GenMuPhi1 = nullptr;
+   GenMuPhi2 = nullptr;
+   GenMuMuMass = nullptr;
+   GenMuMuEta = nullptr;
+   GenMuMuY = nullptr;
+   GenMuMuPhi = nullptr;
+   GenMuMuPt = nullptr;
+   GenMuDeta = nullptr;
+   GenMuDphi = nullptr;
+   GenMuDR = nullptr;
+
+
    MJTHadronFlavor = nullptr;
    MJTNcHad = nullptr;
    MJTNbHad = nullptr;
@@ -4558,13 +4634,16 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("NCollWeight", &NCollWeight);
    Tree->SetBranchAddress("EventWeight", &EventWeight);
    Tree->SetBranchAddress("PTHat", &PTHat);
-   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
-   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
    Tree->SetBranchAddress("NPU", &NPU);
    Tree->SetBranchAddress("JetPT", &JetPT);
    Tree->SetBranchAddress("JetEta", &JetEta);
    Tree->SetBranchAddress("JetPhi", &JetPhi);
    Tree->SetBranchAddress("IsMuMuTagged", &IsMuMuTagged);
+   Tree->SetBranchAddress("GenJetPT", &GenJetPT);
+   Tree->SetBranchAddress("GenJetEta", &GenJetEta);
+   Tree->SetBranchAddress("GenJetPhi", &GenJetPhi);
+   Tree->SetBranchAddress("GenJetMatchIdx", &GenJetMatchIdx);
+   Tree->SetBranchAddress("GenIsMuMuTagged", &GenIsMuMuTagged);
    Tree->SetBranchAddress("muPt1", &muPt1);
    Tree->SetBranchAddress("muPt2", &muPt2);
    Tree->SetBranchAddress("muEta1", &muEta1);
@@ -4588,12 +4667,31 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("mumuY", &mumuY);
    Tree->SetBranchAddress("mumuPhi", &mumuPhi);
    Tree->SetBranchAddress("mumuPt", &mumuPt);
+   Tree->SetBranchAddress("mumuIsGenMatched", &mumuIsGenMatched);
    //Tree->SetBranchAddress("mumuisOnia", &mumuisOnia);
    Tree->SetBranchAddress("DRJetmu1", &DRJetmu1);
    Tree->SetBranchAddress("DRJetmu2", &DRJetmu2);
    Tree->SetBranchAddress("muDeta", &muDeta);
    Tree->SetBranchAddress("muDphi", &muDphi);
    Tree->SetBranchAddress("muDR", &muDR);
+   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
+   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
+
+   Tree->SetBranchAddress("GenMuPt1", &GenMuPt1);
+   Tree->SetBranchAddress("GenMuPt2", &GenMuPt2);
+   Tree->SetBranchAddress("GenMuEta1", &GenMuEta1);
+   Tree->SetBranchAddress("GenMuEta2", &GenMuEta2);
+   Tree->SetBranchAddress("GenMuPhi1", &GenMuPhi1);
+   Tree->SetBranchAddress("GenMuPhi2", &GenMuPhi2);
+   Tree->SetBranchAddress("GenMuMuMass", &GenMuMuMass);
+   Tree->SetBranchAddress("GenMuMuEta", &GenMuMuEta);
+   Tree->SetBranchAddress("GenMuMuY", &GenMuMuY);
+   Tree->SetBranchAddress("GenMuMuPhi", &GenMuMuPhi);
+   Tree->SetBranchAddress("GenMuMuPt", &GenMuMuPt);
+   Tree->SetBranchAddress("GenMuDeta", &GenMuDeta);
+   Tree->SetBranchAddress("GenMuDphi", &GenMuDphi);
+   Tree->SetBranchAddress("GenMuDR", &GenMuDR);
+
    Tree->SetBranchAddress("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->SetBranchAddress("MJTNcHad", &MJTNcHad);
    Tree->SetBranchAddress("MJTNbHad", &MJTNbHad);
@@ -4667,6 +4765,11 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    JetEta = new std::vector<float>();
    JetPhi = new std::vector<float>();
    IsMuMuTagged = new std::vector<bool>();
+   GenJetPT = new std::vector<float>();
+   GenJetEta = new std::vector<float>();
+   GenJetPhi = new std::vector<float>();
+   GenJetMatchIdx = new std::vector<int>();
+   GenIsMuMuTagged = new std::vector<bool>();
    muPt1 = new std::vector<float>();
    muPt2 = new std::vector<float>();
    muEta1 = new std::vector<float>();
@@ -4690,12 +4793,31 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    mumuY = new std::vector<float>();
    mumuPhi = new std::vector<float>();
    mumuPt = new std::vector<float>();
+   mumuIsGenMatched = new std::vector<bool>();
    //mumuisOnia = new std::vector<int>();
    DRJetmu1 = new std::vector<float>();
    DRJetmu2 = new std::vector<float>();
    muDeta = new std::vector<float>();
    muDphi = new std::vector<float>();
    muDR = new std::vector<float>();
+   ExtraMuWeight = new std::vector<std::vector<float>>();
+   MuMuWeight = new std::vector<float>();
+
+   GenMuPt1 = new std::vector<float>();
+   GenMuPt2 = new std::vector<float>();
+   GenMuEta1 = new std::vector<float>();
+   GenMuEta2 = new std::vector<float>();
+   GenMuPhi1 = new std::vector<float>();
+   GenMuPhi2 = new std::vector<float>();
+   GenMuMuMass = new std::vector<float>();
+   GenMuMuEta = new std::vector<float>();
+   GenMuMuY = new std::vector<float>();
+   GenMuMuPhi = new std::vector<float>();
+   GenMuMuPt = new std::vector<float>();
+   GenMuDeta = new std::vector<float>();
+   GenMuDphi = new std::vector<float>();
+   GenMuDR = new std::vector<float>();
+
    MJTHadronFlavor = new std::vector<int>();
    MJTNcHad = new std::vector<int>();
    MJTNbHad = new std::vector<int>();
@@ -4754,13 +4876,16 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("NCollWeight", &NCollWeight,  "NCollWeight/F");
    Tree->Branch("EventWeight", &EventWeight,  "EventWeight/F");
    Tree->Branch("PTHat", &PTHat,  "PTHat/F");
-   Tree->Branch("ExtraMuWeight", &ExtraMuWeight, "ExtraMuWeight[12]/F");
-   Tree->Branch("MuMuWeight", &MuMuWeight, "MuMuWeight/F");
    Tree->Branch("NPU", &NPU, "NPU/I");
    Tree->Branch("JetPT", &JetPT);
    Tree->Branch("JetEta", &JetEta);
    Tree->Branch("JetPhi", &JetPhi);
    Tree->Branch("IsMuMuTagged", &IsMuMuTagged);
+   Tree->Branch("GenJetPT", &GenJetPT);
+   Tree->Branch("GenJetEta", &GenJetEta);
+   Tree->Branch("GenJetPhi", &GenJetPhi);
+   Tree->Branch("GenJetMatchIdx", &GenJetMatchIdx);
+   Tree->Branch("GenIsMuMuTagged", &GenIsMuMuTagged);
    Tree->Branch("muPt1", &muPt1);
    Tree->Branch("muPt2", &muPt2);
    Tree->Branch("muEta1", &muEta1);
@@ -4784,12 +4909,31 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("mumuY", &mumuY);
    Tree->Branch("mumuPhi", &mumuPhi);
    Tree->Branch("mumuPt", &mumuPt);
+   Tree->Branch("mumuIsGenMatched", &mumuIsGenMatched);
    //Tree->Branch("mumuisOnia", &mumuisOnia);
    Tree->Branch("DRJetmu1", &DRJetmu1);
    Tree->Branch("DRJetmu2", &DRJetmu2);
    Tree->Branch("muDeta", &muDeta);
    Tree->Branch("muDphi", &muDphi);
    Tree->Branch("muDR", &muDR);
+   Tree->Branch("ExtraMuWeight", &ExtraMuWeight);
+   Tree->Branch("MuMuWeight", &MuMuWeight);
+
+   Tree->Branch("GenMuPt1", &GenMuPt1);
+   Tree->Branch("GenMuPt2", &GenMuPt2);
+   Tree->Branch("GenMuEta1", &GenMuEta1);
+   Tree->Branch("GenMuEta2", &GenMuEta2);
+   Tree->Branch("GenMuPhi1", &GenMuPhi1);
+   Tree->Branch("GenMuPhi2", &GenMuPhi2);
+   Tree->Branch("GenMuMuMass", &GenMuMuMass);
+   Tree->Branch("GenMuMuEta", &GenMuMuEta);
+   Tree->Branch("GenMuMuY", &GenMuMuY);
+   Tree->Branch("GenMuMuPhi", &GenMuMuPhi);
+   Tree->Branch("GenMuMuPt", &GenMuMuPt);
+   Tree->Branch("GenMuDeta", &GenMuDeta);
+   Tree->Branch("GenMuDphi", &GenMuDphi);
+   Tree->Branch("GenMuDR", &GenMuDR);
+
    Tree->Branch("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->Branch("MJTNcHad", &MJTNcHad);
    Tree->Branch("MJTNbHad", &MJTNbHad);
@@ -4858,15 +5002,15 @@ void MuMuJetMessenger::Clear()
    ntrk = 0;
    NPU = 0;
 
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = 1;
-
-   MuMuWeight = 1;
-
    JetPT->clear();
    JetEta->clear();
    JetPhi->clear();
    IsMuMuTagged->clear();
+   GenJetPT->clear();
+   GenJetEta->clear();
+   GenJetPhi->clear();
+   GenJetMatchIdx->clear();
+   GenIsMuMuTagged->clear();
    muPt1->clear();
    muPt2->clear();
    muEta1->clear();
@@ -4890,12 +5034,31 @@ void MuMuJetMessenger::Clear()
    mumuY->clear();
    mumuPhi->clear();
    mumuPt->clear();
+   mumuIsGenMatched->clear();
    //mumuisOnia->clear();
    DRJetmu1->clear();
    DRJetmu2->clear();
    muDeta->clear();
    muDphi->clear();
    muDR->clear();
+   ExtraMuWeight->clear();
+   MuMuWeight->clear();
+
+   GenMuPt1->clear();
+   GenMuPt2->clear();
+   GenMuEta1->clear();
+   GenMuEta2->clear();
+   GenMuPhi1->clear();
+   GenMuPhi2->clear();
+   GenMuMuMass->clear();
+   GenMuMuEta->clear();
+   GenMuMuY->clear();
+   GenMuMuPhi->clear();
+   GenMuMuPt->clear();
+   GenMuDeta->clear();
+   GenMuDphi->clear();
+   GenMuDR->clear();
+
    MJTHadronFlavor->clear();
    MJTNcHad->clear();
    MJTNbHad->clear();
@@ -4959,15 +5122,15 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    nsvtx        = M.nsvtx;
    ntrk         = M.ntrk;
 
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = M.ExtraMuWeight[i];
-
-   MuMuWeight   = M.MuMuWeight;
-
    if(JetPT != nullptr && M.JetPT != nullptr)   *JetPT = *(M.JetPT);
    if(JetEta != nullptr && M.JetEta != nullptr)   *JetEta = *(M.JetEta);
    if(JetPhi != nullptr && M.JetPhi != nullptr)   *JetPhi = *(M.JetPhi);
    if(IsMuMuTagged != nullptr && M.IsMuMuTagged != nullptr)   *IsMuMuTagged = *(M.IsMuMuTagged);
+   if(GenJetPT != nullptr && M.GenJetPT != nullptr)   *GenJetPT = *(M.GenJetPT);
+   if(GenJetEta != nullptr && M.GenJetEta != nullptr)   *GenJetEta = *(M.GenJetEta);
+   if(GenJetPhi != nullptr && M.GenJetPhi != nullptr)   *GenJetPhi = *(M.GenJetPhi);
+   if(GenJetMatchIdx != nullptr && M.GenJetMatchIdx != nullptr)   *GenJetMatchIdx = *(M.GenJetMatchIdx);
+   if(GenIsMuMuTagged != nullptr && M.GenIsMuMuTagged != nullptr)   *GenIsMuMuTagged = *(M.GenIsMuMuTagged);
    if(muPt1 != nullptr && M.muPt1 != nullptr)   *muPt1 = *(M.muPt1);
    if(muPt2 != nullptr && M.muPt2 != nullptr)   *muPt2 = *(M.muPt2);
    if(muEta1 != nullptr && M.muEta1 != nullptr)   *muEta1 = *(M.muEta1);
@@ -4991,12 +5154,31 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(mumuY != nullptr && M.mumuY != nullptr)   *mumuY = *(M.mumuY);
    if(mumuPhi != nullptr && M.mumuPhi != nullptr)   *mumuPhi = *(M.mumuPhi);
    if(mumuPt != nullptr && M.mumuPt != nullptr)   *mumuPt = *(M.mumuPt);
+   if(mumuIsGenMatched != nullptr && M.mumuIsGenMatched != nullptr)   *mumuIsGenMatched = *(M.mumuIsGenMatched);
    //if(mumuisOnia != nullptr && M.mumuisOnia != nullptr)   *mumuisOnia = *(M.mumuisOnia);
    if(DRJetmu1 != nullptr && M.DRJetmu1 != nullptr)   *DRJetmu1 = *(M.DRJetmu1);
    if(DRJetmu2 != nullptr && M.DRJetmu2 != nullptr)   *DRJetmu2 = *(M.DRJetmu2);
    if(muDeta != nullptr && M.muDeta != nullptr)   *muDeta = *(M.muDeta);
    if(muDphi != nullptr && M.muDphi != nullptr)   *muDphi = *(M.muDphi);
    if(muDR != nullptr && M.muDR != nullptr)   *muDR = *(M.muDR);
+   if(ExtraMuWeight != nullptr && M.ExtraMuWeight != nullptr)   *ExtraMuWeight = *(M.ExtraMuWeight);
+   if(MuMuWeight != nullptr && M.MuMuWeight != nullptr)   *MuMuWeight = *(M.MuMuWeight);
+
+   if(GenMuPt1 != nullptr && M.GenMuPt1 != nullptr)   *GenMuPt1 = *(M.GenMuPt1);
+   if(GenMuPt2 != nullptr && M.GenMuPt2 != nullptr)   *GenMuPt2 = *(M.GenMuPt2);
+   if(GenMuEta1 != nullptr && M.GenMuEta1 != nullptr)   *GenMuEta1 = *(M.GenMuEta1);
+   if(GenMuEta2 != nullptr && M.GenMuEta2 != nullptr)   *GenMuEta2 = *(M.GenMuEta2);
+   if(GenMuPhi1 != nullptr && M.GenMuPhi1 != nullptr)   *GenMuPhi1 = *(M.GenMuPhi1);
+   if(GenMuPhi2 != nullptr && M.GenMuPhi2 != nullptr)   *GenMuPhi2 = *(M.GenMuPhi2);
+   if(GenMuMuMass != nullptr && M.GenMuMuMass != nullptr)   *GenMuMuMass = *(M.GenMuMuMass);
+   if(GenMuMuEta != nullptr && M.GenMuMuEta != nullptr)   *GenMuMuEta = *(M.GenMuMuEta);
+   if(GenMuMuY != nullptr && M.GenMuMuY != nullptr)   *GenMuMuY = *(M.GenMuMuY);
+   if(GenMuMuPhi != nullptr && M.GenMuMuPhi != nullptr)   *GenMuMuPhi = *(M.GenMuMuPhi);
+   if(GenMuMuPt != nullptr && M.GenMuMuPt != nullptr)   *GenMuMuPt = *(M.GenMuMuPt);
+   if(GenMuDeta != nullptr && M.GenMuDeta != nullptr)   *GenMuDeta = *(M.GenMuDeta);
+   if(GenMuDphi != nullptr && M.GenMuDphi != nullptr)   *GenMuDphi = *(M.GenMuDphi);
+   if(GenMuDR != nullptr && M.GenMuDR != nullptr)   *GenMuDR = *(M.GenMuDR);
+
    if(MJTHadronFlavor != nullptr && M.MJTHadronFlavor != nullptr)   *MJTHadronFlavor = *(M.MJTHadronFlavor);
    if(MJTNcHad != nullptr && M.MJTNcHad != nullptr)   *MJTNcHad = *(M.MJTNcHad);
    if(MJTNbHad != nullptr && M.MJTNbHad != nullptr)   *MJTNbHad = *(M.MJTNbHad);
