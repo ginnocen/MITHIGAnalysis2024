@@ -8,7 +8,8 @@
 #include <algorithm> // for std::min
 #include <iostream>
 #include <vector>
-void loop() {
+
+void loop(bool applyPPSTagCondition = true) {
 
   gStyle->SetOptStat(0);
   // Open the ROOT file
@@ -28,20 +29,14 @@ void loop() {
   }
 
   // x axis = number of tracks, y axis = number of events
-  TH1F *hNtrNoCond = new TH1F("hNtrNoCond", "; n. HP tracks |#eta|<2.4, p_{T}>0.3 GeV; Entries", 1000, -0.5, 999.5);
-  TH1F *hNtrPPS = new TH1F("hNtrPPS", "; n. HP tracks |#eta|<2.4, p_{T}>0.3 GeV; Entries", 1000, -0.5, 999.5);
-  TH2F *hZDCpvsZDCmNoCond = new TH2F("hZDCpvsZDCmNoCond", "; ZDC+; ZDC-", 100, 0, 8000, 100, 0, 8000);
-  TH2F *hZDCpvsZDCmPPS = new TH2F("hZDCpvsZDCmPPS", "; ZDC+; ZDC-", 100, 0, 8000, 100, 0, 8000);
-  TH1F *hZDCmNoCond = new TH1F("hZDCmNoCond", "; ZDC-; Entries", 100, 0, 8000);
-  TH1F *hZDCmPPS = new TH1F("hZDCmPPS", "; ZDC-; Entries", 100, 0, 8000);
-  TH1F *hZDCpNoCond = new TH1F("hZDCpNoCond", "; ZDC+; Entries", 100, 0, 8000);
-  TH1F *hZDCpPPS = new TH1F("hZDCpPPS", "; ZDC+; Entries", 100, 0, 8000);
-  TH1F *hFSC2bottomM_adcNoCond = new TH1F("hFSC2bottomM_adcNoCond", "; FSC2bottomM_adcNoCond; Entries", 100, 0, 256);
-  TH1F *hFSC2bottomM_adcPPS = new TH1F("hFSC2bottomM_adcPPS", "; FSC2bottomM_adcPPS; Entries", 100, 0, 256);
-  TH1F *hFSC2bottomM_chargefCNoCond =
-      new TH1F("hFSC2bottomM_chargefCNoCond", "; FSC2bottomM_chargefCNoCond; Entries", 10000, 0, 400000);
-  TH1F *hFSC2bottomM_chargefCPPS =
-      new TH1F("hFSC2bottomM_chargefCPPS", "; FSC2bottomM_chargefCPPS; Entries", 10000, 0, 400000);
+  TH1F *hNtr = new TH1F("hNtr", "; n. HP tracks |#eta|<2.4, p_{T}>0.3 GeV; Entries", 1000, -0.5, 999.5);
+  TH1F *hEtaCharged = new TH1F("hEtaCharged", "; #eta; Entries", 100, -5, 5);
+  TH1F *hZDCm = new TH1F("hZDCm", "; ZDC-; Entries", 100, 0, 8000);
+  TH1F *hZDCp = new TH1F("hZDCp", "; ZDC+; Entries", 100, 0, 8000);
+  TH1F *hFSC3bottomleftM_adc = new TH1F("hFSC3bottomleftM_adc", "; FSC3bottomleftM_adc; Entries", 100, 0, 256);
+  TH1F *hFSC3botleftM_fC = new TH1F("hFSC3botleftM_fC", "; FSC3bottomleftM_chargefC; Entries", 10000, 0, 400000);
+  TH1F *hLeadingTrackPt = new TH1F("hLeadingTrackPt", "; Leading Track p_{T} [GeV]; Entries", 50, 0, 5);
+
   bool passBaselineEventSelection = false;
   float VZ;
   float VZError;
@@ -104,73 +99,75 @@ void loop() {
   t->SetBranchAddress("FSC3toprightM_chargefC", &FSC3toprightM_chargefC);
 
   const Long64_t nEntries = t->GetEntries();
-  const Long64_t nMax = std::min<Long64_t>(nEntries, 1000000000000); // cap to 1000 as in your code
+  const Long64_t nMax = std::min<Long64_t>(nEntries, 100000000); // cap to 1000 as in your code
   int multHighPurity2p4Pt0p3 = 0;
-
+  std::cout << "Total entries in tree: " << nEntries << "\n";
   for (Long64_t i = 0; i < nMax; ++i) {
     t->GetEntry(i);
     multHighPurity2p4Pt0p3 = 0;
-    if (!passBaselineEventSelection) {
-      continue;
+    // printout every 1000 events
+    if (i % 100000 == 0) {
+      std::cout << "Processing event " << i << "/" << nMax << "\n";
     }
-    // if (HFEMaxPlus > 8.0 || HFEMaxMinus > 8.0) {
-    //   continue;
-    // }
 
+    if (HFEMaxPlus > 9.0)
+      continue;
     if (!HLT_OxyZeroBias_v1) {
       continue;
     } // skip events not passing the trigger
 
+    if (!passBaselineEventSelection) {
+      continue;
+    }
     if (fabs(VZ) > 15.0)
       continue;
 
-    // std::cout << "Event " << i << ": passBaselineEventSelection = " << passBaselineEventSelection << "\n";
+    if (ZDCsumPlus > 1300)
+      continue;
+
+    int size_PPSStation0M_x = PPSStation0M_x->size();
+    int size_PPSStation0M_y = PPSStation0M_y->size();
+    int size_PPSStation2M_x = PPSStation2M_x->size();
+    int size_PPSStation2M_y = PPSStation2M_y->size();
+    // FIXME: this tagging is very very preliminary,
+    // it should be replaced with a proper one that relies on the proton reconstruction, timing, etc.
+    bool PPS_tag =
+        (size_PPSStation0M_x > 0 && size_PPSStation0M_y > 0 && size_PPSStation2M_x > 0 && size_PPSStation2M_y > 0);
+
+    if (applyPPSTagCondition && !PPS_tag)
+      continue;
+    float leadingTrackPt = -1.0;
 
     for (size_t j = 0; j < trkPt->size(); ++j) {
       if (highPurity->at(j)) {
         if (trkPt->at(j) > 0.3 && fabs(trkEta->at(j)) < 2.4) {
           multHighPurity2p4Pt0p3++;
-        }
-      }
+          hEtaCharged->Fill(trkEta->at(j));
+          if (trkPt->at(j) > leadingTrackPt) {
+            leadingTrackPt = trkPt->at(j);
+          }
+        } // end of loop pt and eta cut
+      } // end of highPurity check
+    } // end of track loop
+    // if (leadingTrackPt < 2.0) continue;
+    hLeadingTrackPt->Fill(leadingTrackPt);
+    hNtr->Fill(multHighPurity2p4Pt0p3);
+    hZDCm->Fill(ZDCsumMinus);
+    hZDCp->Fill(ZDCsumPlus);
+    hFSC3bottomleftM_adc->Fill((*FSC3bottomleftM_adc)[2]);
+    hFSC3botleftM_fC->Fill((*FSC3bottomleftM_chargefC)[2]);
+  } // end of event loop
 
-      // std::cout << "  Track " << j << ": Pt = " << trkPt->at(j) << ", Eta = " << trkEta->at(j) << ", Phi = " <<
-      // trkPhi->at(j) << "\n";
-    }
-    int size_PPSStation0M_x = PPSStation0M_x->size();
-    int size_PPSStation0M_y = PPSStation0M_y->size();
-    int size_PPSStation2M_x = PPSStation2M_x->size();
-    int size_PPSStation2M_y = PPSStation2M_y->size();
-    if (size_PPSStation0M_x > 0 && size_PPSStation0M_y > 0 && size_PPSStation2M_x > 0 && size_PPSStation2M_y > 0) {
-      hNtrPPS->Fill(multHighPurity2p4Pt0p3);
-      hZDCpvsZDCmPPS->Fill(ZDCsumPlus, ZDCsumMinus);
-      hZDCmPPS->Fill(ZDCsumMinus);
-      hZDCpPPS->Fill(ZDCsumPlus);
-      hFSC2bottomM_adcPPS->Fill(FSC2bottomM_adc->at(2));
-      hFSC2bottomM_chargefCPPS->Fill(FSC2bottomM_chargefC->at(2));
-    }
-    hNtrNoCond->Fill(multHighPurity2p4Pt0p3);
-    hZDCpvsZDCmNoCond->Fill(ZDCsumPlus, ZDCsumMinus);
-    hZDCmNoCond->Fill(ZDCsumMinus);
-    hZDCpNoCond->Fill(ZDCsumPlus);
-    hFSC2bottomM_adcNoCond->Fill(FSC2bottomM_adc->at(2));
-    hFSC2bottomM_chargefCNoCond->Fill(FSC2bottomM_chargefC->at(2));
-  }
-
-  TFile *outFile = TFile::Open("output.root", "RECREATE");
-  hNtrNoCond->Write();
-  hNtrPPS->Write();
-  hZDCpvsZDCmNoCond->Write();
-  hZDCpvsZDCmPPS->Write();
-  hZDCmNoCond->Write();
-  hZDCmPPS->Write();
-  hZDCpNoCond->Write();
-  hZDCpPPS->Write();
-  hFSC2bottomM_adcNoCond->Write();
-  hFSC2bottomM_adcPPS->Write();
-  hFSC2bottomM_chargefCNoCond->Write();
-  hFSC2bottomM_chargefCPPS->Write();
+  TFile *outFile = TFile::Open(Form("output_loop_ppsTag_%d.root", applyPPSTagCondition), "RECREATE");
+  outFile->cd();
+  hLeadingTrackPt->Write();
+  hNtr->Write();
+  hEtaCharged->Write();
+  hZDCm->Write();
+  hZDCp->Write();
+  hFSC3bottomleftM_adc->Write();
+  hFSC3botleftM_fC->Write();
   outFile->Close();
-  f->Close();
 }
 
 int main() {
