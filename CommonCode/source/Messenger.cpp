@@ -1573,28 +1573,6 @@ bool DzeroTreeMessenger::GetEntry(int iEntry)
    return true;
 }
 
-bool DzeroTreeMessenger::PassUPCDzero2023Cut(int index)
-{
-   if(index >= Dsize)
-      return false;
-  //FIXME : need to be cross-checked
-  if(Dalpha[index] > 0.4)
-      return false;
-  if(Ddtheta[index] > 0.5)
-      return false;
-  if(Dchi2cl[index] < 0.1)
-      return false;
-  if(fabs(Dtrk1PtErr[index] / Dtrk1Pt[index]) > 0.1)
-      return false;
-  if(fabs(Dtrk2PtErr[index] / Dtrk2Pt[index]) > 0.1)
-      return false;
-  if (Dtrk1highPurity[index] == 0 || Dtrk2highPurity[index] == 0)
-      return false;
-  if (DsvpvDistance[index]/DsvpvDisErr[index] < 2.)
-      return false;
-   return true;
-}
-
 DzeroGenTreeMessenger::DzeroGenTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());

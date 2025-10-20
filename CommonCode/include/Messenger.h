@@ -474,7 +474,6 @@ public:
    bool Initialize(TTree *DzeroTree);
    bool Initialize();
    bool GetEntry(int iEntry);
-   bool PassUPCDzero2023Cut(int index); //FIXME: to be fined tuned
 };
 
 
@@ -492,8 +491,8 @@ public:
    int GSignalType[DZEROGENCOUNTMAX];
    int GBAncestorpdgId[DZEROGENCOUNTMAX];
 public:
-   DzeroGenTreeMessenger(TFile &File, std::string TreeName = "Dfinder/ntGenDkpi");
-   DzeroGenTreeMessenger(TFile *File, std::string TreeName = "Dfinder/ntGenDkpi");
+   DzeroGenTreeMessenger(TFile &File, std::string TreeName = "Dfinder/ntGen");
+   DzeroGenTreeMessenger(TFile *File, std::string TreeName = "Dfinder/ntGen");
    DzeroGenTreeMessenger(TTree *DzeroGenTree);
    bool Initialize(TTree *DzeroGenTree);
    bool Initialize();

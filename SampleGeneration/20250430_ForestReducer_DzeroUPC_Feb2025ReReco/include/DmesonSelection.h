@@ -323,7 +323,7 @@ bool DpassCutSystDchi2cl(DzeroTreeMessenger &MDzero, int iD) {
 // DO NOT EDIT BELOW THIS LINE! -----------------------------------------------
 // HIN-25-002 2025-04 PAS SETTINGS --------------------------------------------
 // ============================================================================
-// Used for April 2024 PAS for Quark Matter 2025
+// Used for April 2025 PAS for Quark Matter 2025
 // 2025-09-15:
 //    - Added bins for Dpt 0-2 GeV with same settings as Dpt 2-5 GeV bins.
 // 2025-10-20:
