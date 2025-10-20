@@ -608,7 +608,7 @@ public:
    std::vector<bool> *SingleMuIsGlobal;
    std::vector<bool> *SingleMuIsTracker;
    std::vector<bool> *SingleMuHybridSoft;
-   
+
    std::vector<float> *GenSingleMuPT;
    std::vector<float> *GenSingleMuEta;
    std::vector<float> *GenSingleMuPhi;
@@ -960,7 +960,7 @@ public:
    std::vector<bool> *DpassCutSystDtrkPt;
    std::vector<bool> *DpassCutSystDalpha;
    std::vector<bool> *DpassCutSystDdtheta;
-   std::vector<bool> *DpassCutSystDalphaOnly;
+   std::vector<bool> *DpassCutSystDalphaDdtheta;
    std::vector<bool> *DpassCutSystDchi2cl;
    std::vector<int> *Dgen;
    std::vector<bool> *DisSignalCalc;

@@ -269,20 +269,6 @@ bool DpassCutSystDalpha(DzeroTreeMessenger &MDzero, int iD) {
     iD,
     Dchi2clCutValue_nom,
     DalphaCutValue_syst,
-    DdthetaCutValue_syst,
-    DsvpvSigCutValue_nom,
-    Dtrk1PtCutValue_nom,
-    Dtrk2PtCutValue_nom
-  );
-}
-
-// Added to apply systematics for Dalpha and Ddtheta indendently:
-bool DpassCutSystDalphaOnly(DzeroTreeMessenger &MDzero, int iD) {
-  return DCutSelection(
-    MDzero,
-    iD,
-    Dchi2clCutValue_nom,
-    DalphaCutValue_syst,
     DdthetaCutValue_nom,
     DsvpvSigCutValue_nom,
     Dtrk1PtCutValue_nom,
@@ -297,6 +283,20 @@ bool DpassCutSystDdtheta(DzeroTreeMessenger &MDzero, int iD) {
     iD,
     Dchi2clCutValue_nom,
     DalphaCutValue_nom,
+    DdthetaCutValue_syst,
+    DsvpvSigCutValue_nom,
+    Dtrk1PtCutValue_nom,
+    Dtrk2PtCutValue_nom
+  );
+}
+
+// Added to apply systematics for Dalpha and Ddtheta indendently:
+bool DpassCutSystDalphaDdtheta(DzeroTreeMessenger &MDzero, int iD) {
+  return DCutSelection(
+    MDzero,
+    iD,
+    Dchi2clCutValue_nom,
+    DalphaCutValue_syst,
     DdthetaCutValue_syst,
     DsvpvSigCutValue_nom,
     Dtrk1PtCutValue_nom,
