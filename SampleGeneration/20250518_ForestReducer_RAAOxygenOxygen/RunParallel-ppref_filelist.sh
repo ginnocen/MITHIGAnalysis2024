@@ -1,13 +1,10 @@
 #!/bin/bash
 DATE=$(date +%Y%m%d)
 
-
-# NOT FULLY TESTED, USE WITH CAUTION!
-
 source clean.sh
 
-MAXCORES=40  # too many parallel cores can cause event loss, increase with caution!
-NFILES=1 # number of files to cap the processing at, if -1 processess all files
+MAXCORES=30  # too many parallel cores can cause event loss, increase with caution!
+NFILES=-1 # number of files to cap the processing at, if -1 processess all files
 ISDATA=1
 APPLYTRIGGERREJECTION=1 #  trigger = 0 for no rejection, 1 for ZeroBias, 2 for MinBias
 APPLYEVENTREJECTION=1
@@ -17,22 +14,13 @@ XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/g
 
 
 # ============================================================
-# pp data, low pT PD
+# pp data, low pT PD, Vipul's filelist for crosscheck
 # ============================================================
-NAME="${DATE}_Skim_ppref2024_data"
-PATHSAMPLE="/store/group/phys_heavyions/vpant/ppref2024output/PPRefZeroBiasPlusForward4/crab_ppref2024/250324_080237/0001"
+NAME="${DATE}_Skim_ppref2024_data_CROSSCHECK_1to9087"
+FILELIST="PPRefZeroBiasPlusForward4.txt"
 
 # set your output directory here
-OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME/0001"
-
-# ============================================================
-# pp MC, official minbias
-# ============================================================
-#NAME="${DATE}_Skim_ppref2024_MinBias_TuneCP5_5p36TeV-pythia8_noEvtSel"
-#PATHSAMPLE="/eos/cms/store/group/phys_heavyions/kdeverea/MinBias_TuneCP5_5p36TeV-pythia8/MinBias_TuneCP5_5p36TeV-pythia8/crab_MinBias_TuneCP5_5p36TeV-pythia8/250726_203015/0001"
-
-# set your output directory here
-#OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME/0001"
+OUTPUT="/data00/$USER/OOsamples/Skims/output_$NAME"
 
 
 
@@ -49,7 +37,7 @@ mkdir -p $OUTPUT
 
 # Loop through each file in the file list
 COUNTER=0
-for FILEPATH in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep 'HiForestMiniAOD'); do
+while IFS= read -r FILEPATH; do
 
     if [ $NFILES -gt 0 ] && [ $COUNTER -ge $NFILES ]; then
         break
@@ -60,7 +48,7 @@ for FILEPATH in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep 'HiForestMiniAOD'); do
 
     wait_for_slot
     ((COUNTER++))
-done
+done < $FILELIST
 wait
 
 echo "Processing COMPLETE"
