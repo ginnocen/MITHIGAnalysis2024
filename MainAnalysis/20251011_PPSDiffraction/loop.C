@@ -9,7 +9,7 @@
 #include <iostream>
 #include <vector>
 
-void loop(bool applyPPSTagCondition = true) {
+void loop(bool applyPPSTagCondition = true, bool applyZDCPlusVeto = true, bool applyHFPlusGapVeto = true) {
 
   gStyle->SetOptStat(0);
   // Open the ROOT file
@@ -110,7 +110,7 @@ void loop(bool applyPPSTagCondition = true) {
       std::cout << "Processing event " << i << "/" << nMax << "\n";
     }
 
-    if (HFEMaxPlus > 9.0)
+    if (applyHFPlusGapVeto && HFEMaxPlus > 9.0)
       continue;
     if (!HLT_OxyZeroBias_v1) {
       continue;
@@ -122,7 +122,7 @@ void loop(bool applyPPSTagCondition = true) {
     if (fabs(VZ) > 15.0)
       continue;
 
-    if (ZDCsumPlus > 1300)
+    if (applyZDCPlusVeto && ZDCsumPlus > 1300)
       continue;
 
     int size_PPSStation0M_x = PPSStation0M_x->size();
@@ -158,7 +158,9 @@ void loop(bool applyPPSTagCondition = true) {
     hFSC3botleftM_fC->Fill((*FSC3bottomleftM_chargefC)[2]);
   } // end of event loop
 
-  TFile *outFile = TFile::Open(Form("output_loop_ppsTag_%d.root", applyPPSTagCondition), "RECREATE");
+  TFile *outFile = TFile::Open(Form("output_loop_ppsTag_%d_zdcPlusVeto_%d_HFPlusGapVeto_%d.root", applyPPSTagCondition,
+                                    applyZDCPlusVeto, applyHFPlusGapVeto),
+                               "RECREATE");
   outFile->cd();
   hLeadingTrackPt->Write();
   hNtr->Write();

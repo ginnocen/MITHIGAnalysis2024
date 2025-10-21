@@ -1,5 +1,6 @@
-void draw(TString string1 = "ppsTag_0", TString string2 = "ppsTag_1", TString histname = "hFSC3botleftM_fC",
-          float xmin = 0, float xmax = 100, float ymin = 0, float ymax = 100, bool logy = true, bool logx = false) {
+void draw(TString string1 = "ppsTag_0_zdcPlusVeto_0_HFPlusGapVeto_1",
+          TString string2 = "ppsTag_0_zdcPlusVeto_0_HFPlusGapVeto_1", TString histname = "hNtrk", float xmin = 0,
+          float xmax = 100, float ymin = 0, float ymax = 100, bool logy = true, bool logx = false) {
 
   TFile *f1 = TFile::Open(Form("output_loop_%s.root", string1.Data()));
   TFile *f2 = TFile::Open(Form("output_loop_%s.root", string2.Data()));
@@ -28,9 +29,8 @@ void draw(TString string1 = "ppsTag_0", TString string2 = "ppsTag_1", TString hi
   c1->SaveAs(Form("comparison_%s_vs_%s_%s.png", string1.Data(), string2.Data(), histname.Data()));
 }
 
-void compare() {
-  draw("ppsTag_0", "ppsTag_1", "hFSC3botleftM_fC", 0, 20000, 1e-4, 1, true, true);
-  draw("ppsTag_0", "ppsTag_1", "hEtaCharged", -5, 5, 1e-4, 1, true, false);
-  draw("ppsTag_0", "ppsTag_1", "hZDCm", 0, 3000, 1e-4, 1, true, false);
-  draw("ppsTag_0", "ppsTag_1", "hZDCp", 0, 3000, 1e-4, 1, true, false);
+void compare(TString string1 = "ppsTag_0_zdcPlusVeto_0_HFPlusGapVeto_0",
+             TString string2 = "ppsTag_0_zdcPlusVeto_1_HFPlusGapVeto_1") {
+  draw(string1, string2, "hNtr", 0, 100, 1e-4, 10, true, false);
+  draw(string1, string2, "hEtaCharged", -6, 6, 1e-4, 0.5, true, false);
 }
