@@ -11,7 +11,9 @@
 #define GENCOUNTMAX 250
 #define VERTEXCOUNTMAX 200
 #define DZEROCOUNTMAX 20000 //FIXME: to be fined tuned
+#define LAMBDACCOUNTMAX 20000 //FIXME: to be fined tuned
 #define DZEROGENCOUNTMAX 300 //FIXME: to be fined tuned
+#define DFINDERGENCOUNTMAX 300 //FIXME: to be fined tuned for Dfinder
 #define SVTXCOUNTMAX 50
 #define TRACKCOUNTMAX 20000
 #define PLANEMAX 200
@@ -35,7 +37,9 @@ class PbPbUPCTrackTreeMessenger;
 class ZDCTreeMessenger;
 class HFAdcMessenger;
 class DzeroTreeMessenger;
+class LambdaCTreeMessenger;
 class DzeroGenTreeMessenger;
+class DfinderGenTreeMessenger;
 class UPCEECTreeMessenger;
 
 
@@ -477,6 +481,64 @@ public:
 };
 
 
+class LambdaCTreeMessenger
+{
+public:
+   TTree *Tree;
+   int Dsize;
+   float Dpt[LAMBDACCOUNTMAX];
+   float Dphi[LAMBDACCOUNTMAX];
+   float Dy[LAMBDACCOUNTMAX];
+   float Dmass[LAMBDACCOUNTMAX];
+   float Dtrk1Pt[LAMBDACCOUNTMAX];
+   float Dtrk1PtErr[LAMBDACCOUNTMAX];
+   float Dtrk1Eta[LAMBDACCOUNTMAX];
+   float Dtrk1P[LAMBDACCOUNTMAX];
+   float Dtrk1dedx[LAMBDACCOUNTMAX];
+   float Dtrk1MassHypo[LAMBDACCOUNTMAX];
+   float Dtrk1PixelHit[LAMBDACCOUNTMAX];
+   float Dtrk1StripHit[LAMBDACCOUNTMAX];
+   float Dtrk1highPurity[LAMBDACCOUNTMAX];
+   float Dtrk2Pt[LAMBDACCOUNTMAX];
+   float Dtrk2PtErr[LAMBDACCOUNTMAX];
+   float Dtrk2Eta[LAMBDACCOUNTMAX];
+   float Dtrk2P[LAMBDACCOUNTMAX];
+   float Dtrk2dedx[LAMBDACCOUNTMAX];
+   float Dtrk2MassHypo[LAMBDACCOUNTMAX];
+   float Dtrk2PixelHit[LAMBDACCOUNTMAX];
+   float Dtrk2StripHit[LAMBDACCOUNTMAX];
+   float Dtrk2highPurity[LAMBDACCOUNTMAX];
+   float Dtrk3Pt[LAMBDACCOUNTMAX];
+   float Dtrk3PtErr[LAMBDACCOUNTMAX];
+   float Dtrk3Eta[LAMBDACCOUNTMAX];
+   float Dtrk3P[LAMBDACCOUNTMAX];
+   float Dtrk3dedx[LAMBDACCOUNTMAX];
+   float Dtrk3MassHypo[LAMBDACCOUNTMAX];
+   float Dtrk3PixelHit[LAMBDACCOUNTMAX];
+   float Dtrk3StripHit[LAMBDACCOUNTMAX];
+   float Dtrk3highPurity[LAMBDACCOUNTMAX];
+   float Dchi2cl[LAMBDACCOUNTMAX];
+   float DsvpvDistance[LAMBDACCOUNTMAX];
+   float DsvpvDisErr[LAMBDACCOUNTMAX];
+   float DsvpvDistance_2D[LAMBDACCOUNTMAX];
+   float DsvpvDisErr_2D[LAMBDACCOUNTMAX];
+   float Dip3d[LAMBDACCOUNTMAX];
+   float Dip3derr[LAMBDACCOUNTMAX];
+   float Dalpha[LAMBDACCOUNTMAX];
+   float Ddtheta[LAMBDACCOUNTMAX];
+   int Dgen[LAMBDACCOUNTMAX];
+   float Dgenpt[LAMBDACCOUNTMAX];
+   int DgenBAncestorpdgId[LAMBDACCOUNTMAX];
+public:
+   LambdaCTreeMessenger(TFile &File, std::string TreeName = "Dfinder/ntLambdaCtopkpi");
+   LambdaCTreeMessenger(TFile *File, std::string TreeName = "Dfinder/ntLambdaCtopkpi");
+   LambdaCTreeMessenger(TTree *DzeroTree);
+   bool Initialize(TTree *DzeroTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+};
+
+
 class DzeroGenTreeMessenger
 {
 public:
@@ -495,6 +557,28 @@ public:
    DzeroGenTreeMessenger(TFile *File, std::string TreeName = "Dfinder/ntGen");
    DzeroGenTreeMessenger(TTree *DzeroGenTree);
    bool Initialize(TTree *DzeroGenTree);
+   bool Initialize();
+   bool GetEntry(int iEntry);
+};
+
+class DfinderGenTreeMessenger
+{
+public:
+   TTree *Tree;
+   int Gsize;
+   float Gpt[DFINDERGENCOUNTMAX];
+   float Gy[DFINDERGENCOUNTMAX];
+   float Gphi[DFINDERGENCOUNTMAX];
+   int GpdgId[DFINDERGENCOUNTMAX];
+   int GisSignal[DFINDERGENCOUNTMAX];
+   int GcollisionId[DFINDERGENCOUNTMAX];
+   int GSignalType[DFINDERGENCOUNTMAX];
+   int GBAncestorpdgId[DFINDERGENCOUNTMAX];
+public:
+   DfinderGenTreeMessenger(TFile &File, std::string TreeName = "Dfinder/ntGen");
+   DfinderGenTreeMessenger(TFile *File, std::string TreeName = "Dfinder/ntGen");
+   DfinderGenTreeMessenger(TTree *DfinderGenTree);
+   bool Initialize(TTree *DfinderGenTree);
    bool Initialize();
    bool GetEntry(int iEntry);
 };
@@ -1024,6 +1108,144 @@ public:
 
 };
 
+class LambdaCUPCTreeMessenger
+{
+public:
+   TTree *Tree;
+   int Run;
+   long long Event;
+   int Lumi;
+   //FIXME: these refer to best vertex positions calculated from the track tree
+   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
+   int nVtx;
+   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+   bool selectedBkgFilter, selectedVtxFilter;
+   float ZDCsumPlus;
+   float ZDCsumMinus;
+   float HFEMaxPlus;
+   float HFEMaxMinus;
+   //booleans
+   bool ZDCgammaN, ZDCNgamma;
+   bool gapgammaN, gapNgamma;
+   std::vector<bool>  *gammaN;
+   std::vector<bool>  *Ngamma;
+   int nTrackInAcceptanceHP;
+   //LambdaC reco quantities
+   int Dsize;
+   std::vector<float> *Dpt;
+   std::vector<float> *Dphi;
+   std::vector<float> *Dy;
+   std::vector<float> *Dmass;
+   std::vector<float> *Dtrk1P;
+   std::vector<float> *Dtrk1Pt;
+   std::vector<float> *Dtrk1PtErr;
+   std::vector<float> *Dtrk1Eta;
+   std::vector<float> *Dtrk1dedx;
+   std::vector<float> *Dtrk1MassHypo;
+   std::vector<float> *Dtrk1PixelHit;
+   std::vector<float> *Dtrk1StripHit;
+   std::vector<float> *Dtrk1PionScore;
+   std::vector<float> *Dtrk1KaonScore;
+   std::vector<float> *Dtrk1ProtScore;
+   std::vector<float> *Dtrk2P;
+   std::vector<float> *Dtrk2Pt;
+   std::vector<float> *Dtrk2PtErr;
+   std::vector<float> *Dtrk2Eta;
+   std::vector<float> *Dtrk2dedx;
+   std::vector<float> *Dtrk2MassHypo;
+   std::vector<float> *Dtrk2PixelHit;
+   std::vector<float> *Dtrk2StripHit;
+   std::vector<float> *Dtrk2PionScore;
+   std::vector<float> *Dtrk2KaonScore;
+   std::vector<float> *Dtrk2ProtScore;
+   std::vector<float> *Dtrk3P;
+   std::vector<float> *Dtrk3Pt;
+   std::vector<float> *Dtrk3PtErr;
+   std::vector<float> *Dtrk3Eta;
+   std::vector<float> *Dtrk3dedx;
+   std::vector<float> *Dtrk3MassHypo;
+   std::vector<float> *Dtrk3PixelHit;
+   std::vector<float> *Dtrk3StripHit;
+   std::vector<float> *Dtrk3PionScore;
+   std::vector<float> *Dtrk3KaonScore;
+   std::vector<float> *Dtrk3ProtScore;
+   std::vector<float> *Dchi2cl;
+   std::vector<float> *DsvpvDistance;
+   std::vector<float> *DsvpvDisErr;
+   std::vector<float> *DsvpvDistance_2D;
+   std::vector<float> *DsvpvDisErr_2D;
+   std::vector<float> *Dip3d;
+   std::vector<float> *Dip3derr;
+   std::vector<float> *Dalpha;
+   std::vector<float> *Ddtheta;
+   std::vector<bool> *DpassCutNominal;
+   std::vector<bool> *DpassCutLoose;
+   std::vector<bool> *DpassCutSystDsvpvSig;
+   std::vector<bool> *DpassCutSystDtrkPt;
+   std::vector<bool> *DpassCutSystDalpha;
+   std::vector<bool> *DpassCutSystDdtheta;
+   std::vector<bool> *DpassCutSystDchi2cl;
+   std::vector<int> *Dgen;
+   std::vector<bool> *DisSignalCalc;
+   std::vector<bool> *DisSignalCalcPrompt;
+   std::vector<bool> *DisSignalCalcFeeddown;
+   //MC only quantities
+   int Gsize;
+   std::vector<float> *Gpt;
+   std::vector<float> *Gy;
+   std::vector<bool> *GisSignalCalc;
+   std::vector<bool> *GisSignalCalcPrompt;
+   std::vector<bool> *GisSignalCalcFeeddown;
+
+   ///////////////////
+   // Defining the rapidity gap energy threshold array for the systematics study -- 1
+   // [Change accordingly] function gammaN_EThresh*()
+   ///////////////////
+   const int N_gapEThresh = 9;
+   // from tight to loose
+   const std::vector<float> gapEThresh_gammaN = {4.3, 5.5, 6.4, 7.8, 9.2, 10.6, 12.5, 15.0, 16.2};
+   const std::vector<float> gapEThresh_Ngamma = {4.5, 5.5, 6.5, 7.6, 8.6, 10.0, 12.0, 15.0, 16.0};
+
+public:   // Derived quantities
+   bool GoodPhotonuclear; //FIXME: currently not implemented
+
+private:
+   bool WriteMode;
+   bool Initialized;
+
+public:
+   LambdaCUPCTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   LambdaCUPCTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   LambdaCUPCTreeMessenger(TTree *LambdaCUPCTree = nullptr, bool Debug = false);
+   ~DzeroUPCTreeMessenger();
+   bool Initialize(TTree *LambdaCUPCTree, bool Debug = false);
+   bool Initialize(bool Debug = false);
+   int GetEntries();
+   bool GetEntry(int iEntry);
+   bool SetBranch(TTree *T);
+   void Clear();
+   void CopyNonTrack(LambdaCUPCTreeMessenger &M);
+   bool FillEntry();
+
+   ///////////////////
+   // Utility functions to examine passing a specific rapidity gap energy threshold -- 2
+   // [Change accordingly] the declaration of gapEThresh_*
+   ///////////////////
+   bool gammaN_EThreshTight()   { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(0); }
+   bool gammaN_EThreshLoose()   { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(N_gapEThresh-1); }
+   bool gammaN_EThreshNominal() { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(N_gapEThresh/2); }
+   bool gammaN_EThreshSyst5p5() { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(1); }
+   bool gammaN_EThreshSyst15()  { if (this->gammaN->size()!=N_gapEThresh) return false; return this->gammaN->at(7); }
+   bool gammaN_EThreshCustom(float threshold)  { return ( this->ZDCgammaN && this->HFEMaxPlus <= threshold ); }
+
+   bool Ngamma_EThreshTight()   { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(0); }
+   bool Ngamma_EThreshLoose()   { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(N_gapEThresh-1); }
+   bool Ngamma_EThreshNominal() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(N_gapEThresh/2); }
+   bool Ngamma_EThreshSyst5p5() { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(1); }
+   bool Ngamma_EThreshSyst15()  { if (this->Ngamma->size()!=N_gapEThresh) return false; return this->Ngamma->at(7); }
+   bool Ngamma_EThreshCustom(float threshold)  { return ( this->ZDCNgamma && this->HFEMaxMinus <= threshold ); }
+
+};
 
 class ChargedHadronRAATreeMessenger
 {
