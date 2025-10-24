@@ -21,7 +21,7 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i);
 bool isGenMuonSelected(SingleMuTreeMessenger *M, int i);
 bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int mu1, int mu2);
 //int isOnia(float mass);
-std::vector<int> mu_trackmatch(float dr_cut, JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
+std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
@@ -34,10 +34,6 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   bool IsPP = CL.GetBool("IsPP", false);
   bool svtx = CL.GetBool("svtx", false);
-  float dr_cut = CL.GetDouble("dr_cut", 0.0004);
-  //int cent_high  = CL.GetInt("cent_high", 100);
-  //int cent_low = CL.GetInt("cent_low", 0);
-
   int Year = CL.GetInt("Year", 2018);
   double Fraction = CL.GetDouble("Fraction", 1.00);
   double MinJetPT = CL.GetDouble("MinJetPT", 30);
@@ -67,7 +63,6 @@ int main(int argc, char *argv[]) {
     TrackTreeMessenger MTrackPP(InputFile);
     PbPbTrackTreeMessenger MTrack(InputFile);
     GenParticleTreeMessenger MGen(InputFile);
-    PFTreeMessenger MPF(InputFile, PFTreeName);
     MuTreeMessenger MMu(InputFile);
     SingleMuTreeMessenger MSingleMu(InputFile);
     SkimTreeMessenger MSkim(InputFile);
@@ -87,7 +82,6 @@ int main(int argc, char *argv[]) {
         Bar.Update(iE);
         Bar.Print();
       }
-      // std::cout << "Event " << iE << endl;
 
       MEvent.GetEntry(iE);
       MGen.GetEntry(iE);
@@ -95,7 +89,6 @@ int main(int argc, char *argv[]) {
         MTrackPP.GetEntry(iE);
       else
         MTrack.GetEntry(iE);
-      MPF.GetEntry(iE);
       MMu.GetEntry(iE);
       MSingleMu.GetEntry(iE);
       MSkim.GetEntry(iE);
@@ -116,7 +109,6 @@ int main(int argc, char *argv[]) {
       MGenMuMuJet.Event = MEvent.Event;
       MMuMuJet.hiBin = MEvent.hiBin;
       MGenMuMuJet.hiBin = MEvent.hiBin;
-      //if(hiBin/2.0 > cent_high || hiBin/2.0 < cent_low) {continue;}
       MMuMuJet.hiHF = MEvent.hiHF;
       MGenMuMuJet.hiHF = MEvent.hiHF;
       MMuMuJet.NPU = 0;
@@ -182,13 +174,17 @@ int main(int argc, char *argv[]) {
         std::cout << "pp analysis is not yet implemented" << std::endl;
         if (IsData == true) {
           int pprimaryVertexFilter = MSkim.PVFilter;
-          int beamScrapingFilter = MSkim.BeamScrapingFilter;
+          //int beamScrapingFilter = MSkim.BeamScrapingFilter; NO BEAM SCRAPING YET
+          int beamScrapingFilter = 1;
           if (pprimaryVertexFilter == 0 || beamScrapingFilter == 0)
             continue;
-          int minbiastrigger = MTrigger.CheckTriggerStartWith("HLT_HIMinimumBias_v*");
+          int minbiastrigger = MTrigger.CheckTriggerStartWith("HLT_HIAK4PFJet30_v*");
           if (minbiastrigger == 0)
             continue;
         } // end if pp data
+        else {
+          // pp MC event selection if any
+        }
       } else { // if PbPb
         if (IsData == true) {
           int pprimaryVertexFilter = MSkim.PVFilter;
@@ -206,6 +202,9 @@ int main(int argc, char *argv[]) {
           if (minbiastrigger == 0)
             continue;
         }
+        else {
+          // PbPb MC event selection if any
+        }
       }
 
       // JET SELECTION
@@ -220,12 +219,29 @@ int main(int argc, char *argv[]) {
         if (!passPurity)
           continue;
 
-        MMuMuJet.MJTHadronFlavor = MJet.MJTHadronFlavor[ijet];
-        MMuMuJet.MJTNcHad = MJet.MJTNcHad[ijet];
-        MMuMuJet.MJTNbHad = MJet.MJTNbHad[ijet];
         MMuMuJet.JetPT = MJet.JetPT[ijet];
         MMuMuJet.JetEta = MJet.JetEta[ijet];
         MMuMuJet.JetPhi = MJet.JetPhi[ijet];
+
+        // ADD FLAVOR INFO -- note that only a few of these branches are implemented for PbPb
+        MMuMuJet.HadronFlavor = ISPP ? MJet.HadronFlavor[ijet] : MJet.MJTHadronFlavor[ijet];
+        MMuMuJet.PartonFlavor = MJet.PartonFlavor[ijet];
+        MMuMuJet.NcHad = ISPP ? MJet.NcHad[ijet] : MJet.MJTNcHad[ijet];
+        MMuMuJet.NbHad = ISPP ? MJet.NbHad[ijet] : MJet.MJTNbHad[ijet];
+        MMuMuJet.NbPar = MJet.NbPar[ijet];
+        MMuMuJet.NcPar = MJet.NcPar[ijet];
+        MMuMuJet.HasGSPB = MJet.HasGSPB[ijet];
+        MMuMuJet.HasGSPC = MJet.HasGSPC[ijet];
+
+        // ADD TAGGING INFO
+        MMuMuJet.PN_bb = MJet.PN_bb[ijet];
+        MMuMuJet.PN_b = MJet.PN_b[ijet];
+        MMuMuJet.PN_cc = MJet.PN_cc[ijet];
+        MMuMuJet.PN_c = MJet.PN_c[ijet];
+        MMuMuJet.PN_undef = MJet.PN_undef[ijet];
+        MMuMuJet.PN_uds = MJet.PN_uds[ijet];
+        MMuMuJet.PN_g = MJet.PN_g[ijet];
+        MMuMuJet.PN_pu = MJet.PN_pu[ijet];
 
         if (svtx) {
 
@@ -435,8 +451,8 @@ int main(int argc, char *argv[]) {
         MMuMuJet.muDphi= muDphi;
         MMuMuJet.muDR= muDR;
 
-        mt1 = mu_trackmatch(dr_cut, &MJet, ijet, muPt1, muEta1, muPhi1);
-        mt2 = mu_trackmatch(dr_cut, &MJet, ijet, muPt2, muEta2, muPhi2);
+        mt1 = mu_trackmatch(&MJet, ijet, muPt1, muEta1, muPhi1);
+        mt2 = mu_trackmatch(&MJet, ijet, muPt2, muEta2, muPhi2);
 
         MMuMuJet.trkIdx_mu1 = mt1[0];
         MMuMuJet.trkIdx_mu2 = mt2[0];
@@ -773,8 +789,9 @@ bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int reco1,
 
 }*/
 
-std::vector<int> mu_trackmatch(float dr_cut, JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi){
+std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi){
 
+  float dr_cut = 0.0004; // SUBJECT TO TUNING
   std::vector<int> idx = {-1, -1};
   std::vector<int> bad = {-1, -1};
 

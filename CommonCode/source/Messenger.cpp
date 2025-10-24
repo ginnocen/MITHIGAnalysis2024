@@ -547,6 +547,34 @@ bool JetTreeMessenger::Initialize()
       Tree->SetBranchAddress("mjtNcHad", &MJTNcHad);
    if(Tree->GetBranch("mjtNbHad"))
       Tree->SetBranchAddress("mjtNbHad", &MJTNbHad);
+   if(Tree->GetBranch("jtHadFlav")) 
+      Tree->SetBranchAddress("jtHadFlav", &HadronFlavor);
+   if(Tree->GetBranch("jtPartFlav")) 
+      Tree->SetBranchAddress("jtPartFlav", &PartonFlavor);
+   if(Tree->GetBranch("jtNcHad"))   
+      Tree->SetBranchAddress("jtNcHad", &NcHad);
+   if(Tree->GetBranch("jtNbHad"))   
+      Tree->SetBranchAddress("jtNbHad", &NbHad);
+   if(Tree->GetBranch("jtNbPar"))   
+      Tree->SetBranchAddress("jtNbPar", &NbPar);
+   if(Tree->GetBranch("jtNcPar"))   
+      Tree->SetBranchAddress("jtNcPar", &NcPar);
+   if(Tree->GetBranch("jtHasGSPB")) 
+      Tree->SetBranchAddress("jtHasGSPB", &HasGSPB);
+   if(Tree->GetBranch("jtHasGSPC")) 
+      Tree->SetBranchAddress("jtHasGSPC", &HasGSPC);
+   if(Tree->GetBranch("discr_particleNet_bb"))
+      Tree->SetBranchAddress("discr_particleNet_bb", &PN_bb);
+   if(Tree->GetBranch("discr_particleNet_b"))
+      Tree->SetBranchAddress("discr_particleNet_b", &PN_b);
+   if(Tree->GetBranch("discr_particleNet_cc"))
+      Tree->SetBranchAddress("discr_particleNet_cc", &PN_cc);
+   if(Tree->GetBranch("discr_particleNet_c"))
+      Tree->SetBranchAddress("discr_particleNet_c", &PN_c);
+   if(Tree->GetBranch("discr_particleNet_uds"))
+      Tree->SetBranchAddress("discr_particleNet_uds", &PN_uds);
+   if(Tree->GetBranch("discr_particleNet_g"))
+      Tree->SetBranchAddress("discr_particleNet_g", &PN_g);
    if(Tree->GetBranch("refSubJetPt"))
       Tree->SetBranchAddress("refSubJetPt", &RefGSubJetPT);
    else

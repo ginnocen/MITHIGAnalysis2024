@@ -34,6 +34,8 @@ public:
    float EventWeight;
    float PTHat;
    int NPU;
+   int nsvtx;
+   int ntrk;
 
    // JET PROPERTIES
    float JetPT;
@@ -95,6 +97,7 @@ public:
    float GenMuDR;
 
    // FLAVOR
+   int ParFlavor;
    int HadronFlavor;
    int NcHad;
    int NbHad;
@@ -120,7 +123,6 @@ public:
    float jtptCh;
 
    // SVTX INFO
-   int nsvtx;
    std::vector<int> *svtxJetId;
    std::vector<int> *svtxNtrk;
    std::vector<float> *svtxdl;
@@ -137,7 +139,6 @@ public:
    int svtxIdx_mu2;
 
    // TRACK INFO
-   int ntrk;
    std::vector<int> *trkJetId;
    std::vector<int> *trkSvtxId;
    std::vector<float> *trkPt;
