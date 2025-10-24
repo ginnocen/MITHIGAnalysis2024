@@ -180,9 +180,18 @@ bool DimuonJetMessenger::Initialize()
    Tree->SetBranchAddress("GenMuDphi", &GenMuDphi);
    Tree->SetBranchAddress("GenMuDR", &GenMuDR);
 
-   Tree->SetBranchAddress("MJTHadronFlavor", &MJTHadronFlavor);
-   Tree->SetBranchAddress("MJTNcHad", &MJTNcHad);
-   Tree->SetBranchAddress("MJTNbHad", &MJTNbHad);
+   Tree->SetBranchAddress("HadronFlavor", &HadronFlavor);
+   Tree->SetBranchAddress("NcHad", &NcHad);
+   Tree->SetBranchAddress("NbHad", &NbHad);
+
+   Tree->SetBranchAddress("PN_pu", &PN_pu);
+   Tree->SetBranchAddress("PN_bb", &PN_bb);
+   Tree->SetBranchAddress("PN_b", &PN_b);
+   Tree->SetBranchAddress("PN_cc", &PN_cc);
+   Tree->SetBranchAddress("PN_c", &PN_c);
+   Tree->SetBranchAddress("PN_undef", &PN_undef);
+   Tree->SetBranchAddress("PN_uds", &PN_uds);
+   Tree->SetBranchAddress("PN_g", &PN_g);
 
    Tree->SetBranchAddress("jtNsvtx", &jtNsvtx);
    Tree->SetBranchAddress("jtNtrk", &jtNtrk);

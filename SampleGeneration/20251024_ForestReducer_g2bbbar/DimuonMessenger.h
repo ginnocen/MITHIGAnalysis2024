@@ -94,15 +94,32 @@ public:
    float GenMuDphi;
    float GenMuDR;
 
-   // PBPB Flavor 
+   // FLAVOR
    int HadronFlavor;
    int NcHad;
    int NbHad;
+   int NbPar;
+   int NcPar;
+   bool jtHasGSPB;
+   bool jtHasGSPB;
 
+
+   // TAGGING INFO
+   float PN_pu;
+   float PN_bb;
+   float PN_b;
+   float PN_cc;
+   float PN_c;
+   float PN_undef;
+   float PN_uds;
+   float PN_g;
+
+   // MISC
    int jtNsvtx;
    int jtNtrk;
    float jtptCh;
 
+   // SVTX INFO
    int nsvtx;
    std::vector<int> *svtxJetId;
    std::vector<int> *svtxNtrk;
@@ -119,8 +136,7 @@ public:
    int svtxIdx_mu1;
    int svtxIdx_mu2;
 
-   //
-
+   // TRACK INFO
    int ntrk;
    std::vector<int> *trkJetId;
    std::vector<int> *trkSvtxId;
