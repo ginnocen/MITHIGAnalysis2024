@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     TFile InputFile(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile);
-    TrackTreeMessenger MTrackPP(InputFile);
+    PPTrackTreeMessenger MTrackPP(InputFile);
     PbPbTrackTreeMessenger MTrack(InputFile);
     GenParticleTreeMessenger MGen(InputFile);
     MuTreeMessenger MMu(InputFile);
@@ -96,7 +96,6 @@ int main(int argc, char *argv[]) {
       MJet.GetEntry(iE);
       MMuMuJet.Clear();
       MGenMuMuJet.Clear();
-
       ////////////////////////////////////////
       ////////// Global event stuff //////////
       ////////////////////////////////////////
@@ -136,12 +135,11 @@ int main(int argc, char *argv[]) {
       ////////////////////////////
       ////////// Vertex //////////
       ////////////////////////////
-
       MMuMuJet.NVertex = 0;
       MGenMuMuJet.NVertex = 0;
       int BestVertex = -1;
       for (int i = 0; i < (IsPP ? MTrackPP.nVtx : MTrack.VX->size()); i++) {
-        if (IsPP == true && (BestVertex < 0 || MTrackPP.sumPtVtx[i] > MTrackPP.sumPtVtx[BestVertex]))
+        if (IsPP == true && (BestVertex < 0 || MTrackPP.ptSumVtx->at(i) > MTrackPP.ptSumVtx->at(BestVertex)))
           BestVertex = i;
         if (IsPP == false && (BestVertex < 0 || MTrack.VPTSum->at(i) > MTrack.VPTSum->at(BestVertex)))
           BestVertex = i;
@@ -151,12 +149,12 @@ int main(int argc, char *argv[]) {
       }
 
       if (BestVertex >= 0) {
-        MMuMuJet.VX = IsPP ? MTrackPP.xVtx[BestVertex] : MTrack.VX->at(BestVertex);
-        MMuMuJet.VY = IsPP ? MTrackPP.yVtx[BestVertex] : MTrack.VY->at(BestVertex);
-        MMuMuJet.VZ = IsPP ? MTrackPP.zVtx[BestVertex] : MTrack.VZ->at(BestVertex);
-        MMuMuJet.VXError = IsPP ? MTrackPP.xVtxErr[BestVertex] : MTrack.VXError->at(BestVertex);
-        MMuMuJet.VYError = IsPP ? MTrackPP.yVtxErr[BestVertex] : MTrack.VYError->at(BestVertex);
-        MMuMuJet.VZError = IsPP ? MTrackPP.zVtxErr[BestVertex] : MTrack.VZError->at(BestVertex);
+        MMuMuJet.VX = IsPP ? MTrackPP.xVtx->at(BestVertex) : MTrack.VX->at(BestVertex);
+        MMuMuJet.VY = IsPP ? MTrackPP.yVtx->at(BestVertex) : MTrack.VY->at(BestVertex);
+        MMuMuJet.VZ = IsPP ? MTrackPP.zVtx->at(BestVertex) : MTrack.VZ->at(BestVertex);
+        MMuMuJet.VXError = IsPP ? MTrackPP.xErrVtx->at(BestVertex) : MTrack.VXError->at(BestVertex);
+        MMuMuJet.VYError = IsPP ? MTrackPP.yErrVtx->at(BestVertex) : MTrack.VYError->at(BestVertex);
+        MMuMuJet.VZError = IsPP ? MTrackPP.zErrVtx->at(BestVertex) : MTrack.VZError->at(BestVertex);
 
         MGenMuMuJet.VX = MMuMuJet.VX;
         MGenMuMuJet.VY = MMuMuJet.VY;
@@ -165,13 +163,12 @@ int main(int argc, char *argv[]) {
         MGenMuMuJet.VYError = MMuMuJet.VYError;
         MGenMuMuJet.VZError = MMuMuJet.VZError;
       }
-
       /////////////////////////////////////
       ////////// Event selection //////////
       /////////////////////////////////////
 
       if (IsPP == true) {
-        std::cout << "pp analysis is not yet implemented" << std::endl;
+        //std::cout << "pp analysis is not yet implemented" << std::endl;
         if (IsData == true) {
           int pprimaryVertexFilter = MSkim.PVFilter;
           //int beamScrapingFilter = MSkim.BeamScrapingFilter; NO BEAM SCRAPING YET
