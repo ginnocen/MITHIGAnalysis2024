@@ -24,6 +24,3 @@ cd ..
 cd $CURRENTDIR
 make
 rm Skim*.root
-
-rootcling -f DictDict.cxx -c DictTypes.h LinkDef.h
-g++ -fPIC -shared DictDict.cxx `root-config --cflags --libs` -o libDict.so

@@ -575,6 +575,10 @@ bool JetTreeMessenger::Initialize()
       Tree->SetBranchAddress("discr_particleNet_uds", &PN_uds);
    if(Tree->GetBranch("discr_particleNet_g"))
       Tree->SetBranchAddress("discr_particleNet_g", &PN_g);
+   if(Tree->GetBranch("discr_particleNet_undef"))
+      Tree->SetBranchAddress("discr_particleNet_undef", &PN_undef);
+   if(Tree->GetBranch("discr_particleNet_pu"))
+      Tree->SetBranchAddress("discr_particleNet_pu", &PN_pu);
    if(Tree->GetBranch("refSubJetPt"))
       Tree->SetBranchAddress("refSubJetPt", &RefGSubJetPT);
    else

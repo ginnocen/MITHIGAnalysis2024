@@ -97,14 +97,14 @@ public:
    float GenMuDR;
 
    // FLAVOR
-   int ParFlavor;
+   int PartonFlavor;
    int HadronFlavor;
    int NcHad;
    int NbHad;
    int NbPar;
    int NcPar;
-   bool jtHasGSPB;
-   bool jtHasGSPB;
+   bool HasGSPB;
+   bool HasGSPC;
 
 
    // TAGGING INFO

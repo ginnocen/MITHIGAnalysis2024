@@ -224,10 +224,10 @@ int main(int argc, char *argv[]) {
         MMuMuJet.JetPhi = MJet.JetPhi[ijet];
 
         // ADD FLAVOR INFO -- note that only a few of these branches are implemented for PbPb
-        MMuMuJet.HadronFlavor = ISPP ? MJet.HadronFlavor[ijet] : MJet.MJTHadronFlavor[ijet];
+        MMuMuJet.HadronFlavor = IsPP ? MJet.HadronFlavor[ijet] : MJet.MJTHadronFlavor[ijet];
         MMuMuJet.PartonFlavor = MJet.PartonFlavor[ijet];
-        MMuMuJet.NcHad = ISPP ? MJet.NcHad[ijet] : MJet.MJTNcHad[ijet];
-        MMuMuJet.NbHad = ISPP ? MJet.NbHad[ijet] : MJet.MJTNbHad[ijet];
+        MMuMuJet.NcHad = IsPP ? MJet.NcHad[ijet] : MJet.MJTNcHad[ijet];
+        MMuMuJet.NbHad = IsPP ? MJet.NbHad[ijet] : MJet.MJTNbHad[ijet];
         MMuMuJet.NbPar = MJet.NbPar[ijet];
         MMuMuJet.NcPar = MJet.NcPar[ijet];
         MMuMuJet.HasGSPB = MJet.HasGSPB[ijet];

@@ -181,7 +181,7 @@ bool DimuonJetMessenger::Initialize()
    Tree->SetBranchAddress("GenMuDR", &GenMuDR);
 
    Tree->SetBranchAddress("HadronFlavor", &HadronFlavor);
-   Tree->SetBranchAddress("ParFlavor", &ParFlavor);
+   Tree->SetBranchAddress("PartonFlavor", &PartonFlavor);
    Tree->SetBranchAddress("NcHad", &NcHad);
    Tree->SetBranchAddress("NbHad", &NbHad);
    Tree->SetBranchAddress("NcPar", &NcPar);
@@ -364,9 +364,23 @@ bool DimuonJetMessenger::SetBranch(TTree *T)
    Tree->Branch("GenMuDphi", &GenMuDphi);
    Tree->Branch("GenMuDR", &GenMuDR);
 
-   Tree->Branch("MJTHadronFlavor", &MJTHadronFlavor);
-   Tree->Branch("MJTNcHad", &MJTNcHad);
-   Tree->Branch("MJTNbHad", &MJTNbHad);
+   Tree->Branch("HadronFlavor", &HadronFlavor);
+   Tree->Branch("PartonFlavor", &PartonFlavor);
+   Tree->Branch("NcHad", &NcHad);
+   Tree->Branch("NbHad", &NbHad);
+   Tree->Branch("NcPar", &NcPar);
+   Tree->Branch("NbPar", &NbPar);
+   Tree->Branch("HasGSPB", &HasGSPB);
+   Tree->Branch("HasGSPC", &HasGSPC);
+
+   Tree->Branch("PN_pu", &PN_pu);
+   Tree->Branch("PN_bb", &PN_bb);
+   Tree->Branch("PN_b", &PN_b);
+   Tree->Branch("PN_cc", &PN_cc);
+   Tree->Branch("PN_c", &PN_c);
+   Tree->Branch("PN_undef", &PN_undef);
+   Tree->Branch("PN_uds", &PN_uds);
+   Tree->Branch("PN_g", &PN_g);
 
    Tree->Branch("jtNsvtx", &jtNsvtx);
    Tree->Branch("jtNtrk", &jtNtrk);
@@ -484,10 +498,22 @@ void DimuonJetMessenger::Clear()
    GenMuDeta = -999;
    GenMuDphi = -999;
    GenMuDR = -999;
-
-    MJTHadronFlavor = -999;
-    MJTNcHad = -999;
-    MJTNbHad = -999;
+   HadronFlavor = -999;
+   PartonFlavor = -999;
+   NcHad = -999;
+   NbHad = -999;
+   NcPar = -999;
+   NbPar = -999;
+   HasGSPB = false;
+   HasGSPC = false;
+   PN_pu = 0.0;
+   PN_bb = 0.0;
+   PN_b = 0.0;
+   PN_cc = 0.0;
+   PN_c = 0.0;
+   PN_undef = 0.0;
+   PN_uds = 0.0;
+   PN_g = 0.0; 
     jtptCh = -999;
     jtNtrk = -999;
     jtNsvtx = -999;
@@ -583,10 +609,22 @@ void DimuonJetMessenger::Clear_Jet()
    GenMuDeta = -999;
    GenMuDphi = -999;
    GenMuDR = -999;
-
-    MJTHadronFlavor = -999;
-    MJTNcHad = -999;
-    MJTNbHad = -999;
+   HadronFlavor = -999;
+   PartonFlavor = -999;
+   NcHad = -999;
+   NbHad = -999;
+   NcPar = -999;
+   NbPar = -999;
+   HasGSPB = false;
+   HasGSPC = false;
+   PN_pu = 0.0;
+   PN_bb = 0.0;
+   PN_b = 0.0;
+   PN_cc = 0.0;
+   PN_c = 0.0;
+   PN_undef = 0.0;
+   PN_uds = 0.0;
+   PN_g = 0.0;
     jtptCh = -999;
     jtNtrk = -999;
     jtNsvtx = -999;
@@ -698,9 +736,22 @@ void DimuonJetMessenger::CopyNonTrack(DimuonJetMessenger &M)
    GenMuDeta   = M.GenMuDeta;
    GenMuDphi   = M.GenMuDphi;
    GenMuDR     = M.GenMuDR;
-    MJTHadronFlavor = M.MJTHadronFlavor;
-    MJTNcHad        = M.MJTNcHad;
-    MJTNbHad       = M.MJTNbHad;
+   HadronFlavor = M.HadronFlavor;
+   PartonFlavor = M.PartonFlavor;
+   NcHad       = M.NcHad;
+   NbHad       = M.NbHad;
+   NcPar       = M.NcPar;
+   NbPar       = M.NbPar;
+   HasGSPB     = M.HasGSPB;
+   HasGSPC     = M.HasGSPC;
+   PN_pu       = M.PN_pu;
+   PN_bb       = M.PN_bb;
+   PN_b        = M.PN_b;
+   PN_cc       = M.PN_cc;
+   PN_c        = M.PN_c;
+   PN_undef    = M.PN_undef;
+   PN_uds      = M.PN_uds;
+   PN_g        = M.PN_g;
     jtNsvtx    = M.jtNsvtx;
     jtNtrk     = M.jtNtrk;
     jtptCh     = M.jtptCh;
