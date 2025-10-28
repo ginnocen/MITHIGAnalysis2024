@@ -211,7 +211,7 @@ public:
    float RefPartonPT[JETCOUNTMAX];
    int RefPartonFlavor[JETCOUNTMAX];
    int RefPartonFlavorForB[JETCOUNTMAX];
-   int MJTHadronFlavor[JETCOUNTMAX];
+   int MJTHadronFlavor[JETCOUNTMAX]; // MJT hadron tagging is from newer CMSSW for g2ccbar PbPb analysis
    int MJTNcHad[JETCOUNTMAX];
    int MJTNbHad[JETCOUNTMAX];
    int HadronFlavor[JETCOUNTMAX];
