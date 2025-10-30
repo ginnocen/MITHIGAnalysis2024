@@ -6,5 +6,4 @@ Samples
 *.gif
 *.jpg
 *.jpeg
-
-.DS_Store
+*.o

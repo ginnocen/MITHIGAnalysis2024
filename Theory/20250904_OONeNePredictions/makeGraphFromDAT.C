@@ -1,0 +1,125 @@
+/* makeGraphFromDAT.C: take in DAT file, produce root file with output
+ * Hannah Bossi, <hannah.bossi@cern.ch>, 08/20/2025
+ */
+#include <TGraphErrors.h>
+#include <TCanvas.h>
+#include <TAxis.h>
+#include <TStyle.h>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <iostream>
+
+
+TGraphAsymmErrors*  getGraphFromDAT(std::string inputFile, int mode);
+
+void makeGraphFromDAT(){
+  gStyle->SetOptStat(0);
+  gStyle->SetOptTitle(0);
+
+  TGraphAsymmErrors* g = (TGraphAsymmErrors*) getGraphFromDAT("trajectumjewelMBhadRAA.dat", 0); 
+  TGraphAsymmErrors* g2 = (TGraphAsymmErrors*) getGraphFromDAT("trajectumjewelMBhadRAA.dat", 1);
+  TGraphAsymmErrors* g3 = (TGraphAsymmErrors*) getGraphFromDAT("trajectumjewelMBhadRAA.dat", 2);
+  TGraphAsymmErrors* g4 = (TGraphAsymmErrors*) getGraphFromDAT("trajectumjewelMBhadRAA.dat", 3);
+
+  
+  // plot just to check if it's correct
+  TCanvas *c = new TCanvas("c","c",800,600);
+  g->Draw("A3");   // "3" = draw filled band
+  g->GetHistogram()->GetXaxis()->SetTitle("#it{p}_{T}");
+  g->GetHistogram()->GetYaxis()->SetTitle("#it{R}_{AA}");
+  g->GetHistogram()->GetYaxis()->SetRangeUser(0.0, 1.2);
+  g->SetFillColorAlpha(kRed, 0.3);
+  g->SetLineColor(kRed);
+  g2->SetFillColorAlpha(kBlue, 0.3);
+  g2->SetLineColor(kBlue);
+  g2->Draw("L3 same");
+  g3->SetFillColorAlpha(kGreen, 0.3);
+  g3->SetLineColor(kGreen);
+  g3->Draw("L3 same");
+  g4->SetFillColorAlpha(kGray, 0.3);
+  g4->SetLineColor(kGray);
+  g4->Draw("L3 same");
+
+  TLegend* l = new TLegend(0.7, 0.16, 0.88, 0.3);
+  l->SetFillColor(0);
+  l->SetBorderSize(0);
+  l->AddEntry(g, "OO PGCM", "f");
+  l->AddEntry(g2, "NeNe PGCM", "f");
+  l->AddEntry(g3, "OO NLEFT", "f");
+  l->AddEntry(g4, "NeNe NLEFT", "f");
+  l->Draw(); 
+  c->SaveAs("MinBiasTheory_TrajectumJEWELhadRAA.pdf");
+
+  // write to a root file
+  TFile* outFile = new TFile("MinBias_TrajectumJEWELhadRAA.root", "RECREATE");
+  outFile->cd();
+  g->SetName("OO_PGCM");
+  g->Write();
+  g2->SetName("NeNe_PGCM");
+  g2->Write();
+  g3->SetName("OO_NLEFT");
+  g3->Write();
+  g4->SetName("NeNe_NLEFT");
+  g4->Write();
+  outFile->Close();
+}
+
+// take in a dat, return a TGraph - for now take 0-100%]
+// mode = 0 (OO PGCM), 1 (NeNe PGCM), 2 (OO NLEFT), 3 (NeNe NLEFT)
+TGraphAsymmErrors*  getGraphFromDAT(std::string inputFile, int mode){
+
+  // read in the input file
+  std::ifstream infile(inputFile);
+
+  std::vector<double> x, y, ex_low, ex_high, ey_low, ey_high;
+  std::string line;
+
+  while (std::getline(infile, line)) {
+    if (line.empty() || line[0] == '#') continue; // skip comments & blanks
+
+    double pT, OO_PGCM, OO_PGCM_unc, NeNe_PGCM, NeNe_PGCM_unc, OO_NLEFT, OO_NLEFT_unc, NeNe_NLEFT, NeNe_NLEFT_unc, XeXe, XeXe_unc, PbPb,PbPb_unc; 
+    std::istringstream ss(line);
+    if (!(ss >> pT >> OO_PGCM >> OO_PGCM_unc >> NeNe_PGCM >> NeNe_PGCM_unc >> OO_NLEFT >> OO_NLEFT_unc >> NeNe_NLEFT >> NeNe_NLEFT_unc >> XeXe >> XeXe_unc >> PbPb >> PbPb_unc))
+      continue;
+
+    x.push_back(pT);
+    if(mode == 0){
+      y.push_back(OO_PGCM);
+      ey_high.push_back(OO_PGCM_unc);
+      ey_low.push_back(OO_PGCM_unc); 
+    }
+    else if(mode == 1){
+      y.push_back(NeNe_PGCM);
+      ey_high.push_back(NeNe_PGCM_unc);
+      ey_low.push_back(NeNe_PGCM_unc);
+    }
+    else if(mode == 2){
+      y.push_back(OO_NLEFT);
+      ey_high.push_back(OO_NLEFT_unc);
+      ey_low.push_back(OO_NLEFT_unc);
+    }
+    else if(mode ==3){
+      y.push_back(NeNe_NLEFT);
+      ey_high.push_back(NeNe_NLEFT_unc);
+      ey_low.push_back(NeNe_NLEFT_unc);
+    }
+    else{
+      std::cout << "[ERROR]: mode not recognized" << std::endl;
+      y.push_back(-1);
+      ey_high.push_back(0.0);
+      ey_low.push_back(0.0);
+    }
+
+    ex_low.push_back(0.0);   // no x errors
+    ex_high.push_back(0.0);
+
+  }
+  
+  TGraphAsymmErrors *gr = new TGraphAsymmErrors( x.size(), x.data(), y.data(),ex_low.data(), ex_high.data(), ey_low.data(), ey_high.data());
+
+
+
+  return gr; 
+}

@@ -86,6 +86,22 @@ bool HiEventTreeMessenger::Initialize()
    if(Tree->GetBranch("hiEvtPlanes"))   Tree->SetBranchAddress("hiEvtPlanes", &hiEvtPlanes);
    if(Tree->GetBranch("hiHF_pf"))       Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
    else                                 hiHF_pf = 0.;
+   if(Tree->GetBranch("hiHFPlus_pf"))   Tree->SetBranchAddress("hiHFPlus_pf", &hiHFPlus_pf);
+   else                                 hiHFPlus_pf = 0.;
+   if(Tree->GetBranch("hiHFMinus_pf"))  Tree->SetBranchAddress("hiHFMinus_pf", &hiHFMinus_pf);
+   else                                 hiHFMinus_pf = 0.;
+   if(Tree->GetBranch("hiHFPlus_pfle1")) Tree->SetBranchAddress("hiHFPlus_pfle1", &hiHFPlus_pfle1);
+   else                                 hiHFPlus_pfle1 = 0.;
+   if(Tree->GetBranch("hiHFPlus_pfle2")) Tree->SetBranchAddress("hiHFPlus_pfle2", &hiHFPlus_pfle2);
+   else                                 hiHFPlus_pfle2 = 0.;
+   if(Tree->GetBranch("hiHFPlus_pfle3")) Tree->SetBranchAddress("hiHFPlus_pfle3", &hiHFPlus_pfle3);
+   else                                 hiHFPlus_pfle3 = 0.;
+   if(Tree->GetBranch("hiHFMinus_pfle1")) Tree->SetBranchAddress("hiHFMinus_pfle1", &hiHFMinus_pfle1);
+   else                                 hiHFMinus_pfle1 = 0.;
+   if(Tree->GetBranch("hiHFMinus_pfle2")) Tree->SetBranchAddress("hiHFMinus_pfle2", &hiHFMinus_pfle2);
+   else                                 hiHFMinus_pfle2 = 0.;
+   if(Tree->GetBranch("hiHFMinus_pfle3")) Tree->SetBranchAddress("hiHFMinus_pfle3", &hiHFMinus_pfle3);
+   else                                 hiHFMinus_pfle3 = 0.;
    if(Tree->GetBranch("Ncoll"))         Tree->SetBranchAddress("Ncoll", &Ncoll);
    else                                 Ncoll = 0.;
    if(Tree->GetBranch("Npart"))         Tree->SetBranchAddress("Npart", &Npart);
@@ -531,6 +547,38 @@ bool JetTreeMessenger::Initialize()
       Tree->SetBranchAddress("mjtNcHad", &MJTNcHad);
    if(Tree->GetBranch("mjtNbHad"))
       Tree->SetBranchAddress("mjtNbHad", &MJTNbHad);
+   if(Tree->GetBranch("jtHadFlav")) 
+      Tree->SetBranchAddress("jtHadFlav", &HadronFlavor);
+   if(Tree->GetBranch("jtPartFlav")) 
+      Tree->SetBranchAddress("jtPartFlav", &PartonFlavor);
+   if(Tree->GetBranch("jtNcHad"))   
+      Tree->SetBranchAddress("jtNcHad", &NcHad);
+   if(Tree->GetBranch("jtNbHad"))   
+      Tree->SetBranchAddress("jtNbHad", &NbHad);
+   if(Tree->GetBranch("jtNbPar"))   
+      Tree->SetBranchAddress("jtNbPar", &NbPar);
+   if(Tree->GetBranch("jtNcPar"))   
+      Tree->SetBranchAddress("jtNcPar", &NcPar);
+   if(Tree->GetBranch("jtHasGSPB")) 
+      Tree->SetBranchAddress("jtHasGSPB", &HasGSPB);
+   if(Tree->GetBranch("jtHasGSPC")) 
+      Tree->SetBranchAddress("jtHasGSPC", &HasGSPC);
+   if(Tree->GetBranch("discr_particleNet_bb"))
+      Tree->SetBranchAddress("discr_particleNet_bb", &PN_bb);
+   if(Tree->GetBranch("discr_particleNet_b"))
+      Tree->SetBranchAddress("discr_particleNet_b", &PN_b);
+   if(Tree->GetBranch("discr_particleNet_cc"))
+      Tree->SetBranchAddress("discr_particleNet_cc", &PN_cc);
+   if(Tree->GetBranch("discr_particleNet_c"))
+      Tree->SetBranchAddress("discr_particleNet_c", &PN_c);
+   if(Tree->GetBranch("discr_particleNet_uds"))
+      Tree->SetBranchAddress("discr_particleNet_uds", &PN_uds);
+   if(Tree->GetBranch("discr_particleNet_g"))
+      Tree->SetBranchAddress("discr_particleNet_g", &PN_g);
+   if(Tree->GetBranch("discr_particleNet_undef"))
+      Tree->SetBranchAddress("discr_particleNet_undef", &PN_undef);
+   if(Tree->GetBranch("discr_particleNet_pu"))
+      Tree->SetBranchAddress("discr_particleNet_pu", &PN_pu);
    if(Tree->GetBranch("refSubJetPt"))
       Tree->SetBranchAddress("refSubJetPt", &RefGSubJetPT);
    else
@@ -861,6 +909,24 @@ void TriggerTreeMessenger::FillTriggerNames()
 {
    Name.clear();
    Decision.clear();
+
+   // 2025 pO and OO run
+   Name.push_back("HLT_OxyZeroBias_v1");
+   Name.push_back("HLT_OxyZDC1nOR_v1");
+   Name.push_back("HLT_OxySingleMuOpen_NotMBHF2OR_v1");
+   Name.push_back("HLT_OxySingleJet8_ZDC1nAsymXOR_v1");
+   Name.push_back("HLT_OxyNotMBHF2_v1");
+   Name.push_back("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1");
+   Name.push_back("HLT_OxyZeroBias_MinPixelCluster400_v1");
+   Name.push_back("HLT_MinimumBiasHF_OR_BptxAND_v1");
+   Name.push_back("HLT_MinimumBiasHF_AND_BptxAND_v1");
+
+   Name.push_back("HLT_OxySingleJet16_ZDC1nAsymXOR_v1");
+   Name.push_back("HLT_OxySingleJet16_ZDC1nXOR_v1");
+   Name.push_back("HLT_OxySingleJet24_ZDC1nAsymXOR_v1");
+   Name.push_back("HLT_OxySingleJet24_ZDC1nXOR_v1");
+   Name.push_back("HLT_OxyL1SingleJet20_v1");
+
    // 2024 triggers UPCs
    Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
    Name.push_back("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
@@ -1532,6 +1598,7 @@ bool DzeroTreeMessenger::Initialize()
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
    Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
    Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
+   if(Tree->GetBranch("Dtrk1P")) Tree->SetBranchAddress("Dtrk1P", &Dtrk1P);
    if(Tree->GetBranch("Dtrk1dedx")) Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
    if(Tree->GetBranch("Dtrk1MassHypo")) Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
    if(Tree->GetBranch("Dtrk1PixelHit")) Tree->SetBranchAddress("Dtrk1PixelHit", &Dtrk1PixelHit);
@@ -1540,6 +1607,7 @@ bool DzeroTreeMessenger::Initialize()
    Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
    Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
    Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
+   if(Tree->GetBranch("Dtrk2P")) Tree->SetBranchAddress("Dtrk2P", &Dtrk2P);
    if(Tree->GetBranch("Dtrk2dedx")) Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
    if(Tree->GetBranch("Dtrk2MassHypo")) Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
    if(Tree->GetBranch("Dtrk2PixelHit")) Tree->SetBranchAddress("Dtrk2PixelHit", &Dtrk2PixelHit);
@@ -1568,28 +1636,6 @@ bool DzeroTreeMessenger::GetEntry(int iEntry)
 
    Tree->GetEntry(iEntry);
 
-   return true;
-}
-
-bool DzeroTreeMessenger::PassUPCDzero2023Cut(int index)
-{
-   if(index >= Dsize)
-      return false;
-  //FIXME : need to be cross-checked
-  if(Dalpha[index] > 0.4)
-      return false;
-  if(Ddtheta[index] > 0.5)
-      return false;
-  if(Dchi2cl[index] < 0.1)
-      return false;
-  if(fabs(Dtrk1PtErr[index] / Dtrk1Pt[index]) > 0.1)
-      return false;
-  if(fabs(Dtrk2PtErr[index] / Dtrk2Pt[index]) > 0.1)
-      return false;
-  if (Dtrk1highPurity[index] == 0 || Dtrk2highPurity[index] == 0)
-      return false;
-  if (DsvpvDistance[index]/DsvpvDisErr[index] < 2.)
-      return false;
    return true;
 }
 
@@ -1842,6 +1888,11 @@ bool SingleMuTreeMessenger::Initialize(){
     SingleMuIsTracker = nullptr;
     SingleMuHybridSoft = nullptr;
 
+    GenSingleMuPT = nullptr;
+    GenSingleMuEta = nullptr;
+    GenSingleMuPhi = nullptr;
+    GenSingleMuPID = nullptr;
+
     Tree->SetBranchAddress("recoPt", &SingleMuPT);
     Tree->SetBranchAddress("recoEta", &SingleMuEta);
     Tree->SetBranchAddress("recoPhi", &SingleMuPhi);
@@ -1854,6 +1905,12 @@ bool SingleMuTreeMessenger::Initialize(){
     Tree->SetBranchAddress("recoIsGlobal", &SingleMuIsGlobal);
     Tree->SetBranchAddress("recoIsTracker", &SingleMuIsTracker);
     Tree->SetBranchAddress("recoIDHybridSoft", &SingleMuHybridSoft);
+
+    Tree->SetBranchAddress("genPt", &GenSingleMuPT);
+    Tree->SetBranchAddress("genEta", &GenSingleMuEta);
+    Tree->SetBranchAddress("genPhi", &GenSingleMuPhi);
+    Tree->SetBranchAddress("genPID", &GenSingleMuPID);
+
     return true;
 }
 
@@ -1913,7 +1970,7 @@ bool PbPbTrackTreeMessenger::Initialize()
    TrackEta = nullptr;
    TrackPhi = nullptr;
    TrackCharge = nullptr;
-   TrackPDFID = nullptr;
+   TrackPDGId = nullptr;
    TrackNHits = nullptr;
    TrackNPixHits = nullptr;
    TrackNLayers = nullptr;
@@ -1953,7 +2010,7 @@ bool PbPbTrackTreeMessenger::Initialize()
    Tree->SetBranchAddress("trkEta", &TrackEta);
    Tree->SetBranchAddress("trkPhi", &TrackPhi);
    Tree->SetBranchAddress("trkCharge", &TrackCharge);
-   Tree->SetBranchAddress("trkPDFId", &TrackPDFID);
+   Tree->SetBranchAddress("trkPDGId", &TrackPDGId);
    Tree->SetBranchAddress("trkNHits", &TrackNHits);
    Tree->SetBranchAddress("trkNPixHits", &TrackNPixHits);
    Tree->SetBranchAddress("trkNLayers", &TrackNLayers);
@@ -2376,6 +2433,112 @@ bool PPTrackTreeMessenger::PassChargedHadronPPStandardCuts(int index)
    return true;
 }
 
+bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025StandardCuts(int index)
+{
+   //FIXME: currently this matches Vipul analysis
+   if(index >= nTrk)
+      return false;
+
+   if(abs(trkCharge->at(index)) != 1)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+   
+   if (trkPt->at(index) < 0.1)
+      return false;
+   
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(trkPt->at(index) > 10 && RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 3)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
+   return true;
+
+}
+
+bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025LooseCuts(int index)
+{
+   //FIXME: currently this matches Vipul analysis
+   if(index >= nTrk)
+      return false;
+
+   if(abs(trkCharge->at(index)) != 1)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+
+   if (trkPt->at(index) < 0.1)
+      return false;
+
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(trkPt->at(index) > 10 && RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 5)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 5)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
+   return true;
+
+}
+
+bool PPTrackTreeMessenger::PassChargedHadronPPOONeNe2025TightCuts(int index)
+{
+   //FIXME: currently this matches Vipul analysis
+   if(index >= nTrk)
+      return false;
+
+   if(abs(trkCharge->at(index)) != 1)
+      return false;
+
+   if(highPurity->at(index) == false)
+      return false;
+
+   if (trkPt->at(index) < 0.1)
+      return false;
+
+   double RelativeUncertainty = trkPtError->at(index)/ trkPt->at(index);
+   if(trkPt->at(index) > 10 && RelativeUncertainty > 0.1)
+      return false;
+
+   if(fabs(trkDxyAssociatedVtx->at(index)) / trkDxyErrAssociatedVtx->at(index) > 2)
+      return false;
+
+   if(fabs(trkDzAssociatedVtx->at(index)) / trkDzErrAssociatedVtx->at(index) > 2)
+      return false;
+
+   if (fabs(trkEta->at(index)) > 2.4)
+      return false;
+
+   if (trkPt->at(index) > 500)
+     return false;
+
+   return true;
+
+}
+
+
 ZDCTreeMessenger::ZDCTreeMessenger(TFile &File, std::string TreeName)
 {
    Tree = (TTree *)File.Get(TreeName.c_str());
@@ -2416,6 +2579,126 @@ bool ZDCTreeMessenger::Initialize()
 }
 
 bool ZDCTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
+PPSTreeMessenger::PPSTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+PPSTreeMessenger::PPSTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+PPSTreeMessenger::PPSTreeMessenger(TTree *PPSTree)
+{
+   Initialize(PPSTree);
+}
+
+bool PPSTreeMessenger::Initialize(TTree *PPSTree)
+{
+   Tree = PPSTree;
+   return Initialize();
+}
+
+bool PPSTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+   n = 0;
+
+   Tree->SetBranchAddress("n",         &n);
+   Tree->SetBranchAddress("zside",     &zside);
+   Tree->SetBranchAddress("station",   &station);
+   Tree->SetBranchAddress("x",         &x);
+   Tree->SetBranchAddress("y",         &y);
+
+   return true;
+}
+
+bool PPSTreeMessenger::GetEntry(int iEntry)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Tree->GetEntry(iEntry);
+   return true;
+}
+
+FSCTreeMessenger::FSCTreeMessenger(TFile &File, std::string TreeName)
+{
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize();
+}
+
+FSCTreeMessenger::FSCTreeMessenger(TFile *File, std::string TreeName)
+{
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize();
+}
+
+FSCTreeMessenger::FSCTreeMessenger(TTree *FSCTree)
+{
+   Initialize(FSCTree);
+}
+
+bool FSCTreeMessenger::Initialize(TTree *FSCTree)
+{
+   Tree = FSCTree;
+   return Initialize();
+}
+
+bool FSCTreeMessenger::Initialize()
+{
+   if(Tree == nullptr)
+      return false;
+   n = 0;
+
+   Tree->SetBranchAddress("n",            &n);
+   Tree->SetBranchAddress("zside",        &zside);
+   Tree->SetBranchAddress("section",      &section);
+   Tree->SetBranchAddress("channel",      &channel);
+
+   Tree->SetBranchAddress("adcTs0",       &adcTs0);
+   Tree->SetBranchAddress("adcTs1",       &adcTs1);
+   Tree->SetBranchAddress("adcTs2",       &adcTs2);
+   Tree->SetBranchAddress("adcTs3",       &adcTs3);
+   Tree->SetBranchAddress("adcTs4",       &adcTs4);
+   Tree->SetBranchAddress("adcTs5",       &adcTs5);
+
+   Tree->SetBranchAddress("chargefCTs0",  &chargefCTs0);
+   Tree->SetBranchAddress("chargefCTs1",  &chargefCTs1);
+   Tree->SetBranchAddress("chargefCTs2",  &chargefCTs2);
+   Tree->SetBranchAddress("chargefCTs3",  &chargefCTs3);
+   Tree->SetBranchAddress("chargefCTs4",  &chargefCTs4);
+   Tree->SetBranchAddress("chargefCTs5",  &chargefCTs5);
+
+   Tree->SetBranchAddress("tdcTs0",       &tdcTs0);
+   Tree->SetBranchAddress("tdcTs1",       &tdcTs1);
+   Tree->SetBranchAddress("tdcTs2",       &tdcTs2);
+   Tree->SetBranchAddress("tdcTs3",       &tdcTs3);
+   Tree->SetBranchAddress("tdcTs4",       &tdcTs4);
+   Tree->SetBranchAddress("tdcTs5",       &tdcTs5);
+
+   return true;
+}
+
+bool FSCTreeMessenger::GetEntry(int iEntry)
 {
    if(Tree == nullptr)
       return false;
@@ -3082,13 +3365,17 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete DpassCut23PASSystDtrkPt;
       delete DpassCut23PASSystDalpha;
       delete DpassCut23PASSystDchi2cl;
-      delete DpassCutDefault;
+      delete DpassCutNominal;
+      delete DpassCutLoose;
       delete DpassCutSystDsvpvSig;
       delete DpassCutSystDtrkPt;
       delete DpassCutSystDalpha;
+      delete DpassCutSystDdtheta;
+      delete DpassCutSystDalphaDdtheta;
       delete DpassCutSystDchi2cl;
       delete Dy;
       delete Dmass;
+      delete Dtrk1P;
       delete Dtrk1Pt;
       delete Dtrk1PtErr;
       delete Dtrk1Eta;
@@ -3096,6 +3383,10 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dtrk1MassHypo;
       delete Dtrk1PixelHit;
       delete Dtrk1StripHit;
+      delete Dtrk1PionScore;
+      delete Dtrk1KaonScore;
+      delete Dtrk1ProtScore;
+      delete Dtrk2P;
       delete Dtrk2Pt;
       delete Dtrk2PtErr;
       delete Dtrk2Eta;
@@ -3103,6 +3394,9 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dtrk2MassHypo;
       delete Dtrk2PixelHit;
       delete Dtrk2StripHit;
+      delete Dtrk2PionScore;
+      delete Dtrk2KaonScore;
+      delete Dtrk2ProtScore;
       delete Dchi2cl;
       delete DsvpvDistance;
       delete DsvpvDisErr;
@@ -3145,13 +3439,17 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    DpassCut23PASSystDtrkPt = nullptr;
    DpassCut23PASSystDalpha = nullptr;
    DpassCut23PASSystDchi2cl = nullptr;
-   DpassCutDefault = nullptr;
+   DpassCutNominal = nullptr;
+   DpassCutLoose = nullptr;
    DpassCutSystDsvpvSig = nullptr;
    DpassCutSystDtrkPt = nullptr;
    DpassCutSystDalpha = nullptr;
+   DpassCutSystDdtheta = nullptr;
+   DpassCutSystDalphaDdtheta = nullptr;
    DpassCutSystDchi2cl = nullptr;
    Dy = nullptr;
    Dmass = nullptr;
+   Dtrk1P = nullptr;
    Dtrk1Pt = nullptr;
    Dtrk1PtErr = nullptr;
    Dtrk1Eta = nullptr;
@@ -3159,6 +3457,10 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dtrk1MassHypo = nullptr;
    Dtrk1PixelHit = nullptr;
    Dtrk1StripHit = nullptr;
+   Dtrk1PionScore = nullptr;
+   Dtrk1KaonScore = nullptr;
+   Dtrk1ProtScore = nullptr;
+   Dtrk2P = nullptr;
    Dtrk2Pt = nullptr;
    Dtrk2PtErr = nullptr;
    Dtrk2Eta = nullptr;
@@ -3166,6 +3468,9 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dtrk2MassHypo = nullptr;
    Dtrk2PixelHit = nullptr;
    Dtrk2StripHit = nullptr;
+   Dtrk2PionScore = nullptr;
+   Dtrk2KaonScore = nullptr;
+   Dtrk2ProtScore = nullptr;
    Dchi2cl = nullptr;
    DsvpvDistance = nullptr;
    DsvpvDisErr = nullptr;
@@ -3216,27 +3521,35 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("Dpt", &Dpt);
    Tree->SetBranchAddress("Dy", &Dy);
    Tree->SetBranchAddress("Dmass", &Dmass);
+   Tree->SetBranchAddress("Dtrk1P", &Dtrk1P);
    Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
-   if(Tree->GetBranch("Dtrk1PtErr")) Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
-   if(Tree->GetBranch("Dtrk1Eta")) Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
-   if(Tree->GetBranch("Dtrk1dedx")) Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
-   if(Tree->GetBranch("Dtrk1MassHypo")) Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
-   if(Tree->GetBranch("Dtrk1PixelHit")) Tree->SetBranchAddress("Dtrk1PixelHit", &Dtrk1PixelHit);
-   if(Tree->GetBranch("Dtrk1StripHit")) Tree->SetBranchAddress("Dtrk1StripHit", &Dtrk1StripHit);
+   Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
+   Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
+   Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
+   Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
+   Tree->SetBranchAddress("Dtrk1PixelHit", &Dtrk1PixelHit);
+   Tree->SetBranchAddress("Dtrk1StripHit", &Dtrk1StripHit);
+   Tree->SetBranchAddress("Dtrk1PionScore", &Dtrk1PionScore);
+   Tree->SetBranchAddress("Dtrk1KaonScore", &Dtrk1KaonScore);
+   Tree->SetBranchAddress("Dtrk1ProtScore", &Dtrk1ProtScore);
+   Tree->SetBranchAddress("Dtrk2P", &Dtrk2P);
    Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
-   if(Tree->GetBranch("Dtrk2PtErr")) Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
-   if(Tree->GetBranch("Dtrk2Eta")) Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
-   if(Tree->GetBranch("Dtrk2dedx")) Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
-   if(Tree->GetBranch("Dtrk2MassHypo")) Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
-   if(Tree->GetBranch("Dtrk2PixelHit")) Tree->SetBranchAddress("Dtrk2PixelHit", &Dtrk2PixelHit);
-   if(Tree->GetBranch("Dtrk2StripHit")) Tree->SetBranchAddress("Dtrk2StripHit", &Dtrk2StripHit);
+   Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
+   Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
+   Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
+   Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
+   Tree->SetBranchAddress("Dtrk2PixelHit", &Dtrk2PixelHit);
+   Tree->SetBranchAddress("Dtrk2StripHit", &Dtrk2StripHit);
+   Tree->SetBranchAddress("Dtrk2PionScore", &Dtrk2PionScore);
+   Tree->SetBranchAddress("Dtrk2KaonScore", &Dtrk2KaonScore);
+   Tree->SetBranchAddress("Dtrk2ProtScore", &Dtrk2ProtScore);
    Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
    Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
    Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
    Tree->SetBranchAddress("DsvpvDistance_2D", &DsvpvDistance_2D);
    Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
-   if(Tree->GetBranch("Dip3d")) Tree->SetBranchAddress("Dip3d", &Dip3d);
-   if(Tree->GetBranch("Dip3derr")) Tree->SetBranchAddress("Dip3derr", &Dip3derr);
+   Tree->SetBranchAddress("Dip3d", &Dip3d);
+   Tree->SetBranchAddress("Dip3derr", &Dip3derr);
    Tree->SetBranchAddress("Dalpha", &Dalpha);
    Tree->SetBranchAddress("Ddtheta", &Ddtheta);
    Tree->SetBranchAddress("DpassCut23PAS", &DpassCut23PAS);
@@ -3245,11 +3558,15 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("DpassCut23PASSystDtrkPt", &DpassCut23PASSystDtrkPt);
    Tree->SetBranchAddress("DpassCut23PASSystDalpha", &DpassCut23PASSystDalpha);
    Tree->SetBranchAddress("DpassCut23PASSystDchi2cl", &DpassCut23PASSystDchi2cl);
-   if(Tree->GetBranch("DpassCutDefault")) Tree->SetBranchAddress("DpassCutDefault", &DpassCutDefault);
-   if(Tree->GetBranch("DpassCutSystDsvpvSig")) Tree->SetBranchAddress("DpassCutSystDsvpvSig", &DpassCutSystDsvpvSig);
-   if(Tree->GetBranch("DpassCutSystDtrkPt")) Tree->SetBranchAddress("DpassCutSystDtrkPt", &DpassCutSystDtrkPt);
-   if(Tree->GetBranch("DpassCutSystDalpha")) Tree->SetBranchAddress("DpassCutSystDalpha", &DpassCutSystDalpha);
-   if(Tree->GetBranch("DpassCutSystDchi2cl")) Tree->SetBranchAddress("DpassCutSystDchi2cl", &DpassCutSystDchi2cl);
+   Tree->SetBranchAddress("DpassCutNominal", &DpassCutNominal);
+   Tree->SetBranchAddress("DpassCutDefault", &DpassCutNominal); // Cuts for backwards compatibility
+   Tree->SetBranchAddress("DpassCutLoose", &DpassCutLoose);
+   Tree->SetBranchAddress("DpassCutSystDsvpvSig", &DpassCutSystDsvpvSig);
+   Tree->SetBranchAddress("DpassCutSystDtrkPt", &DpassCutSystDtrkPt);
+   Tree->SetBranchAddress("DpassCutSystDalpha", &DpassCutSystDalpha);
+   Tree->SetBranchAddress("DpassCutSystDdtheta", &DpassCutSystDdtheta);
+   Tree->SetBranchAddress("DpassCutSystDalphaDdtheta", &DpassCutSystDalphaDdtheta);
+   Tree->SetBranchAddress("DpassCutSystDchi2cl", &DpassCutSystDchi2cl);
    Tree->SetBranchAddress("Dgen", &Dgen);
    Tree->SetBranchAddress("DisSignalCalc", &DisSignalCalc);
    Tree->SetBranchAddress("DisSignalCalcPrompt", &DisSignalCalcPrompt);
@@ -3296,10 +3613,13 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    DpassCut23PASSystDtrkPt = new std::vector<bool>();
    DpassCut23PASSystDalpha = new std::vector<bool>();
    DpassCut23PASSystDchi2cl = new std::vector<bool>();
-   DpassCutDefault = new std::vector<bool>();
+   DpassCutNominal = new std::vector<bool>();
+   DpassCutLoose = new std::vector<bool>();
    DpassCutSystDsvpvSig = new std::vector<bool>();
    DpassCutSystDtrkPt = new std::vector<bool>();
    DpassCutSystDalpha = new std::vector<bool>();
+   DpassCutSystDalphaDdtheta = new std::vector<bool>();
+   DpassCutSystDdtheta = new std::vector<bool>();
    DpassCutSystDchi2cl = new std::vector<bool>();
    Dy = new std::vector<float>();
    Dmass = new std::vector<float>();
@@ -3310,6 +3630,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Dtrk1MassHypo = new std::vector<float>();
    Dtrk1PixelHit = new std::vector<float>();
    Dtrk1StripHit = new std::vector<float>();
+   Dtrk1P = new std::vector<float>();
+   Dtrk1PionScore = new std::vector<float>();
+   Dtrk1KaonScore = new std::vector<float>();
+   Dtrk1ProtScore = new std::vector<float>();
    Dtrk2Pt = new std::vector<float>();
    Dtrk2PtErr = new std::vector<float>();
    Dtrk2Eta = new std::vector<float>();
@@ -3317,6 +3641,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Dtrk2MassHypo = new std::vector<float>();
    Dtrk2PixelHit = new std::vector<float>();
    Dtrk2StripHit = new std::vector<float>();
+   Dtrk2P = new std::vector<float>();
+   Dtrk2PionScore = new std::vector<float>();
+   Dtrk2KaonScore = new std::vector<float>();
+   Dtrk2ProtScore = new std::vector<float>();
    Dchi2cl = new std::vector<float>();
    DsvpvDistance = new std::vector<float>();
    DsvpvDisErr = new std::vector<float>();
@@ -3378,6 +3706,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dtrk1MassHypo",         &Dtrk1MassHypo);
    Tree->Branch("Dtrk1PixelHit",         &Dtrk1PixelHit);
    Tree->Branch("Dtrk1StripHit",         &Dtrk1StripHit);
+   Tree->Branch("Dtrk1P",                &Dtrk1P);
+   Tree->Branch("Dtrk1PionScore",        &Dtrk1PionScore);
+   Tree->Branch("Dtrk1KaonScore",        &Dtrk1KaonScore);
+   Tree->Branch("Dtrk1ProtScore",        &Dtrk1ProtScore);
    Tree->Branch("Dtrk2Pt",               &Dtrk2Pt);
    Tree->Branch("Dtrk2PtErr",            &Dtrk2PtErr);
    Tree->Branch("Dtrk2Eta",              &Dtrk2Eta);
@@ -3385,6 +3717,10 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dtrk2MassHypo",         &Dtrk2MassHypo);
    Tree->Branch("Dtrk2PixelHit",         &Dtrk2PixelHit);
    Tree->Branch("Dtrk2StripHit",         &Dtrk2StripHit);
+   Tree->Branch("Dtrk2P",                &Dtrk2P);
+   Tree->Branch("Dtrk2PionScore",        &Dtrk2PionScore);
+   Tree->Branch("Dtrk2KaonScore",        &Dtrk2KaonScore);
+   Tree->Branch("Dtrk2ProtScore",        &Dtrk2ProtScore);
    Tree->Branch("Dchi2cl",               &Dchi2cl);
    Tree->Branch("DsvpvDistance",         &DsvpvDistance);
    Tree->Branch("DsvpvDisErr",           &DsvpvDisErr);
@@ -3400,10 +3736,13 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("DpassCut23PASSystDtrkPt",&DpassCut23PASSystDtrkPt);
    Tree->Branch("DpassCut23PASSystDalpha",&DpassCut23PASSystDalpha);
    Tree->Branch("DpassCut23PASSystDchi2cl",&DpassCut23PASSystDchi2cl);
-   Tree->Branch("DpassCutDefault",       &DpassCutDefault);
+   Tree->Branch("DpassCutNominal",       &DpassCutNominal);
+   Tree->Branch("DpassCutLoose",         &DpassCutLoose);
    Tree->Branch("DpassCutSystDsvpvSig",  &DpassCutSystDsvpvSig);
    Tree->Branch("DpassCutSystDtrkPt",    &DpassCutSystDtrkPt);
    Tree->Branch("DpassCutSystDalpha",    &DpassCutSystDalpha);
+   Tree->Branch("DpassCutSystDalphaDdtheta",&DpassCutSystDalphaDdtheta);
+   Tree->Branch("DpassCutSystDdtheta",   &DpassCutSystDdtheta);
    Tree->Branch("DpassCutSystDchi2cl",   &DpassCutSystDchi2cl);
    Tree->Branch("Dgen",                  &Dgen);
    Tree->Branch("DisSignalCalc",         &DisSignalCalc);
@@ -3458,17 +3797,25 @@ void DzeroUPCTreeMessenger::Clear()
    Dtrk1Pt->clear();
    Dtrk1PtErr->clear();
    Dtrk1Eta->clear();
+   Dtrk1P->clear();
    Dtrk1dedx->clear();
    Dtrk1MassHypo->clear();
    Dtrk1PixelHit->clear();
    Dtrk1StripHit->clear();
+   Dtrk1PionScore->clear();
+   Dtrk1KaonScore->clear();
+   Dtrk1ProtScore->clear();
    Dtrk2Pt->clear();
    Dtrk2PtErr->clear();
    Dtrk2Eta->clear();
+   Dtrk2P->clear();
    Dtrk2dedx->clear();
    Dtrk2MassHypo->clear();
    Dtrk2PixelHit->clear();
    Dtrk2StripHit->clear();
+   Dtrk2PionScore->clear();
+   Dtrk2KaonScore->clear();
+   Dtrk2ProtScore->clear();
    Dchi2cl->clear();
    DsvpvDistance->clear();
    DsvpvDisErr->clear();
@@ -3484,10 +3831,13 @@ void DzeroUPCTreeMessenger::Clear()
    DpassCut23PASSystDtrkPt->clear();
    DpassCut23PASSystDalpha->clear();
    DpassCut23PASSystDchi2cl->clear();
-   DpassCutDefault->clear();
+   DpassCutNominal->clear();
+   DpassCutLoose->clear();
    DpassCutSystDsvpvSig->clear();
    DpassCutSystDtrkPt->clear();
    DpassCutSystDalpha->clear();
+   DpassCutSystDalphaDdtheta->clear();
+   DpassCutSystDdtheta->clear();
    DpassCutSystDchi2cl->clear();
    Dgen->clear();
    DisSignalCalc->clear();
@@ -3537,17 +3887,25 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(Dtrk1Pt != nullptr && M.Dtrk1Pt != nullptr)   *Dtrk1Pt = *(M.Dtrk1Pt);
    if(Dtrk1PtErr != nullptr && M.Dtrk1PtErr != nullptr)   *Dtrk1PtErr = *(M.Dtrk1PtErr);
    if(Dtrk1Eta != nullptr && M.Dtrk1Eta != nullptr)   *Dtrk1Eta = *(M.Dtrk1Eta);
+   if(Dtrk1P != nullptr && M.Dtrk1P != nullptr)   *Dtrk1P = *(M.Dtrk1P);
    if(Dtrk1dedx != nullptr && M.Dtrk1dedx != nullptr)   *Dtrk1dedx = *(M.Dtrk1dedx);
    if(Dtrk1MassHypo != nullptr && M.Dtrk1MassHypo != nullptr)   *Dtrk1MassHypo = *(M.Dtrk1MassHypo);
    if(Dtrk1PixelHit != nullptr && M.Dtrk1PixelHit != nullptr)   *Dtrk1PixelHit = *(M.Dtrk1PixelHit);
    if(Dtrk1StripHit != nullptr && M.Dtrk1StripHit != nullptr)   *Dtrk1StripHit = *(M.Dtrk1StripHit);
+   if(Dtrk1PionScore != nullptr && M.Dtrk1PionScore != nullptr)   *Dtrk1PionScore = *(M.Dtrk1PionScore);
+   if(Dtrk1KaonScore != nullptr && M.Dtrk1KaonScore != nullptr)   *Dtrk1KaonScore = *(M.Dtrk1KaonScore);
+   if(Dtrk1ProtScore != nullptr && M.Dtrk1ProtScore != nullptr)   *Dtrk1ProtScore = *(M.Dtrk1ProtScore);
    if(Dtrk2Pt != nullptr && M.Dtrk2Pt != nullptr)   *Dtrk2Pt = *(M.Dtrk2Pt);
    if(Dtrk2PtErr != nullptr && M.Dtrk2PtErr != nullptr)   *Dtrk2PtErr = *(M.Dtrk2PtErr);
    if(Dtrk2Eta != nullptr && M.Dtrk2Eta != nullptr)   *Dtrk2Eta = *(M.Dtrk2Eta);
+   if(Dtrk2P != nullptr && M.Dtrk2P != nullptr)   *Dtrk2P = *(M.Dtrk2P);
    if(Dtrk2dedx != nullptr && M.Dtrk2dedx != nullptr)   *Dtrk2dedx = *(M.Dtrk2dedx);
    if(Dtrk2MassHypo != nullptr && M.Dtrk2MassHypo != nullptr)   *Dtrk2MassHypo = *(M.Dtrk2MassHypo);
    if(Dtrk2PixelHit != nullptr && M.Dtrk2PixelHit != nullptr)   *Dtrk2PixelHit = *(M.Dtrk2PixelHit);
    if(Dtrk2StripHit != nullptr && M.Dtrk2StripHit != nullptr)   *Dtrk2StripHit = *(M.Dtrk2StripHit);
+   if(Dtrk2PionScore != nullptr && M.Dtrk2PionScore != nullptr)   *Dtrk2PionScore = *(M.Dtrk2PionScore);
+   if(Dtrk2KaonScore != nullptr && M.Dtrk2KaonScore != nullptr)   *Dtrk2KaonScore = *(M.Dtrk2KaonScore);
+   if(Dtrk2ProtScore != nullptr && M.Dtrk2ProtScore != nullptr)   *Dtrk2ProtScore = *(M.Dtrk2ProtScore);
    if(Dchi2cl != nullptr && M.Dchi2cl != nullptr)   *Dchi2cl = *(M.Dchi2cl);
    if(DsvpvDistance != nullptr && M.DsvpvDistance != nullptr)   *DsvpvDistance = *(M.DsvpvDistance);
    if(DsvpvDisErr != nullptr && M.DsvpvDisErr != nullptr)   *DsvpvDisErr = *(M.DsvpvDisErr);
@@ -3563,10 +3921,13 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(DpassCut23PASSystDtrkPt != nullptr && M.DpassCut23PASSystDtrkPt != nullptr)   *DpassCut23PASSystDtrkPt = *(M.DpassCut23PASSystDtrkPt);
    if(DpassCut23PASSystDalpha != nullptr && M.DpassCut23PASSystDalpha != nullptr)   *DpassCut23PASSystDalpha = *(M.DpassCut23PASSystDalpha);
    if(DpassCut23PASSystDchi2cl != nullptr && M.DpassCut23PASSystDchi2cl != nullptr)   *DpassCut23PASSystDchi2cl = *(M.DpassCut23PASSystDchi2cl);
-   if(DpassCutDefault != nullptr && M.DpassCutDefault != nullptr)   *DpassCutDefault = *(M.DpassCutDefault);
+   if(DpassCutNominal != nullptr && M.DpassCutNominal != nullptr)   *DpassCutNominal = *(M.DpassCutNominal);
+   if(DpassCutLoose != nullptr && M.DpassCutLoose != nullptr)   *DpassCutLoose = *(M.DpassCutLoose);
    if(DpassCutSystDsvpvSig != nullptr && M.DpassCutSystDsvpvSig != nullptr)   *DpassCutSystDsvpvSig = *(M.DpassCutSystDsvpvSig);
    if(DpassCutSystDtrkPt != nullptr && M.DpassCutSystDtrkPt != nullptr)   *DpassCutSystDtrkPt = *(M.DpassCutSystDtrkPt);
    if(DpassCutSystDalpha != nullptr && M.DpassCutSystDalpha != nullptr)   *DpassCutSystDalpha = *(M.DpassCutSystDalpha);
+   if(DpassCutSystDdtheta != nullptr && M.DpassCutSystDdtheta != nullptr)   *DpassCutSystDdtheta = *(M.DpassCutSystDdtheta);
+   if(DpassCutSystDalphaDdtheta != nullptr && M.DpassCutSystDalphaDdtheta != nullptr)   *DpassCutSystDalphaDdtheta = *(M.DpassCutSystDalphaDdtheta);
    if(DpassCutSystDchi2cl != nullptr && M.DpassCutSystDchi2cl != nullptr)   *DpassCutSystDchi2cl = *(M.DpassCutSystDchi2cl);
    if(Dgen != nullptr && M.Dgen != nullptr)   *Dgen = *(M.Dgen);
    if(DisSignalCalc != nullptr && M.DisSignalCalc != nullptr)   *DisSignalCalc = *(M.DisSignalCalc);
@@ -3596,16 +3957,16 @@ bool DzeroUPCTreeMessenger::FillEntry()
    return true;
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, bool Debug)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile &File, std::string TreeName, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Initialized = false;
    WriteMode = false;
 
    Tree = (TTree *)File.Get(TreeName.c_str());
-   Initialize(Debug);
+   Initialize(saveTriggerBits, Debug, includeFSCandPPS);
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName, bool Debug)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::string TreeName, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Initialized = false;
    WriteMode = false;
@@ -3614,15 +3975,15 @@ ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TFile *File, std::s
       Tree = (TTree *)File->Get(TreeName.c_str());
    else
       Tree = nullptr;
-   Initialize(Debug);
+   Initialize(saveTriggerBits, Debug, includeFSCandPPS);
 }
 
-ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree, bool Debug)
+ChargedHadronRAATreeMessenger::ChargedHadronRAATreeMessenger(TTree *ChargedHadRAATree, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Initialized = false;
    WriteMode = false;
 
-   Initialize(ChargedHadRAATree, Debug);
+   Initialize(ChargedHadRAATree, saveTriggerBits, Debug, includeFSCandPPS);
 }
 
 ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
@@ -3645,7 +4006,18 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
       delete trkNLayers;
       delete trkNormChi2;
       delete pfEnergy;
+      delete trkPassChargedHadron_Nominal;
+      delete trkPassChargedHadron_Loose;
+      delete trkPassChargedHadron_Tight;
       delete trackWeight;
+      delete trackingEfficiency_Nominal;
+      delete trackingEfficiency_Loose;
+      delete trackingEfficiency_Tight;
+      delete MC_TrkPtReweight;
+      delete MC_TrkDCAReweight;
+      delete TrkSpeciesWeight_pp;
+      delete TrkSpeciesWeight_dNdEta40;
+      delete TrkSpeciesWeight_dNdEta100;
 
       if (DebugMode == true) {
          // delete debug related vectors
@@ -3661,24 +4033,56 @@ ChargedHadronRAATreeMessenger::~ChargedHadronRAATreeMessenger()
          delete Allchi2Vtx;
          delete AllndofVtx;
          delete AllptSumVtx;
+      }
 
+      if (includeFSCandPPSMode) {
+         delete PPSStation0M_x;
+         delete PPSStation0M_y;
+         delete PPSStation2M_x;
+         delete PPSStation2M_y;
+
+         delete FSC2topM_adc;
+         delete FSC2topM_chargefC;
+         delete FSC2topM_tdc;
+
+         delete FSC2bottomM_adc;
+         delete FSC2bottomM_chargefC;
+         delete FSC2bottomM_tdc;
+
+         delete FSC3bottomleftM_adc;
+         delete FSC3bottomleftM_chargefC;
+         delete FSC3bottomleftM_tdc;
+
+         delete FSC3bottomrightM_adc;
+         delete FSC3bottomrightM_chargefC;
+         delete FSC3bottomrightM_tdc;
+
+         delete FSC3topleftM_adc;
+         delete FSC3topleftM_chargefC;
+         delete FSC3topleftM_tdc;
+
+         delete FSC3toprightM_adc;
+         delete FSC3toprightM_chargefC;
+         delete FSC3toprightM_tdc;
       }
    }
 }
 
-bool ChargedHadronRAATreeMessenger::Initialize(TTree *ChargedHadRAATree, bool Debug)
+bool ChargedHadronRAATreeMessenger::Initialize(TTree *ChargedHadRAATree, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    Tree = ChargedHadRAATree;
-   return Initialize(Debug);
+   return Initialize(saveTriggerBits, Debug, includeFSCandPPS);
 }
 
-bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
+bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    if(Tree == nullptr)
       return false;
 
    Initialized = true;
    DebugMode = Debug;
+   includeFSCandPPSMode = includeFSCandPPS;
+   saveTriggerBitsMode = saveTriggerBits;
    trkPt = nullptr;
    trkPhi = nullptr;
    trkPtError = nullptr;
@@ -3695,7 +4099,19 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    trkNLayers = nullptr;
    trkNormChi2 = nullptr;
    pfEnergy = nullptr;
+   trkPassChargedHadron_Nominal = nullptr;
+   trkPassChargedHadron_Loose = nullptr;
+   trkPassChargedHadron_Tight = nullptr;
    trackWeight = nullptr;
+   trackingEfficiency_Nominal = nullptr;
+   trackingEfficiency_Loose = nullptr;
+   trackingEfficiency_Tight = nullptr;
+   MC_TrkPtReweight = nullptr;
+   MC_TrkDCAReweight = nullptr;
+   TrkSpeciesWeight_pp = nullptr;
+   TrkSpeciesWeight_dNdEta40 = nullptr;
+   TrkSpeciesWeight_dNdEta100 = nullptr;
+
 
    Tree->SetBranchAddress("Run", &Run);
    Tree->SetBranchAddress("Event", &Event);
@@ -3704,6 +4120,10 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("VX", &VX);
    Tree->SetBranchAddress("VY", &VY);
    Tree->SetBranchAddress("VZ", &VZ);
+   Tree->SetBranchAddress("VZ_pf", &VZ_pf);
+   Tree->SetBranchAddress("eventEfficiencyWeight_Nominal", &eventEfficiencyWeight_Nominal);
+   Tree->SetBranchAddress("eventEfficiencyWeight_Loose", &eventEfficiencyWeight_Loose);
+   Tree->SetBranchAddress("eventEfficiencyWeight_Tight", &eventEfficiencyWeight_Tight);
    Tree->SetBranchAddress("VXError", &VXError);
    Tree->SetBranchAddress("VYError", &VYError);
    Tree->SetBranchAddress("VZError", &VZError);
@@ -3714,6 +4134,9 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("chi2Vtx", &chi2Vtx);
    Tree->SetBranchAddress("ndofVtx", &ndofVtx);
    Tree->SetBranchAddress("nVtx", &nVtx);
+   Tree->SetBranchAddress("nTrk", &nTrk);
+   Tree->SetBranchAddress("multiplicityEta2p4", &multiplicityEta2p4);
+   Tree->SetBranchAddress("multiplicityEta1p0", &multiplicityEta1p0);
    Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
    Tree->SetBranchAddress("HFEMaxPlus2", &HFEMaxPlus2);
    Tree->SetBranchAddress("HFEMaxPlus3", &HFEMaxPlus3);
@@ -3727,10 +4150,38 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
    Tree->SetBranchAddress("mMaxL1HFAdcMinus", &mMaxL1HFAdcMinus);
    Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
+   Tree->SetBranchAddress("hiHFPlus_pf", &hiHFPlus_pf);
+   Tree->SetBranchAddress("hiHFMinus_pf", &hiHFMinus_pf);
    Tree->SetBranchAddress("Npart", &Npart);
    Tree->SetBranchAddress("Ncoll", &Ncoll);
    Tree->SetBranchAddress("leadingPtEta1p0_sel", &leadingPtEta1p0_sel);
    Tree->SetBranchAddress("sampleType", &sampleType);
+   Tree->SetBranchAddress("passBaselineEventSelection", &passBaselineEventSelection);
+   Tree->SetBranchAddress("passL1HFAND_16_Online", &passL1HFAND_16_Online);
+   Tree->SetBranchAddress("passL1HFOR_16_Online", &passL1HFOR_16_Online);
+   Tree->SetBranchAddress("passL1HFAND_14_Online", &passL1HFAND_14_Online);
+   Tree->SetBranchAddress("passL1HFOR_14_Online", &passL1HFOR_14_Online);
+   Tree->SetBranchAddress("passHFAND_10_Offline", &passHFAND_10_Offline);
+   Tree->SetBranchAddress("passHFAND_13_Offline", &passHFAND_13_Offline);
+   Tree->SetBranchAddress("passHFAND_19_Offline", &passHFAND_19_Offline);
+
+   if(Tree->GetBranch("HLT_PPRefZeroBias_v6"))            Tree->SetBranchAddress("HLT_PPRefZeroBias_v6", &HLT_PPRefZeroBias_v6); 
+   if(Tree->GetBranch("HLT_OxyZeroBias_v1"))                  Tree->SetBranchAddress("HLT_OxyZeroBias_v1", &HLT_OxyZeroBias_v1);
+   if(Tree->GetBranch("HLT_OxyZDC1nOR_v1"))                   Tree->SetBranchAddress("HLT_OxyZDC1nOR_v1",  &HLT_OxyZDC1nOR_v1);
+   if(Tree->GetBranch("HLT_OxySingleMuOpen_NotMBHF2OR_v1"))   Tree->SetBranchAddress("HLT_OxySingleMuOpen_NotMBHF2OR_v1", &HLT_OxySingleMuOpen_NotMBHF2OR_v1);
+   if(Tree->GetBranch("HLT_OxySingleJet8_ZDC1nAsymXOR_v1"))   Tree->SetBranchAddress("HLT_OxySingleJet8_ZDC1nAsymXOR_v1", &HLT_OxySingleJet8_ZDC1nAsymXOR_v1);
+   if(Tree->GetBranch("HLT_OxyNotMBHF2_v1"))                  Tree->SetBranchAddress("HLT_OxyNotMBHF2_v1",                &HLT_OxyNotMBHF2_v1);
+   if(Tree->GetBranch("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1")) Tree->SetBranchAddress("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1", &HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1);
+   if(Tree->GetBranch("HLT_OxyZeroBias_MinPixelCluster400_v1")) Tree->SetBranchAddress("HLT_OxyZeroBias_MinPixelCluster400_v1", &HLT_OxyZeroBias_MinPixelCluster400_v1);
+   if(Tree->GetBranch("HLT_MinimumBiasHF_OR_BptxAND_v1"))     Tree->SetBranchAddress("HLT_MinimumBiasHF_OR_BptxAND_v1",   &HLT_MinimumBiasHF_OR_BptxAND_v1);
+   if(Tree->GetBranch("HLT_MinimumBiasHF_AND_BptxAND_v1"))    Tree->SetBranchAddress("HLT_MinimumBiasHF_AND_BptxAND_v1",  &HLT_MinimumBiasHF_AND_BptxAND_v1);
+
+   if(Tree->GetBranch("HLT_OxySingleJet16_ZDC1nAsymXOR_v1"))  Tree->SetBranchAddress("HLT_OxySingleJet16_ZDC1nAsymXOR_v1",  &HLT_OxySingleJet16_ZDC1nAsymXOR_v1);
+   if(Tree->GetBranch("HLT_OxySingleJet16_ZDC1nXOR_v1"))      Tree->SetBranchAddress("HLT_OxySingleJet16_ZDC1nXOR_v1",  &HLT_OxySingleJet16_ZDC1nXOR_v1);
+   if(Tree->GetBranch("HLT_OxySingleJet24_ZDC1nAsymXOR_v1"))  Tree->SetBranchAddress("HLT_OxySingleJet24_ZDC1nAsymXOR_v1",  &HLT_OxySingleJet24_ZDC1nAsymXOR_v1);
+   if(Tree->GetBranch("HLT_OxySingleJet24_ZDC1nXOR_v1"))      Tree->SetBranchAddress("HLT_OxySingleJet24_ZDC1nXOR_v1",  &HLT_OxySingleJet24_ZDC1nXOR_v1);
+   if(Tree->GetBranch("HLT_OxyL1SingleJet20_v1"))             Tree->SetBranchAddress("HLT_OxyL1SingleJet20_v1",  &HLT_OxyL1SingleJet20_v1);
+
    Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkPhi", &trkPhi);
    Tree->SetBranchAddress("trkPtError", &trkPtError);
@@ -3747,34 +4198,103 @@ bool ChargedHadronRAATreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("trkNLayers", &trkNLayers);
    Tree->SetBranchAddress("trkNormChi2", &trkNormChi2);
    Tree->SetBranchAddress("pfEnergy", &pfEnergy);
+   Tree->SetBranchAddress("trkPassChargedHadron_Nominal", &trkPassChargedHadron_Nominal);
+   Tree->SetBranchAddress("trkPassChargedHadron_Loose", &trkPassChargedHadron_Loose);
+   Tree->SetBranchAddress("trkPassChargedHadron_Tight", &trkPassChargedHadron_Tight);
    Tree->SetBranchAddress("trackWeight", &trackWeight);
+   Tree->SetBranchAddress("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
+   Tree->SetBranchAddress("trackingEfficiency_Loose", &trackingEfficiency_Loose);
+   Tree->SetBranchAddress("trackingEfficiency_Tight", &trackingEfficiency_Tight);
+   Tree->SetBranchAddress("MC_TrkPtReweight", &MC_TrkPtReweight);
+   Tree->SetBranchAddress("MC_TrkDCAReweight", &MC_TrkDCAReweight);
+   Tree->SetBranchAddress("TrkSpeciesWeight_pp", &TrkSpeciesWeight_pp);
+   Tree->SetBranchAddress("TrkSpeciesWeight_dNdEta40", &TrkSpeciesWeight_dNdEta40);
+   Tree->SetBranchAddress("TrkSpeciesWeight_dNdEta100", &TrkSpeciesWeight_dNdEta100);
 
-   if (DebugMode) {
-      // initialize debug quantities
-      AllxVtx = nullptr;
-      AllyVtx = nullptr;
-      AllzVtx = nullptr;
-      AllxVtxError = nullptr;
-      AllyVtxError = nullptr;
-      AllzVtxError = nullptr;
-      AllisFakeVtx = nullptr;
-      AllnTracksVtx = nullptr;
-      Allchi2Vtx = nullptr;
-      AllndofVtx = nullptr;
-      AllptSumVtx = nullptr;
+   // initialize debug quantities
+   AllxVtx = nullptr;
+   AllyVtx = nullptr;
+   AllzVtx = nullptr;
+   AllxVtxError = nullptr;
+   AllyVtxError = nullptr;
+   AllzVtxError = nullptr;
+   AllisFakeVtx = nullptr;
+   AllnTracksVtx = nullptr;
+   Allchi2Vtx = nullptr;
+   AllndofVtx = nullptr;
+   AllptSumVtx = nullptr;
 
-      Tree->SetBranchAddress("AllxVtx", &AllxVtx);
-      Tree->SetBranchAddress("AllyVtx", &AllyVtx);
-      Tree->SetBranchAddress("AllzVtx", &AllzVtx);
-      Tree->SetBranchAddress("AllxVtxError", &AllxVtxError);
-      Tree->SetBranchAddress("AllyVtxError", &AllyVtxError);
-      Tree->SetBranchAddress("AllzVtxError", &AllzVtxError);
-      Tree->SetBranchAddress("AllisFakeVtx", &AllisFakeVtx);
-      Tree->SetBranchAddress("AllnTracksVtx", &AllnTracksVtx);
-      Tree->SetBranchAddress("Allchi2Vtx", &Allchi2Vtx);
-      Tree->SetBranchAddress("AllndofVtx", &AllndofVtx);
-      Tree->SetBranchAddress("AllptSumVtx", &AllptSumVtx);
-   }
+   if(Tree->GetBranch("AllxVtx")) Tree->SetBranchAddress("AllxVtx", &AllxVtx);
+   if(Tree->GetBranch("AllyVtx")) Tree->SetBranchAddress("AllyVtx", &AllyVtx);
+   if(Tree->GetBranch("AllzVtx")) Tree->SetBranchAddress("AllzVtx", &AllzVtx);
+   if(Tree->GetBranch("AllxVtxError")) Tree->SetBranchAddress("AllxVtxError", &AllxVtxError);
+   if(Tree->GetBranch("AllyVtxError")) Tree->SetBranchAddress("AllyVtxError", &AllyVtxError);
+   if(Tree->GetBranch("AllzVtxError")) Tree->SetBranchAddress("AllzVtxError", &AllzVtxError);
+   if(Tree->GetBranch("AllisFakeVtx")) Tree->SetBranchAddress("AllisFakeVtx", &AllisFakeVtx);
+   if(Tree->GetBranch("AllnTracksVtx")) Tree->SetBranchAddress("AllnTracksVtx", &AllnTracksVtx);
+   if(Tree->GetBranch("Allchi2Vtx")) Tree->SetBranchAddress("Allchi2Vtx", &Allchi2Vtx);
+   if(Tree->GetBranch("AllndofVtx")) Tree->SetBranchAddress("AllndofVtx", &AllndofVtx);
+   if(Tree->GetBranch("AllptSumVtx")) Tree->SetBranchAddress("AllptSumVtx", &AllptSumVtx);
+
+   // Initialize FSC and PPS information if present
+   
+   PPSStation0M_x = nullptr;
+   PPSStation0M_y = nullptr;
+   PPSStation2M_x = nullptr;
+   PPSStation2M_y = nullptr;
+
+   FSC2topM_adc = nullptr;
+   FSC2topM_chargefC = nullptr;
+   FSC2topM_tdc = nullptr;
+
+   FSC2bottomM_adc = nullptr;
+   FSC2bottomM_chargefC = nullptr;
+   FSC2bottomM_tdc = nullptr;
+
+   FSC3bottomleftM_adc = nullptr;
+   FSC3bottomleftM_chargefC = nullptr;
+   FSC3bottomleftM_tdc = nullptr;
+
+   FSC3bottomrightM_adc = nullptr;
+   FSC3bottomrightM_chargefC = nullptr;
+   FSC3bottomrightM_tdc = nullptr;
+
+   FSC3topleftM_adc = nullptr;
+   FSC3topleftM_chargefC = nullptr;
+   FSC3topleftM_tdc = nullptr;
+
+   FSC3toprightM_adc = nullptr;
+   FSC3toprightM_chargefC = nullptr;
+   FSC3toprightM_tdc = nullptr;
+
+   if(Tree->GetBranch("PPSStation0M_x"))   Tree->SetBranchAddress("PPSStation0M_x", &PPSStation0M_x);
+   if(Tree->GetBranch("PPSStation0M_y"))   Tree->SetBranchAddress("PPSStation0M_y", &PPSStation0M_y);
+   if(Tree->GetBranch("PPSStation2M_x"))   Tree->SetBranchAddress("PPSStation2M_x", &PPSStation2M_x);
+   if(Tree->GetBranch("PPSStation2M_y"))   Tree->SetBranchAddress("PPSStation2M_y", &PPSStation2M_y);
+      
+   if(Tree->GetBranch("FSC2topM_adc"))     Tree->SetBranchAddress("FSC2topM_adc", &FSC2topM_adc);
+   if(Tree->GetBranch("FSC2topM_chargefC"))Tree->SetBranchAddress("FSC2topM_chargefC", &FSC2topM_chargefC);
+   if(Tree->GetBranch("FSC2topM_tdc"))     Tree->SetBranchAddress("FSC2topM_tdc", &FSC2topM_tdc);
+
+   if(Tree->GetBranch("FSC2bottomM_adc"))  Tree->SetBranchAddress("FSC2bottomM_adc", &FSC2bottomM_adc);
+   if(Tree->GetBranch("FSC2bottomM_chargefC")) Tree->SetBranchAddress("FSC2bottomM_chargefC", &FSC2bottomM_chargefC);
+   if(Tree->GetBranch("FSC2bottomM_tdc"))  Tree->SetBranchAddress("FSC2bottomM_tdc", &FSC2bottomM_tdc);
+
+   if(Tree->GetBranch("FSC3bottomleftM_adc"))   Tree->SetBranchAddress("FSC3bottomleftM_adc", &FSC3bottomleftM_adc);
+   if(Tree->GetBranch("FSC3bottomleftM_chargefC"))   Tree->SetBranchAddress("FSC3bottomleftM_chargefC", &FSC3bottomleftM_chargefC);
+   if(Tree->GetBranch("FSC3bottomleftM_tdc"))   Tree->SetBranchAddress("FSC3bottomleftM_tdc", &FSC3bottomleftM_tdc);
+
+   if(Tree->GetBranch("FSC3bottomrightM_adc"))   Tree->SetBranchAddress("FSC3bottomrightM_adc", &FSC3bottomrightM_adc);
+   if(Tree->GetBranch("FSC3bottomrightM_chargefC"))   Tree->SetBranchAddress("FSC3bottomrightM_chargefC", &FSC3bottomrightM_chargefC);
+   if(Tree->GetBranch("FSC3bottomrightM_tdc"))   Tree->SetBranchAddress("FSC3bottomrightM_tdc", &FSC3bottomrightM_tdc);
+
+   if(Tree->GetBranch("FSC3topleftM_adc"))   Tree->SetBranchAddress("FSC3topleftM_adc", &FSC3topleftM_adc);
+   if(Tree->GetBranch("FSC3topleftM_chargefC"))   Tree->SetBranchAddress("FSC3topleftM_chargefC", &FSC3topleftM_chargefC);
+   if(Tree->GetBranch("FSC3topleftM_tdc"))   Tree->SetBranchAddress("FSC3topleftM_tdc", &FSC3topleftM_tdc);
+      
+   if(Tree->GetBranch("FSC3toprightM_adc"))   Tree->SetBranchAddress("FSC3toprightM_adc", &FSC3toprightM_adc);
+   if(Tree->GetBranch("FSC3toprightM_chargefC"))   Tree->SetBranchAddress("FSC3toprightM_chargefC", &FSC3toprightM_chargefC);
+   if(Tree->GetBranch("FSC3toprightM_tdc"))   Tree->SetBranchAddress("FSC3toprightM_tdc", &FSC3toprightM_tdc);
 
    return true;
 }
@@ -3795,7 +4315,7 @@ bool ChargedHadronRAATreeMessenger::GetEntry(int iEntry)
    return true;
 }
 
-bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
+bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, bool Debug, bool includeFSCandPPS)
 {
    if(T == nullptr)
       return false;
@@ -3803,6 +4323,8 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Initialized = true;
    WriteMode = true;
    DebugMode = Debug;
+   includeFSCandPPSMode = includeFSCandPPS;
+   saveTriggerBitsMode = saveTriggerBits;
 
    trkPt = new std::vector<float>();
    trkPhi = new std::vector<float>();
@@ -3820,7 +4342,19 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    trkNLayers = new std::vector<char>();
    trkNormChi2 = new std::vector<float>();
    pfEnergy = new std::vector<float>();
+   trkPassChargedHadron_Nominal = new std::vector<bool>();
+   trkPassChargedHadron_Loose = new std::vector<bool>();
+   trkPassChargedHadron_Tight = new std::vector<bool>();
    trackWeight = new std::vector<float>();
+   trackingEfficiency_Nominal = new std::vector<float>();
+   trackingEfficiency_Loose = new std::vector<float>();
+   trackingEfficiency_Tight = new std::vector<float>();
+   MC_TrkPtReweight = new std::vector<float>();
+   MC_TrkDCAReweight = new std::vector<float>();
+   TrkSpeciesWeight_pp = new std::vector<float>();
+   TrkSpeciesWeight_dNdEta40 = new std::vector<float>();
+   TrkSpeciesWeight_dNdEta100 = new std::vector<float>();
+   
 
    Tree = T;
 
@@ -3831,6 +4365,12 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("VX",                         &VX, "VX/F");
    Tree->Branch("VY",                         &VY, "VY/F");
    Tree->Branch("VZ",                         &VZ, "VZ/F");
+   Tree->Branch("VZ_pf",                      &VZ_pf, "VZ_pf/F");
+   Tree->Branch("eventEfficiencyWeight_Nominal",        &eventEfficiencyWeight_Nominal, "eventEfficiencyWeight_Nominal/F");
+   Tree->Branch("eventEfficiencyWeight_Loose",          &eventEfficiencyWeight_Loose, "eventEfficiencyWeight_Loose/F");
+   Tree->Branch("eventEfficiencyWeight_Tight",          &eventEfficiencyWeight_Tight, "eventEfficiencyWeight_Tight/F");
+   Tree->Branch("MC_VZReweight",              &MC_VZReweight, "MC_VZReweight/F");
+   Tree->Branch("MC_MultReweight",            &MC_MultReweight, "MC_MultReweight/F");
    Tree->Branch("VXError",                    &VXError, "VXError/F");
    Tree->Branch("VYError",                    &VYError, "VYError/F");
    Tree->Branch("VZError",                    &VZError, "VZError/F");
@@ -3841,6 +4381,9 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("chi2Vtx",                    &chi2Vtx, "chi2Vtx/F");
    Tree->Branch("ndofVtx",                    &ndofVtx, "ndofVtx/F");
    Tree->Branch("nVtx",                       &nVtx, "nVtx/I");
+   Tree->Branch("nTrk",                       &nTrk, "nTrk/I");
+   Tree->Branch("multiplicityEta2p4",          &multiplicityEta2p4, "multiplicityEta2p4/I");
+   Tree->Branch("multiplicityEta1p0",          &multiplicityEta1p0, "multiplicityEta1p0/I");
    Tree->Branch("HFEMaxPlus",                 &HFEMaxPlus, "HFEMaxPlus/F");
    Tree->Branch("HFEMaxPlus2",                &HFEMaxPlus2, "HFEMaxPlus2/F");
    Tree->Branch("HFEMaxPlus3",                &HFEMaxPlus3, "HFEMaxPlus3/F");
@@ -3854,10 +4397,45 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("mMaxL1HFAdcPlus",            &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
    Tree->Branch("mMaxL1HFAdcMinus",           &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
    Tree->Branch("hiHF_pf",                    &hiHF_pf, "hiHF_pf/F");
+   Tree->Branch("hiHFPlus_pf",                &hiHFPlus_pf, "hiHFPlus_pf/F");
+   Tree->Branch("hiHFMinus_pf",               &hiHFMinus_pf, "hiHFMinus_pf/F");
    Tree->Branch("Npart",                      &Npart, "Npart/F");
    Tree->Branch("Ncoll",                      &Ncoll, "Ncoll/F");
    Tree->Branch("leadingPtEta1p0_sel",        &leadingPtEta1p0_sel, "leadingPtEta1p0_sel/F");
    Tree->Branch("sampleType",                 &sampleType, "sampleType/I");
+   Tree->Branch("passBaselineEventSelection", &passBaselineEventSelection, "passBaselineEventSelection/O");
+   Tree->Branch("passL1HFAND_16_Online",      &passL1HFAND_16_Online, "passL1HFAND_16_Online/O");
+   Tree->Branch("passL1HFOR_16_Online",       &passL1HFOR_16_Online, "passL1HFOR_16_Online/O");
+   Tree->Branch("passL1HFAND_14_Online",      &passL1HFAND_14_Online, "passL1HFAND_14_Online/O");
+   Tree->Branch("passL1HFOR_14_Online",       &passL1HFOR_14_Online, "passL1HFOR_14_Online/O");
+   Tree->Branch("passHFAND_10_Offline",       &passHFAND_10_Offline, "passHFAND_10_Offline/O");
+   Tree->Branch("passHFAND_13_Offline",       &passHFAND_13_Offline, "passHFAND_13_Offline/O");
+   Tree->Branch("passHFAND_19_Offline",       &passHFAND_19_Offline, "passHFAND_19_Offline/O");
+
+   if (saveTriggerBitsMode == 0) {        // pp HLT bits
+      Tree->Branch("HLT_PPRefZeroBias_v6",                                      &HLT_PPRefZeroBias_v6, "HLT_PPRefZeroBias_v6/O");
+   }
+   if (saveTriggerBitsMode == 1) {        // OO HLT bits 
+      Tree->Branch("HLT_OxySingleJet16_ZDC1nAsymXOR_v1",                         &HLT_OxySingleJet16_ZDC1nAsymXOR_v1, "HLT_OxySingleJet16_ZDC1nAsymXOR_v1/O");
+      Tree->Branch("HLT_OxySingleJet16_ZDC1nXOR_v1",                             &HLT_OxySingleJet16_ZDC1nXOR_v1, "HLT_OxySingleJet16_ZDC1nXOR_v1/O");
+      Tree->Branch("HLT_OxySingleJet24_ZDC1nAsymXOR_v1",                         &HLT_OxySingleJet24_ZDC1nAsymXOR_v1, "HLT_OxySingleJet24_ZDC1nAsymXOR_v1/O");
+      Tree->Branch("HLT_OxySingleJet24_ZDC1nXOR_v1",                             &HLT_OxySingleJet24_ZDC1nXOR_v1, "HLT_OxySingleJet24_ZDC1nXOR_v1/O");
+      Tree->Branch("HLT_OxyZDC1nOR_v1",                                          &HLT_OxyZDC1nOR_v1, "HLT_OxyZDC1nOR_v1/O");
+      Tree->Branch("HLT_OxyZeroBias_v1",                                         &HLT_OxyZeroBias_v1, "HLT_OxyZeroBias_v1/O");
+      Tree->Branch("HLT_MinimumBiasHF_OR_BptxAND_v1",                            &HLT_MinimumBiasHF_OR_BptxAND_v1, "HLT_MinimumBiasHF_OR_BptxAND_v1/O");
+      Tree->Branch("HLT_OxyL1SingleJet20_v1",                                    &HLT_OxyL1SingleJet20_v1, "HLT_OxyL1SingleJet20_v1/O");
+   } else if (saveTriggerBitsMode == 2) { // pO HLT bits
+      Tree->Branch("HLT_OxyZeroBias_v1",                                         &HLT_OxyZeroBias_v1, "HLT_OxyZeroBias_v1/O");
+      Tree->Branch("HLT_OxyZDC1nOR_v1",                                          &HLT_OxyZDC1nOR_v1, "HLT_OxyZDC1nOR_v1/O");
+      Tree->Branch("HLT_OxySingleMuOpen_NotMBHF2OR_v1",                          &HLT_OxySingleMuOpen_NotMBHF2OR_v1, "HLT_OxySingleMuOpen_NotMBHF2OR_v1/O");
+      Tree->Branch("HLT_OxySingleJet8_ZDC1nAsymXOR_v1",                          &HLT_OxySingleJet8_ZDC1nAsymXOR_v1, "HLT_OxySingleJet8_ZDC1nAsymXOR_v1/O");
+      Tree->Branch("HLT_OxyNotMBHF2_v1",                                         &HLT_OxyNotMBHF2_v1, "HLT_OxyNotMBHF2_v1/O");
+      Tree->Branch("HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1",&HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1, "HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1/O");
+      Tree->Branch("HLT_OxyZeroBias_MinPixelCluster400_v1",                      &HLT_OxyZeroBias_MinPixelCluster400_v1, "HLT_OxyZeroBias_MinPixelCluster400_v1/O");
+      Tree->Branch("HLT_MinimumBiasHF_OR_BptxAND_v1",                            &HLT_MinimumBiasHF_OR_BptxAND_v1, "HLT_MinimumBiasHF_OR_BptxAND_v1/O");
+      Tree->Branch("HLT_MinimumBiasHF_AND_BptxAND_v1",                           &HLT_MinimumBiasHF_AND_BptxAND_v1, "HLT_MinimumBiasHF_AND_BptxAND_v1/O");
+   }
+
    Tree->Branch("trkPt",                      &trkPt);
    Tree->Branch("trkPhi",                     &trkPhi);
    Tree->Branch("trkPtError",                 &trkPtError);
@@ -3874,7 +4452,18 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
    Tree->Branch("trkNLayers",                 &trkNLayers);
    Tree->Branch("trkNormChi2",                &trkNormChi2);
    Tree->Branch("pfEnergy",                   &pfEnergy);
+   Tree->Branch("trkPassChargedHadron_Nominal", &trkPassChargedHadron_Nominal);
+   Tree->Branch("trkPassChargedHadron_Loose", &trkPassChargedHadron_Loose);
+   Tree->Branch("trkPassChargedHadron_Tight", &trkPassChargedHadron_Tight);
    Tree->Branch("trackWeight",                &trackWeight);
+   Tree->Branch("trackingEfficiency_Nominal", &trackingEfficiency_Nominal);
+   Tree->Branch("trackingEfficiency_Loose",   &trackingEfficiency_Loose);
+   Tree->Branch("trackingEfficiency_Tight",   &trackingEfficiency_Tight);
+   Tree->Branch("MC_TrkPtReweight",           &MC_TrkPtReweight);
+   Tree->Branch("MC_TrkDCAReweight",          &MC_TrkDCAReweight);
+   Tree->Branch("TrkSpeciesWeight_pp",        &TrkSpeciesWeight_pp);
+   Tree->Branch("TrkSpeciesWeight_dNdEta40",  &TrkSpeciesWeight_dNdEta40);
+   Tree->Branch("TrkSpeciesWeight_dNdEta100", &TrkSpeciesWeight_dNdEta100);
 
    if (DebugMode) {
       // set debug related branches
@@ -3903,6 +4492,66 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, bool Debug)
       Tree->Branch("AllptSumVtx",             &AllptSumVtx);
    }
 
+   if (includeFSCandPPSMode) {
+      PPSStation0M_x = new std::vector<float>();
+      PPSStation0M_y = new std::vector<float>();
+      PPSStation2M_x = new std::vector<float>();
+      PPSStation2M_y = new std::vector<float>();
+
+      FSC2topM_adc = new std::vector<int>();
+      FSC2topM_chargefC = new std::vector<float>();
+      FSC2topM_tdc = new std::vector<int>();
+
+      FSC2bottomM_adc = new std::vector<int>();
+      FSC2bottomM_chargefC = new std::vector<float>();
+      FSC2bottomM_tdc = new std::vector<int>();
+
+      FSC3bottomleftM_adc = new std::vector<int>();
+      FSC3bottomleftM_chargefC = new std::vector<float>();
+      FSC3bottomleftM_tdc = new std::vector<int>();
+
+      FSC3bottomrightM_adc = new std::vector<int>();
+      FSC3bottomrightM_chargefC = new std::vector<float>();
+      FSC3bottomrightM_tdc = new std::vector<int>();
+
+      FSC3topleftM_adc = new std::vector<int>();
+      FSC3topleftM_chargefC = new std::vector<float>();
+      FSC3topleftM_tdc = new std::vector<int>();
+
+      FSC3toprightM_adc = new std::vector<int>();
+      FSC3toprightM_chargefC = new std::vector<float>();
+      FSC3toprightM_tdc = new std::vector<int>();
+
+      Tree->Branch("PPSStation0M_x",          &PPSStation0M_x);
+      Tree->Branch("PPSStation0M_y",          &PPSStation0M_y);
+      Tree->Branch("PPSStation2M_x",          &PPSStation2M_x);
+      Tree->Branch("PPSStation2M_y",          &PPSStation2M_y);
+
+      Tree->Branch("FSC2topM_adc",            &FSC2topM_adc);
+      Tree->Branch("FSC2topM_chargefC",       &FSC2topM_chargefC);
+      Tree->Branch("FSC2topM_tdc",            &FSC2topM_tdc);
+
+      Tree->Branch("FSC2bottomM_adc",         &FSC2bottomM_adc);
+      Tree->Branch("FSC2bottomM_chargefC",    &FSC2bottomM_chargefC);
+      Tree->Branch("FSC2bottomM_tdc",         &FSC2bottomM_tdc);
+
+      Tree->Branch("FSC3bottomleftM_adc",     &FSC3bottomleftM_adc);
+      Tree->Branch("FSC3bottomleftM_chargefC",&FSC3bottomleftM_chargefC);
+      Tree->Branch("FSC3bottomleftM_tdc",     &FSC3bottomleftM_tdc);
+
+      Tree->Branch("FSC3bottomrightM_adc",    &FSC3bottomrightM_adc);
+      Tree->Branch("FSC3bottomrightM_chargefC",&FSC3bottomrightM_chargefC);
+      Tree->Branch("FSC3bottomrightM_tdc",    &FSC3bottomrightM_tdc);
+
+      Tree->Branch("FSC3topleftM_adc",        &FSC3topleftM_adc);
+      Tree->Branch("FSC3topleftM_chargefC",   &FSC3topleftM_chargefC);
+      Tree->Branch("FSC3topleftM_tdc",        &FSC3topleftM_tdc);
+
+      Tree->Branch("FSC3toprightM_adc",       &FSC3toprightM_adc);
+      Tree->Branch("FSC3toprightM_chargefC",  &FSC3toprightM_chargefC);
+      Tree->Branch("FSC3toprightM_tdc",       &FSC3toprightM_tdc);
+   }
+
    return true;
 }
 
@@ -3918,6 +4567,12 @@ void ChargedHadronRAATreeMessenger::Clear()
    VX = 0.;
    VY = 0.;
    VZ = 0.;
+   VZ_pf = 0.;
+   eventEfficiencyWeight_Nominal = -1.0;
+   eventEfficiencyWeight_Loose = -1.0;
+   eventEfficiencyWeight_Tight = -1.0;
+   MC_VZReweight = 1.0;
+   MC_MultReweight = 1.0;
    VXError = 0.;
    VYError = 0.;
    VZError = 0.;
@@ -3928,6 +4583,9 @@ void ChargedHadronRAATreeMessenger::Clear()
    chi2Vtx = 0.;
    ndofVtx = 0.;
    nVtx = 0;
+   nTrk = 0;
+   multiplicityEta2p4 = 0;
+   multiplicityEta1p0 = 0;
    HFEMaxPlus = -9999.;
    HFEMaxPlus2 = -9999.;
    HFEMaxPlus3 = -9999.;
@@ -3941,10 +4599,45 @@ void ChargedHadronRAATreeMessenger::Clear()
    mMaxL1HFAdcPlus = 0;
    mMaxL1HFAdcMinus = 0;
    hiHF_pf = 0.;
+   hiHFPlus_pf = 0.;
+   hiHFMinus_pf = 0.;
    Npart = 0.;
    Ncoll = 0.;
    leadingPtEta1p0_sel = 0.;
    sampleType = -1;
+   passBaselineEventSelection = false;
+   passL1HFAND_16_Online = false;
+   passL1HFOR_16_Online = false;
+   passL1HFAND_14_Online = false;
+   passL1HFOR_14_Online = false;
+   passHFAND_10_Offline = false;
+   passHFAND_13_Offline = false;
+   passHFAND_19_Offline = false;
+
+   if (saveTriggerBitsMode == 0){ // PPREF HLT BITS 
+      HLT_PPRefZeroBias_v6 = false;
+   }
+   if (saveTriggerBitsMode == 1) { // OO HLT bits
+      HLT_OxySingleJet16_ZDC1nAsymXOR_v1 = false;
+      HLT_OxySingleJet16_ZDC1nXOR_v1 = false;
+      HLT_OxySingleJet24_ZDC1nAsymXOR_v1 = false;
+      HLT_OxySingleJet24_ZDC1nXOR_v1 = false;
+      HLT_OxyZDC1nOR_v1 = false;
+      HLT_OxyZeroBias_v1 = false;
+      HLT_MinimumBiasHF_OR_BptxAND_v1 = false;
+      HLT_OxyL1SingleJet20_v1 = false;
+   } else if (saveTriggerBitsMode == 2) { // pO HLT bits
+      HLT_OxyZeroBias_v1 = false;
+      HLT_OxyZDC1nOR_v1 = false;
+      HLT_OxySingleMuOpen_NotMBHF2OR_v1 = false;
+      HLT_OxySingleJet8_ZDC1nAsymXOR_v1 = false;
+      HLT_OxyNotMBHF2_v1 = false;
+      HLT_OxyZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v1 = false;
+      HLT_OxyZeroBias_MinPixelCluster400_v1 = false;
+      HLT_MinimumBiasHF_OR_BptxAND_v1 = false;
+      HLT_MinimumBiasHF_AND_BptxAND_v1 = false;
+   }
+
    trkPt->clear();
    trkPhi->clear();
    trkPtError->clear();
@@ -3961,7 +4654,18 @@ void ChargedHadronRAATreeMessenger::Clear()
    trkNLayers->clear();
    trkNormChi2->clear();
    pfEnergy->clear();
+   trkPassChargedHadron_Nominal->clear();
+   trkPassChargedHadron_Loose->clear();
+   trkPassChargedHadron_Tight->clear();
    trackWeight->clear();
+   trackingEfficiency_Nominal->clear();
+   trackingEfficiency_Loose->clear();
+   trackingEfficiency_Tight->clear();
+   MC_TrkPtReweight->clear();
+   MC_TrkDCAReweight->clear();
+   TrkSpeciesWeight_pp->clear();
+   TrkSpeciesWeight_dNdEta40->clear();
+   TrkSpeciesWeight_dNdEta100->clear();
 
    if (DebugMode) {
       // clear debug related branches
@@ -3977,7 +4681,37 @@ void ChargedHadronRAATreeMessenger::Clear()
       Allchi2Vtx->clear();
       AllndofVtx->clear();
       AllptSumVtx->clear();
+   }
 
+   if (includeFSCandPPSMode) {
+      PPSStation0M_x->clear();
+      PPSStation0M_y->clear();
+      PPSStation2M_x->clear();
+      PPSStation2M_y->clear();
+
+      FSC2topM_adc->clear();
+      FSC2topM_chargefC->clear();
+      FSC2topM_tdc->clear();
+
+      FSC2bottomM_adc->clear();
+      FSC2bottomM_chargefC->clear();
+      FSC2bottomM_tdc->clear();
+
+      FSC3bottomleftM_adc->clear();
+      FSC3bottomleftM_chargefC->clear();
+      FSC3bottomleftM_tdc->clear();
+
+      FSC3bottomrightM_adc->clear();
+      FSC3bottomrightM_chargefC->clear();
+      FSC3bottomrightM_tdc->clear();
+
+      FSC3topleftM_adc->clear();
+      FSC3topleftM_chargefC->clear();
+      FSC3topleftM_tdc->clear();
+
+      FSC3toprightM_adc->clear();
+      FSC3toprightM_chargefC->clear();
+      FSC3toprightM_tdc->clear();
    }
 }
 /*
@@ -4113,7 +4847,8 @@ bool UPCEECTreeMessenger::Initialize(bool Debug)
    Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
    Tree->SetBranchAddress("isL1ZDCXORJet12", &isL1ZDCXORJet12);
    Tree->SetBranchAddress("isL1ZDCXORJet16", &isL1ZDCXORJet16);
-   Tree->SetBranchAddress("trkPt", &trkPt); 
+   Tree->SetBranchAddress("isGammaN", &isGammaN);
+   Tree->SetBranchAddress("trkPt", &trkPt);
    Tree->SetBranchAddress("trkEta", &trkEta); 
    Tree->SetBranchAddress("trkPhi", &trkPhi);
    Tree->SetBranchAddress("pfEnergy", &pfEnergy); 
@@ -4195,6 +4930,7 @@ bool UPCEECTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("isL1ZDCXORJet8",        &isL1ZDCXORJet8, "isL1ZDCXORJet8/O");
    Tree->Branch("isL1ZDCXORJet12",       &isL1ZDCXORJet12, "isL1ZDCXORJet12/O");
    Tree->Branch("isL1ZDCXORJet16",       &isL1ZDCXORJet16, "isL1ZDCXORJet16/O");
+   Tree->Branch("isGammaN",              &isGammaN, "isGammaN/O");
    Tree->Branch("Nch",                   &Nch, "Nch/I");
    Tree->Branch("trkPt",                 &trkPt); 
    Tree->Branch("trkEta",                &trkEta);
@@ -4238,6 +4974,7 @@ void UPCEECTreeMessenger::Clear()
    isL1ZDCXORJet8 = false;
    isL1ZDCXORJet12 = false;
    isL1ZDCXORJet16 = false;
+   isGammaN = false;
    Nch = -999;
    trkPt->clear(); 
    trkEta->clear(); 
@@ -4318,6 +5055,11 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete JetEta;
       delete JetPhi;
       delete IsMuMuTagged;
+      delete GenJetPT;
+      delete GenJetEta;
+      delete GenJetPhi;
+      delete GenJetMatchIdx;
+      delete GenIsMuMuTagged;
       delete muPt1;
       delete muPt2;
       delete muEta1;
@@ -4341,12 +5083,31 @@ MuMuJetMessenger::~MuMuJetMessenger()
       delete mumuY;
       delete mumuPhi;
       delete mumuPt;
+      delete mumuIsGenMatched;
       //delete mumuisOnia;
       delete DRJetmu1;
       delete DRJetmu2;
       delete muDeta;
       delete muDphi;
       delete muDR;
+      delete ExtraMuWeight;
+      delete MuMuWeight;
+
+      delete GenMuPt1;
+      delete GenMuPt2;
+      delete GenMuEta1;
+      delete GenMuEta2;
+      delete GenMuPhi1;
+      delete GenMuPhi2;
+      delete GenMuMuMass;
+      delete GenMuMuEta;
+      delete GenMuMuY;
+      delete GenMuMuPhi;
+      delete GenMuMuPt;
+      delete GenMuDeta;
+      delete GenMuDphi;
+      delete GenMuDR;
+
       delete MJTHadronFlavor;
       delete MJTNcHad;
       delete MJTNbHad;
@@ -4406,6 +5167,11 @@ bool MuMuJetMessenger::Initialize()
    JetEta = nullptr;
    JetPhi = nullptr;
    IsMuMuTagged = nullptr;
+   GenJetPT = nullptr;
+   GenJetEta = nullptr;
+   GenJetPhi = nullptr;
+   GenJetMatchIdx = nullptr;
+   GenIsMuMuTagged = nullptr;
    muPt1 = nullptr;
    muPt2 = nullptr;
    muEta1 = nullptr;
@@ -4429,12 +5195,32 @@ bool MuMuJetMessenger::Initialize()
    mumuY = nullptr;
    mumuPhi = nullptr;
    mumuPt = nullptr;
+   mumuIsGenMatched = nullptr;
    //mumuisOnia = nullptr;
    DRJetmu1 = nullptr;
    DRJetmu2 = nullptr;
    muDeta = nullptr;
    muDphi = nullptr;
    muDR = nullptr;
+   ExtraMuWeight = nullptr;
+   MuMuWeight = nullptr;
+
+   GenMuPt1 = nullptr;
+   GenMuPt2 = nullptr;
+   GenMuEta1 = nullptr;
+   GenMuEta2 = nullptr;
+   GenMuPhi1 = nullptr;
+   GenMuPhi2 = nullptr;
+   GenMuMuMass = nullptr;
+   GenMuMuEta = nullptr;
+   GenMuMuY = nullptr;
+   GenMuMuPhi = nullptr;
+   GenMuMuPt = nullptr;
+   GenMuDeta = nullptr;
+   GenMuDphi = nullptr;
+   GenMuDR = nullptr;
+
+
    MJTHadronFlavor = nullptr;
    MJTNcHad = nullptr;
    MJTNbHad = nullptr;
@@ -4491,13 +5277,16 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("NCollWeight", &NCollWeight);
    Tree->SetBranchAddress("EventWeight", &EventWeight);
    Tree->SetBranchAddress("PTHat", &PTHat);
-   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
-   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
    Tree->SetBranchAddress("NPU", &NPU);
    Tree->SetBranchAddress("JetPT", &JetPT);
    Tree->SetBranchAddress("JetEta", &JetEta);
    Tree->SetBranchAddress("JetPhi", &JetPhi);
    Tree->SetBranchAddress("IsMuMuTagged", &IsMuMuTagged);
+   Tree->SetBranchAddress("GenJetPT", &GenJetPT);
+   Tree->SetBranchAddress("GenJetEta", &GenJetEta);
+   Tree->SetBranchAddress("GenJetPhi", &GenJetPhi);
+   Tree->SetBranchAddress("GenJetMatchIdx", &GenJetMatchIdx);
+   Tree->SetBranchAddress("GenIsMuMuTagged", &GenIsMuMuTagged);
    Tree->SetBranchAddress("muPt1", &muPt1);
    Tree->SetBranchAddress("muPt2", &muPt2);
    Tree->SetBranchAddress("muEta1", &muEta1);
@@ -4521,12 +5310,31 @@ bool MuMuJetMessenger::Initialize()
    Tree->SetBranchAddress("mumuY", &mumuY);
    Tree->SetBranchAddress("mumuPhi", &mumuPhi);
    Tree->SetBranchAddress("mumuPt", &mumuPt);
+   Tree->SetBranchAddress("mumuIsGenMatched", &mumuIsGenMatched);
    //Tree->SetBranchAddress("mumuisOnia", &mumuisOnia);
    Tree->SetBranchAddress("DRJetmu1", &DRJetmu1);
    Tree->SetBranchAddress("DRJetmu2", &DRJetmu2);
    Tree->SetBranchAddress("muDeta", &muDeta);
    Tree->SetBranchAddress("muDphi", &muDphi);
    Tree->SetBranchAddress("muDR", &muDR);
+   Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
+   Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
+
+   Tree->SetBranchAddress("GenMuPt1", &GenMuPt1);
+   Tree->SetBranchAddress("GenMuPt2", &GenMuPt2);
+   Tree->SetBranchAddress("GenMuEta1", &GenMuEta1);
+   Tree->SetBranchAddress("GenMuEta2", &GenMuEta2);
+   Tree->SetBranchAddress("GenMuPhi1", &GenMuPhi1);
+   Tree->SetBranchAddress("GenMuPhi2", &GenMuPhi2);
+   Tree->SetBranchAddress("GenMuMuMass", &GenMuMuMass);
+   Tree->SetBranchAddress("GenMuMuEta", &GenMuMuEta);
+   Tree->SetBranchAddress("GenMuMuY", &GenMuMuY);
+   Tree->SetBranchAddress("GenMuMuPhi", &GenMuMuPhi);
+   Tree->SetBranchAddress("GenMuMuPt", &GenMuMuPt);
+   Tree->SetBranchAddress("GenMuDeta", &GenMuDeta);
+   Tree->SetBranchAddress("GenMuDphi", &GenMuDphi);
+   Tree->SetBranchAddress("GenMuDR", &GenMuDR);
+
    Tree->SetBranchAddress("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->SetBranchAddress("MJTNcHad", &MJTNcHad);
    Tree->SetBranchAddress("MJTNbHad", &MJTNbHad);
@@ -4600,6 +5408,11 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    JetEta = new std::vector<float>();
    JetPhi = new std::vector<float>();
    IsMuMuTagged = new std::vector<bool>();
+   GenJetPT = new std::vector<float>();
+   GenJetEta = new std::vector<float>();
+   GenJetPhi = new std::vector<float>();
+   GenJetMatchIdx = new std::vector<int>();
+   GenIsMuMuTagged = new std::vector<bool>();
    muPt1 = new std::vector<float>();
    muPt2 = new std::vector<float>();
    muEta1 = new std::vector<float>();
@@ -4623,12 +5436,31 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    mumuY = new std::vector<float>();
    mumuPhi = new std::vector<float>();
    mumuPt = new std::vector<float>();
+   mumuIsGenMatched = new std::vector<bool>();
    //mumuisOnia = new std::vector<int>();
    DRJetmu1 = new std::vector<float>();
    DRJetmu2 = new std::vector<float>();
    muDeta = new std::vector<float>();
    muDphi = new std::vector<float>();
    muDR = new std::vector<float>();
+   ExtraMuWeight = new std::vector<std::vector<float>>();
+   MuMuWeight = new std::vector<float>();
+
+   GenMuPt1 = new std::vector<float>();
+   GenMuPt2 = new std::vector<float>();
+   GenMuEta1 = new std::vector<float>();
+   GenMuEta2 = new std::vector<float>();
+   GenMuPhi1 = new std::vector<float>();
+   GenMuPhi2 = new std::vector<float>();
+   GenMuMuMass = new std::vector<float>();
+   GenMuMuEta = new std::vector<float>();
+   GenMuMuY = new std::vector<float>();
+   GenMuMuPhi = new std::vector<float>();
+   GenMuMuPt = new std::vector<float>();
+   GenMuDeta = new std::vector<float>();
+   GenMuDphi = new std::vector<float>();
+   GenMuDR = new std::vector<float>();
+
    MJTHadronFlavor = new std::vector<int>();
    MJTNcHad = new std::vector<int>();
    MJTNbHad = new std::vector<int>();
@@ -4687,13 +5519,16 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("NCollWeight", &NCollWeight,  "NCollWeight/F");
    Tree->Branch("EventWeight", &EventWeight,  "EventWeight/F");
    Tree->Branch("PTHat", &PTHat,  "PTHat/F");
-   Tree->Branch("ExtraMuWeight", &ExtraMuWeight, "ExtraMuWeight[12]/F");
-   Tree->Branch("MuMuWeight", &MuMuWeight, "MuMuWeight/F");
    Tree->Branch("NPU", &NPU, "NPU/I");
    Tree->Branch("JetPT", &JetPT);
    Tree->Branch("JetEta", &JetEta);
    Tree->Branch("JetPhi", &JetPhi);
    Tree->Branch("IsMuMuTagged", &IsMuMuTagged);
+   Tree->Branch("GenJetPT", &GenJetPT);
+   Tree->Branch("GenJetEta", &GenJetEta);
+   Tree->Branch("GenJetPhi", &GenJetPhi);
+   Tree->Branch("GenJetMatchIdx", &GenJetMatchIdx);
+   Tree->Branch("GenIsMuMuTagged", &GenIsMuMuTagged);
    Tree->Branch("muPt1", &muPt1);
    Tree->Branch("muPt2", &muPt2);
    Tree->Branch("muEta1", &muEta1);
@@ -4717,12 +5552,31 @@ bool MuMuJetMessenger::SetBranch(TTree *T)
    Tree->Branch("mumuY", &mumuY);
    Tree->Branch("mumuPhi", &mumuPhi);
    Tree->Branch("mumuPt", &mumuPt);
+   Tree->Branch("mumuIsGenMatched", &mumuIsGenMatched);
    //Tree->Branch("mumuisOnia", &mumuisOnia);
    Tree->Branch("DRJetmu1", &DRJetmu1);
    Tree->Branch("DRJetmu2", &DRJetmu2);
    Tree->Branch("muDeta", &muDeta);
    Tree->Branch("muDphi", &muDphi);
    Tree->Branch("muDR", &muDR);
+   Tree->Branch("ExtraMuWeight", &ExtraMuWeight);
+   Tree->Branch("MuMuWeight", &MuMuWeight);
+
+   Tree->Branch("GenMuPt1", &GenMuPt1);
+   Tree->Branch("GenMuPt2", &GenMuPt2);
+   Tree->Branch("GenMuEta1", &GenMuEta1);
+   Tree->Branch("GenMuEta2", &GenMuEta2);
+   Tree->Branch("GenMuPhi1", &GenMuPhi1);
+   Tree->Branch("GenMuPhi2", &GenMuPhi2);
+   Tree->Branch("GenMuMuMass", &GenMuMuMass);
+   Tree->Branch("GenMuMuEta", &GenMuMuEta);
+   Tree->Branch("GenMuMuY", &GenMuMuY);
+   Tree->Branch("GenMuMuPhi", &GenMuMuPhi);
+   Tree->Branch("GenMuMuPt", &GenMuMuPt);
+   Tree->Branch("GenMuDeta", &GenMuDeta);
+   Tree->Branch("GenMuDphi", &GenMuDphi);
+   Tree->Branch("GenMuDR", &GenMuDR);
+
    Tree->Branch("MJTHadronFlavor", &MJTHadronFlavor);
    Tree->Branch("MJTNcHad", &MJTNcHad);
    Tree->Branch("MJTNbHad", &MJTNbHad);
@@ -4791,15 +5645,15 @@ void MuMuJetMessenger::Clear()
    ntrk = 0;
    NPU = 0;
 
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = 1;
-
-   MuMuWeight = 1;
-
    JetPT->clear();
    JetEta->clear();
    JetPhi->clear();
    IsMuMuTagged->clear();
+   GenJetPT->clear();
+   GenJetEta->clear();
+   GenJetPhi->clear();
+   GenJetMatchIdx->clear();
+   GenIsMuMuTagged->clear();
    muPt1->clear();
    muPt2->clear();
    muEta1->clear();
@@ -4823,12 +5677,31 @@ void MuMuJetMessenger::Clear()
    mumuY->clear();
    mumuPhi->clear();
    mumuPt->clear();
+   mumuIsGenMatched->clear();
    //mumuisOnia->clear();
    DRJetmu1->clear();
    DRJetmu2->clear();
    muDeta->clear();
    muDphi->clear();
    muDR->clear();
+   ExtraMuWeight->clear();
+   MuMuWeight->clear();
+
+   GenMuPt1->clear();
+   GenMuPt2->clear();
+   GenMuEta1->clear();
+   GenMuEta2->clear();
+   GenMuPhi1->clear();
+   GenMuPhi2->clear();
+   GenMuMuMass->clear();
+   GenMuMuEta->clear();
+   GenMuMuY->clear();
+   GenMuMuPhi->clear();
+   GenMuMuPt->clear();
+   GenMuDeta->clear();
+   GenMuDphi->clear();
+   GenMuDR->clear();
+
    MJTHadronFlavor->clear();
    MJTNcHad->clear();
    MJTNbHad->clear();
@@ -4892,15 +5765,15 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    nsvtx        = M.nsvtx;
    ntrk         = M.ntrk;
 
-   for(int i = 0; i < 12; i++)
-      ExtraMuWeight[i] = M.ExtraMuWeight[i];
-
-   MuMuWeight   = M.MuMuWeight;
-
    if(JetPT != nullptr && M.JetPT != nullptr)   *JetPT = *(M.JetPT);
    if(JetEta != nullptr && M.JetEta != nullptr)   *JetEta = *(M.JetEta);
    if(JetPhi != nullptr && M.JetPhi != nullptr)   *JetPhi = *(M.JetPhi);
    if(IsMuMuTagged != nullptr && M.IsMuMuTagged != nullptr)   *IsMuMuTagged = *(M.IsMuMuTagged);
+   if(GenJetPT != nullptr && M.GenJetPT != nullptr)   *GenJetPT = *(M.GenJetPT);
+   if(GenJetEta != nullptr && M.GenJetEta != nullptr)   *GenJetEta = *(M.GenJetEta);
+   if(GenJetPhi != nullptr && M.GenJetPhi != nullptr)   *GenJetPhi = *(M.GenJetPhi);
+   if(GenJetMatchIdx != nullptr && M.GenJetMatchIdx != nullptr)   *GenJetMatchIdx = *(M.GenJetMatchIdx);
+   if(GenIsMuMuTagged != nullptr && M.GenIsMuMuTagged != nullptr)   *GenIsMuMuTagged = *(M.GenIsMuMuTagged);
    if(muPt1 != nullptr && M.muPt1 != nullptr)   *muPt1 = *(M.muPt1);
    if(muPt2 != nullptr && M.muPt2 != nullptr)   *muPt2 = *(M.muPt2);
    if(muEta1 != nullptr && M.muEta1 != nullptr)   *muEta1 = *(M.muEta1);
@@ -4924,12 +5797,31 @@ void MuMuJetMessenger::CopyNonTrack(MuMuJetMessenger &M)
    if(mumuY != nullptr && M.mumuY != nullptr)   *mumuY = *(M.mumuY);
    if(mumuPhi != nullptr && M.mumuPhi != nullptr)   *mumuPhi = *(M.mumuPhi);
    if(mumuPt != nullptr && M.mumuPt != nullptr)   *mumuPt = *(M.mumuPt);
+   if(mumuIsGenMatched != nullptr && M.mumuIsGenMatched != nullptr)   *mumuIsGenMatched = *(M.mumuIsGenMatched);
    //if(mumuisOnia != nullptr && M.mumuisOnia != nullptr)   *mumuisOnia = *(M.mumuisOnia);
    if(DRJetmu1 != nullptr && M.DRJetmu1 != nullptr)   *DRJetmu1 = *(M.DRJetmu1);
    if(DRJetmu2 != nullptr && M.DRJetmu2 != nullptr)   *DRJetmu2 = *(M.DRJetmu2);
    if(muDeta != nullptr && M.muDeta != nullptr)   *muDeta = *(M.muDeta);
    if(muDphi != nullptr && M.muDphi != nullptr)   *muDphi = *(M.muDphi);
    if(muDR != nullptr && M.muDR != nullptr)   *muDR = *(M.muDR);
+   if(ExtraMuWeight != nullptr && M.ExtraMuWeight != nullptr)   *ExtraMuWeight = *(M.ExtraMuWeight);
+   if(MuMuWeight != nullptr && M.MuMuWeight != nullptr)   *MuMuWeight = *(M.MuMuWeight);
+
+   if(GenMuPt1 != nullptr && M.GenMuPt1 != nullptr)   *GenMuPt1 = *(M.GenMuPt1);
+   if(GenMuPt2 != nullptr && M.GenMuPt2 != nullptr)   *GenMuPt2 = *(M.GenMuPt2);
+   if(GenMuEta1 != nullptr && M.GenMuEta1 != nullptr)   *GenMuEta1 = *(M.GenMuEta1);
+   if(GenMuEta2 != nullptr && M.GenMuEta2 != nullptr)   *GenMuEta2 = *(M.GenMuEta2);
+   if(GenMuPhi1 != nullptr && M.GenMuPhi1 != nullptr)   *GenMuPhi1 = *(M.GenMuPhi1);
+   if(GenMuPhi2 != nullptr && M.GenMuPhi2 != nullptr)   *GenMuPhi2 = *(M.GenMuPhi2);
+   if(GenMuMuMass != nullptr && M.GenMuMuMass != nullptr)   *GenMuMuMass = *(M.GenMuMuMass);
+   if(GenMuMuEta != nullptr && M.GenMuMuEta != nullptr)   *GenMuMuEta = *(M.GenMuMuEta);
+   if(GenMuMuY != nullptr && M.GenMuMuY != nullptr)   *GenMuMuY = *(M.GenMuMuY);
+   if(GenMuMuPhi != nullptr && M.GenMuMuPhi != nullptr)   *GenMuMuPhi = *(M.GenMuMuPhi);
+   if(GenMuMuPt != nullptr && M.GenMuMuPt != nullptr)   *GenMuMuPt = *(M.GenMuMuPt);
+   if(GenMuDeta != nullptr && M.GenMuDeta != nullptr)   *GenMuDeta = *(M.GenMuDeta);
+   if(GenMuDphi != nullptr && M.GenMuDphi != nullptr)   *GenMuDphi = *(M.GenMuDphi);
+   if(GenMuDR != nullptr && M.GenMuDR != nullptr)   *GenMuDR = *(M.GenMuDR);
+
    if(MJTHadronFlavor != nullptr && M.MJTHadronFlavor != nullptr)   *MJTHadronFlavor = *(M.MJTHadronFlavor);
    if(MJTNcHad != nullptr && M.MJTNcHad != nullptr)   *MJTNcHad = *(M.MJTNcHad);
    if(MJTNbHad != nullptr && M.MJTNbHad != nullptr)   *MJTNbHad = *(M.MJTNbHad);
