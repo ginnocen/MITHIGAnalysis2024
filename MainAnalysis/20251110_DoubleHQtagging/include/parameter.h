@@ -3,15 +3,20 @@
 //============================================================//
 class Parameters {
 public:
-    Parameters( float MinJetPT, float MaxJetPT, int TriggerChoice, bool IsData, float scaleFactor = 1.0)
-	: MinJetPT(MinJetPT), MaxJetPT(MaxJetPT), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor) {}
+    Parameters( float MinJetPT, float MaxJetPT, string DCAString, int ChargeSelection, int TriggerChoice, bool IsData, bool IsPP, int NbHad, int NcHad, float scaleFactor = 1.0)
+	: MinJetPT(MinJetPT), MaxJetPT(MaxJetPT), DCAString(DCAString), ChargeSelection(ChargeSelection), TriggerChoice(TriggerChoice), IsData(IsData), IsPP(IsPP), NbHad(NbHad), NcHad(NcHad), scaleFactor(scaleFactor) {}
     Parameters() {}
    string input;          // Input file name
    string output;         // Output file name
    float MinJetPT;        // Lower limit of jet pt
    float MaxJetPT;        // Upper limit of jet pt
+   string DCAString;      // DCA selection string
+   int ChargeSelection;   // Charge selection: -1 for opposite sign, 1 for same sign, 0 for all
    int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
    bool IsData;           // Data or MC
+   bool IsPP;
+   int NbHad;               // -1 = ANY # of B hadrons
+   int NcHad;               // -1 = ANY # of C hadrons
    float scaleFactor;     // Scale factor
    int nThread;           // Number of Threads
    int nChunk;            // Process the Nth chunk
@@ -20,8 +25,13 @@ public:
        cout << "Output file: " << output << endl;
        cout << "MinJetPT: " << MinJetPT << endl;
        cout << "MaxJetPT: " << MaxJetPT << endl;
+       cout << "DCAString: " << DCAString << endl;
+       cout << "ChargeSelection: " << ChargeSelection << endl;
        cout << "TriggerChoice: " << TriggerChoice << endl;
        cout << "IsData: " << IsData << endl;
+       cout << "IsPP: " << IsPP << endl;
+       cout << "NbHad: " << NbHad << endl;
+       cout << "NcHad: " << NcHad << endl;
        cout << "scaleFactor: " << scaleFactor << endl;
        cout << "nThread: " << nThread << endl;
        cout << "nChunk: " << nChunk << endl;
@@ -38,30 +48,48 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hMinJetPT->SetBinContent(1, par.MinJetPT);
     TH1D* hMaxJetPT = new TH1D("parMaxJetPT", "parMaxJetPT", 1, 0, 1);
     hMaxJetPT->SetBinContent(1, par.MaxJetPT);
+    TH1D* hChargeSelection = new TH1D("parChargeSelection", "parChargeSelection", 1, 0, 1);
+    hChargeSelection->SetBinContent(1, par.ChargeSelection);
     TH1D* hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
     hTriggerChoice->SetBinContent(1, par.TriggerChoice);
     TH1D* hIsData = new TH1D("parIsData", "parIsData", 1, 0, 1);
     hIsData->SetBinContent(1, par.IsData);
+    TH1D* hIsPP = new TH1D("parIsPP", "parIsPP", 1, 0, 1);
+    hIsPP->SetBinContent(1, par.IsPP);
     TH1D* hScaleFactor = new TH1D("parScaleFactor", "parScaleFactor", 1, 0, 1);
     hScaleFactor->SetBinContent(1, par.scaleFactor);
     TH1D* hNThread = new TH1D("parNThread", "parNThread", 1, 0, 1);
     hNThread->SetBinContent(1, par.nThread);
     TH1D* hNChunk = new TH1D("parNChunk", "parNChunk", 1, 0, 1);
     hNChunk->SetBinContent(1, par.nChunk);
+    TNamed *hDCAString = new TNamed("parDCAString", par.DCAString.c_str());
+    TH1D* hNbHad = new TH1D("parNbHad", "parNbHad", 1, 0, 1);
+    hNbHad->SetBinContent(1, par.NbHad);
+    TH1D* hNcHad = new TH1D("parNcHad", "parNcHad", 1, 0, 1);
+    hNcHad->SetBinContent(1, par.NcHad);
     
     // Write histograms to the output file
     hMinJetPT->Write();
     hMaxJetPT->Write();
     hTriggerChoice->Write();
     hIsData->Write();
+    hIsPP->Write();
     hScaleFactor->Write();
     hNThread->Write();
     hNChunk->Write();
+    hDCAString->Write();
+    hNbHad->Write();
+    hNcHad->Write();
 
     delete hMinJetPT;
+    delete hMaxJetPT;
     delete hTriggerChoice;
     delete hIsData;
+    delete hIsPP;
+    delete hNbHad;
+    delete hNcHad;
     delete hScaleFactor;
     delete hNThread;
     delete hNChunk;
+
 }
