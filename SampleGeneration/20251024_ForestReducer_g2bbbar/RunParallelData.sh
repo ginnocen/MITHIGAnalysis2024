@@ -6,8 +6,8 @@ source clean.sh
 echo "Running on sample ID: $SAMPLEID"
 
 if [ "$SAMPLEID" -eq 0 ]; then
-    NAMEData="/data00/g2ccbar/data2018/skim_09232025_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_0/"
-    FOLDER="/data00/g2ccbar/data2018/minBiasForest_02022025/mb0" 
+    NAMEData="/data00/g2ccbar/data2018/skim_110525_0"
+    FOLDER="/eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_test/251022_062442/0009" 
 fi
 echo "Running on sample: $NAMEData"
 echo "Running on folder: $FOLDER"
@@ -47,9 +47,10 @@ while IFS= read -r file; do
             echo "Processing $file"
             ./Execute --Input "$file" \
             --IsData true \
-            --IsPP false \
-            --svtx false \
+            --IsPP true \
+            --svtx true \
             --Output "$OUTPUTData/output_$counter.root" \
+            --PFJetCollection ak3PFJetAnalyzer/t \
             --MinJetPT 0 --Fraction 1.0 & 
     ((counter++))
     wait_for_slot
