@@ -30,6 +30,43 @@ bool checkError(const Parameters &par) { return false; }
 //============================================================//
 bool eventSelection(DimuonJetMessenger *b, const Parameters &par) { return true; }
 
+bool jetselection(DimuonJetMessenger *b, const Parameters &par) { 
+
+  // DIMUON SELECTION
+  if (b->IsMuMuTagged != 1) return false;
+  
+  // JET PT CUT 
+  if (b->JetPT < par.MinJetPT || b->JetPT > par.MaxJetPT) return false;
+  
+  // DCA SELECTION
+  TTreeFormula* DCAFormula = new TTreeFormula("dcaSelection", par.DCAString.c_str(), b->Tree);
+  if (DCAFormula->EvalInstance() <= 0) {
+      return false;
+  }
+  delete DCAFormula;
+
+  // CHARGE SELECTION
+  if (par.ChargeSelection == 1) {
+    if (b->muCharge1 != b->muCharge2)
+      return false;
+  } else if (par.ChargeSelection == -1) {
+    if (b->muCharge1 == b->muCharge2)
+      return false;
+  }
+  
+  //FLAVOR TAGGING 
+  if (par.NbHad >= 0) {
+    if (b->NbHad != par.NbHad)
+      return false;
+  }
+  if (par.NcHad >= 0) {
+    if (b->NcHad != par.NcHad)
+      return false;
+  } 
+  
+  return true; 
+}
+
 class DataAnalyzer {
 public:
   TFile *inf, *outf;
@@ -60,32 +97,6 @@ public:
     hInvMass = new TH1D(Form("hInvMass%s", title.c_str()), "", 50, 0, 7);
     hDCA = new TH1D(Form("hDCA%s", title.c_str()), "", 50, -10, 2);
     
-    // JET SELECTION
-    TString selections = "IsMuMuTagged == 1";
-    selections += " && ";
-    selections += par.DCAString;
-    selections += " && JetPT < ";
-    selections += par.MaxJetPT;
-    selections += " && JetPT > ";
-    selections += par.MinJetPT;
-    if(par.ChargeSelection == 1) {
-        selections += " && muCharge1 == muCharge2";
-    } else if(par.ChargeSelection == -1) {
-        selections += " && muCharge1 != muCharge2";
-    }
-    if(par.NbHad >= 0) {
-        selections += " && NbHad == ";
-        selections += par.NbHad;
-    }
-    if(par.NcHad >= 0) {
-        selections += " && NcHad == ";
-        selections += par.NcHad;
-    }
-    
-    cout << "SELECTION STRING: " << endl;
-    cout << selections << endl;
-    TTreeFormula* CutFormula = new TTreeFormula("dcaSelection", selections, MDimuonJet->Tree);
-    
     // LOOP OVER JETS
     unsigned long nentries = MDimuonJet->GetEntries();
     ProgressBar Bar(cout, nentries);
@@ -97,9 +108,8 @@ public:
         Bar.Print();
       }
 
-      // DCA SELECTION using EvalInstance
-      if (CutFormula->EvalInstance() <= 0)
-        continue; 
+      // APPLY JET SELECTION
+      if (!jetselection(MDimuonJet, par)){continue;}
 
       // FILL HISTOGRAMS
       hInclusivejetPT->Fill(MDimuonJet->JetPT);
