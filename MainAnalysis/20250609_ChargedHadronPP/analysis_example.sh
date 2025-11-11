@@ -1,21 +1,24 @@
-
 #!/bin/bash
-## FIXME: need to use your own path to the skimmed data
-PATHSKIM=/Users/ginnocen/Desktop/MITHIGAnalysis2024/SampleGeneration/20250518_ForestReducer_RAAOxygenOxygen/data00/OOsamples/Skims
-#source clean.sh
-# rm *.root
-TRACKPTMIN=1
-TRIGGER=0
-ISDATA=1
-SCALEFACTOR=1.0
+
+# ============================================================
+# OO data
+# ============================================================
 source clean.sh
 
-INPUT=$PATHSKIM/Skim_HiForestMiniAOD_ppchargedhadron2024_debugfile.root
-OUTPUTANALYSIS=output.root
+INPUT=/data00/kdeverea/OOsamples/Skims/20250723_Skim_ppref2024_Official_noEvtSel.root
+OUTPUTANALYSIS=output/20250723_Skim_ppref2024_Official_noEvtSel.root
+
 ./ExecuteChargedHadronRAA \
   --Input $INPUT \
-  --TRACKPTMIN $TRACKPTMIN \
-  --TriggerChoice $TRIGGER \
-  --ScaleFactor $SCALEFACTOR \
-  --IsData $ISDATA \
-  --Output $OUTPUTANALYSIS
+  --Output $OUTPUTANALYSIS \
+  --IsData true \
+  --IsPP true \
+  --ApplyEventSelection true \
+  --UseEventWeight false \
+  --UseTrackWeight false \
+  --TrackWeightSelection 2 \
+  --MinTrackPt 0.1 \
+  --MinLeadingTrackPt -1 \
+  --ScaleFactor 1
+
+# 1: loose , 2: nominal , 3: tight , 4: y2017

@@ -6,9 +6,9 @@ namespace fs = std::filesystem;
 //============================================================//
 class Parameters {
 public:
-  Parameters(int TriggerChoice, bool IsData, float scaleFactor = 1.0, float VzMax = 15.0, 
+  Parameters(int TriggerChoice, bool IsData, float scaleFactor = 1.0, float xSection = 1, float VzMax = 15.0, 
              int NVtxMin = 1, int CCFilter = 1, int PVFilter = 1, int IsHijing = 0, float HFE_min1 = 4.0, float HFE_min2 = 4.0)
-      : TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor), VzMax(VzMax), NVtxMin(NVtxMin), 
+      : TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor), xSection(xSection), VzMax(VzMax), NVtxMin(NVtxMin), 
       CCFilter(CCFilter), PVFilter(PVFilter), IsHijing(IsHijing), HFE_min1(HFE_min1), HFE_min2(HFE_min2) {
   }
   Parameters() {}
@@ -18,6 +18,7 @@ public:
   bool IsData;       // Data or MC
   float scaleFactor; // Scale factor
 
+  float xSection;    // Cross section in b 
   float VzMax;       // Z Vertex
   int NVtxMin;       // Minimum number of vertices
   int CCFilter;      // Cluster Compatibility Filter
@@ -33,6 +34,7 @@ public:
     cout << "TriggerChoice: " << TriggerChoice << endl;
     cout << "IsData: " << IsData << endl;
     cout << "Scale factor: " << scaleFactor << endl;
+    cout << "Cross section: " << xSection << endl;
     cout << "VzMax: " << VzMax << endl;
     cout << "NVtxMin: " << NVtxMin << endl;
     cout << "CCFilter: " << CCFilter << endl;
@@ -56,6 +58,8 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   TH1D *hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
   hTriggerChoice->SetBinContent(1, par.TriggerChoice);
 
+  TH1D *hXSection = new TH1D("parXSection", "parXSection", 1, 0, 1);
+  hXSection->SetBinContent(1, par.xSection);
   TH1D *hVzMax = new TH1D("parVzMax", "parVzMax", 1, 0, 1);
   hVzMax->SetBinContent(1, par.VzMax);
   TH1D *hNVtxMin = new TH1D("parNVtxMin", "parNVtxMin", 1, 0, 1);
@@ -77,6 +81,7 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   hTriggerChoice->Write();
   hScaleFactor->Write();
 
+  hXSection->Write();
   hVzMax->Write();
   hNVtxMin->Write();
   hCCFilter->Write();
@@ -89,6 +94,7 @@ void saveParametersToHistograms(const Parameters &par, TFile *outf) {
   delete hTriggerChoice;
   delete hIsData;
   delete hScaleFactor;
+  delete hXSection;
   delete hVzMax;
   delete hNVtxMin;
   delete hPVFilter;

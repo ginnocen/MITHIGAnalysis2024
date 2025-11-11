@@ -16,6 +16,7 @@ using namespace std;
 #include "helpMessage.h"
 #include "parameter.h" // Parameters for the analysis
 #include "utilities.h" // Utility functions for the analysis
+#include "QAMessenger.h"
 
 //============================================================//
 // Function to check for configuration errors
@@ -63,8 +64,10 @@ public:
   TH1D *hNcoll; 
   TH1D *hNpart;
   TH1D *hTrkPt;
+  TH1D *hTrkEta;
   TH2D *hTrkPtEta;
   ChargedHadronRAATreeMessenger *MChargedHadronRAA;
+  QAMessenger *QA;
   string title;
 
   DataAnalyzer(const char *filename, const char *outFilename, const char *mytitle = "")
@@ -85,12 +88,17 @@ public:
     hNcoll = new TH1D(Form("hNColl%s", title.c_str()), "", 61, -0.5, 60.5);
     hNcoll->Sumw2();
     hNpart = new TH1D(Form("hNpart%s", title.c_str()), "", 100, 0, 100);
+    hNpart->Sumw2();
     hTrkPt = new TH1D(Form("hTrkPt%s", title.c_str()), "", 100, 0, 10);
     hTrkPt->Sumw2();
+    hTrkEta = new TH1D(Form("hTrkEta%s", title.c_str()), "", 50, -3.0, 3.0);
+    hTrkEta->Sumw2();
     hTrkPtEta = new TH2D(Form("hTrkPtEta%s", title.c_str()), "", 40, 0, 20, 50, -4.0, 4.0);
     hTrkPtEta->Sumw2();
+    if(doQA){QA->Initialize();}
     par.printParameters();
     unsigned long nEntry = MChargedHadronRAA->GetEntries() * par.scaleFactor;
+    float weight = par.xSection / nEntry; 
     ProgressBar Bar(cout, nEntry);
     Bar.SetStyle(1);
 
@@ -101,12 +109,14 @@ public:
       }
       MChargedHadronRAA->GetEntry(i);
       if(!eventSelection(MChargedHadronRAA, par)) {continue;}
-      if(par.IsHijing && MChargedHadronRAA->Npart <= 1) {continue;} // MAY BECOME OBSOLETE. IF SO, WILL REMOVE ISHIJIN PARAMETER
-      hNcoll->Fill(MChargedHadronRAA->Ncoll);
-      hNpart->Fill(MChargedHadronRAA->Npart);
+      if(par.IsHijing && MChargedHadronRAA->Npart <= 1) {continue;} // MAY BECOME OBSOLETE. IF SO, WILL REMOVE ISHIJING PARAMETER
+      if(doQA){QA->AnalyzeEvent(MChargedHadronRAA, weight)};
+      hNcoll->Fill(MChargedHadronRAA->Ncoll, weight);
+      hNpart->Fill(MChargedHadronRAA->Npart, weight);
       for (unsigned long j = 0; j < MChargedHadronRAA->trkPt->size(); j++) {
-        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j));
-        hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j));
+        hTrkPt->Fill(MChargedHadronRAA->trkPt->at(j), weight);
+        hTrkEta->Fill(MChargedHadronRAA->trkEta->at(j), weight);
+        hTrkPtEta->Fill(MChargedHadronRAA->trkPt->at(j), MChargedHadronRAA->trkEta->at(j), weight);
       }
     } // end of event loop
   } // end of analyze
@@ -116,7 +126,10 @@ public:
     smartWrite(hNcoll);
     smartWrite(hNpart);
     smartWrite(hTrkPt);
+    smartWrite(hTrkEta);
     smartWrite(hTrkPtEta);
+    if(doQA) {QA->WriteHistograms(outf);}
+    
   }
 
 private:
@@ -124,7 +137,9 @@ private:
     delete hNcoll;
     delete hNpart;
     delete hTrkPt;
+    delete hTrkEta;
     delete hTrkPtEta;
+    if(doQA){QA->DeleteHistograms();}
   }
 };
 
@@ -140,6 +155,7 @@ int main(int argc, char *argv[]) {
   int TriggerChoice = CL.GetInt("TriggerChoice", 0);
   
   // EVENT SELECTION Parameters
+  float xSection = CL.GetDouble("Xsection", 1.0); // Cross section in b
   float VzMax = CL.GetDouble("Vzmax", 15.0); // Maximum Z vertex position. Set to very high to disable the cut
   int NVtxMin = CL.GetInt("NVtxMin", 1); // Minimum number of vertices. Set to 0 to disable the cut
   int CCFilter = CL.GetInt("CCFilter", 1); // Cluster Compatibility Filter. Set to 0 to disable the cut
@@ -151,8 +167,10 @@ int main(int argc, char *argv[]) {
   // AND CONDITION: HFE_min1 = HFE_min2
   // OR CONDITION:  HFE_min2 = 0.0
   // ASYMMETRIC CONDITION: HFE_min1 != HFE_min2
+  bool doQA = CL.GetBool("doQA", 1); 
+  cout << "doQA: " << doQA << endl;
 
-  Parameters par(TriggerChoice, IsData, scaleFactor, VzMax, NVtxMin, CCFilter, PVFilter, IsHijing, HFE_min1, HFE_min2);
+  Parameters par(TriggerChoice, IsData, scaleFactor, xSection, VzMax, NVtxMin, CCFilter, PVFilter, IsHijing, HFE_min1, HFE_min2, doQA);
   par.input = CL.Get("Input", "input.root");    // Input file
   par.output = CL.Get("Output", "output.root"); // Output file
   if (checkError(par))
