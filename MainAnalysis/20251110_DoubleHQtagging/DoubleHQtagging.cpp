@@ -118,7 +118,6 @@ public:
 
     }
     
-    delete CutFormula;
   }
 
   void writeHistograms(TFile *outf) {

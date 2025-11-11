@@ -10,6 +10,6 @@ INPUT=/data00/g2ccbar/mc2018/skim_102725_0/mergedfile.root
      --ChargeSelection -1 \
      --NbHad 2 \
      --NcHad -1 \
-     --DCAString "muDiDxy1 > 0.01 && muDiDxy2 > 0.01" \
+     --DCAString "muDiDxy1 > 0.005 && muDiDxy2 > 0.005" \
      --Output output_DoubleHQtagging.root
 wait
