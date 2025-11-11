@@ -63,4 +63,4 @@ OUTPUT=/flavoroutputs/output
      --DCAString "abs(muDiDxy1) > 0.005 && abs(muDiDxy2) > 0.005" \
      --Output ${OUTPUT}_uds.root
 
-root -l -b -q 'plotter.C("flavoroutputs/output_bb.root","hInvMass",1)'
+root -l -b -q 'plotter.C("flavoroutputs/output","hInvMass",1)'

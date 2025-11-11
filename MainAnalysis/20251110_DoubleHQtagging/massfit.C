@@ -1,11 +1,15 @@
 #include <TTree.h>
 #include <TFile.h>
+#include <TLegend.h>
+#include <TLatex.h>
+#include <TNtuple.h>
 
 #include <RooAddPdf.h>
 #include <RooGaussian.h>
 #include <RooChebychev.h>
 #include <RooRealVar.h>
 #include <RooDataSet.h>
+#include <RooDataHist.h>
 #include <RooFitResult.h>
 #include <RooPlot.h>
 #include <TCanvas.h>
@@ -17,11 +21,15 @@
 using namespace std;
 using namespace RooFit;
 
-void main_fit(TTree *datatree, string outputstring, double &signalYield_, double &signalError_, float jetptmin, float jetptmax) {
+void main_fit(TNtuple *datatuple, string outputstring, double &signalYield_, double &signalError_, float jetptmin, float jetptmax) {
     gStyle->SetOptStat(0);
     TCanvas* canvas = new TCanvas("canvas", "Fit Plot", 800, 800);
-    // Define the mass range and variables
-    RooRealVar m("mumuMass", "Mass [GeV]", 0.0, 10.0);
+    
+    // Define the mass range and variables for the ntuple data
+    RooRealVar m("mumuMass", "Mass [GeV]", 0.0, 7.0);  // Match your histogram range
+    RooRealVar muDiDxy1Dxy2("muDiDxy1Dxy2", "DCA", -10, 2);
+    RooRealVar mumuPt("mumuPt", "Dimuon pT [GeV]", 0, 50);
+    RooRealVar JetPT("JetPT", "Jet pT [GeV]", 0, 500);
 
     // Define the signal model: double Gaussian
     RooRealVar mean("mean", "mean", 1.5, 1.0, 2.0);
@@ -48,8 +56,8 @@ void main_fit(TTree *datatree, string outputstring, double &signalYield_, double
     RooRealVar nbkg("nbkg", "number of background events", 500, 0, 10000);
     RooAddPdf model("model", "signal + background", RooArgList(signal, background), RooArgList(nsig, nbkg));
 
-    // Import data
-    RooDataSet data("data", "dataset", RooArgSet(m), Import(*datatree));
+    // Import ntuple data - we only need the mumuMass for the fit
+    RooDataSet data("data", "dataset", RooArgSet(m, muDiDxy1Dxy2, mumuPt, JetPT), Import(*datatuple));
 
     // Fit the model to data
     RooFitResult* result = model.fitTo(data, Save());
@@ -60,17 +68,51 @@ void main_fit(TTree *datatree, string outputstring, double &signalYield_, double
     signalError_ = signalError;
     // Print the results
     std::cout << "Signal Yield (nsig): " << signalYield << " ± " << signalError << std::endl;
+    std::cout << "Background Yield (nbkg): " << nbkg.getVal() << " ± " << nbkg.getError() << std::endl;
+    
     // Plot the data and the fit result
-    RooPlot* frame = m.frame();
+    RooPlot* frame = m.frame(Title(Form("(PbPb) #mu^{+}#mu^{-} mass fit, %.0f < p_{T}^{jet} < %.0f GeV", jetptmin, jetptmax)));
     frame->SetTitleSize(0.03);
-    frame->SetTitle(Form("(PbPb) #mu^{+}#mu^{-} mass fit, %.0f < p_{T}^{jet} < %.0f GeV", jetptmin, jetptmax));
     frame->GetYaxis()->SetTitleOffset(1.3);
-    data.plotOn(frame);
-    model.plotOn(frame);
-    model.plotOn(frame, Components(background), LineStyle(kDashed), LineColor(kRed));
+    frame->GetXaxis()->SetTitle("m_{#mu#mu} [GeV/c^{2}]");
+    frame->GetYaxis()->SetTitle("Events / 0.1 GeV/c^{2}");
+    
+    // Plot data points
+    data.plotOn(frame, MarkerStyle(20), MarkerSize(0.8), Name("data"));
+    
+    // Plot total fit
+    model.plotOn(frame, LineColor(kBlue), LineWidth(2), Name("total"));
+    
+    // Plot individual components
+    model.plotOn(frame, Components(signal), LineStyle(kSolid), LineColor(kGreen+2), LineWidth(2), Name("signal"));
+    model.plotOn(frame, Components(background), LineStyle(kDashed), LineColor(kRed), LineWidth(2), Name("background"));
+    model.plotOn(frame, Components(jpsi), LineStyle(kDotted), LineColor(kMagenta), LineWidth(2), Name("jpsi"));
+    model.plotOn(frame, Components(upsilon), LineStyle(kDashDotted), LineColor(kOrange), LineWidth(2), Name("upsilon"));
+    
+    // Draw the plot
     frame->Draw();
     
-    canvas->SaveAs(Form("output/fit_result%s.pdf", outputstring.c_str()));
+    // Add legend
+    TLegend* legend = new TLegend(0.65, 0.65, 0.88, 0.88);
+    legend->SetBorderSize(0);
+    legend->SetFillStyle(0);
+    legend->AddEntry(frame->findObject("data"), "Data", "p");
+    legend->AddEntry(frame->findObject("total"), "Total Fit", "l");
+    legend->AddEntry(frame->findObject("signal"), "Signal (double Gauss)", "l");
+    legend->AddEntry(frame->findObject("background"), "Background (J/#psi + #Upsilon)", "l");
+    legend->AddEntry(frame->findObject("jpsi"), "J/#psi component", "l");
+    legend->AddEntry(frame->findObject("upsilon"), "#Upsilon component", "l");
+    legend->Draw();
+    
+    // Add text box with fit results
+    TLatex* latex = new TLatex();
+    latex->SetNDC();
+    latex->SetTextSize(0.03);
+    latex->DrawLatex(0.15, 0.85, Form("Signal yield: %.0f #pm %.0f", signalYield, signalError));
+    latex->DrawLatex(0.15, 0.81, Form("Background yield: %.0f #pm %.0f", nbkg.getVal(), nbkg.getError()));
+    latex->DrawLatex(0.15, 0.77, Form("#chi^{2}/ndf: %.2f", frame->chiSquare()));
+    
+    canvas->SaveAs(Form("fit_result%s.pdf", outputstring.c_str()));
 
 }
 
@@ -85,9 +127,11 @@ int main(int argc, char *argv[]) {
   float MaxJetPT       = CL.GetDouble("MaxJetPT", 40);          // Maximum Jet PT
   TFile *inf  = new TFile(input.c_str());
   TFile *outf = new TFile(output.c_str(), "RECREATE");
-  TTree *t = (TTree*) inf->Get("nt");
+  TNtuple *nt = (TNtuple*) inf->Get("nt");
+
+  
   double signalMuMu, sigMuMuError;
-  main_fit(t, outputstring, signalMuMu, sigMuMuError, MinJetPT, MaxJetPT);
+  main_fit(nt, outputstring, signalMuMu, sigMuMuError, MinJetPT, MaxJetPT);
   TH1F *hYieldMuMuJetPt = new TH1F("hYieldMuMuJetPt", "Yield MuMu", 1, 0, 1);
   hYieldMuMuJetPt->SetBinContent(1, signalMuMu);
   TH1F *hInclusivejetPT = (TH1F*) inf->Get("hInclusivejetPT");

@@ -77,6 +77,8 @@ public:
   TH1D *hInclusivejetPT;
   TH1D *hInvMass;
   TH1D *hmuDiDxy1Dxy2;
+  TH1D *hmumuPt;
+  TNtuple *nt;
   DimuonJetMessenger *MDimuonJet;
   string title;
 
@@ -100,6 +102,8 @@ public:
     hInclusivejetPT = new TH1D(Form("hInclusivejetPT%s", title.c_str()), "", 500, 0, 500);
     hInvMass = new TH1D(Form("hInvMass%s", title.c_str()), "", 50, 0, 7);
     hmuDiDxy1Dxy2 = new TH1D(Form("hmuDiDxy1Dxy2%s", title.c_str()), "", 50, -10, 2);
+    hmumuPt = new TH1D(Form("hmumuPt%s", title.c_str()), "", 100, 0, 50);  // FIX: Initialize missing histogram
+    nt = new TNtuple(Form("nt%s", title.c_str()), "", "mumuMass:muDiDxy1Dxy2:mumuPt:JetPT");
 
     // LOOP OVER JETS
     unsigned long nentries = MDimuonJet->GetEntries();
@@ -121,6 +125,8 @@ public:
       hInclusivejetPT->Fill(MDimuonJet->JetPT);
       hInvMass->Fill(MDimuonJet->mumuMass);
       hmuDiDxy1Dxy2->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
+      hmumuPt->Fill(MDimuonJet->mumuPt);
+      nt->Fill(MDimuonJet->mumuMass, MDimuonJet->muDiDxy1Dxy2, MDimuonJet->mumuPt, MDimuonJet->JetPT);
     }
   }
 
@@ -129,6 +135,8 @@ public:
     smartWrite(hInclusivejetPT);
     smartWrite(hInvMass);
     smartWrite(hmuDiDxy1Dxy2);
+    smartWrite(hmumuPt);
+    smartWrite(nt);
   }
 
 private:
@@ -136,6 +144,8 @@ private:
     delete hInclusivejetPT;
     delete hInvMass;
     delete hmuDiDxy1Dxy2;
+    delete hmumuPt;
+    delete nt;
   }
 };
 
