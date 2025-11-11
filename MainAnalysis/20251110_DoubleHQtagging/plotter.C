@@ -1,4 +1,28 @@
+#include <TFile.h>
+#include <TH1D.h>
+#include <TCanvas.h>
+#include <THStack.h>
+#include <TLegend.h>
+#include <TStyle.h>
+#include <map>
 using namespace std;
+
+// Function to get display label for histogram
+string getHistogramLabel(const string& histname) {
+    // Static dictionary - created only once, persists across function calls
+    static map<string, string> histogramLabels = {
+        {"hInvMass", "Invariant Mass (GeV)"},
+        {"hInclusivejetPT", "Jet p_{T} (GeV)"},
+        {"hmuDiDxy1Dxy2", "log_{10}(Dxy1 * Dxy2)"},
+    };
+    
+    auto it = histogramLabels.find(histname);
+    if (it != histogramLabels.end()) {
+        return it->second;
+    }
+    // Return the histogram name if not found in dictionary
+    return histname;
+}
 
 void plot_flavors(string filename = "flavoroutput/output", const char* histname = "hInvMass", const char* xlabel = "Invariant Mass (GeV)", const char* outputname = "flavor_composition_stack") {
 
@@ -46,7 +70,7 @@ void plot_flavors(string filename = "flavoroutput/output", const char* histname 
     leg->Draw();
     
     // Save the plot
-    c1->SaveAs(Form("%s_plot.pdf", outputname));
+    c1->SaveAs(Form("%s.pdf", outputname));
 
 
 
@@ -56,20 +80,29 @@ void plot_standalone(string filename = "output.root", const char* histname = "hI
 
     TFile* f = new TFile(filename.c_str());
     TH1D* h = (TH1D*)f->Get(histname);
+    h->GetXaxis()->SetTitle(xlabel);
 
     TCanvas* c1 = new TCanvas("c1", "Standalone Plot", 900, 600);
     h->Draw("hist");
 
-    c1->SaveAs(Form("%s_plot.pdf", outputname));
+    c1->SaveAs(Form("%s.pdf", outputname));
 
 }
 
-int plotter(){
+int plotter(const char* infilename = "output_DoubleHQtagging.root", const char* histname = "hInvMass", int doflavorstack = 1) {
 
     gStyle->SetOptStat(0);
+
+    // Get the appropriate label from the dictionary
+    string xlabel = getHistogramLabel(string(histname));
+    string outputname = string("plot_") + string(histname) + string(doflavorstack ? "_flavorstack" : "_standalone");
     
-    plot_flavors("flavoroutputs/output", "hInvMass", "Invariant Mass (GeV)", "flavor_composition_stack");
+    if (doflavorstack)
+        plot_flavors(infilename, histname, xlabel.c_str(), outputname.c_str());
+    else
+        plot_standalone(infilename, histname, xlabel.c_str(), outputname.c_str());
     
+
     return 12039481;
 
 }

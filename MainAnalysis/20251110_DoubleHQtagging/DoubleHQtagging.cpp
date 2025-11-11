@@ -55,14 +55,16 @@ bool jetselection(DimuonJetMessenger *b, const Parameters &par) {
   }
   
   //FLAVOR TAGGING 
-  if (par.NbHad >= 0) {
-    if (b->NbHad != par.NbHad)
-      return false;
+  if(par.IsData == 0) {
+    if (par.NbHad >= 0) {
+      if (b->NbHad != par.NbHad)
+        return false;
+    }
+    if (par.NcHad >= 0) {
+      if (b->NcHad != par.NcHad)
+        return false;
+    }
   }
-  if (par.NcHad >= 0) {
-    if (b->NcHad != par.NcHad)
-      return false;
-  } 
   
   return true; 
 }
@@ -72,7 +74,7 @@ public:
   TFile *inf, *outf;
   TH1D *hInclusivejetPT;
   TH1D *hInvMass;
-  TH1D *hDCA;
+  TH1D *hmuDiDxy1Dxy2;
   DimuonJetMessenger *MDimuonJet;
   string title;
 
@@ -95,7 +97,7 @@ public:
     // HISTOGRAMS
     hInclusivejetPT = new TH1D(Form("hInclusivejetPT%s", title.c_str()), "", 500, 0, 500);
     hInvMass = new TH1D(Form("hInvMass%s", title.c_str()), "", 50, 0, 7);
-    hDCA = new TH1D(Form("hDCA%s", title.c_str()), "", 50, -10, 2);
+    hmuDiDxy1Dxy2 = new TH1D(Form("hmuDiDxy1Dxy2%s", title.c_str()), "", 50, -10, 2);
     
     // LOOP OVER JETS
     unsigned long nentries = MDimuonJet->GetEntries();
@@ -114,7 +116,7 @@ public:
       // FILL HISTOGRAMS
       hInclusivejetPT->Fill(MDimuonJet->JetPT);
       hInvMass->Fill(MDimuonJet->mumuMass);
-      hDCA->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
+      hmuDiDxy1Dxy2->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
 
     }
     
@@ -124,11 +126,11 @@ public:
     outf->cd();
     smartWrite(hInclusivejetPT);
     smartWrite(hInvMass);
-    smartWrite(hDCA);
+    smartWrite(hmuDiDxy1Dxy2);
   }
 
 private:
-  void deleteHistograms() { delete hInclusivejetPT; delete hInvMass; delete hDCA; }
+  void deleteHistograms() { delete hInclusivejetPT; delete hInvMass; delete hmuDiDxy1Dxy2; }
 };
 
 //============================================================//

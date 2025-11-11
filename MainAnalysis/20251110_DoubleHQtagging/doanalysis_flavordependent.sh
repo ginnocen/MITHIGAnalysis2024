@@ -12,7 +12,7 @@ OUTPUT=/flavoroutputs/output
      --ChargeSelection -1 \
      --NbHad 2 \
      --NcHad -1 \
-     --DCAString "muDiDxy1 > 0.01 && muDiDxy2 > 0.01" \
+     --DCAString "abs(muDiDxy1) > 0.005 && abs(muDiDxy2) > 0.005" \
      --Output ${OUTPUT}_bb.root
 
 ./ExecuteDoubleHQtagging \
@@ -24,7 +24,7 @@ OUTPUT=/flavoroutputs/output
      --ChargeSelection -1 \
      --NbHad 1 \
      --NcHad -1 \
-     --DCAString "muDiDxy1 > 0.01 && muDiDxy2 > 0.01" \
+     --DCAString "abs(muDiDxy1) > 0.005 && abs(muDiDxy2) > 0.005" \
      --Output ${OUTPUT}_b.root
 
 ./ExecuteDoubleHQtagging \
@@ -36,7 +36,7 @@ OUTPUT=/flavoroutputs/output
      --ChargeSelection -1 \
      --NbHad 0 \
      --NcHad 2 \
-     --DCAString "muDiDxy1 > 0.01 && muDiDxy2 > 0.01" \
+     --DCAString "abs(muDiDxy1) > 0.005 && abs(muDiDxy2) > 0.005" \
      --Output ${OUTPUT}_cc.root
 
 ./ExecuteDoubleHQtagging \
@@ -48,7 +48,7 @@ OUTPUT=/flavoroutputs/output
      --ChargeSelection -1 \
      --NbHad 0 \
      --NcHad 1 \
-     --DCAString "muDiDxy1 > 0.01 && muDiDxy2 > 0.01" \
+     --DCAString "abs(muDiDxy1) > 0.005 && abs(muDiDxy2) > 0.005" \
      --Output ${OUTPUT}_c.root
 
 ./ExecuteDoubleHQtagging \
@@ -60,6 +60,7 @@ OUTPUT=/flavoroutputs/output
      --ChargeSelection -1 \
      --NbHad 0 \
      --NcHad 0 \
-     --DCAString "muDiDxy1 > 0.01 && muDiDxy2 > 0.01" \
+     --DCAString "abs(muDiDxy1) > 0.005 && abs(muDiDxy2) > 0.005" \
      --Output ${OUTPUT}_uds.root
 
+root -l -b -q 'plotter.C("flavoroutputs/output_bb.root","hInvMass",1)'
