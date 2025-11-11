@@ -56,9 +56,9 @@ public:
     outf->cd();
 
     // HISTOGRAMS
-    hInclusivejetPT = new TH1D(Form("hInclusivejetPT_%s", title.c_str()), "", 500, 0, 500);
-    hInvMass = new TH1D(Form("hInvMass_%s", title.c_str()), "", 50, 0, 7);
-    hDCA = new TH1D(Form("hDCA_%s", title.c_str()), "", 50, -10, 2);
+    hInclusivejetPT = new TH1D(Form("hInclusivejetPT%s", title.c_str()), "", 500, 0, 500);
+    hInvMass = new TH1D(Form("hInvMass%s", title.c_str()), "", 50, 0, 7);
+    hDCA = new TH1D(Form("hDCA%s", title.c_str()), "", 50, -10, 2);
     
     // JET SELECTION
     TString selections = "IsMuMuTagged == 1";
