@@ -1,6 +1,6 @@
 source clean.sh
 rm *.root
-INPUT=/data00/g2ccbar/mc2018/skim_102725_0/mergedfile.root
+INPUT=/data00/g2ccbar/mc2018/skim_102725_all/mergedfile.root
 ./ExecuteDoubleHQtagging \
      --Input $INPUT \
      --IsData 0 \
@@ -8,8 +8,6 @@ INPUT=/data00/g2ccbar/mc2018/skim_102725_0/mergedfile.root
      --MinJetPT 80 \
      --MaxJetPT 120 \
      --ChargeSelection -1 \
-     --NbHad -1 \
-     --NcHad -1 \
      --DCAString "abs(muDiDxy1) > 0.005 && abs(muDiDxy2) > 0.005" \
      --Output output_DoubleHQtagging.root
 
