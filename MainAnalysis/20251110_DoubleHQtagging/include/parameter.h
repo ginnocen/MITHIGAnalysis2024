@@ -3,8 +3,8 @@
 //============================================================//
 class Parameters {
 public:
-    Parameters( float MinJetPT, float MaxJetPT, string DCAString, int ChargeSelection, int TriggerChoice, bool IsData, bool IsPP, int NbHad, int NcHad, float scaleFactor = 1.0)
-	: MinJetPT(MinJetPT), MaxJetPT(MaxJetPT), DCAString(DCAString), ChargeSelection(ChargeSelection), TriggerChoice(TriggerChoice), IsData(IsData), IsPP(IsPP), NbHad(NbHad), NcHad(NcHad), scaleFactor(scaleFactor) {}
+    Parameters( float MinJetPT, float MaxJetPT, string DCAString, int ChargeSelection, int TriggerChoice, bool IsData, bool IsPP, float scaleFactor = 1.0)
+	: MinJetPT(MinJetPT), MaxJetPT(MaxJetPT), DCAString(DCAString), ChargeSelection(ChargeSelection), TriggerChoice(TriggerChoice), IsData(IsData), IsPP(IsPP), scaleFactor(scaleFactor) {}
     Parameters() {}
    string input;          // Input file name
    string output;         // Output file name
@@ -15,8 +15,6 @@ public:
    int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
    bool IsData;           // Data or MC
    bool IsPP;
-   int NbHad;               // -1 = ANY # of B hadrons
-   int NcHad;               // -1 = ANY # of C hadrons
    float scaleFactor;     // Scale factor
    int nThread;           // Number of Threads
    int nChunk;            // Process the Nth chunk
@@ -30,8 +28,6 @@ public:
        cout << "TriggerChoice: " << TriggerChoice << endl;
        cout << "IsData: " << IsData << endl;
        cout << "IsPP: " << IsPP << endl;
-       cout << "NbHad: " << NbHad << endl;
-       cout << "NcHad: " << NcHad << endl;
        cout << "scaleFactor: " << scaleFactor << endl;
        cout << "nThread: " << nThread << endl;
        cout << "nChunk: " << nChunk << endl;
@@ -63,10 +59,6 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     TH1D* hNChunk = new TH1D("parNChunk", "parNChunk", 1, 0, 1);
     hNChunk->SetBinContent(1, par.nChunk);
     TNamed *hDCAString = new TNamed("parDCAString", par.DCAString.c_str());
-    TH1D* hNbHad = new TH1D("parNbHad", "parNbHad", 1, 0, 1);
-    hNbHad->SetBinContent(1, par.NbHad);
-    TH1D* hNcHad = new TH1D("parNcHad", "parNcHad", 1, 0, 1);
-    hNcHad->SetBinContent(1, par.NcHad);
     
     // Write histograms to the output file
     hMinJetPT->Write();
@@ -78,16 +70,12 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hNThread->Write();
     hNChunk->Write();
     hDCAString->Write();
-    hNbHad->Write();
-    hNcHad->Write();
 
     delete hMinJetPT;
     delete hMaxJetPT;
     delete hTriggerChoice;
     delete hIsData;
     delete hIsPP;
-    delete hNbHad;
-    delete hNcHad;
     delete hScaleFactor;
     delete hNThread;
     delete hNChunk;

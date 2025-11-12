@@ -10,6 +10,7 @@
 #include <TTreeFormula.h>
 
 #include <iostream>
+#include <vector>
 
 using namespace std;
 #include "CommandLine.h" // Yi's Commandline bundle
@@ -25,11 +26,32 @@ using namespace std;
 //============================================================//
 bool checkError(const Parameters &par) { return false; }
 
+//======= FlavorClassifier ===================================//
+// Organize MC jets by gen level hadron information
+//============================================================//
+int FlavorClassifier(int NbHad, int NcHad) {
+  if (NbHad == 2)
+    return 5; // bbbar
+  else if (NbHad == 1)
+    return 4; // b
+  else if ((NcHad == 2) && (NbHad == 0))
+    return 3; // ccbar
+  else if ((NcHad == 1) && (NbHad == 0))
+    return 2; // c
+  else if ((NbHad == 0) && (NcHad == 0))
+    return 1; // light
+  else 
+    return 0; // other
+}
+
 //======= eventSelection =====================================//
 // Check if the event pass eventSelection criteria
 //============================================================//
 bool eventSelection(DimuonJetMessenger *b, const Parameters &par) { return true; }
 
+//======= JetSelection =====================================//
+// Check if the event pass JetSelection criteria
+//============================================================//
 bool jetselection(DimuonJetMessenger *b, const Parameters &par) {
 
   // DIMUON SELECTION
@@ -56,29 +78,28 @@ bool jetselection(DimuonJetMessenger *b, const Parameters &par) {
       return false;
   }
 
-  // FLAVOR TAGGING
-  if (par.IsData == 0) {
-    if (par.NbHad >= 0) {
-      if (b->NbHad != par.NbHad)
-        return false;
-    }
-    if (par.NcHad >= 0) {
-      if (b->NcHad != par.NcHad)
-        return false;
-    }
-  }
-
   return true;
 }
 
 class DataAnalyzer {
 public:
   TFile *inf, *outf;
+  
+  // INCLUSIVE HISTOGRAMS
   TH1D *hInclusivejetPT;
   TH1D *hInvMass;
   TH1D *hmuDiDxy1Dxy2;
   TH1D *hmumuPt;
   TNtuple *nt;
+  
+  // FLAVOR-SORTED HISTOGRAMS 
+  vector<TH1D*> hInclusivejetPT_flavors;
+  vector<TH1D*> hInvMass_flavors;     
+  vector<TH1D*> hmuDiDxy1Dxy2_flavors;
+  vector<TH1D*> hmumuPt_flavors;
+  vector<TNtuple*> nt_flavors;
+  vector<string> flavorNames;
+
   DimuonJetMessenger *MDimuonJet;
   string title;
 
@@ -98,12 +119,23 @@ public:
   void analyze(Parameters &par) {
     outf->cd();
 
-    // HISTOGRAMS
+    // DECLARE HISTOGRAMS
     hInclusivejetPT = new TH1D(Form("hInclusivejetPT%s", title.c_str()), "", 500, 0, 500);
     hInvMass = new TH1D(Form("hInvMass%s", title.c_str()), "", 50, 0, 7);
     hmuDiDxy1Dxy2 = new TH1D(Form("hmuDiDxy1Dxy2%s", title.c_str()), "", 50, -10, 2);
     hmumuPt = new TH1D(Form("hmumuPt%s", title.c_str()), "", 100, 0, 50);  // FIX: Initialize missing histogram
     nt = new TNtuple(Form("nt%s", title.c_str()), "", "mumuMass:muDiDxy1Dxy2:mumuPt:JetPT");
+
+    // DECLARE FLAVOR HISTOGRAMS
+    if(!par.IsData) {
+      flavorNames = {"other", "uds", "c", "cc", "b", "bb"};
+      for(int i = 0; i < 6; i++) {
+        hInclusivejetPT_flavors.push_back(new TH1D(Form("hInclusivejetPT_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 500, 0, 500));
+        hInvMass_flavors.push_back(new TH1D(Form("hInvMass_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, 0, 7));
+        hmuDiDxy1Dxy2_flavors.push_back(new TH1D(Form("hmuDiDxy1Dxy2_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, -10, 2));
+        hmumuPt_flavors.push_back(new TH1D(Form("hmumuPt_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 100, 0, 50));
+      }
+    }
 
     // LOOP OVER JETS
     unsigned long nentries = MDimuonJet->GetEntries();
@@ -127,26 +159,53 @@ public:
       hmuDiDxy1Dxy2->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
       hmumuPt->Fill(MDimuonJet->mumuPt);
       nt->Fill(MDimuonJet->mumuMass, MDimuonJet->muDiDxy1Dxy2, MDimuonJet->mumuPt, MDimuonJet->JetPT);
+
+      // FILL FLAVOR HISTOGRAMS (MC only)
+      if (!par.IsData) {
+        int flavorIndex = FlavorClassifier(MDimuonJet->NbHad, MDimuonJet->NcHad); 
+        hInvMass_flavors[flavorIndex]->Fill(MDimuonJet->mumuMass);
+        hInclusivejetPT_flavors[flavorIndex]->Fill(MDimuonJet->JetPT);
+        hmuDiDxy1Dxy2_flavors[flavorIndex]->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
+        hmumuPt_flavors[flavorIndex]->Fill(MDimuonJet->mumuPt);
+      }
     }
   }
 
-  void writeHistograms(TFile *outf) {
+  void writeHistograms(TFile *outf, Parameters &par) {
     outf->cd();
     smartWrite(hInclusivejetPT);
     smartWrite(hInvMass);
     smartWrite(hmuDiDxy1Dxy2);
     smartWrite(hmumuPt);
     smartWrite(nt);
+    
+    // Write flavor-specific histograms
+    if(!par.IsData) {
+      for(int i = 0; i < 6; i++) {
+      smartWrite(hInvMass_flavors[i]);
+      smartWrite(hInclusivejetPT_flavors[i]);
+      smartWrite(hmuDiDxy1Dxy2_flavors[i]);
+      smartWrite(hmumuPt_flavors[i]);
+      }
+    }
   }
 
 private:
-  void deleteHistograms() {
+  void deleteHistograms(Parameters &par) {
     delete hInclusivejetPT;
     delete hInvMass;
     delete hmuDiDxy1Dxy2;
     delete hmumuPt;
     delete nt;
-  }
+
+    if(!par.IsData) {
+      for(int i = 0; i < 6; i++) {
+        delete hInvMass_flavors[i];
+        delete hInclusivejetPT_flavors[i];
+        delete hmuDiDxy1Dxy2_flavors[i];
+        delete hmumuPt_flavors[i];
+      }
+    }
 };
 
 //============================================================//
@@ -163,12 +222,9 @@ int main(int argc, char *argv[]) {
   TString DCAString = CL.Get("DCAString", "");         // DCA selection string
   bool IsData = CL.GetBool("IsData", 1);               // Data or MC
   bool IsPP = CL.GetBool("IsPP", 0);                   // pp or PbPb
-  int NbHad = CL.GetInt("NbHad", -1);                  // Number of b hadrons (-1 = no cut)
-  int NcHad = CL.GetInt("NcHad", -1);                  // Number of c hadrons (-1 = no cut)
   bool TriggerChoice = CL.GetBool("TriggerChoice", 1); // Which trigger to use
   float scaleFactor = CL.GetDouble("scaleFactor", 1.); // Scale factor for the output
-  Parameters par(MinJetPT, MaxJetPT, string(DCAString.Data()), ChargeSelection, TriggerChoice, IsData, IsPP, NbHad,
-                 NcHad, scaleFactor);
+  Parameters par(MinJetPT, MaxJetPT, string(DCAString.Data()), ChargeSelection, TriggerChoice, IsData, IsPP, scaleFactor);
   par.input = CL.Get("Input", "mergedfile.root"); // Input file
   par.output = CL.Get("Output", "output.root");   // Output file
   par.nThread = CL.GetInt("nThread", 1);          // The number of threads to be used for parallel processing.
@@ -180,7 +236,7 @@ int main(int argc, char *argv[]) {
   // Analyze Data
   DataAnalyzer analyzer(par.input.c_str(), par.output.c_str(), "");
   analyzer.analyze(par);
-  analyzer.writeHistograms(analyzer.outf);
+  analyzer.writeHistograms(analyzer.outf, par);
   saveParametersToHistograms(par, analyzer.outf);
   cout << "done!" << analyzer.outf->GetName() << endl;
 }
