@@ -1,4 +1,4 @@
-default: ExecuteDoubleHQtagging MassFit
+default: ExecuteDoubleHQtagging MassFit Plotter
 
 ExecuteDoubleHQtagging: DoubleHQtagging.cpp
 	g++ DoubleHQtagging.cpp -O3 -I. -I$(ProjectBase)/CommonCode/include -I./include \

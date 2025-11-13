@@ -123,7 +123,7 @@ public:
     hInclusivejetPT = new TH1D(Form("hInclusivejetPT%s", title.c_str()), "", 500, 0, 500);
     hInvMass = new TH1D(Form("hInvMass%s", title.c_str()), "", 50, 0, 7);
     hmuDiDxy1Dxy2 = new TH1D(Form("hmuDiDxy1Dxy2%s", title.c_str()), "", 50, -10, 2);
-    hmumuPt = new TH1D(Form("hmumuPt%s", title.c_str()), "", 100, 0, 50);  // FIX: Initialize missing histogram
+    hmumuPt = new TH1D(Form("hmumuPt%s", title.c_str()), "", 50, 0, 150);  // FIX: Initialize missing histogram
     nt = new TNtuple(Form("nt%s", title.c_str()), "", "mumuMass:muDiDxy1Dxy2:mumuPt:JetPT");
 
     // DECLARE FLAVOR HISTOGRAMS
@@ -133,7 +133,8 @@ public:
         hInclusivejetPT_flavors.push_back(new TH1D(Form("hInclusivejetPT_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 500, 0, 500));
         hInvMass_flavors.push_back(new TH1D(Form("hInvMass_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, 0, 7));
         hmuDiDxy1Dxy2_flavors.push_back(new TH1D(Form("hmuDiDxy1Dxy2_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, -10, 2));
-        hmumuPt_flavors.push_back(new TH1D(Form("hmumuPt_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 100, 0, 50));
+        hmumuPt_flavors.push_back(new TH1D(Form("hmumuPt_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, 0, 150));
+        nt_flavors.push_back(new TNtuple(Form("nt_%s_%s", flavorNames[i].c_str(), title.c_str()), "", "mumuMass:muDiDxy1Dxy2:mumuPt:JetPT"));
       }
     }
 
@@ -167,6 +168,7 @@ public:
         hInclusivejetPT_flavors[flavorIndex]->Fill(MDimuonJet->JetPT);
         hmuDiDxy1Dxy2_flavors[flavorIndex]->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
         hmumuPt_flavors[flavorIndex]->Fill(MDimuonJet->mumuPt);
+        nt_flavors[flavorIndex]->Fill(MDimuonJet->mumuMass, MDimuonJet->muDiDxy1Dxy2, MDimuonJet->mumuPt, MDimuonJet->JetPT);
       }
     }
   }
@@ -186,6 +188,7 @@ public:
       smartWrite(hInclusivejetPT_flavors[i]);
       smartWrite(hmuDiDxy1Dxy2_flavors[i]);
       smartWrite(hmumuPt_flavors[i]);
+      smartWrite(nt_flavors[i]);
       }
     }
   }
@@ -198,13 +201,12 @@ private:
     delete hmumuPt;
     delete nt;
 
-    if(!par.IsData) {
-      for(int i = 0; i < 6; i++) {
-        delete hInvMass_flavors[i];
-        delete hInclusivejetPT_flavors[i];
-        delete hmuDiDxy1Dxy2_flavors[i];
-        delete hmumuPt_flavors[i];
-      }
+    for(int i = 0; i < 6; i++) {
+      delete hInvMass_flavors[i];
+      delete hInclusivejetPT_flavors[i];
+      delete hmuDiDxy1Dxy2_flavors[i];
+      delete hmumuPt_flavors[i];
+      delete nt_flavors[i];
     }
   }
 };

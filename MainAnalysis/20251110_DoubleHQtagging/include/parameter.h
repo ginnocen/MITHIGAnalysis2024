@@ -63,6 +63,7 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     // Write histograms to the output file
     hMinJetPT->Write();
     hMaxJetPT->Write();
+    hChargeSelection->Write();
     hTriggerChoice->Write();
     hIsData->Write();
     hIsPP->Write();
@@ -73,6 +74,7 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
 
     delete hMinJetPT;
     delete hMaxJetPT;
+    delete hChargeSelection;
     delete hTriggerChoice;
     delete hIsData;
     delete hIsPP;

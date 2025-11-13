@@ -1,12 +1,9 @@
-rm ExecuteDoubleHQtagging
+rm ExecuteDoubleHQtagging MassFit
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
 rm -rf Output
-rm SkimReco.root
-rm list.txt
 rm -rf output
 rm *.txt*
-rm SkimReco.root
 rm .DS_Store
 CURRENTDIR=$PWD
 cd /home/$USER/CMSSW_13_2_4/src
