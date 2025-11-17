@@ -566,8 +566,7 @@ void plotdR(TFile* infile, const char* outputdir=""){
     legend->SetFillColor(kWhite);
     legend->AddEntry(h_dR, parm.descriptor.c_str(), "lep");
     legend->Draw();
-    c1->SaveAs(Form("%s/dimuon_DeltaR_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
-
+    c1->SaveAs(Form("%s/dimuon_DeltaR_%.0f_%.0f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
 }
 
 void plotDR_flavors(TFile* infile, const char* outputdir=""){
