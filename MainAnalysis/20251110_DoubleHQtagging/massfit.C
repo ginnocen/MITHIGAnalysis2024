@@ -27,8 +27,9 @@ void main_fit(TNtuple *datatuple, string outputstring, double &signalYield_, dou
     
     // Define the mass range and variables for the ntuple data
     RooRealVar m("mumuMass", "Mass [GeV]", 0.0, 7.0);  // Match your histogram range
-    RooRealVar muDiDxy1Dxy2("muDiDxy1Dxy2", "DCA", -10, 2);
+    RooRealVar muDiDxy1Dxy2Sig("muDiDxy1Dxy2Sig", "DCA Significance Product", -3, 4);
     RooRealVar mumuPt("mumuPt", "Dimuon pT [GeV]", 0, 50);
+    RooRealVar muDR("muDR", "Dimuon #DeltaR", 0, 0.6);
     RooRealVar JetPT("JetPT", "Jet pT [GeV]", 0, 500);
 
     // Define the signal model: double Gaussian
@@ -57,7 +58,7 @@ void main_fit(TNtuple *datatuple, string outputstring, double &signalYield_, dou
     RooAddPdf model("model", "signal + background", RooArgList(signal, background), RooArgList(nsig, nbkg));
 
     // Import ntuple data - we only need the mumuMass for the fit
-    RooDataSet data("data", "dataset", RooArgSet(m, muDiDxy1Dxy2, mumuPt, JetPT), Import(*datatuple));
+    RooDataSet data("data", "dataset", RooArgSet(m, muDiDxy1Dxy2Sig, mumuPt, muDR, JetPT), Import(*datatuple));
 
     // Fit the model to data
     RooFitResult* result = model.fitTo(data, Save());
@@ -112,10 +113,9 @@ void main_fit(TNtuple *datatuple, string outputstring, double &signalYield_, dou
     latex->DrawLatex(0.15, 0.81, Form("Background yield: %.0f #pm %.0f", nbkg.getVal(), nbkg.getError()));
     latex->DrawLatex(0.15, 0.77, Form("#chi^{2}/ndf: %.2f", frame->chiSquare()));
     
-    canvas->SaveAs(Form("fit_result%s.pdf", outputstring.c_str()));
+    canvas->SaveAs(Form("%s_fit_result.pdf", outputstring.c_str()));
 
 }
-
 
 int main(int argc, char *argv[]) {
   std::cout << "Starting mass fit" << std::endl;

@@ -21,8 +21,9 @@ struct Parameters {
 const char* parseDCAcut(string dcaString) {
     string readableDCAstring = dcaString;
     
-    // Replace " && " with ", " for better readability in plots
     size_t pos = 0;
+    // Replace " && " with ", " for better readability in plots
+    pos = 0;
     while ((pos = readableDCAstring.find(" && ", pos)) != string::npos) {
         readableDCAstring.replace(pos, 4, ", ");
         pos += 2; // Move past the replacement
@@ -39,6 +40,18 @@ const char* parseDCAcut(string dcaString) {
     while ((pos = readableDCAstring.find("abs(muDiDxy2)", pos)) != string::npos) {
         readableDCAstring.replace(pos, 13, "#left|D_{xy}^{#mu2}#right|");
         pos += 13;
+    }
+
+    pos = 0;
+    while ((pos = readableDCAstring.find("abs(muDiDxy1 / muDiDxy1Err) > ", pos)) != string::npos) {
+        readableDCAstring.replace(pos, 29, "#left|D_{xy}^{#mu1} / #sigma_{D_{xy}^{#mu1}}#right| > ");
+        pos += 29;
+    }
+
+    pos = 0;
+    while ((pos = readableDCAstring.find("abs(muDiDxy2 / muDiDxy2Err) > ", pos)) != string::npos) {
+        readableDCAstring.replace(pos, 29, "#left|D_{xy}^{#mu2} / #sigma_{D_{xy}^{#mu2}}#right| > ");
+        pos += 29;
     }
     
     // Return as const char* (note: this creates a temporary, so use immediately)
@@ -130,7 +143,41 @@ Parameters drawcuts(TFile* infile, TCanvas* c){
     return par;
 }
 
-void plotInvMass(TFile* infile){
+void DrawYields(TFile* infile, TCanvas* c){
+    
+    if(infile->GetListOfKeys()->Contains("hInvMass_bb") == false){
+        cout << "Flavor-specific histograms not found!" << endl;
+        return;
+    }
+
+    TH1D* h_dimuon_mass_bb = (TH1D*)infile->Get("hInvMass_bb");
+    TH1D* h_dimuon_mass_b = (TH1D*)infile->Get("hInvMass_b");
+    TH1D* h_dimuon_mass_c = (TH1D*)infile->Get("hInvMass_c");
+    TH1D* h_dimuon_mass_cc = (TH1D*)infile->Get("hInvMass_cc");
+    TH1D* h_dimuon_mass_uds = (TH1D*)infile->Get("hInvMass_uds");
+
+    int yield_bb = h_dimuon_mass_bb->Integral();
+    int yield_b = h_dimuon_mass_b->Integral();
+    int yield_c = h_dimuon_mass_c->Integral();
+    int yield_cc = h_dimuon_mass_cc->Integral();
+    int yield_uds = h_dimuon_mass_uds->Integral();
+
+    c->cd();
+
+    TLatex* latex = new TLatex();
+    latex->SetNDC();  // Use normalized coordinates (0-1)
+    latex->SetTextSize(0.04);
+    latex->SetTextFont(42);
+
+    latex->DrawLatex(0.70, 0.45, "Flavor Yields");
+    latex->DrawLatex(0.70, 0.40, Form("bb: %d", yield_bb));
+    latex->DrawLatex(0.70, 0.35, Form("b: %d", yield_b));
+    latex->DrawLatex(0.70, 0.30, Form("cc: %d", yield_cc));
+    latex->DrawLatex(0.70, 0.25, Form("c: %d", yield_c));
+    latex->DrawLatex(0.70, 0.20, Form("uds: %d", yield_uds));
+}
+
+void plotInvMass(TFile* infile,const char* outputdir=""){
 
     TCanvas* c1 = new TCanvas("c1", "Dimuon Mass", 800, 600);
     //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top
@@ -161,23 +208,23 @@ void plotInvMass(TFile* infile){
     legend->AddEntry(h_dimuon_mass, parm.descriptor.c_str(), "lep");
     legend->Draw();
     
-    c1->SaveAs("dimuon_mass.pdf");
+    c1->SaveAs(Form("%s/dimuon_mass_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
 }
 
-void plotInvMass_flavors(TFile* infile){
+void plotInvMass_flavors(TFile* infile,const char* outputdir=""){
 
     TCanvas* c1 = new TCanvas("c1", "Dimuon Mass by Flavor", 800, 600);
     //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top
-    if(infile->GetListOfKeys()->Contains("hInvMass_bb_") == false){
+    if(infile->GetListOfKeys()->Contains("hInvMass_bb") == false){
         cout << "Flavor-specific histograms not found!" << endl;
         return;
     }
 
-    TH1D* h_dimuon_mass_bb = (TH1D*)infile->Get("hInvMass_bb_");
-    TH1D* h_dimuon_mass_b = (TH1D*)infile->Get("hInvMass_b_");
-    TH1D* h_dimuon_mass_c = (TH1D*)infile->Get("hInvMass_c_");
-    TH1D* h_dimuon_mass_cc = (TH1D*)infile->Get("hInvMass_cc_");
-    TH1D* h_dimuon_mass_uds = (TH1D*)infile->Get("hInvMass_uds_");
+    TH1D* h_dimuon_mass_bb = (TH1D*)infile->Get("hInvMass_bb");
+    TH1D* h_dimuon_mass_b = (TH1D*)infile->Get("hInvMass_b");
+    TH1D* h_dimuon_mass_c = (TH1D*)infile->Get("hInvMass_c");
+    TH1D* h_dimuon_mass_cc = (TH1D*)infile->Get("hInvMass_cc");
+    TH1D* h_dimuon_mass_uds = (TH1D*)infile->Get("hInvMass_uds");
 
     // Set colors and styles for each histogram with transparency
     h_dimuon_mass_bb->SetFillColorAlpha(kRed, 0.2);
@@ -240,6 +287,7 @@ void plotInvMass_flavors(TFile* infile){
     h_dimuon_mass_uds->Draw("E same");
 
     Parameters parm = drawcuts(infile, c1);
+    DrawYields(infile, c1);
 
     TLegend* legend = new TLegend(0.11, 0.67, 0.40, 0.88);
     legend->SetBorderSize(0);
@@ -251,11 +299,11 @@ void plotInvMass_flavors(TFile* infile){
     legend->AddEntry(h_dimuon_mass_uds, "uds (N_{c} = 0, N_{b} = 0)", "f");
     legend->Draw();
 
-    c1->SaveAs("dimuon_mass_flavors.pdf");
+    c1->SaveAs(Form("%s/dimuon_mass_flavors_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
 
 }
 
-void plotmumupt(TFile* infile){
+void plotmumupt(TFile* infile, const char* outputdir=""){
 
     TCanvas* c1 = new TCanvas("c1", "Dimuon PT", 800, 600);
     //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top
@@ -286,26 +334,26 @@ void plotmumupt(TFile* infile){
     legend->AddEntry(h_dimuon_pt, parm.descriptor.c_str(), "lep");
     legend->Draw();
 
-    c1->SaveAs("dimuon_pt.pdf");
+    c1->SaveAs(Form("%s/dimuon_pt_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
 
     
 
 }
 
-void plotmumupt_flavors(TFile* infile){
+void plotmumupt_flavors(TFile* infile,const char* outputdir=""){
 
     TCanvas* c1 = new TCanvas("c1", "Dimuon PT by Flavor", 800, 600);
     //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top
-    if(infile->GetListOfKeys()->Contains("hmumuPt_bb_") == false){
+    if(infile->GetListOfKeys()->Contains("hmumuPt_bb") == false){
         cout << "Flavor-specific histograms not found!" << endl;
         return;
     }
 
-    TH1D* h_dimuon_pt_bb = (TH1D*)infile->Get("hmumuPt_bb_");
-    TH1D* h_dimuon_pt_b = (TH1D*)infile->Get("hmumuPt_b_");
-    TH1D* h_dimuon_pt_c = (TH1D*)infile->Get("hmumuPt_c_");
-    TH1D* h_dimuon_pt_cc = (TH1D*)infile->Get("hmumuPt_cc_");
-    TH1D* h_dimuon_pt_uds = (TH1D*)infile->Get("hmumuPt_uds_");
+    TH1D* h_dimuon_pt_bb = (TH1D*)infile->Get("hmumuPt_bb");
+    TH1D* h_dimuon_pt_b = (TH1D*)infile->Get("hmumuPt_b");
+    TH1D* h_dimuon_pt_c = (TH1D*)infile->Get("hmumuPt_c");
+    TH1D* h_dimuon_pt_cc = (TH1D*)infile->Get("hmumuPt_cc");
+    TH1D* h_dimuon_pt_uds = (TH1D*)infile->Get("hmumuPt_uds");
     // Set colors and styles for each histogram with transparency
     h_dimuon_pt_bb->SetFillColorAlpha(kRed, 0.2);
     h_dimuon_pt_bb->SetLineColor(kRed);
@@ -359,6 +407,7 @@ void plotmumupt_flavors(TFile* infile){
     h_dimuon_pt_cc->Draw("E same");
     h_dimuon_pt_uds->Draw("E same");
     Parameters parm = drawcuts(infile, c1);
+    DrawYields(infile, c1);
     TLegend* legend = new TLegend(0.11, 0.67, 0.40, 0.88);
     legend->SetBorderSize(0);
     legend->SetFillColor(kWhite);
@@ -369,15 +418,15 @@ void plotmumupt_flavors(TFile* infile){
     legend->AddEntry(h_dimuon_pt_uds, "uds (N_{c} = 0, N_{b} = 0)", "f");
     legend->Draw(); 
 
-    c1->SaveAs("dimuon_pt_flavors.pdf");
+    c1->SaveAs(Form("%s/dimuon_pt_flavors_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
 
 }
 
-void plotDCA(TFile* infile){
+void plotDCA(TFile* infile, const char* outputdir=""){
 
     TCanvas* c1 = new TCanvas("c1", "DCA", 800, 600);
     //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top    
-    TH1D* h_dca = (TH1D*)infile->Get("hmuDiDxy1Dxy2");
+    TH1D* h_dca = (TH1D*)infile->Get("hmuDiDxy1Dxy2Sig");
     if(!h_dca){
         cout << "Histogram hmuDiDxy1Dxy2 not found!" << endl;
         return;
@@ -398,25 +447,24 @@ void plotDCA(TFile* infile){
     legend->SetFillColor(kWhite);
     legend->AddEntry(h_dca, parm.descriptor.c_str(), "lep");
     legend->Draw();
-    c1->SaveAs("dimuon_DCA.pdf");
+    c1->SaveAs(Form("%s/dimuon_DCA_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
 
 }
 
-void plotDCA_flavors(TFile* infile){
+void plotDCA_flavors(TFile* infile, const char* outputdir=""){
 
     TCanvas* c1 = new TCanvas("c1", "DCA by Flavor", 800, 600);
     //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top
-    if(infile->GetListOfKeys()->Contains("hmuDiDxy1Dxy2_bb_") == false){
+    if(infile->GetListOfKeys()->Contains("hmuDiDxy1Dxy2Sig_bb") == false){
         cout << "Flavor-specific histograms not found!" << endl;
         return;
     }
 
-    TH1D* h_dca_bb = (TH1D*)infile->Get("hmuDiDxy1Dxy2_bb_");
-    TH1D* h_dca_b = (TH1D*)infile->Get("hmuDiDxy1Dxy2_b_");
-    TH1D* h_dca_c = (TH1D*)infile->Get("hmuDiDxy1Dxy2_c_");
-    TH1D* h_dca_cc = (TH1D*)infile->Get("hmuDiDxy1Dxy2_cc_");
-    TH1D* h_dca_uds = (TH1D*)infile->Get("hmuDiDxy1Dxy2_uds_");
-
+    TH1D* h_dca_bb = (TH1D*)infile->Get("hmuDiDxy1Dxy2Sig_bb");
+    TH1D* h_dca_b = (TH1D*)infile->Get("hmuDiDxy1Dxy2Sig_b");
+    TH1D* h_dca_c = (TH1D*)infile->Get("hmuDiDxy1Dxy2Sig_c");
+    TH1D* h_dca_cc = (TH1D*)infile->Get("hmuDiDxy1Dxy2Sig_cc");
+    TH1D* h_dca_uds = (TH1D*)infile->Get("hmuDiDxy1Dxy2Sig_uds");
     // Set colors and styles for each histogram with transparency
     h_dca_bb->SetFillColorAlpha(kRed, 0.2);
     h_dca_bb->SetLineColor(kRed);
@@ -461,7 +509,7 @@ void plotDCA_flavors(TFile* infile){
     h_dca_uds->SetMinimum(0);
 
     // Draw histograms with fills - order matters for visibility
-    h_dca_c->GetXaxis()->SetTitle("log10(|D_{xy}^{#mu1}| x |D_{xy}^{#mu2}|)");
+    h_dca_c->GetXaxis()->SetTitle("log10(#left|D_{xy}^{#mu1} / #sigma_{D_{xy}^{#mu1}}#right| x #left|D_{xy}^{#mu2} / #sigma_{D_{xy}^{#mu2}}#right|)");
     h_dca_c->GetYaxis()->SetTitle("Dimuon Jets");
     h_dca_c->Draw("HIST");
     h_dca_bb->Draw("HIST same");
@@ -477,6 +525,7 @@ void plotDCA_flavors(TFile* infile){
     h_dca_uds->Draw("E same");
 
     Parameters parm = drawcuts(infile, c1);
+    DrawYields(infile, c1);
     TLegend* legend = new TLegend(0.11, 0.67, 0.40, 0.88);
     legend->SetBorderSize(0);
     legend->SetFillColor(kWhite);
@@ -487,11 +536,130 @@ void plotDCA_flavors(TFile* infile){
     legend->AddEntry(h_dca_uds, "uds (N_{c} = 0, N_{b} = 0)", "f");
     legend->Draw();
 
-    c1->SaveAs("dimuon_DCA_flavors.pdf");
+    c1->SaveAs(Form("%s/dimuon_DCA_flavors_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
 
 }
 
-void plotter(const char* inputfile = "output_DoubleHQtagging_1.root"){
+
+void plotdR(TFile* infile, const char* outputdir=""){
+
+    TCanvas* c1 = new TCanvas("c1", "Delta R", 800, 600);
+    //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top    
+    TH1D* h_dR = (TH1D*)infile->Get("hmuDR");
+    if(!h_dR){
+        cout << "Histogram hmuDR not found!" << endl;
+        return;
+    }
+    h_dR->SetLineColor(kBlack);
+    h_dR->SetLineWidth(2);
+    h_dR->SetMarkerStyle(20);
+    h_dR->SetMarkerSize(0.8);
+    h_dR->GetXaxis()->SetTitle("#DeltaR(#mu, jet)");
+    h_dR->GetYaxis()->SetTitle("Dimuon Jets");
+    h_dR->SetMaximum(h_dR->GetMaximum()*1.7);
+    h_dR->SetMinimum(0);
+    h_dR->Draw("PE");  
+    Parameters parm = drawcuts(infile, c1);
+    cout << parm.descriptor << endl;
+    TLegend* legend = new TLegend(0.11, 0.75, 0.45, 0.88);
+    legend->SetBorderSize(0);
+    legend->SetFillColor(kWhite);
+    legend->AddEntry(h_dR, parm.descriptor.c_str(), "lep");
+    legend->Draw();
+    c1->SaveAs(Form("%s/dimuon_DeltaR_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
+
+}
+
+void plotDR_flavors(TFile* infile, const char* outputdir=""){
+
+    TCanvas* c1 = new TCanvas("c1", "Delta R by Flavor", 800, 600);
+    //c1->SetMargin(0.15, 0.05, 0.15, 0.1);  // left, right, bottom, top
+    if(infile->GetListOfKeys()->Contains("hmuDR_bb") == false){
+        cout << "Flavor-specific histograms not found!" << endl;
+        return;
+    }
+
+    TH1D* h_dR_bb = (TH1D*)infile->Get("hmuDR_bb");
+    TH1D* h_dR_b = (TH1D*)infile->Get("hmuDR_b");
+    TH1D* h_dR_c = (TH1D*)infile->Get("hmuDR_c");
+    TH1D* h_dR_cc = (TH1D*)infile->Get("hmuDR_cc");
+    TH1D* h_dR_uds = (TH1D*)infile->Get("hmuDR_uds");
+    // Set colors and styles for each histogram with transparency
+    h_dR_bb->SetFillColorAlpha(kRed, 0.2);
+    h_dR_bb->SetLineColor(kRed);
+    h_dR_b->SetFillColorAlpha(kBlue, 0.2);
+    h_dR_b->SetLineColor(kBlue);
+    h_dR_c->SetFillColorAlpha(kGreen+2, 0.2);
+    h_dR_c->SetLineColor(kGreen+2);
+    h_dR_cc->SetFillColorAlpha(kOrange+2, 0.2);
+    h_dR_cc->SetLineColor(kOrange+2);
+    h_dR_uds->SetFillColorAlpha(kTeal, 0.2);
+    h_dR_uds->SetLineColor(kTeal);
+
+    h_dR_bb->SetMarkerStyle(20);
+    h_dR_b->SetMarkerStyle(20);
+    h_dR_c->SetMarkerStyle(20);
+    h_dR_cc->SetMarkerStyle(20);
+    h_dR_uds->SetMarkerStyle(20);
+
+    h_dR_bb->SetMarkerColor(kRed);
+    h_dR_b->SetMarkerColor(kBlue);
+    h_dR_c->SetMarkerColor(kGreen);
+    h_dR_cc->SetMarkerColor(kOrange);
+    h_dR_uds->SetMarkerColor(kTeal);
+
+    float m = max({
+        h_dR_bb->GetMaximum(),
+        h_dR_b->GetMaximum(),
+        h_dR_c->GetMaximum(),
+        h_dR_cc->GetMaximum(),
+        h_dR_uds->GetMaximum()
+    });
+    h_dR_bb->SetMaximum(m * 1.7);
+    h_dR_b->SetMaximum(m * 1.7);
+    h_dR_c->SetMaximum(m * 1.7);
+    h_dR_cc->SetMaximum(m * 1.7);
+    h_dR_uds->SetMaximum(m * 1.7);  
+
+    h_dR_bb->SetMinimum(0);
+    h_dR_b->SetMinimum(0);
+    h_dR_c->SetMinimum(0);
+    h_dR_cc->SetMinimum(0);
+    h_dR_uds->SetMinimum(0);
+
+    // Draw histograms with fills - order matters for visibility
+    h_dR_c->GetXaxis()->SetTitle("#DeltaR(#mu, jet)");
+    h_dR_c->GetYaxis()->SetTitle("Dimuon Jets");
+    h_dR_c->Draw("HIST");
+    h_dR_bb->Draw("HIST same");
+    h_dR_b->Draw("HIST same");
+    h_dR_cc->Draw("HIST same");
+    h_dR_uds->Draw("HIST same");
+
+    // Overlay with error bars (no fill, just markers)
+    h_dR_c->Draw("E same");
+    h_dR_bb->Draw("E same");
+    h_dR_b->Draw("E same");
+    h_dR_cc->Draw("E same");
+    h_dR_uds->Draw("E same");
+
+    Parameters parm = drawcuts(infile, c1);
+    DrawYields(infile, c1);
+    TLegend* legend = new TLegend(0.11, 0.67, 0.40, 0.88);
+    legend->SetBorderSize(0);
+    legend->SetFillColor(kWhite);
+    legend->AddEntry(h_dR_bb, "b#bar{b} (N_{b} = 2)", "f");
+    legend->AddEntry(h_dR_b, "b (N_{b} = 1)", "f");
+    legend->AddEntry(h_dR_cc, "c#bar{c} (N_{c} = 2, N_{b} = 0)", "f");
+    legend->AddEntry(h_dR_c, "c (N_{c} = 1, N_{b} = 0)", "f");
+    legend->AddEntry(h_dR_uds, "uds (N_{c} = 0, N_{b} = 0)", "f");
+    legend->Draw();
+
+    c1->SaveAs(Form("%s/dimuon_DeltaR_flavors_%f_%f.pdf", outputdir, parm.MinJetPt, parm.MaxJetPt));
+
+}
+
+void plotter(const char* inputfile = "output_DoubleHQtagging_1.root",const char* outputdir = "") {
 
     gStyle->SetOptStat(0);
 
@@ -502,16 +670,19 @@ void plotter(const char* inputfile = "output_DoubleHQtagging_1.root"){
     }
     
     // INVARIANT MASS
-    plotInvMass(infile);
-    plotInvMass_flavors(infile);
+    plotInvMass(infile, outputdir);
+    plotInvMass_flavors(infile, outputdir);
     
     // DIMUON PT
-    plotmumupt(infile);
-    plotmumupt_flavors(infile);
-
+    plotmumupt(infile, outputdir);
+    plotmumupt_flavors(infile, outputdir);
     // DCA
-    plotDCA(infile);
-    plotDCA_flavors(infile);
+    plotDCA(infile, outputdir);
+    plotDCA_flavors(infile, outputdir);
+
+    // DR
+    plotdR(infile, outputdir);
+    plotDR_flavors(infile, outputdir);
 
     infile->Close();
 }

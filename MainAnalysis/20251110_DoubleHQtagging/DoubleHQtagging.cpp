@@ -87,16 +87,21 @@ public:
   
   // INCLUSIVE HISTOGRAMS
   TH1D *hInclusivejetPT;
+
+  // DIMUON HISTOGRAMS
+  TH1D *hJetPT;
   TH1D *hInvMass;
-  TH1D *hmuDiDxy1Dxy2;
+  TH1D *hmuDiDxy1Dxy2Sig;
   TH1D *hmumuPt;
+  TH1D *hmuDR;
   TNtuple *nt;
   
   // FLAVOR-SORTED HISTOGRAMS 
-  vector<TH1D*> hInclusivejetPT_flavors;
+  vector<TH1D*> hJetPT_flavors;
   vector<TH1D*> hInvMass_flavors;     
-  vector<TH1D*> hmuDiDxy1Dxy2_flavors;
+  vector<TH1D*> hmuDiDxy1Dxy2Sig_flavors;
   vector<TH1D*> hmumuPt_flavors;
+  vector<TH1D*> hmuDR_flavors;
   vector<TNtuple*> nt_flavors;
   vector<string> flavorNames;
 
@@ -121,20 +126,24 @@ public:
 
     // DECLARE HISTOGRAMS
     hInclusivejetPT = new TH1D(Form("hInclusivejetPT%s", title.c_str()), "", 500, 0, 500);
+
+    hJetPT = new TH1D(Form("hJetPT%s", title.c_str()), "", 500, 0, 500);
     hInvMass = new TH1D(Form("hInvMass%s", title.c_str()), "", 50, 0, 7);
-    hmuDiDxy1Dxy2 = new TH1D(Form("hmuDiDxy1Dxy2%s", title.c_str()), "", 50, -10, 2);
+    hmuDiDxy1Dxy2Sig = new TH1D(Form("hmuDiDxy1Dxy2Sig%s", title.c_str()), "", 50, -3, 4);
     hmumuPt = new TH1D(Form("hmumuPt%s", title.c_str()), "", 50, 0, 150);  // FIX: Initialize missing histogram
-    nt = new TNtuple(Form("nt%s", title.c_str()), "", "mumuMass:muDiDxy1Dxy2:mumuPt:JetPT");
+    hmuDR = new TH1D(Form("hmuDR%s", title.c_str()), "", 50, 0, 0.6);
+    nt = new TNtuple(Form("nt%s", title.c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:mumuPt:muDR:JetPT");
 
     // DECLARE FLAVOR HISTOGRAMS
     if(!par.IsData) {
       flavorNames = {"other", "uds", "c", "cc", "b", "bb"};
       for(int i = 0; i < 6; i++) {
-        hInclusivejetPT_flavors.push_back(new TH1D(Form("hInclusivejetPT_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 500, 0, 500));
-        hInvMass_flavors.push_back(new TH1D(Form("hInvMass_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, 0, 7));
-        hmuDiDxy1Dxy2_flavors.push_back(new TH1D(Form("hmuDiDxy1Dxy2_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, -10, 2));
-        hmumuPt_flavors.push_back(new TH1D(Form("hmumuPt_%s_%s", flavorNames[i].c_str(), title.c_str()), "", 50, 0, 150));
-        nt_flavors.push_back(new TNtuple(Form("nt_%s_%s", flavorNames[i].c_str(), title.c_str()), "", "mumuMass:muDiDxy1Dxy2:mumuPt:JetPT"));
+        hJetPT_flavors.push_back(new TH1D(Form("hJetPT_%s", flavorNames[i].c_str()), "", 500, 0, 500));
+        hInvMass_flavors.push_back(new TH1D(Form("hInvMass_%s", flavorNames[i].c_str()), "", 50, 0, 7));
+        hmuDiDxy1Dxy2Sig_flavors.push_back(new TH1D(Form("hmuDiDxy1Dxy2Sig_%s", flavorNames[i].c_str()), "", 50, -3, 4));
+        hmumuPt_flavors.push_back(new TH1D(Form("hmumuPt_%s", flavorNames[i].c_str()), "", 50, 0, 150));
+        hmuDR_flavors.push_back(new TH1D(Form("hmuDR_%s", flavorNames[i].c_str()), "", 50, 0, 0.6));
+        nt_flavors.push_back(new TNtuple(Form("nt_%s", flavorNames[i].c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:mumuPt:muDR:JetPT"));
       }
     }
 
@@ -149,26 +158,33 @@ public:
         Bar.Print();
       }
 
+      // INCLUSIVE HISTOGRAM
+      if(MDimuonJet->JetPT > par.MinJetPT && MDimuonJet->JetPT < par.MaxJetPT){
+        hInclusivejetPT->Fill(MDimuonJet->JetPT);
+      }
+
       // APPLY JET SELECTION
       if (!jetselection(MDimuonJet, par)) {
         continue;
       }
 
       // FILL HISTOGRAMS
-      hInclusivejetPT->Fill(MDimuonJet->JetPT);
+      hJetPT->Fill(MDimuonJet->JetPT);
       hInvMass->Fill(MDimuonJet->mumuMass);
-      hmuDiDxy1Dxy2->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
+      hmuDiDxy1Dxy2Sig->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2 / MDimuonJet->muDiDxy1Dxy2Err)));
       hmumuPt->Fill(MDimuonJet->mumuPt);
-      nt->Fill(MDimuonJet->mumuMass, MDimuonJet->muDiDxy1Dxy2, MDimuonJet->mumuPt, MDimuonJet->JetPT);
+      hmuDR->Fill(MDimuonJet->muDR);
+      nt->Fill(MDimuonJet->mumuMass, MDimuonJet->muDiDxy1Dxy2 / MDimuonJet->muDiDxy1Dxy2Err, MDimuonJet->mumuPt, MDimuonJet->muDR, MDimuonJet->JetPT);
 
       // FILL FLAVOR HISTOGRAMS (MC only)
-      if (!par.IsData) {
-        int flavorIndex = FlavorClassifier(MDimuonJet->NbHad, MDimuonJet->NcHad); 
+      if (!par.IsData) { 
+        int flavorIndex = FlavorClassifier(MDimuonJet->NbHad, MDimuonJet->NcHad);
+        hJetPT_flavors[flavorIndex]->Fill(MDimuonJet->JetPT);
         hInvMass_flavors[flavorIndex]->Fill(MDimuonJet->mumuMass);
-        hInclusivejetPT_flavors[flavorIndex]->Fill(MDimuonJet->JetPT);
-        hmuDiDxy1Dxy2_flavors[flavorIndex]->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2)));
+        hmuDiDxy1Dxy2Sig_flavors[flavorIndex]->Fill(log10(abs(MDimuonJet->muDiDxy1Dxy2 / MDimuonJet->muDiDxy1Dxy2Err)));
         hmumuPt_flavors[flavorIndex]->Fill(MDimuonJet->mumuPt);
-        nt_flavors[flavorIndex]->Fill(MDimuonJet->mumuMass, MDimuonJet->muDiDxy1Dxy2, MDimuonJet->mumuPt, MDimuonJet->JetPT);
+        hmuDR_flavors[flavorIndex]->Fill(MDimuonJet->muDR);
+        nt_flavors[flavorIndex]->Fill(MDimuonJet->mumuMass, MDimuonJet->muDiDxy1Dxy2 / MDimuonJet->muDiDxy1Dxy2Err, MDimuonJet->mumuPt, MDimuonJet->muDR, MDimuonJet->JetPT);
       }
     }
   }
@@ -176,18 +192,21 @@ public:
   void writeHistograms(TFile *outf, Parameters &par) {
     outf->cd();
     smartWrite(hInclusivejetPT);
+    smartWrite(hJetPT);
     smartWrite(hInvMass);
-    smartWrite(hmuDiDxy1Dxy2);
+    smartWrite(hmuDiDxy1Dxy2Sig);
     smartWrite(hmumuPt);
+    smartWrite(hmuDR);
     smartWrite(nt);
     
     // Write flavor-specific histograms
     if(!par.IsData) {
       for(int i = 0; i < 6; i++) {
       smartWrite(hInvMass_flavors[i]);
-      smartWrite(hInclusivejetPT_flavors[i]);
-      smartWrite(hmuDiDxy1Dxy2_flavors[i]);
+      smartWrite(hJetPT_flavors[i]);
+      smartWrite(hmuDiDxy1Dxy2Sig_flavors[i]);
       smartWrite(hmumuPt_flavors[i]);
+      smartWrite(hmuDR_flavors[i]);
       smartWrite(nt_flavors[i]);
       }
     }
@@ -196,16 +215,19 @@ public:
 private:
   void deleteHistograms(Parameters &par) {
     delete hInclusivejetPT;
+    delete hJetPT;
     delete hInvMass;
-    delete hmuDiDxy1Dxy2;
+    delete hmuDiDxy1Dxy2Sig;
     delete hmumuPt;
+    delete hmuDR;
     delete nt;
 
     for(int i = 0; i < 6; i++) {
       delete hInvMass_flavors[i];
-      delete hInclusivejetPT_flavors[i];
-      delete hmuDiDxy1Dxy2_flavors[i];
+      delete hJetPT_flavors[i];
+      delete hmuDiDxy1Dxy2Sig_flavors[i];
       delete hmumuPt_flavors[i];
+      delete hmuDR_flavors[i];
       delete nt_flavors[i];
     }
   }
@@ -219,7 +241,7 @@ int main(int argc, char *argv[]) {
     return 0;
   CommandLine CL(argc, argv);
   float MinJetPT = CL.GetDouble("MinJetPT", 80);   // Minimum jet pT
-  float MaxJetPT = CL.GetDouble("MaxJetPT", 1000); // Maximum jet pT
+  float MaxJetPT = CL.GetDouble("MaxJetPT", 100); // Maximum jet pT
   int ChargeSelection =
       CL.GetInt("ChargeSelection", 0); // Charge selection for dimuon: 0 = no sel, 1 = same sign, -1 = opposite sign
   TString DCAString = CL.Get("DCAString", "");         // DCA selection string
