@@ -1,13 +1,17 @@
 // Minimal legend adjustments + "Charged hadron R_{AA}" everywhere,
 // note about uncertainties, and BOLD pT range in the legend.
 
-const int nPt = 13;
-double pLow[nPt] = {4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
-double pHigh[nPt] = {5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
+const int nPt = 15;
+double pLow[nPt] = {3.2, 4.0, 4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
+double pHigh[nPt] = {4.0, 4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
 
-void fit(int ptbin = 3, int option = 1) {
+//const int nPt = 13;
+//double pLow[nPt] = {4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
+//double pHigh[nPt] = {5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
 
-  TString filename = Form ("ptBinned_RAAVsA_Pow%d-3.root", option);
+void fit(int ptbin = 3, int option = 1, int versionNumber = 0) {
+
+  TString filename = Form ("ptBinned_RAAVsA_Pow%d-3_Version%d.root", option, versionNumber);
   // Input
   TFile *fileinput = TFile::Open(filename);
   if (!fileinput || fileinput->IsZombie()) {
@@ -127,12 +131,12 @@ void fit(int ptbin = 3, int option = 1) {
   unc->Draw();
 
   // Output
-  c1->SaveAs(Form("fit_ptBin%d_option%d.png", ptbin, option));
+  c1->SaveAs(Form("fit_ptMin%.1f_ptMax%.1f_option%d_version%d.pdf", pLow[ptbin], pHigh[ptbin], option, versionNumber));
 }
 
-void loopall() {
+void fitFormatA(int versionNumber = 1) {
   for (int ptbin = 0; ptbin < nPt; ptbin++) {
-    fit(ptbin, 1);
-    fit(ptbin, 2);
+    fit(ptbin, 1, versionNumber);
+    //fit(ptbin, 2, versionNumber);
   }
 }
