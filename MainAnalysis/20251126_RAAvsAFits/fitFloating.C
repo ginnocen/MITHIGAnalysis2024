@@ -1,15 +1,15 @@
 // Minimal legend adjustments + "Charged hadron R_{AA}" everywhere,
 // note about uncertainties, and BOLD pT range in the legend.
 
+const int nPt = 15;
+double pLow[nPt] = {3.2, 4.0, 4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
+double pHigh[nPt] = {4.0, 4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
+
 // const int nPt = 13;
 // double pLow[nPt] = {4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
 // double pHigh[nPt] = {5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
 
-const int nPt = 12;
-double pLow[nPt] = {4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0};
-double pHigh[nPt] = {5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
-
-TF1 *fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA.root") {
+TF1 *fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA_Pow3-3_Version1.root") {
 
   // Input
   TFile *fileinput = TFile::Open(filename);
@@ -121,7 +121,7 @@ TF1 *fit(int ptbin = 3, TString filename = "ptBinned_RAAVsA.root") {
 
 // Loop over all pT bins and fill an histogram with the m values extracted from the fit
 
-void loopall() {
+void fitAFloating() {
   TF1 *fits[nPt];
   TH1F *hm = new TH1F("hm", "1 + m*(A^{#alpha} - 1); p_{T} (GeV); m", nPt, 0, nPt);
   TH1F *halpha = new TH1F("halpha", "1+ m*(A^{#alpha} - 1); p_{T} (GeV); #alpha", nPt, 0, nPt);

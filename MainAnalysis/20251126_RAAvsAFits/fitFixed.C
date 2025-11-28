@@ -5,13 +5,13 @@ const int nPt = 15;
 double pLow[nPt] = {3.2, 4.0, 4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
 double pHigh[nPt] = {4.0, 4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
 
-//const int nPt = 13;
-//double pLow[nPt] = {4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
-//double pHigh[nPt] = {5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
+// const int nPt = 13;
+// double pLow[nPt] = {4.8, 5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6};
+// double pHigh[nPt] = {5.6, 6.4, 7.2, 9.6, 12.0, 14.4, 19.2, 24.0, 28.8, 35.2, 48.0, 73.6, 103.6};
 
 void fit(int ptbin = 3, int option = 1, int versionNumber = 0) {
 
-  TString filename = Form ("ptBinned_RAAVsA_Pow%d-3_Version%d.root", option, versionNumber);
+  TString filename = Form("ptBinned_RAAVsA_Pow%d-3_Version%d.root", option, versionNumber);
   // Input
   TFile *fileinput = TFile::Open(filename);
   if (!fileinput || fileinput->IsZombie()) {
@@ -32,15 +32,21 @@ void fit(int ptbin = 3, int option = 1, int versionNumber = 0) {
   if (option == 1) {
     xrangemindraw = 1.0;
     xrangemaxdraw = 7.0;
-    xrangeminfit = 1.5; //I am excluding the point at A=1 cause it is already forced to 1 in the fit function
+    xrangeminfit = 1.5; // I am excluding the point at A=1 cause it is already forced to 1 in the fit function
     xrangemaxfit = 6.0;
   } else if (option == 2) {
     xrangemindraw = 1.0;
     xrangemaxdraw = 45.0;
-    xrangeminfit = 1.5; //I am excluding the point at A=1 cause it is already forced to 1 in the fit function
+    xrangeminfit = 1.5; // I am excluding the point at A=1 cause it is already forced to 1 in the fit function
     xrangemaxfit = 40.0;
+  } else if (option == 3) {
+    xrangemindraw = 1.0;
+    xrangemaxdraw = 230.0;
+    xrangeminfit = 1.5; // I am excluding the point at A=1 cause it is already forced to 1 in the fit function
+    xrangemaxfit = 208.0;
   } else {
-    std::cerr << "Invalid option value. Use 1, 2" << std::endl;
+    ::Error("fit", "Invalid option %d", option);
+    return;
   }
   // Fit
   // the fit function already assumes the graph to be plotted as a function of A^(1/3) or A^(2/3)
@@ -48,7 +54,7 @@ void fit(int ptbin = 3, int option = 1, int versionNumber = 0) {
   TF1 *fitfunc = new TF1("fitfunc", "1 + [0]*(x-1)", xrangeminfit, xrangemaxfit);
   fitfunc->SetLineColor(kRed + 1);
   fitfunc->SetLineWidth(6);
-  fitfunc->SetLineStyle(2); // dashed
+  fitfunc->SetLineStyle(2);                  // dashed
   TFitResultPtr r = g->Fit(fitfunc, "S R0"); // "S" for getting fit results, "R" for fit range, "0" to not draw
 
   // Axes (note the Y title)
@@ -131,12 +137,14 @@ void fit(int ptbin = 3, int option = 1, int versionNumber = 0) {
   unc->Draw();
 
   // Output
-  c1->SaveAs(Form("fit_ptMin%.1f_ptMax%.1f_option%d_version%d.pdf", pLow[ptbin], pHigh[ptbin], option, versionNumber));
+  c1->SaveAs(Form("fits/Pow%d_3/fit_ptMin%.1f_ptMax%.1f_option%d_version%d.pdf", option, pLow[ptbin], pHigh[ptbin],
+                  option, versionNumber));
 }
 
 void fitFormatA(int versionNumber = 1) {
   for (int ptbin = 0; ptbin < nPt; ptbin++) {
     fit(ptbin, 1, versionNumber);
-    //fit(ptbin, 2, versionNumber);
+    fit(ptbin, 2, versionNumber);
+    fit(ptbin, 3, versionNumber);
   }
 }
