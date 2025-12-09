@@ -7,8 +7,8 @@ echo "Running on sample ID: $SAMPLEID"
 
 if [ "$SAMPLEID" -eq 0 ]; then
     #NAMEMC="SkimMC2018PbPb_Version20241220_InputForest_20241217_DiJet_pThat-15_TuneCP5_HydjetDrumMB_5p02TeV_Pythia8_FIXEDDR"
-    NAMEMC="/data00/g2ccbar/data2018/skim_102725_6"
-    FOLDER="/eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8/crab_btagged_and_svtagged_jets_MC_test/251021_161510/0006" 
+    NAMEMC="/data00/g2ccbar/data2018/skim_120225_1"
+    FOLDER="/eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8/crab_btagged_and_svtagged_jets_MC_HFfinders/251128_191749/0001"
 fi
 echo "Running on sample: $NAMEMC"
 echo "Running on folder: $FOLDER"
@@ -52,7 +52,7 @@ while IFS= read -r file; do
             --svtx true \
             --Output "$OUTPUTMC/output_$counter.root" \
             --PFJetCollection ak3PFJetAnalyzer/t \
-            --MinJetPT 0 --Fraction 1.0 & 
+            --MinJetPT 45 --Fraction 1.0 & 
     ((counter++))
     wait_for_slot
 done < "$filelistMC"

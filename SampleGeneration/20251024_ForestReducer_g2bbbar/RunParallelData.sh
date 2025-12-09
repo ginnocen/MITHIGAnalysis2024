@@ -1,13 +1,13 @@
 #!/bin/bash
-MAXCORES=40
+MAXCORES=20
 SAMPLEID=0
 source clean.sh
 
 echo "Running on sample ID: $SAMPLEID"
 
 if [ "$SAMPLEID" -eq 0 ]; then
-    NAMEData="/data00/g2ccbar/data2018/skim_110525_0"
-    FOLDER="/eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_test/251022_062442/0009" 
+    NAMEData="/data00/g2ccbar/data2018/skim_120525_0"
+    FOLDER="/eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_HFfindersC/251202_223300/0000"
 fi
 echo "Running on sample: $NAMEData"
 echo "Running on folder: $FOLDER"

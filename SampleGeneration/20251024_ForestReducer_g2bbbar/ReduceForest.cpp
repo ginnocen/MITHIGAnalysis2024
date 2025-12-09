@@ -168,11 +168,9 @@ int main(int argc, char *argv[]) {
       /////////////////////////////////////
 
       if (IsPP == true) {
-        //std::cout << "pp analysis is not yet implemented" << std::endl;
         if (IsData == true) {
           int pprimaryVertexFilter = MSkim.PVFilter;
-          //int beamScrapingFilter = MSkim.BeamScrapingFilter; NO BEAM SCRAPING YET
-          int beamScrapingFilter = 1;
+          int beamScrapingFilter = MSkim.BeamScrapingFilter; 
           if (pprimaryVertexFilter == 0 || beamScrapingFilter == 0)
             continue;
           int minbiastrigger = MTrigger.CheckTriggerStartWith("HLT_HIAK4PFJet30_v*");

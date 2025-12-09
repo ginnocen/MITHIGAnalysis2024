@@ -5,7 +5,7 @@ source clean.sh
 rm *.root
 rm *.pdf
 
-OUTPUTDIR="data_default"
+OUTPUTDIR="mc_charge1_test"
 mkdir -p ${OUTPUTDIR}
 
 # Define arrays for JETPTMIN and JETPTMAX
@@ -19,8 +19,8 @@ if [ "${#JETPTMIN_VALUES[@]}" -ne "${#JETPTMAX_VALUES[@]}" ]; then
 fi
 
 # Input ROOT file
-#INPUT=/data00/g2ccbar/mc2018/skim_102725_all/mergedfile.root
-INPUT=/data00/g2ccbar/data2018/skim_110525_0/mergedfile.root
+INPUT=/data00/g2ccbar/mc2018/skim_102725_all/mergedfile.root
+#INPUT=/data00/g2ccbar/data2018/skim_110525_0/mergedfile.root
 
 # Loop over indices of the arrays
 for i in "${!JETPTMIN_VALUES[@]}"; do
@@ -37,11 +37,11 @@ for i in "${!JETPTMIN_VALUES[@]}"; do
         
         ./ExecuteDoubleHQtagging \
          --Input $INPUT \
-         --IsData 1 \
+         --IsData 0 \
          --IsPP 1 \
          --MinJetPT $JETPTMIN \
          --MaxJetPT $JETPTMAX \
-         --ChargeSelection -1 \
+         --ChargeSelection 1 \
          --DCAString "abs(muDiDxy1 / muDiDxy1Err) > 2.78 && abs(muDiDxy2 / muDiDxy2Err) > 2.78" \
          --Output ${OUTPUT}
 
