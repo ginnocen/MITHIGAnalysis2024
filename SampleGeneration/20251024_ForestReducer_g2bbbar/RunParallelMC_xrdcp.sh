@@ -1,10 +1,12 @@
 #!/bin/bash
-#source clean.sh
+source clean.sh
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+# Get parameters (defaults: N=0, LETTER=A)
+N=${1:-0}
 
-NAME="skim_120925_0"
-PATHSAMPLE="/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8/crab_btagged_and_svtagged_jets_MC_HFfinders/251128_191749/0000"
+NAME="skim_120925_${N}"
+PATHSAMPLE="/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8/crab_btagged_and_svtagged_jets_MC_HFfinders/251128_191749/000${N}"
 OUTPUT="/data00/g2ccbar/mc2018/$NAME"
 
 ### SKIMMER PARAMETERS ###
@@ -16,7 +18,7 @@ MINJETPT=0
 FRACTION=1.0
 
 ### OTHER PARAMETERS ###
-MAXCORES=20  
+MAXCORES=40  
 NFILES=-1
 XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/group...
 

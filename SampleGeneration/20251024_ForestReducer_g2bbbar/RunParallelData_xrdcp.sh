@@ -1,9 +1,22 @@
 #!/bin/bash
-#source clean.sh
+source clean.sh
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-NAME="skim_120925_0"
-PATHSAMPLE="/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_HFfindersA/251202_223354/0000"
+# Get parameters (defaults: N=0, LETTER=A)
+N=${1:-0}
+LETTER=${2:-A}
+if [ "$LETTER" = "A" ]; then
+    SAMPLETIME="251202_223354"
+fi
+if [ "$LETTER" = "B" ]; then
+    SAMPLETIME="251202_220441"
+fi
+if [ "$LETTER" = "C" ]; then
+    SAMPLETIME="251202_223300"
+fi
+
+NAME="skim_120925_${LETTER}_${N}"
+PATHSAMPLE="/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_HFfinders${LETTER}/${SAMPLETIME}/000${N}"
 OUTPUT="/data00/g2ccbar/data2018/$NAME"
 
 ### SKIMMER PARAMETERS ###
@@ -15,7 +28,7 @@ MINJETPT=0
 FRACTION=1.0
 
 ### OTHER PARAMETERS ###
-MAXCORES=20  
+MAXCORES=40  
 NFILES=-1
 XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/group...
 
