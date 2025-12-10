@@ -21,40 +21,85 @@ using namespace std;
 #include "DimuonMessenger.h"
 #include "Messenger.h"   
 #include "ProgressBar.h" 
-#include "helpMessage.h"
-#include "utilities.h"  
 
 using namespace std;
 
-bool isSelected(float ){  // ASKGM: EVENT + JET SELECTION HANDLED IN SKIMMER 
-return true;} 
+vector<int> isSelected(DimuonJetMessenger *Jet, float muPtCut){
+    // RETURNS A 3-INT VECTOR THAT ENCODES AT EACH INDEX IF THE JET PASSES THE GIVEN SELECTIONS
+    // 0 - Inclusive Jet selection
+    // 1 - Dimuon Jet selection
+    // 2 - Gen Dimuon Jet selection
+    vector<int> indices = {0, 0, 0};
+
+    // TODO APPLY STANDARD JET SELECTION HERE FOR TRIGGERS ETC
+    indices[0] = 1;
+
+    // DIMUON SELECTIONS
+    if(Jet->IsMuMuTagged == 1){
+        indices[1] = 1;
+        if(Jet->muPt1 < muPtCut || Jet->muPt2 < muPtCut){indices[1] = 0;}
+        //  ASKGM: I plan to make these maps agnostic of charge since the charge product of the dimuon pair 
+        //  will not substantially change its selection efficiency right?
+    }
+
+    // GEN DIMUON SELECTIONS
+    if(Jet->GenIsMuMuTagged == 1){
+        indices[2] = 1;
+        if(Jet->GenMuPt1 < muPtCut || Jet->GenMuPt2 < muPtCut){indices[2] = 0;}
+        // TODO NEED TO APPLY CHARGE SELECTION TO GEN DIMUONS IN SKIMMER
+    }
+
+    return indices;
+}
+
+int isGenSelected(GenDimuonJetMessenger *Jet){
+    // RETURNS IF THE GEN JET IS SELECTED
+    // TODO: POPULATE WITH UPDATED TRIGGER INFO
+    return 1;
+}
 
 int main(int argc, char *argv[]) {
 
     // INPUTS
+    cout << "Beginning Acceptance x Efficiency" << endl;
     CommandLine CL(argc, argv);
-    const char* file = CL.getString("file");
-    const char* output = CL.getString("output");
-    vector<int> ptBins = CL.getIntVector("ptBins");
-    int chargeSelection = CL.getInt("chargeSelection",0); // 1 for same sign, -1 for opposite sign, 0 for no selection
-    float muPtSelection = CL.getDouble("muPt",3.5);
+    string file = CL.Get("Input");
+    string output = CL.Get("Output");
+    vector<double> ptBins = CL.GetDoubleVector("ptBins");
+    int chargeSelection = CL.GetInt("chargeSelection",0);
+    float muPtSelection = CL.GetDouble("muPt",3.5);
+    int useWeightVariation = CL.GetInt("useWeightVariation",0);
+
+    // OPEN OUTPUT FILE FIRST
+    TFile* outFile = new TFile(output.c_str(), "RECREATE");
 
     // IMPORT TREE
-    DimuonJetMessenger t(file);
+    TFile* input = TFile::Open(file.c_str());
+    DimuonJetMessenger *t = new DimuonJetMessenger(input, "Tree");
+    GenDimuonJetMessenger *tgen = new GenDimuonJetMessenger(input, "GenTree");
 
     // DECLARE TREES + HISTOGRAMS
-    TH3D* inclusiveJets = new TH3D("hInclusiveJets","hInclusiveJets",)
+    outFile->cd();
+    TH3D* hRecoInclusiveJets = new TH3D("hRecoInclusiveJets","hRecoInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
+    TH3D* hGenDimJets = new TH3D("hGenDimJets","hGenDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
+    TH3D* hRecoDimJets = new TH3D("hRecoDimJets","hRecoDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
+    hRecoInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    hGenDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    hRecoDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
 
+    TNtuple* ntInclusiveJets = new TNtuple("ntInclusiveJets","ntInclusiveJets", "JetPT:JetEta:JetPhi");
+    TNtuple* ntGenDimJets = new TNtuple("ntGenDimJets","ntGenDimJets", "JetPT:JetEta:JetPhi");
+    TNtuple* ntRecoDimJets = new TNtuple("ntRecoDimJets","ntRecoDimJets", "JetPT:JetEta:JetPhi:Weight");
 
+    // DECLARE GEN TREE + HISTOGRAM
+    TH3D* hGenInclusiveJets = new TH3D("hGenInclusiveJets","hGenInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
+    hGenInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    TNtuple* ntGenInclusiveJets = new TNtuple("ntGenInclusiveJets","ntGenInclusiveJets", "JetPT:JetEta:JetPhi");
 
-
-
-
-
-    unsigned long nentries = t.GetEntries();
+    // JET LOOP
+    unsigned long nentries = t->GetEntries();
     ProgressBar Bar(cout, nentries);
-    for(int i = 0; i < t.GetEntries(); i++) { // LOOP OVER JETS
-
+    for(int i = 0; i < t->GetEntries(); i++) { 
 
         if (i % 1000 == 0) {
             Bar.Update(i);
@@ -62,18 +107,68 @@ int main(int argc, char *argv[]) {
         }
         
         t->GetEntry(i);
+        vector<int> selected = isSelected(t, muPtSelection); 
+        int weight = t->MuMuWeight;
+        if(useWeightVariation != 0){
+            weight = t->ExtraMuWeight->at(useWeightVariation);
+        }
 
+        if(selected[0] == 1){
+            hRecoInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi); // TODO: make sure these guys don't need a weight
+            ntInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+        }
 
+        if(selected[1] == 1){
+            hRecoDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi, weight);
+            ntRecoDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi, weight);
+        }
 
+        if(selected[2] == 1){
+            hGenDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+            ntGenDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+        }
+    }
+    cout << " finished with reco jet loop" << endl;
 
+    // GEN JET LOOP
+    unsigned long genentries = tgen->GetEntries();
+    ProgressBar Bar2(cout, genentries);
+    for(int i = 0; i < genentries; i++) { 
 
-
+        if(i % 1000 == 0) {
+            Bar2.Update(i);
+            Bar2.Print();
+        }
+        
+        tgen->GetEntry(i);
+        if(isGenSelected(tgen) == 1){
+            hGenInclusiveJets->Fill(tgen->GenJetPT, tgen->GenJetEta, tgen->GenJetPhi);
+            ntGenInclusiveJets->Fill(tgen->GenJetPT, tgen->GenJetEta, tgen->GenJetPhi);
+        }
 
     }
-    
-    
+    cout << " finished with gen jet loop" << endl;
 
-  
+    // TAKE RATIOS
+    TH3D* JetEfficiency = (TH3D*)hRecoInclusiveJets->Clone();
+    TH3D* DimJetEfficiency = (TH3D*)hRecoDimJets->Clone();
+    JetEfficiency->Divide(hGenInclusiveJets);
+    DimJetEfficiency->Divide(hGenDimJets);
+    JetEfficiency->SetName("JetEfficiency");
+    DimJetEfficiency->SetName("DimJetEfficiency");
+
+    // SAVE TO FILE
+    outFile->cd();
+    hRecoInclusiveJets->Write();
+    hGenDimJets->Write();
+    hRecoDimJets->Write();
+    ntInclusiveJets->Write();
+    ntGenDimJets->Write();
+    ntRecoDimJets->Write();
+    hGenInclusiveJets->Write();
+    ntGenInclusiveJets->Write();
+
+    outFile->Close();
 }
 
 

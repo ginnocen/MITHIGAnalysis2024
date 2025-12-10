@@ -201,7 +201,6 @@ public:
    float GenJetEta;
    float GenJetPhi;
    int GenJetMatchIdx;
-   bool GenIsMuMuTagged;
 
 
 

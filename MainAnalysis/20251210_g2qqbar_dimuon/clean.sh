@@ -1,4 +1,4 @@
-rm ExecuteDoubleHQtagging MassFit
+rm ExecuteEfficiencies
 rm -rf ../../CommonCode/binary/
 rm -rf ../../CommonCode/library/
 rm -rf Output
@@ -17,4 +17,4 @@ cd CommonCode/
 make
 cd $CURRENTDIR
 make
-rm Skim*.root
+
