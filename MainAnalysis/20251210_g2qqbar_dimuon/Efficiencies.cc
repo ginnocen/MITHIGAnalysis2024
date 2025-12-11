@@ -35,7 +35,7 @@ vector<int> isSelected(DimuonJetMessenger *Jet, float muPtCut, bool isData){
     // none for MC, ?? for Data.
     indices[0] = 1;
 
-    if(isData != true){
+    if(!isData){
 
         // DIMUON SELECTIONS
         if(Jet->IsMuMuTagged == 1){
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]) {
     ProgressBar Bar2(cout, genentries);
     for(int i = 0; i < genentries; i++) { 
 
-        if(isData == true){break;}
+        if(isData){break;}
 
         if(i % 1000 == 0) {
             Bar2.Update(i);
@@ -153,7 +153,7 @@ int main(int argc, char *argv[]) {
     }
     cout << " finished with gen jet loop" << endl;
 
-    if(isData == false){
+    if(!isData){
 
         // TAKE RATIOS
         TH3D* JetEfficiency = (TH3D*)hRecoInclusiveJets->Clone();
