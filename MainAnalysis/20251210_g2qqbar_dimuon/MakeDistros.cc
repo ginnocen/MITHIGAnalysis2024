@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
             hInvMass->Fill(t->JetPT, t->mumuMass, weight);
             hDCAProductSig->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
             hmuDR->Fill(t->JetPT, t->muDR, weight);
-            ntDimuon->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight);
+            ntDimuon->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight); // NOTE MAY WANT TO JUST PUT THE SIGNIFICANCE WITHOUT THE LOG FOR FUTURE REFERENCE
 
             if(isData){continue;} // ONLY MAKE TEMPLATES WITH MC 
 
