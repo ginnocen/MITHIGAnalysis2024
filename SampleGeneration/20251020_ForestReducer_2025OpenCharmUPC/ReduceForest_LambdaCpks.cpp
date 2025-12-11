@@ -97,18 +97,18 @@ int main(int argc, char *argv[]) {
   }
   
   for (string InputFileName : InputFileNames) {
-    TFile InputFile(InputFileName.c_str());
+    auto InputFile = TFile::Open(InputFileName.c_str());
 
-    HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
-    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile); // ppTracks/trackTree
-    GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
-    PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
-    SkimTreeMessenger MSkim(InputFile); // skimanalysis/HltTree
-    TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
-    LambdaCpksTreeMessenger MLambdaC(InputFile); // Dfinder/ntLcTopksTopipi
-    DfinderGenTreeMessenger MDfinderGen(InputFile); // Dfinder/ntGen
-    ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
-    METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
+    HiEventTreeMessenger MEvent(*InputFile); // hiEvtAnalyzer/HiTree
+    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(*InputFile); // ppTracks/trackTree
+    GenParticleTreeMessenger MGen(*InputFile); // HiGenParticleAna/hi
+    PFTreeMessenger MPF(*InputFile, PFTreeName); // particleFlowAnalyser/pftree
+    SkimTreeMessenger MSkim(*InputFile); // skimanalysis/HltTree
+    TriggerTreeMessenger MTrigger(*InputFile); // hltanalysis/HltTree
+    LambdaCpksTreeMessenger MLambdaC(*InputFile, "Dfinder/ntLctopkstopipi"); // Dfinder/ntLcTopksTopipi
+    DfinderGenTreeMessenger MDfinderGen(*InputFile); // Dfinder/ntGen
+    ZDCTreeMessenger MZDC(*InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
+    METFilterTreeMessenger MMETFilter(*InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
 
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);
@@ -117,6 +117,7 @@ int main(int argc, char *argv[]) {
     }
 
     vector<TF1*> dedxFunctions = ImportPIDRoot("../../CommonCode/root/DzeroUPC_dedxMap.root");
+    // vector<TF1*> dedxFunctions = ImportPIDRoot("DzeroUPC_dedxMap.root"); // !! need to add a parameter about the root file location
     TF1* fdedxPionCenter  = dedxFunctions[0];
     TF1* fdedxPionSigmaLo = dedxFunctions[1];
     TF1* fdedxPionSigmaHi = dedxFunctions[2];
@@ -327,7 +328,11 @@ int main(int argc, char *argv[]) {
           else if (ApplyDRejection=="passystddtheta"  && !DpassCutSystDdtheta_) continue;
           else if (ApplyDRejection=="passystdchi2cl"  && !DpassCutSystDchi2cl_) continue;
         }
-        countSelDzero++;
+
+        // !!! my hardcoded cut -->
+        // if (MLambdaC.Dpt[iD] < 2) continue;
+        // <-- my hardcoded cut
+        // 
         MLambdaCUPC.Dpt->push_back(             MLambdaC.Dpt[iD]);
         MLambdaCUPC.Dy->push_back(              MLambdaC.Dy[iD]);
         MLambdaCUPC.Dmass->push_back(           MLambdaC.Dmass[iD]);
@@ -338,31 +343,8 @@ int main(int argc, char *argv[]) {
         MLambdaCUPC.DsvpvDisErr_2D->push_back(  MLambdaC.DsvpvDisErr_2D[iD]);
         MLambdaCUPC.Dalpha->push_back(          MLambdaC.Dalpha[iD]);
         MLambdaCUPC.Ddtheta->push_back(         MLambdaC.Ddtheta[iD]);
-        
-        MLambdaCUPC.Dtrk1P->push_back(          MLambdaC.Dtrk1P[iD]);
-        MLambdaCUPC.Dtrk1Pt->push_back(         MLambdaC.Dtrk1Pt[iD]);
-        MLambdaCUPC.Dtrk1PtErr->push_back(      MLambdaC.Dtrk1PtErr[iD]);
-        MLambdaCUPC.Dtrk1Eta->push_back(        MLambdaC.Dtrk1Eta[iD]);
-        MLambdaCUPC.Dtrk1dedx->push_back(       MLambdaC.Dtrk1dedx[iD]);
-        MLambdaCUPC.Dtrk1MassHypo->push_back(   MLambdaC.Dtrk1MassHypo[iD]);
-        MLambdaCUPC.Dtrk1PixelHit->push_back(   MLambdaC.Dtrk1PixelHit[iD]);
-        MLambdaCUPC.Dtrk1StripHit->push_back(   MLambdaC.Dtrk1StripHit[iD]);
-        if (MLambdaC.Dtrk1P[iD] < 2.5) // Only give valid PID for p_track < 2 GeV
-        {
-          MLambdaCUPC.Dtrk1PionScore->push_back(GetPIDScore(
-            MLambdaC.Dtrk1P[iD], MLambdaC.Dtrk1dedx[iD],
-            fdedxPionCenter, fdedxPionSigmaLo, fdedxPionSigmaHi));
-          MLambdaCUPC.Dtrk1KaonScore->push_back(GetPIDScore(
-            MLambdaC.Dtrk1P[iD], MLambdaC.Dtrk1dedx[iD],
-            fdedxKaonCenter, fdedxKaonSigmaLo, fdedxKaonSigmaHi));
-          MLambdaCUPC.Dtrk1ProtScore->push_back(GetPIDScore(
-            MLambdaC.Dtrk1P[iD], MLambdaC.Dtrk1dedx[iD],
-            fdedxProtCenter, fdedxProtSigmaLo, fdedxProtSigmaHi));
-        } else {
-          MLambdaCUPC.Dtrk1PionScore->push_back(-999.);
-          MLambdaCUPC.Dtrk1KaonScore->push_back(-999.);
-          MLambdaCUPC.Dtrk1ProtScore->push_back(-999.);
-        }
+
+        MLambdaCUPC.DtktkResmass->push_back(    MLambdaC.DtktkResmass[iD]);        
         
         MLambdaCUPC.Dtrk2P->push_back(          MLambdaC.Dtrk2P[iD]);
         MLambdaCUPC.Dtrk2Pt->push_back(         MLambdaC.Dtrk2Pt[iD]);
@@ -454,6 +436,8 @@ int main(int argc, char *argv[]) {
 //          MLambdaCUPC.DisSignalCalcPrompt->push_back(isSignalGenMatched && isPromptGenMatched);
 //          MLambdaCUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
         }
+
+        countSelDzero++;
       }
       MLambdaCUPC.Dsize = countSelDzero;
       MLambdaCUPC.FillEntry();
@@ -463,8 +447,8 @@ int main(int argc, char *argv[]) {
       Bar.Print();
       Bar.PrintLine();
     }
-
-    InputFile.Close();
+    InputFile->Close();
+    std::cout<<"Processed "<<EntryCount<<" events."<<std::endl;
   }
 
   OutputFile.cd();

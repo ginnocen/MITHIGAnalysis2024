@@ -4169,22 +4169,11 @@ LambdaCpksUPCTreeMessenger::~LambdaCpksUPCTreeMessenger()
     delete DsvpvDisErr_2D;
     delete Dalpha;
     delete Ddtheta;
+    delete DtktkResmass;
     delete Dgen;
     delete DisSignalCalc;
     delete DisSignalCalcPrompt;
     delete DisSignalCalcFeeddown;
-    
-    delete Dtrk1P;
-    delete Dtrk1Pt;
-    delete Dtrk1PtErr;
-    delete Dtrk1Eta;
-    delete Dtrk1dedx;
-    delete Dtrk1MassHypo;
-    delete Dtrk1PixelHit;
-    delete Dtrk1StripHit;
-    delete Dtrk1PionScore;
-    delete Dtrk1KaonScore;
-    delete Dtrk1ProtScore;
     
     delete Dtrk2P;
     delete Dtrk2Pt;
@@ -4257,22 +4246,11 @@ bool LambdaCpksUPCTreeMessenger::Initialize(bool Debug)
   DsvpvDisErr_2D = nullptr;
   Dalpha = nullptr;
   Ddtheta = nullptr;
+  DtktkResmass = nullptr;
   Dgen = nullptr;
   DisSignalCalc = nullptr;
   DisSignalCalcPrompt = nullptr;
   DisSignalCalcFeeddown = nullptr;
-
-  Dtrk1P = nullptr;
-  Dtrk1Pt = nullptr;
-  Dtrk1PtErr = nullptr;
-  Dtrk1Eta = nullptr;
-  Dtrk1dedx = nullptr;
-  Dtrk1MassHypo = nullptr;
-  Dtrk1PixelHit = nullptr;
-  Dtrk1StripHit = nullptr;
-  Dtrk1PionScore = nullptr;
-  Dtrk1KaonScore = nullptr;
-  Dtrk1ProtScore = nullptr;
 
   Dtrk2P = nullptr;
   Dtrk2Pt = nullptr;
@@ -4351,6 +4329,7 @@ bool LambdaCpksUPCTreeMessenger::Initialize(bool Debug)
   Tree->SetBranchAddress("DsvpvDisErr_2D",       &DsvpvDisErr_2D);
   Tree->SetBranchAddress("Dalpha",               &Dalpha);
   Tree->SetBranchAddress("Ddtheta",              &Ddtheta);
+  Tree->SetBranchAddress("DtktkResmass",              &DtktkResmass);
   Tree->SetBranchAddress("DpassCutNominal",      &DpassCutNominal);
   Tree->SetBranchAddress("DpassCutLoose",        &DpassCutLoose);
   Tree->SetBranchAddress("DpassCutSystDsvpvSig", &DpassCutSystDsvpvSig);
@@ -4362,18 +4341,6 @@ bool LambdaCpksUPCTreeMessenger::Initialize(bool Debug)
   Tree->SetBranchAddress("DisSignalCalc",        &DisSignalCalc);
   Tree->SetBranchAddress("DisSignalCalcPrompt",  &DisSignalCalcPrompt);
   Tree->SetBranchAddress("DisSignalCalcFeeddown",&DisSignalCalcFeeddown);
-
-  Tree->SetBranchAddress("Dtrk1P",               &Dtrk1P);
-  Tree->SetBranchAddress("Dtrk1Pt",              &Dtrk1Pt);
-  Tree->SetBranchAddress("Dtrk1PtErr",           &Dtrk1PtErr);
-  Tree->SetBranchAddress("Dtrk1Eta",             &Dtrk1Eta);
-  Tree->SetBranchAddress("Dtrk1dedx",            &Dtrk1dedx);
-  Tree->SetBranchAddress("Dtrk1MassHypo",        &Dtrk1MassHypo);
-  Tree->SetBranchAddress("Dtrk1PixelHit",        &Dtrk1PixelHit);
-  Tree->SetBranchAddress("Dtrk1StripHit",        &Dtrk1StripHit);
-  Tree->SetBranchAddress("Dtrk1PionScore",       &Dtrk1PionScore);
-  Tree->SetBranchAddress("Dtrk1KaonScore",       &Dtrk1KaonScore);
-  Tree->SetBranchAddress("Dtrk1ProtScore",       &Dtrk1ProtScore);
 
   Tree->SetBranchAddress("Dtrk2P",               &Dtrk2P);
   Tree->SetBranchAddress("Dtrk2Pt",              &Dtrk2Pt);
@@ -4459,22 +4426,11 @@ bool LambdaCpksUPCTreeMessenger::SetBranch(TTree *T)
   DsvpvDisErr_2D = new std::vector<float>();
   Dalpha = new std::vector<float>();
   Ddtheta = new std::vector<float>();
+  DtktkResmass = new std::vector<float>();
   Dgen = new std::vector<int>();
   DisSignalCalc = new std::vector<bool>();
   DisSignalCalcPrompt = new std::vector<bool>();
   DisSignalCalcFeeddown = new std::vector<bool>();
-
-  Dtrk1P = new std::vector<float>();
-  Dtrk1Pt = new std::vector<float>();
-  Dtrk1PtErr = new std::vector<float>();
-  Dtrk1Eta = new std::vector<float>();
-  Dtrk1dedx = new std::vector<float>();
-  Dtrk1MassHypo = new std::vector<float>();
-  Dtrk1PixelHit = new std::vector<float>();
-  Dtrk1StripHit = new std::vector<float>();
-  Dtrk1PionScore = new std::vector<float>();
-  Dtrk1KaonScore = new std::vector<float>();
-  Dtrk1ProtScore = new std::vector<float>();
 
   Dtrk2P = new std::vector<float>();
   Dtrk2Pt = new std::vector<float>();
@@ -4555,6 +4511,7 @@ bool LambdaCpksUPCTreeMessenger::SetBranch(TTree *T)
   Tree->Branch("DsvpvDisErr_2D",        &DsvpvDisErr_2D);
   Tree->Branch("Dalpha",                &Dalpha);
   Tree->Branch("Ddtheta",               &Ddtheta);
+  Tree->Branch("DtktkResmass",               &DtktkResmass);
   Tree->Branch("DpassCutNominal",       &DpassCutNominal);
   Tree->Branch("DpassCutLoose",         &DpassCutLoose);
   Tree->Branch("DpassCutSystDsvpvSig",  &DpassCutSystDsvpvSig);
@@ -4566,18 +4523,6 @@ bool LambdaCpksUPCTreeMessenger::SetBranch(TTree *T)
   Tree->Branch("DisSignalCalc",         &DisSignalCalc);
   Tree->Branch("DisSignalCalcPrompt",   &DisSignalCalcPrompt);
   Tree->Branch("DisSignalCalcFeeddown", &DisSignalCalcFeeddown);
-
-  Tree->Branch("Dtrk1P",                &Dtrk1P);
-  Tree->Branch("Dtrk1Pt",               &Dtrk1Pt);
-  Tree->Branch("Dtrk1PtErr",            &Dtrk1PtErr);
-  Tree->Branch("Dtrk1Eta",              &Dtrk1Eta);
-  Tree->Branch("Dtrk1dedx",             &Dtrk1dedx);
-  Tree->Branch("Dtrk1MassHypo",         &Dtrk1MassHypo);
-  Tree->Branch("Dtrk1PixelHit",         &Dtrk1PixelHit);
-  Tree->Branch("Dtrk1StripHit",         &Dtrk1StripHit);
-  Tree->Branch("Dtrk1PionScore",        &Dtrk1PionScore);
-  Tree->Branch("Dtrk1KaonScore",        &Dtrk1KaonScore);
-  Tree->Branch("Dtrk1ProtScore",        &Dtrk1ProtScore);
 
   Tree->Branch("Dtrk2P",                &Dtrk2P);
   Tree->Branch("Dtrk2Pt",               &Dtrk2Pt);
@@ -4664,6 +4609,7 @@ void LambdaCpksUPCTreeMessenger::Clear()
   DsvpvDisErr_2D->clear();
   Dalpha->clear();
   Ddtheta->clear();
+  DtktkResmass->clear();
   DpassCutNominal->clear();
   DpassCutLoose->clear();
   DpassCutSystDsvpvSig->clear();
@@ -4675,18 +4621,6 @@ void LambdaCpksUPCTreeMessenger::Clear()
   DisSignalCalc->clear();
   DisSignalCalcPrompt->clear();
   DisSignalCalcFeeddown->clear();
-
-  Dtrk1P->clear();
-  Dtrk1Pt->clear();
-  Dtrk1PtErr->clear();
-  Dtrk1Eta->clear();
-  Dtrk1dedx->clear();
-  Dtrk1MassHypo->clear();
-  Dtrk1PixelHit->clear();
-  Dtrk1StripHit->clear();
-  Dtrk1PionScore->clear();
-  Dtrk1KaonScore->clear();
-  Dtrk1ProtScore->clear();
 
   Dtrk2P->clear();
   Dtrk2Pt->clear();
@@ -4780,6 +4714,8 @@ void LambdaCpksUPCTreeMessenger::CopyNonTrack(LambdaCpksUPCTreeMessenger &M)
     *Dalpha                           = *(M.Dalpha);
   if(Ddtheta                != nullptr && M.Ddtheta                != nullptr)
     *Ddtheta                          = *(M.Ddtheta);
+  if(DtktkResmass                != nullptr && M.DtktkResmass                != nullptr)
+    *DtktkResmass                          = *(M.DtktkResmass);
   if(DpassCutNominal        != nullptr && M.DpassCutNominal        != nullptr)
     *DpassCutNominal                  = *(M.DpassCutNominal);
   if(DpassCutLoose          != nullptr && M.DpassCutLoose          != nullptr)
@@ -4802,29 +4738,6 @@ void LambdaCpksUPCTreeMessenger::CopyNonTrack(LambdaCpksUPCTreeMessenger &M)
     *DisSignalCalcPrompt              = *(M.DisSignalCalcPrompt);
   if(DisSignalCalcFeeddown  != nullptr && M.DisSignalCalcFeeddown  != nullptr)
     *DisSignalCalcFeeddown            = *(M.DisSignalCalcFeeddown);
-  
-  if(Dtrk1P                 != nullptr && M.Dtrk1P                 != nullptr)
-    *Dtrk1P                           = *(M.Dtrk1P);
-  if(Dtrk1Pt                != nullptr && M.Dtrk1Pt                != nullptr)
-    *Dtrk1Pt                          = *(M.Dtrk1Pt);
-  if(Dtrk1PtErr             != nullptr && M.Dtrk1PtErr             != nullptr)
-    *Dtrk1PtErr                       = *(M.Dtrk1PtErr);
-  if(Dtrk1Eta               != nullptr && M.Dtrk1Eta               != nullptr)
-    *Dtrk1Eta                         = *(M.Dtrk1Eta);
-  if(Dtrk1dedx              != nullptr && M.Dtrk1dedx              != nullptr)
-    *Dtrk1dedx                        = *(M.Dtrk1dedx);
-  if(Dtrk1MassHypo          != nullptr && M.Dtrk1MassHypo          != nullptr)
-    *Dtrk1MassHypo                    = *(M.Dtrk1MassHypo);
-  if(Dtrk1PixelHit          != nullptr && M.Dtrk1PixelHit          != nullptr)
-    *Dtrk1PixelHit                    = *(M.Dtrk1PixelHit);
-  if(Dtrk1StripHit          != nullptr && M.Dtrk1StripHit          != nullptr)
-    *Dtrk1StripHit                    = *(M.Dtrk1StripHit);
-  if(Dtrk1PionScore         != nullptr && M.Dtrk1PionScore         != nullptr)
-    *Dtrk1PionScore                   = *(M.Dtrk1PionScore);
-  if(Dtrk1KaonScore         != nullptr && M.Dtrk1KaonScore         != nullptr)
-    *Dtrk1KaonScore                   = *(M.Dtrk1KaonScore);
-  if(Dtrk1ProtScore         != nullptr && M.Dtrk1ProtScore         != nullptr)
-    *Dtrk1ProtScore                   = *(M.Dtrk1ProtScore);
   
   if(Dtrk2P                 != nullptr && M.Dtrk2P                 != nullptr)
     *Dtrk2P                           = *(M.Dtrk2P);
