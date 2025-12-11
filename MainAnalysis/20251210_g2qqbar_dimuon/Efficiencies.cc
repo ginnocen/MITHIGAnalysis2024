@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
     CommandLine CL(argc, argv);
     string file = CL.Get("Input");
     string output = CL.Get("Output");
+    bool isData = CL.GetBool("IsData");
     vector<double> ptBins = CL.GetDoubleVector("ptBins");
     int chargeSelection = CL.GetInt("chargeSelection",0);
     float muPtSelection = CL.GetDouble("muPt",3.5);
@@ -83,13 +84,11 @@ int main(int argc, char *argv[]) {
     TH3D* hRecoInclusiveJets = new TH3D("hRecoInclusiveJets","hRecoInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
     TH3D* hGenDimJets = new TH3D("hGenDimJets","hGenDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
     TH3D* hRecoDimJets = new TH3D("hRecoDimJets","hRecoDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
-    hRecoInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    hRecoInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
     hGenDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hRecoDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
 
-    TNtuple* ntInclusiveJets = new TNtuple("ntInclusiveJets","ntInclusiveJets", "JetPT:JetEta:JetPhi");
-    TNtuple* ntGenDimJets = new TNtuple("ntGenDimJets","ntGenDimJets", "JetPT:JetEta:JetPhi");
-    TNtuple* ntRecoDimJets = new TNtuple("ntRecoDimJets","ntRecoDimJets", "JetPT:JetEta:JetPhi:Weight");
+    TNtuple* ntRecoInclusiveJets = new TNtuple("ntRecoInclusiveJets","ntRecoInclusiveJets", "JetPT:JetEta:JetPhi"); // Trees only important for Inclusive jet unfolding. 
 
     // DECLARE GEN TREE + HISTOGRAM
     TH3D* hGenInclusiveJets = new TH3D("hGenInclusiveJets","hGenInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
@@ -114,19 +113,18 @@ int main(int argc, char *argv[]) {
         }
 
         if(selected[0] == 1){
-            hRecoInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi); // TODO: make sure these guys don't need a weight
-            ntInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+            hRecoInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+            ntRecoInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
         }
 
         if(selected[1] == 1){
             hRecoDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi, weight);
-            ntRecoDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi, weight);
         }
 
         if(selected[2] == 1){
             hGenDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
-            ntGenDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
         }
+        
     }
     cout << " finished with reco jet loop" << endl;
 
@@ -160,13 +158,13 @@ int main(int argc, char *argv[]) {
     // SAVE TO FILE
     outFile->cd();
     hRecoInclusiveJets->Write();
-    hGenDimJets->Write();
-    hRecoDimJets->Write();
-    ntInclusiveJets->Write();
-    ntGenDimJets->Write();
-    ntRecoDimJets->Write();
+    ntRecoInclusiveJets->Write();
     hGenInclusiveJets->Write();
     ntGenInclusiveJets->Write();
+    hGenDimJets->Write();
+    hRecoDimJets->Write();
+    JetEfficiency->Write();
+    DimJetEfficiency->Write();
 
     outFile->Close();
 }
