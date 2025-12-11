@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
         hInvMass_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
         hmuDCAProductSig_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
         hmuDR_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
-        nt_flavors.push_back(new TNtuple(Form("nt_%s", flavorNames[i].c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:mumuPt:muDR:JetPT:weight"));
+        nt_flavors.push_back(new TNtuple(Form("nt_%s", flavorNames[i].c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:muDR:JetPT:weight"));
     }
     
 

@@ -62,10 +62,53 @@ float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax){
     return nJpsi.getVal();
 }
 
-float LFYield(){
+float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax){
     
-
+    RooRealVar fitVar("muDiDxy1Dxy2Sig", "muDiDxy1Dxy2Sig", -3, 4);
+    fitVar.setRange("fitRange", -2, -0.8);
+    fitVar.setRange("normRange", -3, 4);
     
+    // DATA
+    RooDataSet data("data", "data", data_nt, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    
+    // LIGHT FLAVOR TEMPLATE
+    RooDataSet templateLF("templateLF", "Light flavor", nt_uds, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    
+    // HEAVY FLAVOR TEMPLATE 
+    RooDataSet templateHF_other("tmp_other", "", nt_other, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_c("tmp_c", "", nt_c, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_cc("tmp_cc", "", nt_cc, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_b("tmp_b", "", nt_b, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_bb("tmp_bb", "", nt_bb, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    
+    // APPEND HF TEMPLATES
+    RooDataSet templateHF("templateHF", "Heavy flavor", fitVar);
+    templateHF.append(templateHF_other);
+    templateHF.append(templateHF_c);
+    templateHF.append(templateHF_cc);
+    templateHF.append(templateHF_b);
+    templateHF.append(templateHF_bb);
+    
+    // PDFs
+    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", fitVar, templateLF, RooKeysPdf::MirrorLeft, 1.0);
+    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", fitVar, templateHF, RooKeysPdf::MirrorLeft, 1.0);
+    
+    // YIELDs
+    double nTotal = data.sumEntries();
+    RooRealVar nLF("nLF", "N light flavor", nTotal/2, 0, nTotal);
+    RooRealVar nHF("nHF", "N heavy flavor", nTotal/2, 0, nTotal);
+    RooAddPdf model("model", "LF+HF", RooArgList(lfPdf, hfPdf), RooArgList(nLF, nHF));
+    
+    // Fit to data in restricted range, but normalize over full range
+    RooFitResult* result = model.fitTo(data, 
+                                        RooFit::Range("fitRange"),      // Fit only here
+                                       RooFit::NormRange("normRange"),  // But yields are for full range
+                                       RooFit::Save());
+    
+    cout << "Light flavor yield: " << nLF.getVal() << " +/- " << nLF.getError() << endl;
+    cout << "Heavy flavor yield: " << nHF.getVal() << " +/- " << nHF.getError() << endl;
+    
+    return nLF.getVal();
 }
 
 int main(int argc, char *argv[]) {
@@ -86,15 +129,16 @@ int main(int argc, char *argv[]) {
     TNtuple* nt = (TNtuple*)input->Get("ntDimuon");
 
     TFile* templatesFile = TFile::Open(templates.c_str());
-    TNtuple* nt_o = (TNtuple*)templatesFile->Get("nt_other");
+    TNtuple* nt_other = (TNtuple*)templatesFile->Get("nt_other");
     TNtuple* nt_uds = (TNtuple*)templatesFile->Get("nt_uds");
     TNtuple* nt_c = (TNtuple*)templatesFile->Get("nt_c");
     TNtuple* nt_b = (TNtuple*)templatesFile->Get("nt_b");
     TNtuple* nt_cc = (TNtuple*)templatesFile->Get("nt_cc");
     TNtuple* nt_bb = (TNtuple*)templatesFile->Get("nt_bb");
-    vector<TNtuple*> vflavors = {nt_o, nt_uds, nt_c, nt_b, nt_cc, nt_bb};
 
     // DECLARE HISTOGRAMS
+    TFile* outputFile = new TFile(output.c_str(), "RECREATE");
+    outputFile->cd();
     TH1D* JpsiYields = new TH1D("JpsiYields", "J/psi Yields", ptBins.size()-1, &ptBins[0]);
     TH1D* LightYields = new TH1D("LightYields", "Light Flavor Yields", ptBins.size()-1, &ptBins[0]);
     TH1D* SplittingYields = new TH1D("SplittingYields", "Splitting Yields", ptBins.size()-1, &ptBins[0]);
@@ -103,13 +147,54 @@ int main(int argc, char *argv[]) {
     float LightYield = 0;
     float SplittingYield = 0;
     for(int i = 0; i < ptBins.size()-1; i++){
-
-
         
-
+        float ptMin = ptBins[i];
+        float ptMax = ptBins[i+1];
+        
+        // TOTAL YIELD
+        RooRealVar mass("mumuMass", "mass", 0, 10);
+        RooDataSet dataBin("dataBin", "data", nt, mass, 
+                          Form("JetPT < %f && JetPT >= %f", ptMax, ptMin), "weight");
+        float totalYield = dataBin.sumEntries();
+        
+        // JPSI
+        if(doJpsi) {
+            JspiYield = JpsiYield(nt, ptMin, ptMax);
+            JpsiYields->SetBinContent(i+1, JspiYield);
+        }
+        
+        // LF
+        if(doLF) {
+            LightYield = LFYield(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax);
+            LightYields->SetBinContent(i+1, LightYield);
+        }
+        
+        // REMAINING YIELD
+        SplittingYield = totalYield - JspiYield - LightYield;
+        SplittingYields->SetBinContent(i+1, SplittingYield);
+        
     }
 
-    TFile
+    // WRITE TO FILE
+    outputFile->cd();
+    if(doJpsi) JpsiYields->Write();
+    if(doLF) LightYields->Write();
+    SplittingYields->Write();
 
-    
+    // SAVE COMMAND LINE PARAMS
+    TNamed paramFile("InputFile", file.c_str());
+    paramFile.Write();
+    TNamed paramTemplates("Templates", templates.c_str());
+    paramTemplates.Write();
+    TNamed paramDoJpsi("doJpsi", doJpsi ? "true" : "false");
+    paramDoJpsi.Write();
+    TNamed paramDoLF("doLF", doLF ? "true" : "false");
+    paramDoLF.Write();
+    TNamed paramMakePlots("makeplots", makeplots ? "true" : "false");
+    paramMakePlots.Write();
+
+    outputFile->Close();
+
+    // TODO: MAKE PLOTTING INFRASTRUCTURE
+
 }
