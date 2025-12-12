@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 
     // IMPORT EFFICIENCIES
     TFile* effFile = TFile::Open(efficiencies.c_str());
-    TH3D* DimJetEfficiency = (TH3D*)effFile->Get("DimJetEfficiency");
+    TH2D* DimJetEfficiency = (TH2D*)effFile->Get("DimJetEfficiency");
 
     // OUTPUT FILE
     TFile* outFile = new TFile(output.c_str(), "RECREATE");
@@ -110,7 +110,6 @@ int main(int argc, char *argv[]) {
         hmuDR_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
         nt_flavors.push_back(new TNtuple(Form("nt_%s", flavorNames[i].c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:muDR:JetPT:weight"));
     }
-    
 
     // JETS LOOP
     float weight = 0;
@@ -127,7 +126,8 @@ int main(int argc, char *argv[]) {
 
         if(isDimuonSelected(t, muPtSelection, chargeSelection, isData)){
             
-            weight = DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta, t->JetPhi)); // MAY WANT TO MAKE MORE ROBUST FOR DIVIDE BY ZEROS
+            weight = DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // MAY WANT TO MAKE MORE ROBUST FOR DIVIDE BY ZEROS
+            weight *= t->mumuWeight;
 
             hInvMass->Fill(t->JetPT, t->mumuMass, weight);
             hDCAProductSig->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);

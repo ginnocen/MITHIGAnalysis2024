@@ -41,15 +41,12 @@ vector<int> isSelected(DimuonJetMessenger *Jet, float muPtCut, bool isData){
         if(Jet->IsMuMuTagged == 1){
             indices[1] = 1;
             if(Jet->muPt1 < muPtCut || Jet->muPt2 < muPtCut){indices[1] = 0;}
-            //  ASKGM: I plan to make these maps agnostic of charge since the charge product of the dimuon pair 
-            //  will not substantially change its selection efficiency right?
         }
 
         // GEN DIMUON SELECTIONS
         if(Jet->GenIsMuMuTagged == 1){
             indices[2] = 1;
             if(Jet->GenMuPt1 < muPtCut || Jet->GenMuPt2 < muPtCut){indices[2] = 0;}
-            // TODO NEED TO APPLY CHARGE SELECTION TO GEN DIMUONS IN SKIMMER
         }
     }
 
@@ -83,15 +80,15 @@ int main(int argc, char *argv[]) {
     // DECLARE RECO HISTS
     TFile* outFile = new TFile(output.c_str(), "RECREATE");
     outFile->cd();
-    TH3D* hRecoInclusiveJets = new TH3D("hRecoInclusiveJets","hRecoInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
-    TH3D* hGenDimJets = new TH3D("hGenDimJets","hGenDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
-    TH3D* hRecoDimJets = new TH3D("hRecoDimJets","hRecoDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
+    TH2D* hRecoInclusiveJets = new TH2D("hRecoInclusiveJets","hRecoInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
+    TH2D* hGenDimJets = new TH2D("hGenDimJets","hGenDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
+    TH2D* hRecoDimJets = new TH2D("hRecoDimJets","hRecoDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
     hRecoInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
     hGenDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hRecoDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     
     // DECLARE GEN HIST
-    TH3D* hGenInclusiveJets = new TH3D("hGenInclusiveJets","hGenInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4, 10, -3.1416, 3.1416);
+    TH2D* hGenInclusiveJets = new TH2D("hGenInclusiveJets","hGenInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
     hGenInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     
     // DECLARE NTUPLES
@@ -118,11 +115,7 @@ int main(int argc, char *argv[]) {
         }
 
         if(selected[1] == 1){
-            weight = t->MuMuWeight;
-            if(useWeightVariation != -1){
-                weight = t->ExtraMuWeight->at(useWeightVariation);
-            }
-            hRecoDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi, weight);
+            hRecoDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
         }
 
         if(selected[2] == 1){
@@ -156,8 +149,8 @@ int main(int argc, char *argv[]) {
     if(!isData){
 
         // TAKE RATIOS
-        TH3D* JetEfficiency = (TH3D*)hRecoInclusiveJets->Clone();
-        TH3D* DimJetEfficiency = (TH3D*)hRecoDimJets->Clone();
+        TH2D* JetEfficiency = (TH2D*)hRecoInclusiveJets->Clone();
+        TH2D* DimJetEfficiency = (TH2D*)hRecoDimJets->Clone();
         JetEfficiency->Divide(hGenInclusiveJets);
         DimJetEfficiency->Divide(hGenDimJets);
         JetEfficiency->SetName("JetEfficiency");
