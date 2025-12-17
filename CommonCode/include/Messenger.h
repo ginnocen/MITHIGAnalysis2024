@@ -1260,6 +1260,7 @@ public:
   std::vector<float> *DsvpvDisErr_2D;
   std::vector<float> *Dalpha;
   std::vector<float> *Ddtheta;
+  std::vector<float> *DtktkResmass;
   std::vector<bool>  *DpassCutNominal;
   std::vector<bool>  *DpassCutLoose;
   std::vector<bool>  *DpassCutSystDsvpvSig;
@@ -1271,18 +1272,6 @@ public:
   std::vector<bool>  *DisSignalCalc;
   std::vector<bool>  *DisSignalCalcPrompt;
   std::vector<bool>  *DisSignalCalcFeeddown;
-
-  std::vector<float> *Dtrk1P;
-  std::vector<float> *Dtrk1Pt;
-  std::vector<float> *Dtrk1PtErr;
-  std::vector<float> *Dtrk1Eta;
-  std::vector<float> *Dtrk1dedx;
-  std::vector<float> *Dtrk1MassHypo;
-  std::vector<float> *Dtrk1PixelHit;
-  std::vector<float> *Dtrk1StripHit;
-  std::vector<float> *Dtrk1PionScore;
-  std::vector<float> *Dtrk1KaonScore;
-  std::vector<float> *Dtrk1ProtScore;
 
   std::vector<float> *Dtrk2P;
   std::vector<float> *Dtrk2Pt;
