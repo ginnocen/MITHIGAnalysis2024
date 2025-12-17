@@ -165,23 +165,12 @@ public:
    // EVENT SELECTION
    bool BeamScrapingFilter;
    bool PVFilter;
-   bool HLT_AK4PFJet30_v1;
+   bool HLT_HIAK4PFJet30_v1;
    bool HLT_HIAK4PFJet40_v1;
    bool HLT_HIAK4PFJet60_v1;
    bool HLT_HIAK4PFJet80_v1;
    bool HLT_HIAK4PFJet100_v1;
-   bool HLT_HIZeroBias_part0_v6;
-   bool HLT_HIZeroBias_part1_v6;
-   bool HLT_HIZeroBias_part2_v6;
-   bool HLT_HIZeroBias_part3_v6;
-   bool HLT_HIZeroBias_part4_v6;
-   bool HLT_HIZeroBias_part5_v6;
-   bool HLT_HIZeroBias_part6_v6;
-   bool HLT_HIZeroBias_part7_v6;
-   bool HLT_HIZeroBias_part8_v6;
-   bool HLT_HIZeroBias_part9_v6;
-   bool HLT_HIZeroBias_part10_v6;
-   bool HLT_HIZeroBias_part11_v6
+   bool HLT_HIZeroBias_v6;
 
 private:
    bool WriteMode;
@@ -219,6 +208,15 @@ public:
     float EventWeight;
     float PTHat;
     int NPU;
+
+    bool BeamScrapingFilter;
+    bool PVFilter;
+    bool HLT_HIAK4PFJet30_v1;
+    bool HLT_HIAK4PFJet40_v1;
+    bool HLT_HIAK4PFJet60_v1;
+    bool HLT_HIAK4PFJet80_v1;
+    bool HLT_HIAK4PFJet100_v1;
+    bool HLT_HIZeroBias_v6;
     
     // JET PROPERTIES
    float GenJetPT;

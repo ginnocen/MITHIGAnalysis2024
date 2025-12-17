@@ -19,6 +19,7 @@ double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
 bool isMuonSelected(SingleMuTreeMessenger *M, int i);
 bool isGenMuonSelected(SingleMuTreeMessenger *M, int i);
+bool isFakeJet(JetTreeMessenger *MJet, int ijet);
 bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int mu1, int mu2);
 //int isOnia(float mass);
 std::vector<int> mu_trackmatch(JetTreeMessenger *MJet, int jetno, float pt, float eta, float phi);
@@ -167,15 +168,37 @@ int main(int argc, char *argv[]) {
       ////////// Event selection //////////
       /////////////////////////////////////
 
+
+      MMuMuJet.BeamScrapingFilter = MSkim.BeamScrapingFilter;
+      MMuMuJet.PVFilter = MSkim.PVFilter;
+      MMuMuJet.HLT_HIAK4PFJet30_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet30_v1");
+      MMuMuJet.HLT_HIAK4PFJet40_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet40_v1");
+      MMuMuJet.HLT_HIAK4PFJet60_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet60_v1");
+      MMuMuJet.HLT_HIAK4PFJet80_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet80_v1");
+      MMuMuJet.HLT_HIAK4PFJet100_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet100_v1");
+      MMuMuJet.HLT_HIZeroBias_v6 = MTrigger.CheckTrigger("HLT_HIZeroBias_v6");
+
+      MGenMuMuJet.BeamScrapingFilter = MSkim.BeamScrapingFilter;
+      MGenMuMuJet.PVFilter = MSkim.PVFilter;
+      MGenMuMuJet.HLT_HIAK4PFJet30_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet30_v1");
+      MGenMuMuJet.HLT_HIAK4PFJet40_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet40_v1");
+      MGenMuMuJet.HLT_HIAK4PFJet60_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet60_v1");
+      MGenMuMuJet.HLT_HIAK4PFJet80_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet80_v1");
+      MGenMuMuJet.HLT_HIAK4PFJet100_v1 = MTrigger.CheckTrigger("HLT_HIAK4PFJet100_v1");
+      MGenMuMuJet.HLT_HIZeroBias_v6 = MTrigger.CheckTrigger("HLT_HIZeroBias_v6");
+
       if (IsPP == true) {
         if (IsData == true) {
+
           int pprimaryVertexFilter = MSkim.PVFilter;
           int beamScrapingFilter = MSkim.BeamScrapingFilter; 
           if (pprimaryVertexFilter == 0 || beamScrapingFilter == 0)
             continue;
-          int minbiastrigger = MTrigger.CheckTriggerStartWith("HLT_HIAK4PFJet30_v*");
-          if (minbiastrigger == 0)
+          
+          if( !MMuMuJet.HLT_HIAK4PFJet30_v1 && !MMuMuJet.HLT_HIAK4PFJet40_v1 && !MMuMuJet.HLT_HIAK4PFJet60_v1 &&
+              !MMuMuJet.HLT_HIAK4PFJet80_v1 && !MMuMuJet.HLT_HIAK4PFJet100_v1)
             continue;
+
         } // end if pp data
         else {
           // pp MC event selection if any
@@ -217,6 +240,7 @@ int main(int argc, char *argv[]) {
         MMuMuJet.JetPT = MJet.JetPT[ijet];
         MMuMuJet.JetEta = MJet.JetEta[ijet];
         MMuMuJet.JetPhi = MJet.JetPhi[ijet];
+        MMuMuJet.JetIsGenMatched = !isFakeJet(&MJet, ijet);
 
         // ADD FLAVOR INFO -- note that only a few of these branches are implemented for PbPb
         MMuMuJet.HadronFlavor = IsPP ? MJet.HadronFlavor[ijet] : MJet.MJTHadronFlavor[ijet];
@@ -466,6 +490,8 @@ int main(int argc, char *argv[]) {
         float GenMuEta2 = -999; 
         float GenMuPhi1 = -999;
         float GenMuPhi2 = -999; 
+        int GenMuCharge1 = -999;
+        int GenMuCharge2 = -999;
 
         float GenMuMuMass = -999;
         float GenMuMuEta = -999;
@@ -529,6 +555,8 @@ int main(int argc, char *argv[]) {
           GenMuEta2 = MSingleMu.GenSingleMuEta->at(maxGenMu2Index); 
           GenMuPhi1 = MSingleMu.GenSingleMuPhi->at(maxGenMu1Index);
           GenMuPhi2 = MSingleMu.GenSingleMuPhi->at(maxGenMu2Index); 
+          GenMuCharge1 = MSingleMu.GenSingleMuCharge->at(maxGenMu1Index);
+          GenMuCharge2 = MSingleMu.GenSingleMuCharge->at(maxGenMu2Index);
 
           TLorentzVector Mu1, Mu2;
           Mu1.SetPtEtaPhiM(GenMuPt1, GenMuEta1, GenMuPhi1, M_MU);
@@ -590,8 +618,8 @@ int main(int argc, char *argv[]) {
                                       tnp_weight_muid_pbpb(muPt2, muEta2, -2) / tnp_weight_muid_pbpb(muPt2, muEta2, 0);
           MMuMuJet.ExtraMuWeight->at(4) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -1) / tnp_weight_trg_pbpb(muPt1, muEta1,0, 0) *
                                       tnp_weight_trg_pbpb(muPt2, muEta2,0, -1) / tnp_weight_trg_pbpb(muPt2, muEta2,0, 0);
-          MMuMuJet.ExtraMuWeight->at(5) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1,0, muEta1, 0) *
-                                      tnp_weight_trg_pbpb(muPt2, muEta2,0, -2) / tnp_weight_trg_pbpb(muPt2,0, muEta2, 0);
+          MMuMuJet.ExtraMuWeight->at(5) = tnp_weight_trg_pbpb(muPt1, muEta1,0, -2) / tnp_weight_trg_pbpb(muPt1, muEta1, 0, 0) *
+                                      tnp_weight_trg_pbpb(muPt2, muEta2,0, -2) / tnp_weight_trg_pbpb(muPt2, muEta2, 0, 0);
           MMuMuJet.ExtraMuWeight->at(6) = tnp_weight_trk_pbpb(muEta1, 1) / tnp_weight_trk_pbpb(muEta1, 0) *
                                       tnp_weight_trk_pbpb(muEta2, 1) / tnp_weight_trk_pbpb(muEta2, 0);
           MMuMuJet.ExtraMuWeight->at(7) = tnp_weight_trk_pbpb(muEta1, 2) / tnp_weight_trk_pbpb(muEta1, 0) *
@@ -614,6 +642,12 @@ int main(int argc, char *argv[]) {
         MGenMuMuJet.GenJetEta = MJet.GenEta[i];
         MGenMuMuJet.GenJetPhi = MJet.GenPhi[i];
         MGenMuMuJet.GenJetMatchIdx = MJet.GenMatchIndex[i];
+        if(MJet.GenMatchIndex[i] < 0){
+          MGenMuMuJet.GenJetIsRecoMatched = false;
+        }
+        else{
+          MGenMuMuJet.GenJetIsRecoMatched = true;
+        }
         MGenMuMuJet.FillEntry();
       }
 
@@ -719,6 +753,21 @@ bool isGenMuonSelected(SingleMuTreeMessenger *M, int i) {
   return true;
 }
 
+bool isFakeJet(JetTreeMessenger *MJet, int ijet) {
+  if (MJet == nullptr)
+    return false;
+  if (MJet->Tree == nullptr)
+    return false;
+
+  for(int igen = 0; igen < MJet->GenCount; igen++){
+    if(MJet->GenMatchIndex[igen] == ijet){
+      return false;
+    }
+  }
+
+  return true;
+}
+
 bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int reco1, int reco2) {
   if (M == nullptr)
     return false;
@@ -728,27 +777,27 @@ bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int reco1,
   float deta11 = M->GenSingleMuEta->at(gen1) - M->SingleMuEta->at(reco1);  
   float dphi11 = DeltaPhi(M->GenSingleMuPhi->at(gen1), M->SingleMuPhi->at(reco1));
   float dr11 = sqrt(dphi11 * dphi11 + deta11 * deta11);
-  bool chargematch11 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco1) < 0);
+  bool chargemismatch11 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco1) < 0);
 
   float deta22 = M->GenSingleMuEta->at(gen2) - M->SingleMuEta->at(reco2);  
   float dphi22 = DeltaPhi(M->GenSingleMuPhi->at(gen2), M->SingleMuPhi->at(reco2));
   float dr22 = sqrt(dphi22 * dphi22 + deta22 * deta22);
-  bool chargematch22 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco2) < 0);
+  bool chargemismatch22 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco2) < 0);
 
   float deta12 = M->GenSingleMuEta->at(gen1) - M->SingleMuEta->at(reco2);  
   float dphi12 = DeltaPhi(M->GenSingleMuPhi->at(gen1), M->SingleMuPhi->at(reco2));
   float dr12 = sqrt(dphi12 * dphi12 + deta12 * deta12);
-  bool chargematch12 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco2) < 0);
+  bool chargemismatch12 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco2) < 0);
 
   float deta21 = M->GenSingleMuEta->at(gen2) - M->SingleMuEta->at(reco1);  
   float dphi21 = DeltaPhi(M->GenSingleMuPhi->at(gen2), M->SingleMuPhi->at(reco1));
   float dr21 = sqrt(dphi21 * dphi21 + deta21 * deta21);
-  bool chargematch21 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco1) < 0);
+  bool chargemismatch21 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco1) < 0);
 
-  if((dr11 < 0.03) && (dr22 < 0.03) && !chargematch11 && !chargematch22){
+  if((dr11 < 0.03) && (dr22 < 0.03) && !chargemismatch11 && !chargemismatch22){
     return true;
   }
-  if((dr12 < 0.03) && (dr21 < 0.03) && !chargematch12 && !chargematch21){
+  if((dr12 < 0.03) && (dr21 < 0.03) && !chargemismatch12 && !chargemismatch21){
     return true;
   }
 
