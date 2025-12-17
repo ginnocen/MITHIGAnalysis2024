@@ -54,10 +54,10 @@ int main(int argc, char *argv[]) {
   std::vector<int> mt1;
   std::vector<int> mt2;
 
-  for (string InputFileName : InputFileNames) {
+  for (const auto& InputFileName : InputFileNames) {
 
     std::cout << "Processing file: " << InputFileName << std::endl;
-    TFile InputFile(InputFileName.c_str());
+    auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile);
     PPTrackTreeMessenger MTrackPP(InputFile);
@@ -625,7 +625,8 @@ int main(int argc, char *argv[]) {
     Bar.Print();
     Bar.PrintLine();
 
-    InputFile.Close();
+    InputFile->Close();
+    std::cout<<"Processed "<<EntryCount<<" events."<<std::endl;
   } // end loop over input files
 
   OutputFile.cd();

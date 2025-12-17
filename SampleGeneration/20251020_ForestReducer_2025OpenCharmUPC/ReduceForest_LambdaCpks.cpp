@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     ApplyDRejection = "no";
   }
   
-  for (string InputFileName : InputFileNames) {
-    TFile InputFile(InputFileName.c_str());
+  for (const auto& InputFileName : InputFileNames) {
+    auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
     PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile); // ppTracks/trackTree
@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
     PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile); // skimanalysis/HltTree
     TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
-    LambdaCpksTreeMessenger MLambdaC(InputFile); // Dfinder/ntLcTopksTopipi
+    LambdaCpksTreeMessenger MLambdaC(InputFile); // Dfinder/ntLctopkstopipi
     DfinderGenTreeMessenger MDfinderGen(InputFile); // Dfinder/ntGen
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
@@ -439,7 +439,8 @@ int main(int argc, char *argv[]) {
       Bar.PrintLine();
     }
 
-    InputFile.Close();
+    InputFile->Close();
+    std::cout<<"Processed "<<EntryCount<<" events."<<std::endl;
   }
 
   OutputFile.cd();

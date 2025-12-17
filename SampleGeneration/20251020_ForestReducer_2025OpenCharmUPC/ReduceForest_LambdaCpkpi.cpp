@@ -96,8 +96,8 @@ int main(int argc, char *argv[]) {
     ApplyDRejection = "no";
   }
 
-  for (string InputFileName : InputFileNames) {
-    TFile InputFile(InputFileName.c_str());
+  for (const auto& InputFileName : InputFileNames) {
+    auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
     PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile); // ppTracks/trackTree
@@ -439,7 +439,8 @@ int main(int argc, char *argv[]) {
       Bar.PrintLine();
     }
 
-    InputFile.Close();
+    InputFile->Close();
+    std::cout<<"Processed "<<EntryCount<<" events."<<std::endl;
   }
 
   OutputFile.cd();

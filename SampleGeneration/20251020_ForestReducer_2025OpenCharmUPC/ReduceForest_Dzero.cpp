@@ -111,12 +111,12 @@ int main(int argc, char *argv[]) {
     ApplyDRejection = "no";
   }
 
-  for (string InputFileName : InputFileNames) {
-    TFile InputFile(InputFileName.c_str());
+  for (const auto& InputFileName : InputFileNames) {
+    auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
     // Use PbPbTracks/trackTree as the default, else ppTracks/trackTree
-    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, InputFile.Get("PbPbTracks/trackTree")?
+    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, InputFile->Get("PbPbTracks/trackTree")?
                                                                      "PbPbTracks/trackTree":
                                                                      "ppTracks/trackTree"); // ppTracks/trackTree
     GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
@@ -491,7 +491,8 @@ int main(int argc, char *argv[]) {
       Bar.PrintLine();
     }
 
-    InputFile.Close();
+    InputFile->Close();
+    std::cout<<"Processed "<<EntryCount<<" events."<<std::endl;
   }
 
   OutputFile.cd();
