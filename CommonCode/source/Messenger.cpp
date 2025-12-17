@@ -1049,6 +1049,7 @@ void TriggerTreeMessenger::FillTriggerNames()
 
    // pp trigger
    Name.push_back("HLT_AK4PFJet80_Eta5p1_v1");
+   Name.push_back("HLT_HIAK4PFJet30_v1");
    Name.push_back("HLT_HIAK4PFJet40_v1");
    Name.push_back("HLT_HIAK4PFJet60_v1");
    Name.push_back("HLT_HIAK4PFJet80_v1");
@@ -1280,6 +1281,20 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.push_back("HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000_v4");
    Name.push_back("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000_v4");
    Name.push_back("HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000_v4");
+
+   // 2018 ppref HI ZB Trigger
+   Name.push_back("HLT_HIZeroBias_part0_v6");
+   Name.push_back("HLT_HIZeroBias_part1_v6");
+   Name.push_back("HLT_HIZeroBias_part2_v6");
+   Name.push_back("HLT_HIZeroBias_part3_v6");
+   Name.push_back("HLT_HIZeroBias_part4_v6");
+   Name.push_back("HLT_HIZeroBias_part5_v6");
+   Name.push_back("HLT_HIZeroBias_part6_v6");
+   Name.push_back("HLT_HIZeroBias_part7_v6");
+   Name.push_back("HLT_HIZeroBias_part8_v6");
+   Name.push_back("HLT_HIZeroBias_part9_v6");
+   Name.push_back("HLT_HIZeroBias_part10_v6");
+   Name.push_back("HLT_HIZeroBias_part11_v6");
 
    std::sort(Name.begin(), Name.end());
    std::vector<std::string>::iterator iter = std::unique(Name.begin(), Name.end());

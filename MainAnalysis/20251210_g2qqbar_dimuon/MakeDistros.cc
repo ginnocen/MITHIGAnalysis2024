@@ -92,12 +92,15 @@ int main(int argc, char *argv[]) {
     hInvMass->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
     hDCAProductSig->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hmuDR->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    TH2D* hEfficiency = (TH2D*)DimJetEfficiency->Clone("hEfficiency");
+    hEfficiency->Reset();
     TNtuple* ntDimuon = new TNtuple("ntDimuon", "", "mumuMass:muDiDxy1Dxy2Sig:muDR:JetPT:weight");
 
     // FLAVOR HISTOGRAMS + NTUPLES (FOR TEMPLATES)
     vector<TH2D*> hInvMass_flavors;     
     vector<TH2D*> hmuDCAProductSig_flavors;
     vector<TH2D*> hmuDR_flavors;
+    vector<TH2D*> hEfficiency_flavors;
     vector<TNtuple*> nt_flavors;
     vector<string> flavorNames;
     flavorNames = {"other", "uds", "c", "cc", "b", "bb"};
@@ -108,6 +111,8 @@ int main(int argc, char *argv[]) {
         hInvMass_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
         hmuDCAProductSig_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
         hmuDR_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+        hEfficiency_flavors.push_back((TH2D*)DimJetEfficiency->Clone(Form("hEfficiency_%s", flavorNames[i].c_str())));
+        hEfficiency_flavors[i]->Reset();
         nt_flavors.push_back(new TNtuple(Form("nt_%s", flavorNames[i].c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:muDR:JetPT:weight"));
     }
 
@@ -126,13 +131,14 @@ int main(int argc, char *argv[]) {
 
         if(isDimuonSelected(t, muPtSelection, chargeSelection, isData)){
             
-            weight = DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // MAY WANT TO MAKE MORE ROBUST FOR DIVIDE BY ZEROS
-            weight *= t->mumuWeight;
+            weight = 1 / DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // MAY WANT TO MAKE MORE ROBUST FOR DIVIDE BY ZEROS
+            weight *= t->MuMuWeight;
 
             hInvMass->Fill(t->JetPT, t->mumuMass, weight);
             hDCAProductSig->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
             hmuDR->Fill(t->JetPT, t->muDR, weight);
             ntDimuon->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight); // NOTE MAY WANT TO JUST PUT THE SIGNIFICANCE WITHOUT THE LOG FOR FUTURE REFERENCE
+            hEfficiency->Fill(t->JetPT, t->JetEta, 1/weight);
 
             if(isData){continue;} // ONLY MAKE TEMPLATES WITH MC 
 
@@ -141,6 +147,7 @@ int main(int argc, char *argv[]) {
             hmuDCAProductSig_flavors[flavorclass]->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
             hmuDR_flavors[flavorclass]->Fill(t->JetPT, t->muDR, weight);
             nt_flavors[flavorclass]->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight);
+            hEfficiency_flavors[flavorclass]->Fill(t->JetPT, t->JetEta, 1/weight);
 
         }
         
@@ -152,12 +159,14 @@ int main(int argc, char *argv[]) {
     hDCAProductSig->Write();
     hmuDR->Write();
     ntDimuon->Write();
+    hEfficiency->Write();
     if(!isData){
         for(int i = 0; i < 6; i++) {
             hInvMass_flavors[i]->Write();
             hmuDCAProductSig_flavors[i]->Write();
             hmuDR_flavors[i]->Write();
             nt_flavors[i]->Write();
+            hEfficiency_flavors[i]->Write();
         }
     }
     

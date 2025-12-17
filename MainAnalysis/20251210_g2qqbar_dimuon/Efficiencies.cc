@@ -86,14 +86,14 @@ int main(int argc, char *argv[]) {
     hRecoInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
     hGenDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hRecoDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
-    
+
     // DECLARE GEN HIST
     TH2D* hGenInclusiveJets = new TH2D("hGenInclusiveJets","hGenInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
     hGenInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     
     // DECLARE NTUPLES
-    TNtuple* ntGenInclusiveJets = new TNtuple("ntGenInclusiveJets","ntGenInclusiveJets", "JetPT:JetEta:JetPhi");
-    TNtuple* ntRecoInclusiveJets = new TNtuple("ntRecoInclusiveJets","ntRecoInclusiveJets", "JetPT:JetEta:JetPhi"); // Trees only important for Inclusive jet unfolding. 
+    TNtuple* ntGenInclusiveJets = new TNtuple("ntGenInclusiveJets","ntGenInclusiveJets", "JetPT:JetEta");
+    TNtuple* ntRecoInclusiveJets = new TNtuple("ntRecoInclusiveJets","ntRecoInclusiveJets", "JetPT:JetEta"); // Trees only important for Inclusive jet unfolding. 
 
     // JET LOOP
     float weight = 0;
@@ -110,16 +110,16 @@ int main(int argc, char *argv[]) {
         vector<int> selected = isSelected(t, muPtSelection, isData); 
 
         if(selected[0] == 1){
-            hRecoInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
-            ntRecoInclusiveJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+            hRecoInclusiveJets->Fill(t->JetPT, t->JetEta);
+            ntRecoInclusiveJets->Fill(t->JetPT, t->JetEta);
         }
 
         if(selected[1] == 1){
-            hRecoDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+            hRecoDimJets->Fill(t->JetPT, t->JetEta);
         }
 
         if(selected[2] == 1){
-            hGenDimJets->Fill(t->JetPT, t->JetEta, t->JetPhi);
+            hGenDimJets->Fill(t->JetPT, t->JetEta);
         }
         
     }
@@ -139,8 +139,8 @@ int main(int argc, char *argv[]) {
         
         tgen->GetEntry(i);
         if(isGenSelected(tgen) == 1){
-            hGenInclusiveJets->Fill(tgen->GenJetPT, tgen->GenJetEta, tgen->GenJetPhi);
-            ntGenInclusiveJets->Fill(tgen->GenJetPT, tgen->GenJetEta, tgen->GenJetPhi);
+            hGenInclusiveJets->Fill(tgen->GenJetPT, tgen->GenJetEta);
+            ntGenInclusiveJets->Fill(tgen->GenJetPT, tgen->GenJetEta);
         }
 
     }
