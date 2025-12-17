@@ -207,6 +207,7 @@ int main(int argc, char *argv[]) {
       /////////////////////////////////////
       ////////// Event selection //////////
       /////////////////////////////////////
+
       if (IsData == false) {
         MDzeroUPC.Gsize = MDzeroGen.Gsize;
         for (int iDGen = 0; iDGen < MDzeroGen.Gsize; iDGen++) {
@@ -352,6 +353,10 @@ int main(int argc, char *argv[]) {
         nTrackInAcceptanceHP++;
       }
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
+
+      /////////////////////////////////////
+      /////////////    D loop    //////////
+      /////////////////////////////////////
       if (MDzero.Dsize == 20000) cout << "[WARNING] Event " << iE << " has max Dsize!" << endl;
       int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {

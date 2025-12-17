@@ -341,6 +341,10 @@ int main(int argc, char *argv[]) {
         nTrackInAcceptanceHP++;
       }
       MLambdaCUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
+
+      /////////////////////////////////////
+      /////////////    D loop    //////////
+      /////////////////////////////////////
       int countSelD = 0;
       for (int iD = 0; iD < MLambdaC.Dsize; iD++) {
         bool DpassCutNominal_           = DpassCutNominal(MLambdaC, iD);
