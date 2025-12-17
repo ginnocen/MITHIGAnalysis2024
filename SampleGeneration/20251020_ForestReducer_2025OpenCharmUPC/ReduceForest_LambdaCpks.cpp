@@ -339,31 +339,6 @@ int main(int argc, char *argv[]) {
         MLambdaCUPC.Dalpha->push_back(          MLambdaC.Dalpha[iD]);
         MLambdaCUPC.Ddtheta->push_back(         MLambdaC.Ddtheta[iD]);
         
-        MLambdaCUPC.Dtrk1P->push_back(          MLambdaC.Dtrk1P[iD]);
-        MLambdaCUPC.Dtrk1Pt->push_back(         MLambdaC.Dtrk1Pt[iD]);
-        MLambdaCUPC.Dtrk1PtErr->push_back(      MLambdaC.Dtrk1PtErr[iD]);
-        MLambdaCUPC.Dtrk1Eta->push_back(        MLambdaC.Dtrk1Eta[iD]);
-        MLambdaCUPC.Dtrk1dedx->push_back(       MLambdaC.Dtrk1dedx[iD]);
-        MLambdaCUPC.Dtrk1MassHypo->push_back(   MLambdaC.Dtrk1MassHypo[iD]);
-        MLambdaCUPC.Dtrk1PixelHit->push_back(   MLambdaC.Dtrk1PixelHit[iD]);
-        MLambdaCUPC.Dtrk1StripHit->push_back(   MLambdaC.Dtrk1StripHit[iD]);
-        if (MLambdaC.Dtrk1P[iD] < 2.5) // Only give valid PID for p_track < 2 GeV
-        {
-          MLambdaCUPC.Dtrk1PionScore->push_back(GetPIDScore(
-            MLambdaC.Dtrk1P[iD], MLambdaC.Dtrk1dedx[iD],
-            fdedxPionCenter, fdedxPionSigmaLo, fdedxPionSigmaHi));
-          MLambdaCUPC.Dtrk1KaonScore->push_back(GetPIDScore(
-            MLambdaC.Dtrk1P[iD], MLambdaC.Dtrk1dedx[iD],
-            fdedxKaonCenter, fdedxKaonSigmaLo, fdedxKaonSigmaHi));
-          MLambdaCUPC.Dtrk1ProtScore->push_back(GetPIDScore(
-            MLambdaC.Dtrk1P[iD], MLambdaC.Dtrk1dedx[iD],
-            fdedxProtCenter, fdedxProtSigmaLo, fdedxProtSigmaHi));
-        } else {
-          MLambdaCUPC.Dtrk1PionScore->push_back(-999.);
-          MLambdaCUPC.Dtrk1KaonScore->push_back(-999.);
-          MLambdaCUPC.Dtrk1ProtScore->push_back(-999.);
-        }
-        
         MLambdaCUPC.Dtrk2P->push_back(          MLambdaC.Dtrk2P[iD]);
         MLambdaCUPC.Dtrk2Pt->push_back(         MLambdaC.Dtrk2Pt[iD]);
         MLambdaCUPC.Dtrk2PtErr->push_back(      MLambdaC.Dtrk2PtErr[iD]);
