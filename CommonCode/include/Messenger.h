@@ -1235,6 +1235,9 @@ public:
   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
   int nVtx;
   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+  bool isZeroBias;
+  bool isL1ZDCOr_Min400, isL1ZDCOr_Max400;
+  bool isZeroBias_Min400, isZeroBias_Max400;
   bool selectedBkgFilter, selectedVtxFilter;
   float ZDCsumPlus;
   float ZDCsumMinus;
@@ -1373,6 +1376,9 @@ public:
   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
   int nVtx;
   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+  bool isZeroBias;
+  bool isL1ZDCOr_Min400, isL1ZDCOr_Max400;
+  bool isZeroBias_Min400, isZeroBias_Max400;
   bool selectedBkgFilter, selectedVtxFilter;
   float ZDCsumPlus;
   float ZDCsumMinus;
