@@ -112,6 +112,23 @@ int main(int argc, char *argv[]) {
     ApplyDRejection = "no";
   }
 
+  TF1 *fdedxPionCenter = 0, *fdedxPionSigmaLo = 0, *fdedxPionSigmaHi = 0,
+    *fdedxKaonCenter = 0, *fdedxKaonSigmaLo = 0, *fdedxKaonSigmaHi = 0,
+    *fdedxProtCenter = 0, *fdedxProtSigmaLo = 0, *fdedxProtSigmaHi = 0;
+  if (DoPID) {
+    std::cout<<"PID functions from: "<<RootPID<<std::endl;
+    auto dedxFunctions = ImportPIDRoot(RootPID.c_str());
+    fdedxPionCenter  = dedxFunctions[0];
+    fdedxPionSigmaLo = dedxFunctions[1];
+    fdedxPionSigmaHi = dedxFunctions[2];
+    fdedxKaonCenter  = dedxFunctions[3];
+    fdedxKaonSigmaLo = dedxFunctions[4];
+    fdedxKaonSigmaHi = dedxFunctions[5];
+    fdedxProtCenter  = dedxFunctions[6];
+    fdedxProtSigmaLo = dedxFunctions[7];
+    fdedxProtSigmaHi = dedxFunctions[8];
+  }
+    
   for (const auto& InputFileName : InputFileNames) {
     auto* InputFile = TFile::Open(InputFileName.c_str());
 
@@ -135,23 +152,6 @@ int main(int argc, char *argv[]) {
       Bar.SetStyle(-1);
     }
 
-    TF1 *fdedxPionCenter = 0, *fdedxPionSigmaLo = 0, *fdedxPionSigmaHi = 0,
-      *fdedxKaonCenter = 0, *fdedxKaonSigmaLo = 0, *fdedxKaonSigmaHi = 0,
-      *fdedxProtCenter = 0, *fdedxProtSigmaLo = 0, *fdedxProtSigmaHi = 0;
-    if (DoPID) {
-      std::cout<<"PID functions from: "<<RootPID<<std::endl;
-      auto dedxFunctions = ImportPIDRoot(RootPID.c_str());
-      fdedxPionCenter  = dedxFunctions[0];
-      fdedxPionSigmaLo = dedxFunctions[1];
-      fdedxPionSigmaHi = dedxFunctions[2];
-      fdedxKaonCenter  = dedxFunctions[3];
-      fdedxKaonSigmaLo = dedxFunctions[4];
-      fdedxKaonSigmaHi = dedxFunctions[5];
-      fdedxProtCenter  = dedxFunctions[6];
-      fdedxProtSigmaLo = dedxFunctions[7];
-      fdedxProtSigmaHi = dedxFunctions[8];
-    }
-    
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
