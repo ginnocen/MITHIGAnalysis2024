@@ -52,7 +52,10 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   bool IsGammaNMCtype = CL.GetBool("IsGammaNMCtype", true); // This is only meaningful when IsData==false. gammaN: BeamA, Ngamma: BeamB
   int Year = CL.GetInt("Year", 2023);
+  bool DoPID = CL.GetBool("DoPID", true);
+  auto RootPID = CL.Get("RootPID", "../../CommonCode/root/DzeroUPC_dedxMap.root");
 
+  
   double Fraction = CL.GetDouble("Fraction", 1.00);
   float ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
   float ZDCPlus1nThreshold = CL.GetDouble("ZDCPlus1nThreshold", 1100.);
@@ -116,16 +119,22 @@ int main(int argc, char *argv[]) {
       Bar.SetStyle(-1);
     }
 
-    vector<TF1*> dedxFunctions = ImportPIDRoot("../../CommonCode/root/DzeroUPC_dedxMap.root");
-    TF1* fdedxPionCenter  = dedxFunctions[0];
-    TF1* fdedxPionSigmaLo = dedxFunctions[1];
-    TF1* fdedxPionSigmaHi = dedxFunctions[2];
-    TF1* fdedxKaonCenter  = dedxFunctions[3];
-    TF1* fdedxKaonSigmaLo = dedxFunctions[4];
-    TF1* fdedxKaonSigmaHi = dedxFunctions[5];
-    TF1* fdedxProtCenter  = dedxFunctions[6];
-    TF1* fdedxProtSigmaLo = dedxFunctions[7];
-    TF1* fdedxProtSigmaHi = dedxFunctions[8];
+    TF1 *fdedxPionCenter = 0, *fdedxPionSigmaLo = 0, *fdedxPionSigmaHi = 0,
+      *fdedxKaonCenter = 0, *fdedxKaonSigmaLo = 0, *fdedxKaonSigmaHi = 0,
+      *fdedxProtCenter = 0, *fdedxProtSigmaLo = 0, *fdedxProtSigmaHi = 0;
+    if (DoPID) {
+      std::cout<<"PID functions from: "<<RootPID<<std::endl;
+      auto dedxFunctions = ImportPIDRoot(RootPID.c_str());
+      fdedxPionCenter  = dedxFunctions[0];
+      fdedxPionSigmaLo = dedxFunctions[1];
+      fdedxPionSigmaHi = dedxFunctions[2];
+      fdedxKaonCenter  = dedxFunctions[3];
+      fdedxKaonSigmaLo = dedxFunctions[4];
+      fdedxKaonSigmaHi = dedxFunctions[5];
+      fdedxProtCenter  = dedxFunctions[6];
+      fdedxProtSigmaLo = dedxFunctions[7];
+      fdedxProtSigmaHi = dedxFunctions[8];
+    }
 
     /////////////////////////////////
     //////// Main Event Loop ////////
@@ -347,8 +356,8 @@ int main(int argc, char *argv[]) {
         MLambdaCUPC.Dtrk2MassHypo->push_back(   MLambdaC.Dtrk2MassHypo[iD]);
         MLambdaCUPC.Dtrk2PixelHit->push_back(   MLambdaC.Dtrk2PixelHit[iD]);
         MLambdaCUPC.Dtrk2StripHit->push_back(   MLambdaC.Dtrk2StripHit[iD]);
-        if (MLambdaC.Dtrk2P[iD] < 2.5) // Only give valid PID for p_track < 2 GeV
-        {
+
+        if (DoPID && MLambdaC.Dtrk2P[iD] < 2.5) { // Only give valid PID for p_track < 2 GeV
           MLambdaCUPC.Dtrk2PionScore->push_back(GetPIDScore(
             MLambdaC.Dtrk2P[iD], MLambdaC.Dtrk2dedx[iD],
             fdedxPionCenter, fdedxPionSigmaLo, fdedxPionSigmaHi));
@@ -370,8 +379,7 @@ int main(int argc, char *argv[]) {
         MLambdaCUPC.DRestrk1Eta->push_back(        MLambdaC.DRestrk1Eta[iD]);
         MLambdaCUPC.DRestrk1dedx->push_back(       MLambdaC.DRestrk1dedx[iD]);
         MLambdaCUPC.DRestrk1MassHypo->push_back(   MLambdaC.DRestrk1MassHypo[iD]);
-        if (MLambdaC.DRestrk1P[iD] < 2.5) // Only give valid PID for p_track < 2.5 GeV
-        {
+        if (DoPID && MLambdaC.DRestrk1P[iD] < 2.5) { // Only give valid PID for p_track < 2.5 GeV
           MLambdaCUPC.DRestrk1PionScore->push_back(GetPIDScore(
             MLambdaC.DRestrk1P[iD], MLambdaC.DRestrk1dedx[iD],
             fdedxPionCenter, fdedxPionSigmaLo, fdedxPionSigmaHi));
@@ -393,8 +401,7 @@ int main(int argc, char *argv[]) {
         MLambdaCUPC.DRestrk2Eta->push_back(        MLambdaC.DRestrk2Eta[iD]);
         MLambdaCUPC.DRestrk2dedx->push_back(       MLambdaC.DRestrk2dedx[iD]);
         MLambdaCUPC.DRestrk2MassHypo->push_back(   MLambdaC.DRestrk2MassHypo[iD]);
-        if (MLambdaC.DRestrk2P[iD] < 2.5) // Only give valid PID for p_track < 2.5 GeV
-        {
+        if (DoPID && MLambdaC.DRestrk2P[iD] < 2.5) { // Only give valid PID for p_track < 2.5 GeV
           MLambdaCUPC.DRestrk2PionScore->push_back(GetPIDScore(
             MLambdaC.DRestrk2P[iD], MLambdaC.DRestrk2dedx[iD],
             fdedxPionCenter, fdedxPionSigmaLo, fdedxPionSigmaHi));
