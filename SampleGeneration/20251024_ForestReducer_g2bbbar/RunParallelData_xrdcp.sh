@@ -15,7 +15,7 @@ if [ "$LETTER" = "C" ]; then
     SAMPLETIME="251202_223300"
 fi
 
-NAME="skim_120925_${LETTER}_${N}"
+NAME="skim_121725_${LETTER}_${N}"
 PATHSAMPLE="/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_HFfinders${LETTER}/${SAMPLETIME}/000${N}"
 OUTPUT="/data00/g2ccbar/data2018/$NAME"
 

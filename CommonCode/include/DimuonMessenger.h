@@ -46,6 +46,7 @@ public:
    bool GenIsMuMuTagged;
 
    // SINGLE MU INFO
+   int nMu;
    float muPt1;
    float muPt2;
    float muEta1;
@@ -82,14 +83,15 @@ public:
    float MuMuWeight;
 
    //GEN MUON INFO
+   int nGenMu;
    float GenMuPt1;
    float GenMuPt2;
    float GenMuEta1;
    float GenMuEta2;
    float GenMuPhi1;
    float GenMuPhi2;
-   float GenCharge1;
-   float GenCharge2;
+   float GenMuCharge1;
+   float GenMuCharge2;
    float GenMuMuMass;
    float GenMuMuEta;
    float GenMuMuY;

@@ -319,6 +319,7 @@ int main(int argc, char *argv[]) {
         }
 
         bool isJetMuonTagged = false;
+        int nMu = 0;
         float muPt1 = -999.;
         float muPt2 = -999.;
         float muEta1 = -999.;
@@ -356,6 +357,7 @@ int main(int argc, char *argv[]) {
         int nSingleMu = MSingleMu.SingleMuPT->size();
         for (int isinglemu1 = 0; isinglemu1 < nSingleMu; isinglemu1++) {
           if (isMuonSelected(&MSingleMu, isinglemu1) == false) continue;
+          nMu++;
           for (int isinglemu2 = isinglemu1 + 1; isinglemu2 < nSingleMu; isinglemu2++) {
             if (isMuonSelected(&MSingleMu, isinglemu2) == false) continue;
             // if (charge1 == charge2)
@@ -484,6 +486,7 @@ int main(int argc, char *argv[]) {
         // Gen muon info  
 
 	      bool GenIsJetMuonTagged = false;
+        int nGenMu = 0;
         float GenMuPt1 = -999;
         float GenMuPt2 = -999;
 	      float GenMuEta1 = -999; 
@@ -511,12 +514,9 @@ int main(int argc, char *argv[]) {
         
         for(int igen1 = 0; igen1 < nGenSingleMu; igen1++){ 
           if(isGenMuonSelected(&MSingleMu, igen1) == false) continue;
+          nGenMu++;
             for(int igen2 = igen1 + 1; igen2 < nGenSingleMu; igen2++){
               if(isGenMuonSelected(&MSingleMu, igen2) == false) continue;
-
-              //TLorentzVector VGenMu1, VGenMu2;
-              //VGenMu1.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen1),MSingleMu.GenSingleMuEta->at(igen1),MSingleMu.GenSingleMuPhi->at(igen1),M_MU);
-              //VGenMu2.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen2),MSingleMu.GenSingleMuEta->at(igen2),MSingleMu.GenSingleMuPhi->at(igen2),M_MU);
 
               float jetEta = MJet.JetEta[ijet];
               float jetPhi = MJet.JetPhi[ijet];
@@ -555,8 +555,8 @@ int main(int argc, char *argv[]) {
           GenMuEta2 = MSingleMu.GenSingleMuEta->at(maxGenMu2Index); 
           GenMuPhi1 = MSingleMu.GenSingleMuPhi->at(maxGenMu1Index);
           GenMuPhi2 = MSingleMu.GenSingleMuPhi->at(maxGenMu2Index); 
-          GenMuCharge1 = MSingleMu.GenSingleMuCharge->at(maxGenMu1Index);
-          GenMuCharge2 = MSingleMu.GenSingleMuCharge->at(maxGenMu2Index);
+          GenMuCharge1 = (int) MSingleMu.GenSingleMuPID->at(maxGenMu1Index) / 13;
+          GenMuCharge2 = (int) MSingleMu.GenSingleMuPID->at(maxGenMu2Index) / 13;
 
           TLorentzVector Mu1, Mu2;
           Mu1.SetPtEtaPhiM(GenMuPt1, GenMuEta1, GenMuPhi1, M_MU);

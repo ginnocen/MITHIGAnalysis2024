@@ -133,6 +133,7 @@ bool DimuonJetMessenger::Initialize()
    Tree->SetBranchAddress("JetIsGenMatched", &JetIsGenMatched);
    Tree->SetBranchAddress("IsMuMuTagged", &IsMuMuTagged);
    Tree->SetBranchAddress("GenIsMuMuTagged", &GenIsMuMuTagged);
+   Tree->SetBranchAddress("nMu", &nMu);
    Tree->SetBranchAddress("muPt1", &muPt1);
    Tree->SetBranchAddress("muPt2", &muPt2);
    Tree->SetBranchAddress("muEta1", &muEta1);
@@ -166,14 +167,15 @@ bool DimuonJetMessenger::Initialize()
    Tree->SetBranchAddress("ExtraMuWeight", &ExtraMuWeight);
    Tree->SetBranchAddress("MuMuWeight", &MuMuWeight);
 
+   Tree->SetBranchAddress("nGenMu", &nGenMu);
    Tree->SetBranchAddress("GenMuPt1", &GenMuPt1);
    Tree->SetBranchAddress("GenMuPt2", &GenMuPt2);
    Tree->SetBranchAddress("GenMuEta1", &GenMuEta1);
    Tree->SetBranchAddress("GenMuEta2", &GenMuEta2);
    Tree->SetBranchAddress("GenMuPhi1", &GenMuPhi1);
    Tree->SetBranchAddress("GenMuPhi2", &GenMuPhi2);
-   Tree->SetBranchAddress("GenCharge1", &GenCharge1);
-   Tree->SetBranchAddress("GenCharge2", &GenCharge2);
+   Tree->SetBranchAddress("GenMuCharge1", &GenMuCharge1);
+   Tree->SetBranchAddress("GenMuCharge1", &GenMuCharge1);
    Tree->SetBranchAddress("GenMuMuMass", &GenMuMuMass);
    Tree->SetBranchAddress("GenMuMuEta", &GenMuMuEta);
    Tree->SetBranchAddress("GenMuMuY", &GenMuMuY);
@@ -237,6 +239,9 @@ bool DimuonJetMessenger::Initialize()
    Tree->SetBranchAddress("trkMatchSta", &trkMatchSta);
    Tree->SetBranchAddress("trkIdx_mu1", &trkIdx_mu1);
    Tree->SetBranchAddress("trkIdx_mu2", &trkIdx_mu2);
+
+   Tree->SetBranchAddress("BeamScrapingFilter", &BeamScrapingFilter);
+   Tree->SetBranchAddress("PVFilter", &PVFilter);
 
    Tree->SetBranchAddress("HLT_HIAK4PFJet30_v1", &HLT_HIAK4PFJet30_v1);
    Tree->SetBranchAddress("HLT_HIAK4PFJet40_v1", &HLT_HIAK4PFJet40_v1);
@@ -327,6 +332,7 @@ bool DimuonJetMessenger::SetBranch(TTree *T)
    Tree->Branch("JetIsGenMatched", &JetIsGenMatched);
    Tree->Branch("IsMuMuTagged", &IsMuMuTagged);
    Tree->Branch("GenIsMuMuTagged", &GenIsMuMuTagged);
+   Tree->Branch("nMu", &nMu, "nMu/I");
    Tree->Branch("muPt1", &muPt1);
    Tree->Branch("muPt2", &muPt2);
    Tree->Branch("muEta1", &muEta1);
@@ -360,6 +366,7 @@ bool DimuonJetMessenger::SetBranch(TTree *T)
    Tree->Branch("ExtraMuWeight", &ExtraMuWeight);
    Tree->Branch("MuMuWeight", &MuMuWeight);
 
+   Tree->Branch("nGenMu", &nGenMu, "nGenMu/I");
    Tree->Branch("GenMuPt1", &GenMuPt1);
    Tree->Branch("GenMuPt2", &GenMuPt2);
    Tree->Branch("GenMuEta1", &GenMuEta1);
@@ -432,6 +439,8 @@ bool DimuonJetMessenger::SetBranch(TTree *T)
    Tree->Branch("trkIdx_mu1", &trkIdx_mu1);
    Tree->Branch("trkIdx_mu2", &trkIdx_mu2);
 
+   Tree->Branch("BeamScrapingFilter", &BeamScrapingFilter);
+   Tree->Branch("PVFilter", &PVFilter);
    Tree->Branch("HLT_HIAK4PFJet30_v1", &HLT_HIAK4PFJet30_v1);
    Tree->Branch("HLT_HIAK4PFJet40_v1", &HLT_HIAK4PFJet40_v1);
    Tree->Branch("HLT_HIAK4PFJet60_v1", &HLT_HIAK4PFJet60_v1);
@@ -472,6 +481,7 @@ void DimuonJetMessenger::Clear()
     JetIsGenMatched = false;
     IsMuMuTagged = false;
     GenIsMuMuTagged = false;
+    nMu = -999;
     muPt1 = -999;
     muPt2 = -999;
     muEta1 = -999;
@@ -505,6 +515,7 @@ void DimuonJetMessenger::Clear()
     ExtraMuWeight->assign(12, 1.0);
    MuMuWeight = 1;
 
+   nGenMu = -999;
    GenMuPt1 = -999;
    GenMuPt2 = -999;
    GenMuEta1 = -999;
@@ -574,6 +585,8 @@ void DimuonJetMessenger::Clear()
    trkPdgId->clear();
    trkMatchSta->clear();
 
+   BeamScrapingFilter = false;
+   PVFilter = false;
    HLT_HIAK4PFJet30_v1 = false;
    HLT_HIAK4PFJet40_v1 = false;
    HLT_HIAK4PFJet60_v1 = false;
@@ -594,6 +607,7 @@ void DimuonJetMessenger::Clear_Jet()
     JetIsGenMatched = false;
     IsMuMuTagged = false;
     GenIsMuMuTagged = false;
+    nMu = -999;
     muPt1 = -999;
     muPt2 = -999;
     muEta1 = -999;
@@ -627,6 +641,7 @@ void DimuonJetMessenger::Clear_Jet()
     ExtraMuWeight->assign(12, 1.0);
    MuMuWeight = 1;
 
+   nGenMu = -999;
    GenMuPt1 = -999;
    GenMuPt2 = -999;
    GenMuEta1 = -999;
@@ -727,6 +742,7 @@ void DimuonJetMessenger::CopyNonTrack(DimuonJetMessenger &M)
     JetIsGenMatched = M.JetIsGenMatched;
     IsMuMuTagged = M.IsMuMuTagged;
     GenIsMuMuTagged = M.GenIsMuMuTagged;
+    nMu         = M.nMu;
     muPt1       = M.muPt1;
     muPt2       = M.muPt2;
     muEta1      = M.muEta1;
@@ -757,6 +773,7 @@ void DimuonJetMessenger::CopyNonTrack(DimuonJetMessenger &M)
     muDeta      = M.muDeta;
     muDphi      = M.muDphi;
     muDR        = M.muDR;
+   nGenMu      = M.nGenMu;
    GenMuPt1    = M.GenMuPt1;
    GenMuPt2    = M.GenMuPt2;
    GenMuEta1   = M.GenMuEta1; 

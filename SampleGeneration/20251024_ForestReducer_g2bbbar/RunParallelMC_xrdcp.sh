@@ -5,7 +5,7 @@ SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # Get parameters (defaults: N=0, LETTER=A)
 N=${1:-0}
 
-NAME="skim_120925_${N}"
+NAME="skim_121725_${N}"
 PATHSAMPLE="/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8/crab_btagged_and_svtagged_jets_MC_HFfinders/251128_191749/000${N}"
 OUTPUT="/data00/g2ccbar/mc2018/$NAME"
 
