@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
   bool IsGammaNMCtype = CL.GetBool("IsGammaNMCtype", true); // This is only meaningful when IsData==false. gammaN: BeamA, Ngamma: BeamB
   int Year = CL.GetInt("Year", 2023);
   bool DoPID = CL.GetBool("DoPID", true);
+  auto RootPID = CL.Get("RootPID", "../../CommonCode/root/DzeroUPC_dedxMap.root");
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   float ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
@@ -111,12 +112,29 @@ int main(int argc, char *argv[]) {
     ApplyDRejection = "no";
   }
 
-  for (string InputFileName : InputFileNames) {
-    TFile InputFile(InputFileName.c_str());
+  TF1 *fdedxPionCenter = 0, *fdedxPionSigmaLo = 0, *fdedxPionSigmaHi = 0,
+    *fdedxKaonCenter = 0, *fdedxKaonSigmaLo = 0, *fdedxKaonSigmaHi = 0,
+    *fdedxProtCenter = 0, *fdedxProtSigmaLo = 0, *fdedxProtSigmaHi = 0;
+  if (DoPID) {
+    std::cout<<"PID functions from: "<<RootPID<<std::endl;
+    auto dedxFunctions = ImportPIDRoot(RootPID.c_str());
+    fdedxPionCenter  = dedxFunctions[0];
+    fdedxPionSigmaLo = dedxFunctions[1];
+    fdedxPionSigmaHi = dedxFunctions[2];
+    fdedxKaonCenter  = dedxFunctions[3];
+    fdedxKaonSigmaLo = dedxFunctions[4];
+    fdedxKaonSigmaHi = dedxFunctions[5];
+    fdedxProtCenter  = dedxFunctions[6];
+    fdedxProtSigmaLo = dedxFunctions[7];
+    fdedxProtSigmaHi = dedxFunctions[8];
+  }
+    
+  for (const auto& InputFileName : InputFileNames) {
+    auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
     // Use PbPbTracks/trackTree as the default, else ppTracks/trackTree
-    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, InputFile.Get("PbPbTracks/trackTree")?
+    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, InputFile->Get("PbPbTracks/trackTree")?
                                                                      "PbPbTracks/trackTree":
                                                                      "ppTracks/trackTree"); // ppTracks/trackTree
     GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
@@ -133,18 +151,7 @@ int main(int argc, char *argv[]) {
     if (!HideProgressBar) {
       Bar.SetStyle(-1);
     }
-    
-    vector<TF1*> dedxFunctions = ImportPIDRoot("../../CommonCode/root/DzeroUPC_dedxMap.root");
-    TF1* fdedxPionCenter  = dedxFunctions[0];
-    TF1* fdedxPionSigmaLo = dedxFunctions[1];
-    TF1* fdedxPionSigmaHi = dedxFunctions[2];
-    TF1* fdedxKaonCenter  = dedxFunctions[3];
-    TF1* fdedxKaonSigmaLo = dedxFunctions[4];
-    TF1* fdedxKaonSigmaHi = dedxFunctions[5];
-    TF1* fdedxProtCenter  = dedxFunctions[6];
-    TF1* fdedxProtSigmaLo = dedxFunctions[7];
-    TF1* fdedxProtSigmaHi = dedxFunctions[8];
-    
+
     /////////////////////////////////
     //////// Main Event Loop ////////
     /////////////////////////////////
@@ -200,6 +207,7 @@ int main(int argc, char *argv[]) {
       /////////////////////////////////////
       ////////// Event selection //////////
       /////////////////////////////////////
+
       if (IsData == false) {
         MDzeroUPC.Gsize = MDzeroGen.Gsize;
         for (int iDGen = 0; iDGen < MDzeroGen.Gsize; iDGen++) {
@@ -345,6 +353,10 @@ int main(int argc, char *argv[]) {
         nTrackInAcceptanceHP++;
       }
       MDzeroUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
+
+      /////////////////////////////////////
+      /////////////    D loop    //////////
+      /////////////////////////////////////
       if (MDzero.Dsize == 20000) cout << "[WARNING] Event " << iE << " has max Dsize!" << endl;
       int countSelDzero = 0;
       for (int iD = 0; iD < MDzero.Dsize; iD++) {
@@ -491,7 +503,8 @@ int main(int argc, char *argv[]) {
       Bar.PrintLine();
     }
 
-    InputFile.Close();
+    InputFile->Close();
+    std::cout<<"Processed "<<EntryCount<<" events."<<std::endl;
   }
 
   OutputFile.cd();

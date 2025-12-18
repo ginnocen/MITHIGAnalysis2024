@@ -52,7 +52,9 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   bool IsGammaNMCtype = CL.GetBool("IsGammaNMCtype", true); // This is only meaningful when IsData==false. gammaN: BeamA, Ngamma: BeamB
   int Year = CL.GetInt("Year", 2023);
-
+  bool DoPID = CL.GetBool("DoPID", true);
+  auto RootPID = CL.Get("RootPID", "../../CommonCode/root/DzeroUPC_dedxMap.root");
+  
   double Fraction = CL.GetDouble("Fraction", 1.00);
   float ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
   float ZDCPlus1nThreshold = CL.GetDouble("ZDCPlus1nThreshold", 1100.);
@@ -96,11 +98,30 @@ int main(int argc, char *argv[]) {
     ApplyDRejection = "no";
   }
 
-  for (string InputFileName : InputFileNames) {
-    TFile InputFile(InputFileName.c_str());
+  TF1 *fdedxPionCenter = 0, *fdedxPionSigmaLo = 0, *fdedxPionSigmaHi = 0,
+    *fdedxKaonCenter = 0, *fdedxKaonSigmaLo = 0, *fdedxKaonSigmaHi = 0,
+    *fdedxProtCenter = 0, *fdedxProtSigmaLo = 0, *fdedxProtSigmaHi = 0;
+  if (DoPID) {
+    std::cout<<"PID functions from: "<<RootPID<<std::endl;
+    auto dedxFunctions = ImportPIDRoot(RootPID.c_str());
+    fdedxPionCenter  = dedxFunctions[0];
+    fdedxPionSigmaLo = dedxFunctions[1];
+    fdedxPionSigmaHi = dedxFunctions[2];
+    fdedxKaonCenter  = dedxFunctions[3];
+    fdedxKaonSigmaLo = dedxFunctions[4];
+    fdedxKaonSigmaHi = dedxFunctions[5];
+    fdedxProtCenter  = dedxFunctions[6];
+    fdedxProtSigmaLo = dedxFunctions[7];
+    fdedxProtSigmaHi = dedxFunctions[8];
+  }
+  
+  for (const auto& InputFileName : InputFileNames) {
+    auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
-    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile); // ppTracks/trackTree
+    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, InputFile->Get("PbPbTracks/trackTree") ?
+                                            "PbPbTracks/trackTree" :
+                                            "ppTracks/trackTree");
     GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
     PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
     SkimTreeMessenger MSkim(InputFile); // skimanalysis/HltTree
@@ -115,17 +136,6 @@ int main(int argc, char *argv[]) {
     if (!HideProgressBar) {
       Bar.SetStyle(-1);
     }
-    
-    vector<TF1*> dedxFunctions = ImportPIDRoot("../../CommonCode/root/DzeroUPC_dedxMap.root");
-    TF1* fdedxPionCenter  = dedxFunctions[0];
-    TF1* fdedxPionSigmaLo = dedxFunctions[1];
-    TF1* fdedxPionSigmaHi = dedxFunctions[2];
-    TF1* fdedxKaonCenter  = dedxFunctions[3];
-    TF1* fdedxKaonSigmaLo = dedxFunctions[4];
-    TF1* fdedxKaonSigmaHi = dedxFunctions[5];
-    TF1* fdedxProtCenter  = dedxFunctions[6];
-    TF1* fdedxProtSigmaLo = dedxFunctions[7];
-    TF1* fdedxProtSigmaHi = dedxFunctions[8];
 
     /////////////////////////////////
     //////// Main Event Loop ////////
@@ -231,6 +241,39 @@ int main(int argc, char *argv[]) {
           if (ApplyTriggerRejection == 1 && IsData) std::cout << "Trigger rejection ZDCOR || ZDCXORJet8 not implemented for 2024" << std::endl;
           if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
         }
+        else if (Year == 2025) {
+          int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
+          int HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400");
+          int HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000");
+          int HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000");
+          int HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000");
+          int HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000");
+          int HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000");
+          bool isL1ZDCOr =  HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 == 1;
+          bool isL1ZDCXORJet12 = HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000 == 1 ||
+                                HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000 == 1;
+          bool isL1ZDCXORJet16 = HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000 == 1 ||
+                                HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000 == 1;
+          // [Note] If we prescale the HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 in the upcoming run, we will change to the following
+          //   bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400 == 1 ||
+          //                    HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 == 1;
+          MLambdaCUPC.isL1ZDCOr = isL1ZDCOr;
+          MLambdaCUPC.isL1ZDCOr_Min400 = HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000;
+          MLambdaCUPC.isL1ZDCOr_Max400 = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400;
+          MLambdaCUPC.isL1ZDCXORJet8 = false;
+          MLambdaCUPC.isL1ZDCXORJet12 = HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000;
+          MLambdaCUPC.isL1ZDCXORJet16 = HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000;
+
+          // [Note] If we prescale the HLT_HIUPC_ZeroBias_MaxPixelCluster10000_v5 in the upcoming run, we will change to the following
+          // bool isZeroBias = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_SinglePixelTrack_MaxPixelTrack_v16") == 1 ||
+          //                 MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v15") == 1 ||
+          //                 MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MaxPixelCluster10000_v5") == 1;
+          MLambdaCUPC.isZeroBias = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MaxPixelCluster10000");
+          MLambdaCUPC.isZeroBias_Min400 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MinPixelCluster400_MaxPixelCluster10000");
+          MLambdaCUPC.isZeroBias_Max400 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400");
+          if (ApplyTriggerRejection == 1 && IsData && (MLambdaCUPC.isL1ZDCOr || MLambdaCUPC.isL1ZDCOr_Min400 || MLambdaCUPC.isL1ZDCOr_Max400 || MLambdaCUPC.isL1ZDCXORJet12)==false) continue;
+          if (ApplyTriggerRejection == 2 && IsData && (MLambdaCUPC.isL1ZDCOr || MLambdaCUPC.isL1ZDCOr_Min400 || MLambdaCUPC.isL1ZDCOr_Max400)==false) continue;
+        }
       }
       if (IsData == true) {
         MLambdaCUPC.ZDCsumPlus = MZDC.sumPlus;
@@ -295,7 +338,11 @@ int main(int argc, char *argv[]) {
         nTrackInAcceptanceHP++;
       }
       MLambdaCUPC.nTrackInAcceptanceHP = nTrackInAcceptanceHP;
-      int countSelDzero = 0;
+
+      /////////////////////////////////////
+      /////////////    D loop    //////////
+      /////////////////////////////////////
+      int countSelD = 0;
       for (int iD = 0; iD < MLambdaC.Dsize; iD++) {
         bool DpassCutNominal_           = DpassCutNominal(MLambdaC, iD);
         bool DpassCutLoose_             = DpassCutLoose(MLambdaC, iD);
@@ -324,7 +371,7 @@ int main(int argc, char *argv[]) {
           else if (ApplyDRejection=="passystddtheta"  && !DpassCutSystDdtheta_) continue;
           else if (ApplyDRejection=="passystdchi2cl"  && !DpassCutSystDchi2cl_) continue;
         }
-        countSelDzero++;
+        countSelD++;
         MLambdaCUPC.Dpt->push_back(             MLambdaC.Dpt[iD]);
         MLambdaCUPC.Dy->push_back(              MLambdaC.Dy[iD]);
         MLambdaCUPC.Dmass->push_back(           MLambdaC.Dmass[iD]);
@@ -430,7 +477,7 @@ int main(int argc, char *argv[]) {
           MLambdaCUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
         }
       }
-      MLambdaCUPC.Dsize = countSelDzero;
+      MLambdaCUPC.Dsize = countSelD;
       MLambdaCUPC.FillEntry();
     }
     if (!HideProgressBar) {
@@ -439,7 +486,8 @@ int main(int argc, char *argv[]) {
       Bar.PrintLine();
     }
 
-    InputFile.Close();
+    InputFile->Close();
+    std::cout<<"Processed "<<EntryCount<<" events."<<std::endl;
   }
 
   OutputFile.cd();
