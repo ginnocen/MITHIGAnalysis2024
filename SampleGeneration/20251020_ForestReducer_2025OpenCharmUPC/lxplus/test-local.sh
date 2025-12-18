@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 print_duration() {
   local start_time=$1
@@ -10,9 +10,9 @@ print_duration() {
   local seconds=$(( elapsed % 60 ))
 
   echo -ne "\e[33mExecution took "
-  if (( hours > 0 )); then
+  if [[ $hours -gt 0 ]]; then
     echo -ne "${hours} h ${minutes} m"
-  elif (( minutes > 0 )); then
+  elif [[ $minutes -gt 0 ]]; then
     echo -ne "${minutes} min ${seconds} s"
   else
     echo -ne "${seconds} s"
@@ -20,15 +20,13 @@ print_duration() {
   echo -e "\e[0m"
 }
 
-start_time=$(date +%s)
-
 set -x
 
 cd ../
 
 # 800 events
 ./Execute_Lcpks --Input /eos/cms/store/group/phys_heavyions/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward23/crab_PbPbUPC_HIForward23_399966-399989_QuickAnalysis/251204_184915/0000/HiForest_2025PbPbUPC_100.root \
-                --Output skim_HiForestMINIAOD_Lcpks.root --Year 2025 --IsData true \
+                --Output skim_HiForestMINIAOD_local-test_Lcpks.root --Year 2025 --IsData true \
                 --ApplyTriggerRejection 0 \
                 --ApplyEventRejection false \
                 --ApplyZDCGapRejection false \
@@ -36,8 +34,10 @@ cd ../
                 --PFTree particleFlowAnalyser/pftree \
                 --HideProgressBar false
 
+start_time=$(date +%s)
+
 ./Execute_Dzero --Input root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0_400098-400243_QuickAnalysis/251207_153448/0000/HiForest_2025PbPbUPC_100.root \
-                --Output skim_HiForestMINIAOD_Dzero.root --Year 2025 --IsData true \
+                --Output skim_HiForestMINIAOD_local-test_Dzero.root --Year 2025 --IsData true \
                 --ApplyTriggerRejection 0 \
                 --ApplyEventRejection false \
                 --ApplyZDCGapRejection false \

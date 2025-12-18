@@ -31,8 +31,8 @@ scramv1 project CMSSW $CRELEASE
     root --version
 
     input_file=$INFILE
-    # xrdcp $INFILE .
-    # [[ -f $PWD/${INFILE##*/} ]] && input_file=$PWD/${INFILE##*/} || echo "xrdcp failed."
+    xrdcp $INFILE .
+    [[ -f $PWD/${INFILE##*/} ]] && input_file=$PWD/${INFILE##*/} || echo "xrdcp failed."
 
     set -x
     

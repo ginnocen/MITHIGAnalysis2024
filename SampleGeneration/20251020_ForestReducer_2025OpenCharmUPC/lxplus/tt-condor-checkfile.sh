@@ -54,7 +54,6 @@ Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $Is
 Output       = $LOGDIR/log-${infn}.out
 Error        = $LOGDIR/log-${infn}.err
 Log          = $LOGDIR/log-${infn}.log
-# Rank         = Mips
 # +AccountingGroup = "group_u_CMST3.all"
 # +AccountingGroup = "group_u_CMS.u_zh.priority"
 +JobFlavour = "$runtimelimit"
@@ -66,7 +65,7 @@ transfer_input_files = ${EXEFILE},DzeroUPC_dedxMap.root
 Queue 
 EOF
 
-# condor_submit tt-${tag}.condor
+condor_submit tt-${tag}.condor
 mv tt-${tag}.condor $LOGDIR/log-${infn}.condor
 counter=$(($counter+1))
     fi

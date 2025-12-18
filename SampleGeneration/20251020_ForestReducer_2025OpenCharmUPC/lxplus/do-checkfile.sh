@@ -40,7 +40,7 @@ INPUTS=(
     filelists/example.txt
 )
 
-OUTPUTPRIDIR="/eos/cms/store/group/phys_heavyions/"$USER"/Forest2025"
+OUTPUTPRIDIR="/eos/cms/store/group/phys_heavyions/"$USER"/test_condor"
 
 ######################################################
 ### don't change things below if you are just user ###
@@ -75,6 +75,7 @@ do
     else
         CRABNAME=${INPUTDIR##*crab_} ; CRABNAME=${CRABNAME%%/*} ;
         INPUTFILELIST="./filelists/filelist_"$CRABNAME".txt"
+
         if [[ $INPUTDIR == /mnt/T2_US_MIT/* ]] ; then
             ls --color=no $INPUTDIR/*.root -d | sed -e "s|/mnt/T2_US_MIT/hadoop/cms|root://xrootd.cmsaf.mit.edu/|g" > $INPUTFILELIST
         elif [[ $INPUTDIR == /eos* ]] ; then
@@ -109,7 +110,6 @@ done
 if [[ "$prep_jobs" -gt 0 ]]
 then
     echo
-    [[ "$prep_jobs" -eq 2 ]] && . make.sh --libs
     cp -v ../$EXEFILE .
     cp -v $PIDfile .
 
