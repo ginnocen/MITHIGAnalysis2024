@@ -1,5 +1,5 @@
 #!/bin/bash
-[[ $0 == "./make.sh" ]] && { echo 'usage: `. clean.sh` or `source clean.sh` instead of `./clean.sh`' ; exit 1 ; }
+[[ $0 == "./make.sh" ]] && { echo 'usage: `. make.sh` or `source make.sh` instead of `./make.sh`' ; exit 1 ; }
 
 make_libs=0
 for arg in "$@"; do
