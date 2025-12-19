@@ -41,6 +41,7 @@ vector<int> isSelected(DimuonJetMessenger *Jet, float muPtCut, bool isData){
         if(Jet->IsMuMuTagged == 1){
             indices[1] = 1;
             if(Jet->muPt1 < muPtCut || Jet->muPt2 < muPtCut){indices[1] = 0;}
+            //if(!(Jet->mumuIsGenMatched)){indices[1] = 0;}
         }
 
         // GEN DIMUON SELECTIONS

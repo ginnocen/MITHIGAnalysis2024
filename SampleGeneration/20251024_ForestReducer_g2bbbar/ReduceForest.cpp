@@ -731,9 +731,9 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
     return false;
   if (fabs(M->SingleMuEta->at(i)) > 2.3)
     return false;
-  if (M->SingleMuIsTracker->at(i) == 0 || M->SingleMuIsGlobal->at(i) == 0 || M->SingleMuHybridSoft->at(i) == 0 ||
+  if (M->SingleMuIsTracker->at(i) == 0 || M->SingleMuIsGlobal->at(i) == 0 || M->SingleMuSoft->at(i) == 0 ||
       M->SingleMuIsGood->at(i) == 0)
-    return false;
+    return false; // REPLACING HYBRIDS SOFT WITH SOFT
 
   return true;
 }
@@ -747,9 +747,6 @@ bool isGenMuonSelected(SingleMuTreeMessenger *M, int i) {
     return false;
   if (fabs(M->GenSingleMuEta->at(i)) > 2.3)
     return false;
-  //if (M->SingleMuIsTracker->at(i) == 0 || M->SingleMuIsGlobal->at(i) == 0 || M->SingleMuHybridSoft->at(i) == 0 ||
-  //  M->SingleMuIsGood->at(i) == 0)
-  //  return false;
 
   return true;
 }
@@ -778,22 +775,23 @@ bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int reco1,
   float deta11 = M->GenSingleMuEta->at(gen1) - M->SingleMuEta->at(reco1);  
   float dphi11 = DeltaPhi(M->GenSingleMuPhi->at(gen1), M->SingleMuPhi->at(reco1));
   float dr11 = sqrt(dphi11 * dphi11 + deta11 * deta11);
-  bool chargemismatch11 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco1) < 0);
+  bool chargemismatch11 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco1) > 0); 
+  // NOTE the PDGID of a NEGATIVE muon is +13. So, if the charges are mismatched, the product should be (-13)*(-1) or (13)*(+1), both  > 0.
 
   float deta22 = M->GenSingleMuEta->at(gen2) - M->SingleMuEta->at(reco2);  
   float dphi22 = DeltaPhi(M->GenSingleMuPhi->at(gen2), M->SingleMuPhi->at(reco2));
   float dr22 = sqrt(dphi22 * dphi22 + deta22 * deta22);
-  bool chargemismatch22 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco2) < 0);
+  bool chargemismatch22 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco2) > 0);
 
   float deta12 = M->GenSingleMuEta->at(gen1) - M->SingleMuEta->at(reco2);  
   float dphi12 = DeltaPhi(M->GenSingleMuPhi->at(gen1), M->SingleMuPhi->at(reco2));
   float dr12 = sqrt(dphi12 * dphi12 + deta12 * deta12);
-  bool chargemismatch12 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco2) < 0);
+  bool chargemismatch12 = (M->GenSingleMuPID->at(gen1) * M->SingleMuCharge->at(reco2) > 0);
 
   float deta21 = M->GenSingleMuEta->at(gen2) - M->SingleMuEta->at(reco1);  
   float dphi21 = DeltaPhi(M->GenSingleMuPhi->at(gen2), M->SingleMuPhi->at(reco1));
   float dr21 = sqrt(dphi21 * dphi21 + deta21 * deta21);
-  bool chargemismatch21 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco1) < 0);
+  bool chargemismatch21 = (M->GenSingleMuPID->at(gen2) * M->SingleMuCharge->at(reco1) > 0);
 
   if((dr11 < 0.03) && (dr22 < 0.03) && !chargemismatch11 && !chargemismatch22){
     return true;

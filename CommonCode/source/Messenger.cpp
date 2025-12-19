@@ -1844,6 +1844,7 @@ bool SingleMuTreeMessenger::Initialize(){
     SingleMuIsGlobal = nullptr;
     SingleMuIsTracker = nullptr;
     SingleMuHybridSoft = nullptr;
+    SingleMuSoft = nullptr;
 
     GenSingleMuPT = nullptr;
     GenSingleMuEta = nullptr;
@@ -1862,6 +1863,7 @@ bool SingleMuTreeMessenger::Initialize(){
     Tree->SetBranchAddress("recoIsGlobal", &SingleMuIsGlobal);
     Tree->SetBranchAddress("recoIsTracker", &SingleMuIsTracker);
     Tree->SetBranchAddress("recoIDHybridSoft", &SingleMuHybridSoft);
+    Tree->SetBranchAddress("recoIDSoft", &SingleMuSoft);
 
     Tree->SetBranchAddress("genPt", &GenSingleMuPT);
     Tree->SetBranchAddress("genEta", &GenSingleMuEta);
