@@ -17,6 +17,11 @@
 #include <RooDataSet.h>
 #include <RooGaussian.h>
 #include <RooPlot.h>
+#include <RooPolynomial.h>
+#include <RooAddPdf.h>
+#include <RooKeysPdf.h>
+#include <RooArgList.h>
+#include <RooFitResult.h>
 
 #include <iostream>
 #include <vector>
@@ -29,11 +34,14 @@ using namespace std;
 
 using namespace std;
 
-float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax){
+float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
 
     //ESTIMATE JPSI USING SIDEBANDS
     RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 10);
-    RooDataSet data("data", "data", nt, mass, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
+    RooRealVar weight("weight", "weight", 0, 1e10);
+    RooArgSet vars(mass, jetpt, weight);
+    RooDataSet data("data", "data", nt, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
 
     mass.setRange("signal", 2.95, 3.25);
     mass.setRange("leftSB", 2.5, 2.90);
@@ -45,7 +53,7 @@ float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax){
     double nBkgInSignal = (nLeftSB + nRightSB) * (0.375);
 
     //GAUSSIAN JPSI PEAK
-    RooRealVar mean("mean", "J/psi mass", 3.1, 2.95, 3.25);
+    RooRealVar mean("mean", "J/psi mass", 3.1, 2.6, 3.7);
     RooRealVar sigma("sigma", "resolution", 0.09, 0.01, 0.2);
     RooRealVar nJpsi("nJpsi", "N J/psi", nSignal - nBkgInSignal, 0, nSignal);
     RooRealVar nBkg("nBkg", "N bkg", nBkgInSignal);
@@ -59,27 +67,60 @@ float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax){
     RooFitResult* result = model.fitTo(data, RooFit::Range("signal"), RooFit::Save());
     cout << "J/psi yield: " << nJpsi.getVal() << " +/- " << nJpsi.getError() << endl;
 
+    // CREATE FIT PLOT
+    if(plotDir != nullptr) {
+        plotDir->cd();
+        TCanvas* c = new TCanvas(Form("JpsiFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 600);
+        RooPlot* frame = mass.frame(RooFit::Title(Form("J/psi Fit (%.0f < p_{T} < %.0f GeV)", Jetptmin, Jetptmax)));
+        data.plotOn(frame, RooFit::Name("data"));
+        model.plotOn(frame, RooFit::Name("model"));
+        model.plotOn(frame, RooFit::Components(jpsiPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Name("jpsi"));
+        model.plotOn(frame, RooFit::Components(bkgPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen), RooFit::Name("bkg"));
+        
+        // Plot individual PDFs (normalized)
+        jpsiPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kRed+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("jpsi_pdf"));
+        bkgPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kGreen+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("bkg_pdf"));
+        
+        frame->Draw();
+        
+        // Add legend
+        TLegend* leg = new TLegend(0.15, 0.65, 0.40, 0.88);
+        leg->AddEntry(frame->findObject("data"), "Data", "lep");
+        leg->AddEntry(frame->findObject("model"), "Total Fit", "l");
+        leg->AddEntry(frame->findObject("jpsi"), "J/#psi (scaled)", "l");
+        leg->AddEntry(frame->findObject("bkg"), "Bkg (scaled)", "l");
+        leg->AddEntry(frame->findObject("jpsi_pdf"), "J/#psi PDF", "l");
+        leg->AddEntry(frame->findObject("bkg_pdf"), "Bkg PDF", "l");
+        leg->Draw();
+        
+        c->Write();
+        delete c;
+    }
+
     return nJpsi.getVal();
 }
 
-float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax){
+float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
     
     RooRealVar fitVar("muDiDxy1Dxy2Sig", "muDiDxy1Dxy2Sig", -3, 4);
-    fitVar.setRange("fitRange", -2, -0.8);
+    RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
+    RooRealVar weight("weight", "weight", 0, 1e10);
+    RooArgSet vars(fitVar, jetpt, weight);
+    fitVar.setRange("fitRange", -2, -0.3);
     fitVar.setRange("normRange", -3, 4);
     
     // DATA
-    RooDataSet data("data", "data", data_nt, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet data("data", "data", data_nt, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
     
     // LIGHT FLAVOR TEMPLATE
-    RooDataSet templateLF("templateLF", "Light flavor", nt_uds, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateLF("templateLF", "Light flavor", nt_uds, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
     
     // HEAVY FLAVOR TEMPLATE 
-    RooDataSet templateHF_other("tmp_other", "", nt_other, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
-    RooDataSet templateHF_c("tmp_c", "", nt_c, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
-    RooDataSet templateHF_cc("tmp_cc", "", nt_cc, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
-    RooDataSet templateHF_b("tmp_b", "", nt_b, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
-    RooDataSet templateHF_bb("tmp_bb", "", nt_bb, fitVar, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_other("tmp_other", "", nt_other, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_c("tmp_c", "", nt_c, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_cc("tmp_cc", "", nt_cc, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_b("tmp_b", "", nt_b, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_bb("tmp_bb", "", nt_bb, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
     
     // APPEND HF TEMPLATES
     RooDataSet templateHF("templateHF", "Heavy flavor", fitVar);
@@ -107,6 +148,36 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
     
     cout << "Light flavor yield: " << nLF.getVal() << " +/- " << nLF.getError() << endl;
     cout << "Heavy flavor yield: " << nHF.getVal() << " +/- " << nHF.getError() << endl;
+    
+    // CREATE FIT PLOT
+    if(plotDir != nullptr) {
+        plotDir->cd();
+        TCanvas* c = new TCanvas(Form("LFFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 600);
+        RooPlot* frame = fitVar.frame(RooFit::Title(Form("LF/HF Fit (%.0f < p_{T} < %.0f GeV)", Jetptmin, Jetptmax)));
+        data.plotOn(frame, RooFit::Name("data"));
+        model.plotOn(frame, RooFit::Name("model"));
+        model.plotOn(frame, RooFit::Components(lfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Name("LF"));
+        model.plotOn(frame, RooFit::Components(hfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen), RooFit::Name("HF"));
+        
+        // Plot raw KDE templates (normalized)
+        lfPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kRed+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("LF_KDE"));
+        hfPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kGreen+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("HF_KDE"));
+        
+        frame->Draw();
+        
+        // Add legend
+        TLegend* leg = new TLegend(0.65, 0.65, 0.88, 0.88);
+        leg->AddEntry(frame->findObject("data"), "Data", "lep");
+        leg->AddEntry(frame->findObject("model"), "Total Fit", "l");
+        leg->AddEntry(frame->findObject("LF"), "LF (scaled)", "l");
+        leg->AddEntry(frame->findObject("HF"), "HF (scaled)", "l");
+        leg->AddEntry(frame->findObject("LF_KDE"), "LF KDE", "l");
+        leg->AddEntry(frame->findObject("HF_KDE"), "HF KDE", "l");
+        leg->Draw();
+        
+        c->Write();
+        delete c;
+    }
     
     return nLF.getVal();
 }
@@ -142,6 +213,12 @@ int main(int argc, char *argv[]) {
     TH1D* JpsiYields = new TH1D("JpsiYields", "J/psi Yields", ptBins.size()-1, &ptBins[0]);
     TH1D* LightYields = new TH1D("LightYields", "Light Flavor Yields", ptBins.size()-1, &ptBins[0]);
     TH1D* SplittingYields = new TH1D("SplittingYields", "Splitting Yields", ptBins.size()-1, &ptBins[0]);
+    
+    // CREATE PLOTS DIRECTORY
+    TDirectory* plotDir = nullptr;
+    if(makeplots) {
+        plotDir = outputFile->mkdir("plots");
+    }
 
     float JspiYield = 0;
     float LightYield = 0;
@@ -153,19 +230,22 @@ int main(int argc, char *argv[]) {
         
         // TOTAL YIELD
         RooRealVar mass("mumuMass", "mass", 0, 10);
-        RooDataSet dataBin("dataBin", "data", nt, mass, 
+        RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
+        RooRealVar weight("weight", "weight", 0, 1e10);
+        RooArgSet vars(mass, jetpt, weight);
+        RooDataSet dataBin("dataBin", "data", nt, vars, 
                           Form("JetPT < %f && JetPT >= %f", ptMax, ptMin), "weight");
         float totalYield = dataBin.sumEntries();
         
         // JPSI
         if(doJpsi) {
-            JspiYield = JpsiYield(nt, ptMin, ptMax);
+            JspiYield = JpsiYield(nt, ptMin, ptMax, plotDir);
             JpsiYields->SetBinContent(i+1, JspiYield);
         }
         
         // LF
         if(doLF) {
-            LightYield = LFYield(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax);
+            LightYield = LFYield(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
             LightYields->SetBinContent(i+1, LightYield);
         }
         
