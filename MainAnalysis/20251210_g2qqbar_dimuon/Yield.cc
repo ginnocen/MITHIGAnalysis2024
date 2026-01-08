@@ -28,6 +28,8 @@
 
 #include <iostream>
 #include <vector>
+#include <utility>
+#include <tuple>
 
 using namespace std;
 #include "CommandLine.h" 
@@ -85,7 +87,7 @@ float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax, TDirectory* plotDir
         frame->Draw();
         
         // Add legend
-        TLegend* leg = new TLegend(0.15, 0.65, 0.40, 0.88);
+        TLegend* leg = new TLegend(0.55, 0.65, 0.80, 0.88);
         leg->AddEntry(frame->findObject("data"), "Data", "lep");
         leg->AddEntry(frame->findObject("model"), "Total Fit (Gaussian+Constant)", "l");
         leg->AddEntry(frame->findObject("jpsi"), "J/#psi Gaussian", "l");
@@ -100,7 +102,7 @@ float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax, TDirectory* plotDir
     return nJpsi.getVal();
 }
 
-float LFYield_invMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float> LFYield_invMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
 
     //INVERSE MASS FITTING METHOD TO EXTRACT LF YIELD
     RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 10);
@@ -132,8 +134,8 @@ float LFYield_invMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtu
     templateHF.append(templateHF_bb);   
 
     // PDFs
-    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", mass, templateLF, RooKeysPdf::MirrorLeft, 2.0);
-    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", mass, templateHF, RooKeysPdf::MirrorLeft, 2.0);
+    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", mass, templateLF, RooKeysPdf::MirrorLeft, 0.6);
+    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", mass, templateHF, RooKeysPdf::MirrorLeft, 0.6);
     
     // YIELDs
     double nTotal = data.sumEntries();
@@ -168,39 +170,61 @@ float LFYield_invMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtu
         frame->Draw();
 
         // Add legend
-        TLegend* leg = new TLegend(0.15, 0.65, 0.40, 0.88);
+        TLegend* leg = new TLegend(0.55, 0.65, 0.80, 0.88);
         leg->AddEntry(frame->findObject("data"), "Data", "lep");
         leg->AddEntry(frame->findObject("model"), "Total Fit (LF+HF)", "l");
         leg->AddEntry(frame->findObject("LF"), "Light Flavor", "l");
         leg->AddEntry(frame->findObject("HF"), "Heavy Flavor", "l");
         leg->Draw();
 
-        // Bottom pad: residuals
+        // Bottom pad: pulls
         c->cd(2);
         gPad->SetPad(0.0, 0.0, 1.0, 0.3);
         gPad->SetTopMargin(0.02);
         gPad->SetBottomMargin(0.3);
-        RooHist* resid = frame->residHist("data", "model");
-        RooPlot* frame_resid = mass.frame();
-        frame_resid->addPlotable(resid, "P");
-        frame_resid->SetTitle("Residuals");
-        frame_resid->GetYaxis()->SetTitle("Data - Fit");
-        frame_resid->GetYaxis()->SetTitleSize(0.1);
-        frame_resid->GetYaxis()->SetLabelSize(0.1);
-        frame_resid->GetYaxis()->SetTitleOffset(0.3);
-        frame_resid->GetXaxis()->SetTitleSize(0.1);
-        frame_resid->GetXaxis()->SetLabelSize(0.1);
-        frame_resid->Draw();
+        
+        RooPlot* framePull = mass.frame(RooFit::Title(""));
+        RooHist* hpull = frame->pullHist("data", "model");
+        hpull->SetMarkerStyle(20);
+        hpull->SetMarkerSize(0.8);
+        framePull->addPlotable(hpull, "P0");
+        framePull->SetMinimum(-5);
+        framePull->SetMaximum(5);
+        framePull->GetYaxis()->SetTitle("Pull");
+        framePull->GetYaxis()->SetTitleSize(0.12);
+        framePull->GetYaxis()->SetLabelSize(0.10);
+        framePull->GetYaxis()->SetTitleOffset(0.35);
+        framePull->GetYaxis()->SetNdivisions(505);
+        framePull->GetXaxis()->SetTitleSize(0.12);
+        framePull->GetXaxis()->SetLabelSize(0.10);
+        framePull->GetXaxis()->SetTitleOffset(1.0);
+        framePull->Draw();
+        
+        // Add horizontal lines at 0, +/-3
+        TLine* line0 = new TLine(framePull->GetXaxis()->GetXmin(), 0, framePull->GetXaxis()->GetXmax(), 0);
+        line0->SetLineColor(kBlack);
+        line0->SetLineStyle(2);
+        line0->Draw();
+        
+        TLine* line3 = new TLine(framePull->GetXaxis()->GetXmin(), 3, framePull->GetXaxis()->GetXmax(), 3);
+        line3->SetLineColor(kRed);
+        line3->SetLineStyle(2);
+        line3->Draw();
+        
+        TLine* lineM3 = new TLine(framePull->GetXaxis()->GetXmin(), -3, framePull->GetXaxis()->GetXmax(), -3);
+        lineM3->SetLineColor(kRed);
+        lineM3->SetLineStyle(2);
+        lineM3->Draw();
 
         c->Write();
         c->SaveAs(Form("LFFit_invmass_pt%.0f_%.0f.pdf", Jetptmin, Jetptmax));
         delete c;
     } 
-    return nLF.getVal();;
+    return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError());
 }
 
 
-float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float> LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
     
     RooRealVar fitVar("muDiDxy1Dxy2Sig", "muDiDxy1Dxy2Sig", -3, 4);
     RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
@@ -231,8 +255,8 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
     templateHF.append(templateHF_bb);
     
     // PDFs
-    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", fitVar, templateLF, RooKeysPdf::MirrorLeft, 2.0);
-    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", fitVar, templateHF, RooKeysPdf::MirrorLeft, 2.0);
+    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", fitVar, templateLF, RooKeysPdf::MirrorLeft, 1.0);
+    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", fitVar, templateHF, RooKeysPdf::MirrorLeft, 1.0);
     
     // YIELDs
     double nTotal = data.sumEntries();
@@ -326,7 +350,7 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
         delete c;
     }
     
-    return nLF.getVal();
+    return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError());
 }
 
 int main(int argc, char *argv[]) {
@@ -361,7 +385,9 @@ int main(int argc, char *argv[]) {
     outputFile->cd();
     TH1D* JpsiYields = new TH1D("JpsiYields", "J/psi Yields", ptBins.size()-1, &ptBins[0]);
     TH1D* LightYields = new TH1D("LightYields", "Light Flavor Yields", ptBins.size()-1, &ptBins[0]);
+    TH1D* HeavyYields = new TH1D("HeavyYields", "Heavy Flavor Yields", ptBins.size()-1, &ptBins[0]);
     TH1D* LightYields_mass = new TH1D("LightYields_mass", "Light Flavor Yields (inv mass method)", ptBins.size()-1, &ptBins[0]);
+    TH1D* HeavyYields_mass = new TH1D("HeavyYields_mass", "Heavy Flavor Yields (inv mass method)", ptBins.size()-1, &ptBins[0]);
     TH1D* SplittingYields = new TH1D("SplittingYields", "Splitting Yields", ptBins.size()-1, &ptBins[0]);
     
     // CREATE PLOTS DIRECTORY
@@ -372,7 +398,13 @@ int main(int argc, char *argv[]) {
 
     float JspiYield = 0;
     float LightYield = 0;
+    float LightYieldError = 0;
+    float HeavyYield = 0;
+    float HeavyYieldError = 0;
     float LightYield_mass = 0;
+    float LightYieldError_mass = 0;
+    float HeavyYield_mass = 0;
+    float HeavyYieldError_mass = 0;
     float SplittingYield = 0;
     for(int i = 0; i < ptBins.size()-1; i++){
         
@@ -396,14 +428,22 @@ int main(int argc, char *argv[]) {
         
         // LF
         if(doLF) {
-            LightYield = LFYield(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            auto lfResult = LFYield(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError) = lfResult;
             LightYields->SetBinContent(i+1, LightYield);
+            LightYields->SetBinError(i+1, LightYieldError);
+            HeavyYields->SetBinContent(i+1, HeavyYield);
+            HeavyYields->SetBinError(i+1, HeavyYieldError);
         }
 
         // LF VIA INVMASS METHOD
         if(doLF_invMass) {
-            LightYield_mass = LFYield_invMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            auto lfResultMass = LFYield_invMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            tie(LightYield_mass, LightYieldError_mass, HeavyYield_mass, HeavyYieldError_mass) = lfResultMass;
             LightYields_mass->SetBinContent(i+1, LightYield_mass);
+            LightYields_mass->SetBinError(i+1, LightYieldError_mass);
+            HeavyYields_mass->SetBinContent(i+1, HeavyYield_mass);
+            HeavyYields_mass->SetBinError(i+1, HeavyYieldError_mass);
         }
         
         // REMAINING YIELD
@@ -415,8 +455,14 @@ int main(int argc, char *argv[]) {
     // WRITE TO FILE
     outputFile->cd();
     if(doJpsi) JpsiYields->Write();
-    if(doLF) LightYields->Write();
-    if(doLF_invMass) LightYields_mass->Write();
+    if(doLF) {
+        LightYields->Write();
+        HeavyYields->Write();
+    }
+    if(doLF_invMass) {
+        LightYields_mass->Write();
+        HeavyYields_mass->Write();
+    }
     SplittingYields->Write();
 
     // SAVE COMMAND LINE PARAMS

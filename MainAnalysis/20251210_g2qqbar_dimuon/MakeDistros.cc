@@ -148,7 +148,7 @@ int main(int argc, char *argv[]) {
 
             if(isData){continue;} // ONLY MAKE TEMPLATES WITH MC 
 
-            int flavorclass = getFlavorClass(t->NcHad, t->NbHad);
+            int flavorclass = getFlavorClass(t->NbHad, t->NcHad);
             hInvMass_flavors[flavorclass]->Fill(t->JetPT, t->mumuMass, weight);
             hmuDCAProductSig_flavors[flavorclass]->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
             hmuDR_flavors[flavorclass]->Fill(t->JetPT, t->muDR, weight);

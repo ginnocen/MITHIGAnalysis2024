@@ -33,6 +33,7 @@ echo "DONE WITH DISTRIBUTIONS"
     --ptBins 60,80,100,120,160,200,250,300 \
     --doJpsi false \
     --doLF true \
+    --doLF_invMass true \
     --makeplots true \
 
 echo "DONE WITH YIELD FITTING"
