@@ -5,7 +5,7 @@ source clean.sh
     --Templates "testdistros_soft.root" \
     --Output "testyields_soft.root" \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --doJpsi true \
+    --doJpsi false \
     --doLF true \
     --makeplots true \
 

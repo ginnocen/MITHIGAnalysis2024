@@ -12,6 +12,7 @@
 #include <TNtuple.h>
 #include <TTree.h>
 #include <TTreeFormula.h>
+#include <TStyle.h>
 
 #include <iostream>
 #include <vector>
@@ -37,7 +38,7 @@ bool isDimuonSelected(DimuonJetMessenger *Dimuon, float muPtCut, int chargeSelec
         return false;
     }
 
-    if(Dimuon->muCharge1 * Dimuon->muCharge2 != chargeSelection){
+    if(Dimuon->muCharge1 * Dimuon->muCharge2 != chargeSelection && chargeSelection != 0){
         return false;
     }
 
@@ -61,6 +62,8 @@ int getFlavorClass(int NbHad, int NcHad) {
 
 int main(int argc, char *argv[]) {
 
+    gStyle->SetOptStat(0);
+
     // INPUTS
     cout << "Filling Distributions" << endl;
     CommandLine CL(argc, argv);
@@ -72,6 +75,7 @@ int main(int argc, char *argv[]) {
     vector<double> ptBins = CL.GetDoubleVector("ptBins");
     float muPtSelection = CL.GetDouble("muPt",3.5);
     int useWeightVariation = CL.GetInt("useWeightVariation",0);
+    bool makeplots = CL.GetBool("makeplots", false);
 
     // IMPORT TREE
     TFile* input = TFile::Open(file.c_str());
@@ -131,8 +135,10 @@ int main(int argc, char *argv[]) {
 
         if(isDimuonSelected(t, muPtSelection, chargeSelection, isData)){
             
-            weight = 1 / DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // MAY WANT TO MAKE MORE ROBUST FOR DIVIDE BY ZEROS
-            weight *= t->MuMuWeight;
+            // WEIGHTS REMOVED FOR INITIAL FITTING CHECKS
+            //weight = 1 / DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // MAY WANT TO MAKE MORE ROBUST FOR DIVIDE BY ZEROS
+            //if(!isData){weight *= t->MuMuWeight}; --> will definitely want to use these weights to generate a DATA template fom MC
+            weight = 1;
 
             hInvMass->Fill(t->JetPT, t->mumuMass, weight);
             hDCAProductSig->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
@@ -183,6 +189,138 @@ int main(int argc, char *argv[]) {
     paramMuPt.Write();
     TNamed paramWeightVar("useWeightVariation", std::to_string(useWeightVariation).c_str());
     paramWeightVar.Write();
+    TNamed makeplotsParam("makeplots", makeplots ? "true" : "false");
+    makeplotsParam.Write();
+
+    // MAKE PLOTS!
+    if(makeplots){
+        TDirectory* plotDir = outFile->mkdir("plots");
+        plotDir->cd();
+
+        // Create 1D projections for each pT bin
+        for(int iBin = 1; iBin <= ptBins.size()-1; iBin++) {
+            float ptMin = ptBins[iBin-1];
+            float ptMax = ptBins[iBin];
+            
+            // Mass projection
+            TCanvas* c1 = new TCanvas(Form("c_mass_incl_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+            TH1D* h_mass = hInvMass->ProjectionY(Form("h_mass_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+            h_mass->SetLineColor(kBlack);
+            h_mass->SetLineWidth(2);
+            h_mass->SetTitle(Form("Dimuon Mass (%.0f < p_{T} < %.0f GeV);m_{#mu#mu} [GeV];Entries", ptMin, ptMax));
+            h_mass->Draw("HIST");
+            c1->SaveAs(Form("mass_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            delete c1;
+            
+            // DCA projection
+            TCanvas* c2 = new TCanvas(Form("c_dca_incl_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+            TH1D* h_dca = hDCAProductSig->ProjectionY(Form("h_dca_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+            h_dca->SetLineColor(kBlack);
+            h_dca->SetLineWidth(2);
+            h_dca->SetTitle(Form("DCA Product Sig (%.0f < p_{T} < %.0f GeV);log_{10}(|DCA_{1}#timesDCA_{2}|/#sigma);Entries", ptMin, ptMax));
+            h_dca->Draw("HIST");
+            c2->SaveAs(Form("dca_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            delete c2;
+            
+            // DR projection
+            TCanvas* c3 = new TCanvas(Form("c_dr_incl_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+            TH1D* h_dr = hmuDR->ProjectionY(Form("h_dr_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+            h_dr->SetLineColor(kBlack);
+            h_dr->SetLineWidth(2);
+            h_dr->SetTitle(Form("#mu#mu #DeltaR (%.0f < p_{T} < %.0f GeV);#DeltaR(#mu,#mu);Entries", ptMin, ptMax));
+            h_dr->Draw("HIST");
+            c3->SaveAs(Form("dr_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            delete c3;
+        }
+
+        if(!isData){
+            
+            // Overlay plots for each pT bin
+            int colors[7] = {kBlack, kGray+1, kBlue, kCyan, kGreen+2, kRed, kMagenta};
+            for(int iBin = 1; iBin <= ptBins.size()-1; iBin++) {
+                float ptMin = ptBins[iBin-1];
+                float ptMax = ptBins[iBin];
+                
+                // Mass overlay
+                TCanvas* c_mass_overlay = new TCanvas(Form("c_mass_overlay_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+                TH1D* h_mass_incl = hInvMass->ProjectionY(Form("h_mass_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+                h_mass_incl->SetLineColor(colors[0]);
+                h_mass_incl->SetLineWidth(2);
+                h_mass_incl->SetStats(0);
+                h_mass_incl->SetTitle(Form("Dimuon Mass (%.0f < p_{T} < %.0f GeV);m_{#mu#mu} [GeV];Entries", ptMin, ptMax));
+                h_mass_incl->Draw("HIST");
+                
+                TLegend* leg_mass = new TLegend(0.65, 0.45, 0.88, 0.88);
+                leg_mass->AddEntry(h_mass_incl, "Inclusive", "l");
+                
+                vector<TH1D*> h_mass_flavors;
+                for(int i = 0; i < 6; i++) {
+                    TH1D* h = hInvMass_flavors[i]->ProjectionY(Form("h_mass_%s_pt%.0f_%.0f", flavorNames[i].c_str(), ptMin, ptMax), iBin, iBin);
+                    h->SetLineColor(colors[i+1]);
+                    h->SetLineWidth(2);
+                    h->Draw("HIST SAME");
+                    h_mass_flavors.push_back(h);
+                    leg_mass->AddEntry(h, flavorNames[i].c_str(), "l");
+                }
+                leg_mass->Draw();
+                c_mass_overlay->SaveAs(Form("mass_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                delete c_mass_overlay;
+                
+                // DCA overlay
+                TCanvas* c_dca_overlay = new TCanvas(Form("c_dca_overlay_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+                TH1D* h_dca_incl = hDCAProductSig->ProjectionY(Form("h_dca_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+                h_dca_incl->SetLineColor(colors[0]);
+                h_dca_incl->SetLineWidth(2);
+                h_dca_incl->SetStats(0);
+                h_dca_incl->SetTitle(Form("DCA Product Sig (%.0f < p_{T} < %.0f GeV);log_{10}(|DCA_{1}#timesDCA_{2}|/#sigma);Entries", ptMin, ptMax));
+                h_dca_incl->Draw("HIST");
+                
+                TLegend* leg_dca = new TLegend(0.65, 0.45, 0.88, 0.88);
+                leg_dca->AddEntry(h_dca_incl, "Inclusive", "l");
+                
+                vector<TH1D*> h_dca_flavors;
+                for(int i = 0; i < 6; i++) {
+                    TH1D* h = hmuDCAProductSig_flavors[i]->ProjectionY(Form("h_dca_%s_pt%.0f_%.0f", flavorNames[i].c_str(), ptMin, ptMax), iBin, iBin);
+                    h->SetLineColor(colors[i+1]);
+                    h->SetLineWidth(2);
+                    h->Draw("HIST SAME");
+                    h_dca_flavors.push_back(h);
+                    leg_dca->AddEntry(h, flavorNames[i].c_str(), "l");
+                }
+                leg_dca->Draw();
+                c_dca_overlay->SaveAs(Form("dca_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                delete c_dca_overlay;
+                
+                // DR overlay
+                TCanvas* c_dr_overlay = new TCanvas(Form("c_dr_overlay_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+                TH1D* h_dr_incl = hmuDR->ProjectionY(Form("h_dr_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+                h_dr_incl->SetLineColor(colors[0]);
+                h_dr_incl->SetLineWidth(2);
+                h_dr_incl->SetStats(0);
+                h_dr_incl->SetTitle(Form("#mu#mu #DeltaR (%.0f < p_{T} < %.0f GeV);#DeltaR(#mu,#mu);Entries", ptMin, ptMax));
+                h_dr_incl->Draw("HIST");
+                
+                TLegend* leg_dr = new TLegend(0.65, 0.45, 0.88, 0.88);
+                leg_dr->AddEntry(h_dr_incl, "Inclusive", "l");
+                
+                vector<TH1D*> h_dr_flavors;
+                for(int i = 0; i < 6; i++) {
+                    TH1D* h = hmuDR_flavors[i]->ProjectionY(Form("h_dr_%s_pt%.0f_%.0f", flavorNames[i].c_str(), ptMin, ptMax), iBin, iBin);
+                    h->SetLineColor(colors[i+1]);
+                    h->SetLineWidth(2);
+                    h->Draw("HIST SAME");
+                    h_dr_flavors.push_back(h);
+                    leg_dr->AddEntry(h, flavorNames[i].c_str(), "l");
+                }
+                leg_dr->Draw();
+                c_dr_overlay->SaveAs(Form("dr_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                delete c_dr_overlay;
+            }
+        }
+
+    }
+
+
     
     outFile->Close();
 }

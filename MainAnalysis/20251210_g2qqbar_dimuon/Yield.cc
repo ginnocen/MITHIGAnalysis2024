@@ -9,6 +9,8 @@
 #include <TH2D.h>
 #include <TH3D.h>
 #include <TLegend.h>
+#include <TLine.h>
+#include <TStyle.h>
 #include <TNtuple.h>
 #include <TTree.h>
 #include <TTreeFormula.h>
@@ -17,6 +19,7 @@
 #include <RooDataSet.h>
 #include <RooGaussian.h>
 #include <RooPlot.h>
+#include <RooHist.h>
 #include <RooPolynomial.h>
 #include <RooAddPdf.h>
 #include <RooKeysPdf.h>
@@ -37,7 +40,7 @@ using namespace std;
 float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
 
     //ESTIMATE JPSI USING SIDEBANDS
-    RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 10);
+    RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 15);
     RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
     RooRealVar weight("weight", "weight", 0, 1e10);
     RooArgSet vars(mass, jetpt, weight);
@@ -66,6 +69,8 @@ float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax, TDirectory* plotDir
 
     RooFitResult* result = model.fitTo(data, RooFit::Range("signal"), RooFit::Save());
     cout << "J/psi yield: " << nJpsi.getVal() << " +/- " << nJpsi.getError() << endl;
+    cout << "Background yield: " << nBkg.getVal() << " (fixed)" << endl;
+    cout << "Total: " << nJpsi.getVal() + nBkg.getVal() << endl;
 
     // CREATE FIT PLOT
     if(plotDir != nullptr) {
@@ -77,28 +82,123 @@ float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax, TDirectory* plotDir
         model.plotOn(frame, RooFit::Components(jpsiPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Name("jpsi"));
         model.plotOn(frame, RooFit::Components(bkgPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen), RooFit::Name("bkg"));
         
-        // Plot individual PDFs (normalized)
-        jpsiPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kRed+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("jpsi_pdf"));
-        bkgPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kGreen+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("bkg_pdf"));
-        
         frame->Draw();
         
         // Add legend
         TLegend* leg = new TLegend(0.15, 0.65, 0.40, 0.88);
         leg->AddEntry(frame->findObject("data"), "Data", "lep");
-        leg->AddEntry(frame->findObject("model"), "Total Fit", "l");
-        leg->AddEntry(frame->findObject("jpsi"), "J/#psi (scaled)", "l");
-        leg->AddEntry(frame->findObject("bkg"), "Bkg (scaled)", "l");
-        leg->AddEntry(frame->findObject("jpsi_pdf"), "J/#psi PDF", "l");
-        leg->AddEntry(frame->findObject("bkg_pdf"), "Bkg PDF", "l");
+        leg->AddEntry(frame->findObject("model"), "Total Fit (Gaussian+Constant)", "l");
+        leg->AddEntry(frame->findObject("jpsi"), "J/#psi Gaussian", "l");
+        leg->AddEntry(frame->findObject("bkg"), "Constant Bkg", "l");
         leg->Draw();
         
         c->Write();
+        c->SaveAs(Form("JpsiFit_pt%.0f_%.0f.pdf", Jetptmin, Jetptmax));
         delete c;
     }
 
     return nJpsi.getVal();
 }
+
+float LFYield_invMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+
+    //INVERSE MASS FITTING METHOD TO EXTRACT LF YIELD
+    RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 10);
+    RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
+    RooRealVar weight("weight", "weight", 0, 1e10);
+    RooArgSet vars(mass, jetpt, weight);
+    mass.setRange("fitRange", 0, 10); // Fit over full mass range
+    mass.setRange("normRange", 0, 10); // Normalize over full mass range
+
+    // DATA
+    RooDataSet data("data", "data", data_nt, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+
+    // LIGHT FLAVOR TEMPLATE
+    RooDataSet templateLF("templateLF", "Light flavor", nt_uds, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+
+    // HEAVY FLAVOR TEMPLATE 
+    RooDataSet templateHF_other("tmp_other", "", nt_other, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_c("tmp_c", "", nt_c, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_cc("tmp_cc", "", nt_cc, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_b("tmp_b", "", nt_b, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_bb("tmp_bb", "", nt_bb, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+
+    // APPEND HF TEMPLATES
+    RooDataSet templateHF("templateHF", "Heavy flavor", mass);
+    templateHF.append(templateHF_other);
+    templateHF.append(templateHF_c);
+    templateHF.append(templateHF_cc);
+    templateHF.append(templateHF_b);
+    templateHF.append(templateHF_bb);   
+
+    // PDFs
+    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", mass, templateLF, RooKeysPdf::MirrorLeft, 2.0);
+    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", mass, templateHF, RooKeysPdf::MirrorLeft, 2.0);
+    
+    // YIELDs
+    double nTotal = data.sumEntries();
+    RooRealVar nLF("nLF", "N light flavor", nTotal/2, 0, nTotal);
+    RooRealVar nHF("nHF", "N heavy flavor", nTotal/2, 0, nTotal);
+    RooAddPdf model("model", "LF+HF", RooArgList(lfPdf, hfPdf), RooArgList(nLF, nHF));
+
+    // Fit to data in restricted range, but normalize over full range
+    RooFitResult* result = model.fitTo(data, 
+                                        RooFit::Range("fitRange"),      // Fit only here
+                                       RooFit::NormRange("normRange"),  // But yields are for full range
+                                       RooFit::Save());
+
+    cout << "Light flavor yield: " << nLF.getVal() << " +/- " << nLF.getError() << endl;
+    cout << "Heavy flavor yield: " << nHF.getVal() << " +/- " << nHF.getError() << endl;
+
+    // CREATE FIT PLOT
+    if(plotDir != nullptr) {
+        plotDir->cd();
+        TCanvas* c = new TCanvas(Form("LFFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 800);
+        c->Divide(1,2); 
+
+        // Top pad: main fit
+        c->cd(1);
+        gPad->SetPad(0.0, 0.3, 1.0, 1.0);
+        gPad->SetBottomMargin(0.02);
+        RooPlot* frame = mass.frame(RooFit::Title(Form("LF/HF Fit (%.0f < p_{T} < %.0f GeV)", Jetptmin, Jetptmax)));
+        data.plotOn(frame, RooFit::Name("data"));
+        model.plotOn(frame, RooFit::Range("fitRange"), RooFit::NormRange("normRange"), RooFit::Name("model"));
+        model.plotOn(frame, RooFit::Components(lfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("LF"));
+        model.plotOn(frame, RooFit::Components(hfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kBlue), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("HF"));
+        frame->Draw();
+
+        // Add legend
+        TLegend* leg = new TLegend(0.15, 0.65, 0.40, 0.88);
+        leg->AddEntry(frame->findObject("data"), "Data", "lep");
+        leg->AddEntry(frame->findObject("model"), "Total Fit (LF+HF)", "l");
+        leg->AddEntry(frame->findObject("LF"), "Light Flavor", "l");
+        leg->AddEntry(frame->findObject("HF"), "Heavy Flavor", "l");
+        leg->Draw();
+
+        // Bottom pad: residuals
+        c->cd(2);
+        gPad->SetPad(0.0, 0.0, 1.0, 0.3);
+        gPad->SetTopMargin(0.02);
+        gPad->SetBottomMargin(0.3);
+        RooHist* resid = frame->residHist("data", "model");
+        RooPlot* frame_resid = mass.frame();
+        frame_resid->addPlotable(resid, "P");
+        frame_resid->SetTitle("Residuals");
+        frame_resid->GetYaxis()->SetTitle("Data - Fit");
+        frame_resid->GetYaxis()->SetTitleSize(0.1);
+        frame_resid->GetYaxis()->SetLabelSize(0.1);
+        frame_resid->GetYaxis()->SetTitleOffset(0.3);
+        frame_resid->GetXaxis()->SetTitleSize(0.1);
+        frame_resid->GetXaxis()->SetLabelSize(0.1);
+        frame_resid->Draw();
+
+        c->Write();
+        c->SaveAs(Form("LFFit_invmass_pt%.0f_%.0f.pdf", Jetptmin, Jetptmax));
+        delete c;
+    } 
+    return nLF.getVal();;
+}
+
 
 float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
     
@@ -106,7 +206,7 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
     RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
     RooRealVar weight("weight", "weight", 0, 1e10);
     RooArgSet vars(fitVar, jetpt, weight);
-    fitVar.setRange("fitRange", -2, -0.3);
+    fitVar.setRange("fitRange", -3, 4);
     fitVar.setRange("normRange", -3, 4);
     
     // DATA
@@ -131,8 +231,8 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
     templateHF.append(templateHF_bb);
     
     // PDFs
-    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", fitVar, templateLF, RooKeysPdf::MirrorLeft, 1.0);
-    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", fitVar, templateHF, RooKeysPdf::MirrorLeft, 1.0);
+    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", fitVar, templateLF, RooKeysPdf::MirrorLeft, 2.0);
+    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", fitVar, templateHF, RooKeysPdf::MirrorLeft, 2.0);
     
     // YIELDs
     double nTotal = data.sumEntries();
@@ -152,17 +252,25 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
     // CREATE FIT PLOT
     if(plotDir != nullptr) {
         plotDir->cd();
-        TCanvas* c = new TCanvas(Form("LFFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 600);
+        TCanvas* c = new TCanvas(Form("LFFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 800);
+        c->Divide(1,2);
+        
+        // Top pad: main fit
+        c->cd(1);
+        gPad->SetPad(0.0, 0.3, 1.0, 1.0);
+        gPad->SetBottomMargin(0.02);
+        
         RooPlot* frame = fitVar.frame(RooFit::Title(Form("LF/HF Fit (%.0f < p_{T} < %.0f GeV)", Jetptmin, Jetptmax)));
         data.plotOn(frame, RooFit::Name("data"));
-        model.plotOn(frame, RooFit::Name("model"));
-        model.plotOn(frame, RooFit::Components(lfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Name("LF"));
-        model.plotOn(frame, RooFit::Components(hfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen), RooFit::Name("HF"));
+        model.plotOn(frame, RooFit::Range("fitRange"), RooFit::NormRange("normRange"), RooFit::Name("model"));
+        model.plotOn(frame, RooFit::Components(lfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("LF"));
+        model.plotOn(frame, RooFit::Components(hfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("HF"));
         
-        // Plot raw KDE templates (normalized)
-        lfPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kRed+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("LF_KDE"));
-        hfPdf.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kGreen+2), RooFit::Normalization(1.0, RooAbsReal::RelativeExpected), RooFit::Name("HF_KDE"));
+        // Plot full model over entire range (dotted)
+        model.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kBlue), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("model_full"));
         
+        frame->GetXaxis()->SetLabelSize(0);
+        frame->GetXaxis()->SetTitleSize(0);
         frame->Draw();
         
         // Add legend
@@ -171,11 +279,50 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
         leg->AddEntry(frame->findObject("model"), "Total Fit", "l");
         leg->AddEntry(frame->findObject("LF"), "LF (scaled)", "l");
         leg->AddEntry(frame->findObject("HF"), "HF (scaled)", "l");
-        leg->AddEntry(frame->findObject("LF_KDE"), "LF KDE", "l");
-        leg->AddEntry(frame->findObject("HF_KDE"), "HF KDE", "l");
+        leg->AddEntry(frame->findObject("model_full"), "Full PDF (extrapolated)", "l");
         leg->Draw();
         
+        // Bottom pad: residuals/pulls
+        c->cd(2);
+        gPad->SetPad(0.0, 0.0, 1.0, 0.3);
+        gPad->SetTopMargin(0.02);
+        gPad->SetBottomMargin(0.3);
+        
+        RooPlot* framePull = fitVar.frame(RooFit::Title(""));
+        RooHist* hpull = frame->pullHist("data", "model");
+        hpull->SetMarkerStyle(20);
+        hpull->SetMarkerSize(0.8);
+        framePull->addPlotable(hpull, "P0");
+        framePull->SetMinimum(-5);
+        framePull->SetMaximum(5);
+        framePull->GetYaxis()->SetTitle("Pull");
+        framePull->GetYaxis()->SetTitleSize(0.12);
+        framePull->GetYaxis()->SetLabelSize(0.10);
+        framePull->GetYaxis()->SetTitleOffset(0.35);
+        framePull->GetYaxis()->SetNdivisions(505);
+        framePull->GetXaxis()->SetTitleSize(0.12);
+        framePull->GetXaxis()->SetLabelSize(0.10);
+        framePull->GetXaxis()->SetTitleOffset(1.0);
+        framePull->Draw("lp");
+        
+        // Add horizontal lines at 0, +/-3
+        TLine* line0 = new TLine(framePull->GetXaxis()->GetXmin(), 0, framePull->GetXaxis()->GetXmax(), 0);
+        line0->SetLineColor(kBlack);
+        line0->SetLineStyle(2);
+        line0->Draw();
+        
+        TLine* line3 = new TLine(framePull->GetXaxis()->GetXmin(), 3, framePull->GetXaxis()->GetXmax(), 3);
+        line3->SetLineColor(kRed);
+        line3->SetLineStyle(2);
+        line3->Draw();
+        
+        TLine* lineM3 = new TLine(framePull->GetXaxis()->GetXmin(), -3, framePull->GetXaxis()->GetXmax(), -3);
+        lineM3->SetLineColor(kRed);
+        lineM3->SetLineStyle(2);
+        lineM3->Draw();
+        
         c->Write();
+        c->SaveAs(Form("LFFit_pt%.0f_%.0f.pdf", Jetptmin, Jetptmax));
         delete c;
     }
     
@@ -183,6 +330,7 @@ float LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_
 }
 
 int main(int argc, char *argv[]) {
+    gStyle->SetOptStat(0);
 
     // INPUTS
     cout << "Beginning Acceptance x Efficiency" << endl;
@@ -193,6 +341,7 @@ int main(int argc, char *argv[]) {
     vector<double> ptBins = CL.GetDoubleVector("ptBins");
     bool doJpsi = CL.GetBool("doJpsi");
     bool doLF = CL.GetBool("doLF");
+    bool doLF_invMass = CL.GetBool("doLF_invMass");
     bool makeplots = CL.GetBool("makeplots");
 
     // IMPORT TREE
@@ -212,6 +361,7 @@ int main(int argc, char *argv[]) {
     outputFile->cd();
     TH1D* JpsiYields = new TH1D("JpsiYields", "J/psi Yields", ptBins.size()-1, &ptBins[0]);
     TH1D* LightYields = new TH1D("LightYields", "Light Flavor Yields", ptBins.size()-1, &ptBins[0]);
+    TH1D* LightYields_mass = new TH1D("LightYields_mass", "Light Flavor Yields (inv mass method)", ptBins.size()-1, &ptBins[0]);
     TH1D* SplittingYields = new TH1D("SplittingYields", "Splitting Yields", ptBins.size()-1, &ptBins[0]);
     
     // CREATE PLOTS DIRECTORY
@@ -222,6 +372,7 @@ int main(int argc, char *argv[]) {
 
     float JspiYield = 0;
     float LightYield = 0;
+    float LightYield_mass = 0;
     float SplittingYield = 0;
     for(int i = 0; i < ptBins.size()-1; i++){
         
@@ -248,6 +399,12 @@ int main(int argc, char *argv[]) {
             LightYield = LFYield(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
             LightYields->SetBinContent(i+1, LightYield);
         }
+
+        // LF VIA INVMASS METHOD
+        if(doLF_invMass) {
+            LightYield_mass = LFYield_invMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            LightYields_mass->SetBinContent(i+1, LightYield_mass);
+        }
         
         // REMAINING YIELD
         SplittingYield = totalYield - JspiYield - LightYield;
@@ -259,6 +416,7 @@ int main(int argc, char *argv[]) {
     outputFile->cd();
     if(doJpsi) JpsiYields->Write();
     if(doLF) LightYields->Write();
+    if(doLF_invMass) LightYields_mass->Write();
     SplittingYields->Write();
 
     // SAVE COMMAND LINE PARAMS
@@ -270,11 +428,11 @@ int main(int argc, char *argv[]) {
     paramDoJpsi.Write();
     TNamed paramDoLF("doLF", doLF ? "true" : "false");
     paramDoLF.Write();
+    TNamed paramDoLFInvMass("doLF_invMass", doLF_invMass ? "true" : "false");
+    paramDoLFInvMass.Write();
     TNamed paramMakePlots("makeplots", makeplots ? "true" : "false");
     paramMakePlots.Write();
 
     outputFile->Close();
-
-    // TODO: MAKE PLOTTING INFRASTRUCTURE
 
 }
