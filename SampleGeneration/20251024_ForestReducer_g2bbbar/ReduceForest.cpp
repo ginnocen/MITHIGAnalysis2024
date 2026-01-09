@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
             continue;
           
           if( !MMuMuJet.HLT_HIAK4PFJet30_v1 && !MMuMuJet.HLT_HIAK4PFJet40_v1 && !MMuMuJet.HLT_HIAK4PFJet60_v1 &&
-              !MMuMuJet.HLT_HIAK4PFJet80_v1 && !MMuMuJet.HLT_HIAK4PFJet100_v1)
+              !MMuMuJet.HLT_HIAK4PFJet80_v1 && !MMuMuJet.HLT_HIAK4PFJet100_v1 && !MMuMuJet.HLT_HIZeroBias_v6)
             continue;
 
         } // end if pp data
@@ -731,9 +731,9 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
     return false;
   if (fabs(M->SingleMuEta->at(i)) > 2.3)
     return false;
-  if (M->SingleMuIsTracker->at(i) == 0 || M->SingleMuIsGlobal->at(i) == 0 || M->SingleMuSoft->at(i) == 0 ||
+  if ((M->SingleMuIsTracker->at(i) == 0 && M->SingleMuIsGlobal->at(i) == 0) || M->SingleMuSoft->at(i) == 0 ||
       M->SingleMuIsGood->at(i) == 0)
-    return false; // REPLACING HYBRIDS SOFT WITH SOFT
+    return false; // REPLACING HYBRID SOFT WITH SOFT
 
   return true;
 }
