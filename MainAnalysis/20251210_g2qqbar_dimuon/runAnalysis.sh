@@ -7,7 +7,7 @@ INPUT="/data00/g2ccbar/mc2018/skim_010526_soft_0/mergedfile.root"
 
 ./ExecuteEfficiency \
     --Input $INPUT \
-    --Output "testefficiencies_soft.root" \
+    --Output "testefficiencies.root" \
     --IsData false \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
@@ -16,8 +16,8 @@ echo "DONE WITH EFFICIENCIES"
 
 ./MakeDistros \
     --Input $INPUT \
-    --Input_Efficiency "testefficiencies_soft.root" \
-    --Output "testdistros_soft.root" \
+    --Input_Efficiency "testefficiencies.root" \
+    --Output "testdistros.root" \
     --IsData false \
     --chargeSelection 0 \
     --ptBins 60,80,100,120,160,200,250,300 \
@@ -27,11 +27,10 @@ echo "DONE WITH EFFICIENCIES"
 echo "DONE WITH DISTRIBUTIONS"
 
 ./ExecuteYield \
-    --Input "testdistros_soft.root" \
-    --Templates "testdistros_soft.root" \
-    --Output "testyields_soft.root" \
+    --Input "testdistros.root" \
+    --Templates "testdistros.root" \
+    --Output "testyields.root" \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --doJpsi false \
     --doLF true \
     --doLF_invMass true \
     --makeplots true \

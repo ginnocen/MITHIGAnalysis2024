@@ -39,70 +39,7 @@ using namespace std;
 
 using namespace std;
 
-float JpsiYield(TNtuple* nt, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
-
-    //ESTIMATE JPSI USING SIDEBANDS
-    RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 15);
-    RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
-    RooRealVar weight("weight", "weight", 0, 1e10);
-    RooArgSet vars(mass, jetpt, weight);
-    RooDataSet data("data", "data", nt, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
-
-    mass.setRange("signal", 2.95, 3.25);
-    mass.setRange("leftSB", 2.5, 2.90);
-    mass.setRange("rightSB", 3.3, 3.7);
-
-    double nSignal = data.sumEntries("", "signal");
-    double nLeftSB = data.sumEntries("", "leftSB");
-    double nRightSB = data.sumEntries("", "rightSB");
-    double nBkgInSignal = (nLeftSB + nRightSB) * (0.375);
-
-    //GAUSSIAN JPSI PEAK
-    RooRealVar mean("mean", "J/psi mass", 3.1, 2.6, 3.7);
-    RooRealVar sigma("sigma", "resolution", 0.09, 0.01, 0.2);
-    RooRealVar nJpsi("nJpsi", "N J/psi", nSignal - nBkgInSignal, 0, nSignal);
-    RooRealVar nBkg("nBkg", "N bkg", nBkgInSignal);
-    nBkg.setConstant(true);  // Fixed from sideband estimate
-
-    RooRealVar c0("c0", "constant", 1);
-    RooPolynomial bkgPdf("bkgPdf", "background", mass, c0);
-    RooGaussian jpsiPdf("jpsiPdf", "J/psi", mass, mean, sigma);
-    RooAddPdf model("model", "jpsi+bkg", RooArgList(jpsiPdf, bkgPdf), RooArgList(nJpsi, nBkg));
-
-    RooFitResult* result = model.fitTo(data, RooFit::Range("signal"), RooFit::Save());
-    cout << "J/psi yield: " << nJpsi.getVal() << " +/- " << nJpsi.getError() << endl;
-    cout << "Background yield: " << nBkg.getVal() << " (fixed)" << endl;
-    cout << "Total: " << nJpsi.getVal() + nBkg.getVal() << endl;
-
-    // CREATE FIT PLOT
-    if(plotDir != nullptr) {
-        plotDir->cd();
-        TCanvas* c = new TCanvas(Form("JpsiFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 600);
-        RooPlot* frame = mass.frame(RooFit::Title(Form("J/psi Fit (%.0f < p_{T} < %.0f GeV)", Jetptmin, Jetptmax)));
-        data.plotOn(frame, RooFit::Name("data"));
-        model.plotOn(frame, RooFit::Name("model"));
-        model.plotOn(frame, RooFit::Components(jpsiPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Name("jpsi"));
-        model.plotOn(frame, RooFit::Components(bkgPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen), RooFit::Name("bkg"));
-        
-        frame->Draw();
-        
-        // Add legend
-        TLegend* leg = new TLegend(0.55, 0.65, 0.80, 0.88);
-        leg->AddEntry(frame->findObject("data"), "Data", "lep");
-        leg->AddEntry(frame->findObject("model"), "Total Fit (Gaussian+Constant)", "l");
-        leg->AddEntry(frame->findObject("jpsi"), "J/#psi Gaussian", "l");
-        leg->AddEntry(frame->findObject("bkg"), "Constant Bkg", "l");
-        leg->Draw();
-        
-        c->Write();
-        c->SaveAs(Form("JpsiFit_pt%.0f_%.0f.pdf", Jetptmin, Jetptmax));
-        delete c;
-    }
-
-    return nJpsi.getVal();
-}
-
-tuple<float, float, float, float> LFYield_invMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float> LFYield_InvMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
 
     //INVERSE MASS FITTING METHOD TO EXTRACT LF YIELD
     RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 10);
@@ -224,7 +161,7 @@ tuple<float, float, float, float> LFYield_invMass(TNtuple* data_nt, TNtuple* nt_
 }
 
 
-tuple<float, float, float, float> LFYield(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float> LFYield_DCA(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
     
     RooRealVar fitVar("muDiDxy1Dxy2Sig", "muDiDxy1Dxy2Sig", -3, 4);
     RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
@@ -363,7 +300,6 @@ int main(int argc, char *argv[]) {
     string output = CL.Get("Output"); 
     string templates = CL.Get("Templates"); // TEMPLATES TO HELP THE FITTING (MC)
     vector<double> ptBins = CL.GetDoubleVector("ptBins");
-    bool doJpsi = CL.GetBool("doJpsi");
     bool doLF = CL.GetBool("doLF");
     bool doLF_invMass = CL.GetBool("doLF_invMass");
     bool makeplots = CL.GetBool("makeplots");
@@ -383,12 +319,10 @@ int main(int argc, char *argv[]) {
     // DECLARE HISTOGRAMS
     TFile* outputFile = new TFile(output.c_str(), "RECREATE");
     outputFile->cd();
-    TH1D* JpsiYields = new TH1D("JpsiYields", "J/psi Yields", ptBins.size()-1, &ptBins[0]);
-    TH1D* LightYields = new TH1D("LightYields", "Light Flavor Yields", ptBins.size()-1, &ptBins[0]);
-    TH1D* HeavyYields = new TH1D("HeavyYields", "Heavy Flavor Yields", ptBins.size()-1, &ptBins[0]);
-    TH1D* LightYields_mass = new TH1D("LightYields_mass", "Light Flavor Yields (inv mass method)", ptBins.size()-1, &ptBins[0]);
-    TH1D* HeavyYields_mass = new TH1D("HeavyYields_mass", "Heavy Flavor Yields (inv mass method)", ptBins.size()-1, &ptBins[0]);
-    TH1D* SplittingYields = new TH1D("SplittingYields", "Splitting Yields", ptBins.size()-1, &ptBins[0]);
+    TH1D* LightYields_DCA = new TH1D("LightYields_DCA", "Light Flavor Yields", ptBins.size()-1, &ptBins[0]);
+    TH1D* HeavyYields_DCA = new TH1D("HeavyYields_DCA", "Heavy Flavor Yields", ptBins.size()-1, &ptBins[0]);
+    TH1D* LightYields_InvMass = new TH1D("LightYields_InvMass", "Light Flavor Yields (inv mass method)", ptBins.size()-1, &ptBins[0]);
+    TH1D* HeavyYields_InvMass = new TH1D("HeavyYields_InvMass", "Heavy Flavor Yields (inv mass method)", ptBins.size()-1, &ptBins[0]);
     
     // CREATE PLOTS DIRECTORY
     TDirectory* plotDir = nullptr;
@@ -396,16 +330,10 @@ int main(int argc, char *argv[]) {
         plotDir = outputFile->mkdir("plots");
     }
 
-    float JspiYield = 0;
     float LightYield = 0;
     float LightYieldError = 0;
     float HeavyYield = 0;
     float HeavyYieldError = 0;
-    float LightYield_mass = 0;
-    float LightYieldError_mass = 0;
-    float HeavyYield_mass = 0;
-    float HeavyYieldError_mass = 0;
-    float SplittingYield = 0;
     for(int i = 0; i < ptBins.size()-1; i++){
         
         float ptMin = ptBins[i];
@@ -420,50 +348,40 @@ int main(int argc, char *argv[]) {
                           Form("JetPT < %f && JetPT >= %f", ptMax, ptMin), "weight");
         float totalYield = dataBin.sumEntries();
         
-        // JPSI
-        if(doJpsi) {
-            JspiYield = JpsiYield(nt, ptMin, ptMax, plotDir);
-            JpsiYields->SetBinContent(i+1, JspiYield);
-        }
-        
         // LF
         if(doLF) {
-            auto lfResult = LFYield(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            auto lfResult = LFYield_DCA(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
             tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError) = lfResult;
-            LightYields->SetBinContent(i+1, LightYield);
-            LightYields->SetBinError(i+1, LightYieldError);
-            HeavyYields->SetBinContent(i+1, HeavyYield);
-            HeavyYields->SetBinError(i+1, HeavyYieldError);
+            LightYields_DCA->SetBinContent(i+1, LightYield);
+            LightYields_DCA->SetBinError(i+1, LightYieldError);
+            HeavyYields_DCA->SetBinContent(i+1, HeavyYield);
+            HeavyYields_DCA->SetBinError(i+1, HeavyYieldError);
         }
 
         // LF VIA INVMASS METHOD
         if(doLF_invMass) {
-            auto lfResultMass = LFYield_invMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
-            tie(LightYield_mass, LightYieldError_mass, HeavyYield_mass, HeavyYieldError_mass) = lfResultMass;
-            LightYields_mass->SetBinContent(i+1, LightYield_mass);
-            LightYields_mass->SetBinError(i+1, LightYieldError_mass);
-            HeavyYields_mass->SetBinContent(i+1, HeavyYield_mass);
-            HeavyYields_mass->SetBinError(i+1, HeavyYieldError_mass);
+            auto lfResultMass = LFYield_InvMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError) = lfResultMass;
+            LightYields_InvMass->SetBinContent(i+1, LightYield);
+            LightYields_InvMass->SetBinError(i+1, LightYieldError);
+            HeavyYields_InvMass->SetBinContent(i+1, HeavyYield);
+            HeavyYields_InvMass->SetBinError(i+1, HeavyYieldError);
         }
         
-        // REMAINING YIELD
-        SplittingYield = totalYield - JspiYield - LightYield;
-        SplittingYields->SetBinContent(i+1, SplittingYield);
         
     }
 
     // WRITE TO FILE
     outputFile->cd();
-    if(doJpsi) JpsiYields->Write();
+        
     if(doLF) {
-        LightYields->Write();
-        HeavyYields->Write();
+        LightYields_DCA->Write();
+        HeavyYields_DCA->Write();
     }
     if(doLF_invMass) {
-        LightYields_mass->Write();
-        HeavyYields_mass->Write();
+        LightYields_InvMass->Write();
+        HeavyYields_InvMass->Write();
     }
-    SplittingYields->Write();
 
     // SAVE COMMAND LINE PARAMS
     TNamed paramFile("InputFile", file.c_str());
@@ -480,5 +398,14 @@ int main(int argc, char *argv[]) {
     paramMakePlots.Write();
 
     outputFile->Close();
+
+    if(makeplots) {
+        
+        // IF do LF_INVMASS, make plots of the 
+        // 1.) the distribution of LF yield as a function of pT 
+        // 2.) the distribution of HF yield as a function of pT
+
+
+    }
 
 }
