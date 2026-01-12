@@ -136,14 +136,14 @@ int main(int argc, char *argv[]) {
         if(isDimuonSelected(t, muPtSelection, chargeSelection, isData)){
             
             // WEIGHTS REMOVED FOR INITIAL FITTING CHECKS
-            //weight = 1 / DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // MAY WANT TO MAKE MORE ROBUST FOR DIVIDE BY ZEROS
+            //weight = 1 / DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // DISCUSS WHERE TO ENTER THE WEIGHTS 
             //if(!isData){weight *= t->MuMuWeight}; --> will definitely want to use these weights to generate a DATA template fom MC
             weight = 1;
 
             hInvMass->Fill(t->JetPT, t->mumuMass, weight);
             hDCAProductSig->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
             hmuDR->Fill(t->JetPT, t->muDR, weight);
-            ntDimuon->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight); // NOTE MAY WANT TO JUST PUT THE SIGNIFICANCE WITHOUT THE LOG FOR FUTURE REFERENCE
+            ntDimuon->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight); 
             hEfficiency->Fill(t->JetPT, t->JetEta, 1/weight);
 
             if(isData){continue;} // ONLY MAKE TEMPLATES WITH MC 
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
             h_mass->SetLineWidth(2);
             h_mass->SetTitle(Form("Dimuon Mass (%.0f < p_{T} < %.0f GeV);m_{#mu#mu} [GeV];Entries", ptMin, ptMax));
             h_mass->Draw("HIST");
-            c1->SaveAs(Form("mass_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c1->SaveAs(Form("plots/mass_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
             delete c1;
             
             // DCA projection
@@ -219,7 +219,7 @@ int main(int argc, char *argv[]) {
             h_dca->SetLineWidth(2);
             h_dca->SetTitle(Form("DCA Product Sig (%.0f < p_{T} < %.0f GeV);log_{10}(|DCA_{1}#timesDCA_{2}|/#sigma);Entries", ptMin, ptMax));
             h_dca->Draw("HIST");
-            c2->SaveAs(Form("dca_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c2->SaveAs(Form("plots/dca_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
             delete c2;
             
             // DR projection
@@ -229,7 +229,7 @@ int main(int argc, char *argv[]) {
             h_dr->SetLineWidth(2);
             h_dr->SetTitle(Form("#mu#mu #DeltaR (%.0f < p_{T} < %.0f GeV);#DeltaR(#mu,#mu);Entries", ptMin, ptMax));
             h_dr->Draw("HIST");
-            c3->SaveAs(Form("dr_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c3->SaveAs(Form("plots/dr_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
             delete c3;
         }
 
@@ -263,7 +263,7 @@ int main(int argc, char *argv[]) {
                     leg_mass->AddEntry(h, flavorNames[i].c_str(), "l");
                 }
                 leg_mass->Draw();
-                c_mass_overlay->SaveAs(Form("mass_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_mass_overlay->SaveAs(Form("plots/mass_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
                 delete c_mass_overlay;
                 
                 // DCA overlay
@@ -288,7 +288,7 @@ int main(int argc, char *argv[]) {
                     leg_dca->AddEntry(h, flavorNames[i].c_str(), "l");
                 }
                 leg_dca->Draw();
-                c_dca_overlay->SaveAs(Form("dca_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_dca_overlay->SaveAs(Form("plots/dca_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
                 delete c_dca_overlay;
                 
                 // DR overlay
@@ -313,7 +313,7 @@ int main(int argc, char *argv[]) {
                     leg_dr->AddEntry(h, flavorNames[i].c_str(), "l");
                 }
                 leg_dr->Draw();
-                c_dr_overlay->SaveAs(Form("dr_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_dr_overlay->SaveAs(Form("plots/dr_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
                 delete c_dr_overlay;
             }
         }

@@ -5,6 +5,7 @@ rm -rf Output
 rm -rf output
 rm *.txt*
 rm .DS_Store
+mkdir -p plots
 CURRENTDIR=$PWD
 cd /home/$USER/CMSSW_13_2_4/src
 cmsenv

@@ -31,7 +31,7 @@ vector<int> isSelected(DimuonJetMessenger *Jet, float muPtCut, bool isData){
     // 2 - Gen Dimuon Jet selection
     vector<int> indices = {0, 0, 0};
 
-    // TODO APPLY EVENT SELECTION HERE 
+    // TODO APPLY EVENT SELECTION HERE FOR DATA SAMPLE
     // none for MC, ?? for Data.
     indices[0] = 1;
 
