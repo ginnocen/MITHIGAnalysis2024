@@ -485,6 +485,7 @@ int main(int argc, char *argv[]) {
             LightYields_DCA->SetTitle("Light Flavor Yields");
             LightYields_DCA->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
             LightYields_DCA->GetYaxis()->SetTitle("Light Flavor Yield");
+            LightYields_DCA->SetMinimum(0);
             LightYields_DCA->Draw("E");
             leg->AddEntry(LightYields_DCA, "DCA Method", "lep");
         }
@@ -503,6 +504,7 @@ int main(int argc, char *argv[]) {
             HeavyYields_DCA->SetTitle("Heavy Flavor Yields");
             HeavyYields_DCA->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
             HeavyYields_DCA->GetYaxis()->SetTitle("Heavy Flavor Yield");
+            HeavyYields_DCA->SetMinimum(0);
             HeavyYields_DCA->Draw("E");
             leg->AddEntry(HeavyYields_DCA, "DCA Method", "lep");
         }
@@ -521,6 +523,8 @@ int main(int argc, char *argv[]) {
             Fractions_DCA->SetTitle("Heavy Flavor Fraction");
             Fractions_DCA->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
             Fractions_DCA->GetYaxis()->SetTitle("Heavy Flavor Fraction");
+            Fractions_DCA->SetMinimum(0);
+            Fractions_DCA->SetMaximum(1);
             Fractions_DCA->Draw("E");
             leg->AddEntry(Fractions_DCA, "DCA Method", "lep");
         }
@@ -539,6 +543,7 @@ int main(int argc, char *argv[]) {
             FullYields_DCA->SetTitle("Total Yields");
             FullYields_DCA->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
             FullYields_DCA->GetYaxis()->SetTitle("Total Yield");
+            FullYields_DCA->SetMinimum(0);
             FullYields_DCA->Draw("E");
             leg->AddEntry(FullYields_DCA, "DCA Method", "lep");
         }

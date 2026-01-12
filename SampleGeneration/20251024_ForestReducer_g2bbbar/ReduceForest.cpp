@@ -486,6 +486,7 @@ int main(int argc, char *argv[]) {
         // Gen muon info  
 
 	      bool GenIsJetMuonTagged = false;
+        bool GenIsRecoMatched = false;
         int nGenMu = 0;
         float GenMuPt1 = -999;
         float GenMuPt2 = -999;
@@ -529,12 +530,17 @@ int main(int argc, char *argv[]) {
               if (dRMu1Jet > 0.3) continue;
               if (dRMu2Jet > 0.3) continue;
 
+              if(isJetMuonTagged && GenIsRecoMatched == false){
+                if(isDimuonGenMatched(&MSingleMu, igen1, igen2,maxMu1Index, maxMu2Index)){ //recording a match if ANY pair of muons match reco-gen, not just pT leading
+                  GenIsRecoMatched = true;
+                }
+              }
+
               TLorentzVector GenMu1, GenMu2;
               GenMu1.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen1), MSingleMu.GenSingleMuEta->at(igen1), MSingleMu.GenSingleMuPhi->at(igen1), M_MU);
               GenMu2.SetPtEtaPhiM(MSingleMu.GenSingleMuPT->at(igen2), MSingleMu.GenSingleMuEta->at(igen2), MSingleMu.GenSingleMuPhi->at(igen2), M_MU);
 
               TLorentzVector GenMuMu = GenMu1 + GenMu2;
-               //cout << dRMu1Jet << " " << dRMu2Jet << " " << GenMuMu.Pt() << endl;
 
               if (GenMuMu.Pt() > maxGenmumuPt) {
                 maxGenmumuPt = GenMuMu.Pt();
@@ -545,7 +551,7 @@ int main(int argc, char *argv[]) {
             }
           }
 
-        if(maxGenmumuPt > 0. && maxGenMu1Index >= 0 && maxGenMu2Index >= 0){
+        if(maxGenmumuPt > 0. && maxGenMu1Index >= 0 && maxGenMu2Index >= 0){ // STILL FILLING WITH THE LEADING PT DIMUON PROPERTIES
           //cout << "gen pair at entry " << iE << endl;
           GenIsJetMuonTagged = true;
           
@@ -574,16 +580,10 @@ int main(int argc, char *argv[]) {
           GenMuDR = sqrt(GenMuDeta * GenMuDeta + GenMuDphi * GenMuDphi);
           
         } // end if dimuon pair found ll 
-
-        if(GenIsJetMuonTagged && isJetMuonTagged){
-          MMuMuJet.mumuIsGenMatched = isDimuonGenMatched(&MSingleMu, maxGenMu1Index, maxGenMu2Index, maxMu1Index, maxMu2Index);
-        }
-        else{
-          MMuMuJet.mumuIsGenMatched = false;
-        }
         
 
         MMuMuJet.GenIsMuMuTagged = GenIsJetMuonTagged;
+        MMuMuJet.mumuIsGenMatched = GenIsRecoMatched;
         MMuMuJet.GenMuMuMass = GenMuMuMass;
         MMuMuJet.GenMuMuPt = GenMuMuPt;
         MMuMuJet.GenMuMuPhi = GenMuMuPhi;
