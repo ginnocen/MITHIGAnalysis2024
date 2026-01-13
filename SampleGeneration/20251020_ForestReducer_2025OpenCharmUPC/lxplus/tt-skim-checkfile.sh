@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $# -ne 6 ]]; then
-    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData]" 
+if [[ $# -ne 7 ]]; then
+    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection]" 
     exit 1
 fi
 
@@ -11,6 +11,7 @@ DESTINATION=$3
 OUTFILE=$4
 CRELEASE=$5
 IsData=$6
+ApplyDRejection=$7
 
 echo "SCRAM_ARCH:          "$SCRAM_ARCH
 echo "PWD:                 "$PWD
@@ -21,11 +22,11 @@ echo "DESTINATION:         "$DESTINATION
 
 # tar -xzvf corr.tar.gz
 source /cvmfs/cms.cern.ch/cmsset_default.sh
-scramv1 project CMSSW $CRELEASE
+scramv1 project CMSSW $CRELEASE # cmsrel
 
 [[ -d $CRELEASE/src ]] && {
     cd $CRELEASE/src
-    eval `scram runtime -sh`
+    eval `scram runtime -sh` # cmsenv
     cd ../../
 
     root --version
@@ -42,13 +43,14 @@ scramv1 project CMSSW $CRELEASE
                --ApplyTriggerRejection 0 \
                --ApplyEventRejection false \
                --ApplyZDCGapRejection false \
-               --ApplyDRejection no \
+               --ApplyDRejection $ApplyDRejection \
                --PFTree particleFlowAnalyser/pftree \
+               --Year 2025 \
                --IsData $IsData
 
     ls
     
-    if [[ $(wc -c $OUTFILE | awk '{print $1}') -gt 700 ]] ; then
+    if [[ $(wc -c $OUTFILE | awk '{print $1}') -gt 700 ]] ; then # check output file size reasonable
         # xrdcp
         SRM_PREFIX="/eos/cms/" ; SRM_PATH=${DESTINATION#${SRM_PREFIX}} ;
         xrdcp ${OUTFILE} root://eoscms.cern.ch//${SRM_PATH}/$OUTFILE
@@ -60,3 +62,4 @@ rm -rf $EXEFILE $CRELEASE
 rm DzeroUPC_dedxMap.root
 rm $PWD/${INFILE##*/}
 rm $OUTFILE
+rm -v x509*

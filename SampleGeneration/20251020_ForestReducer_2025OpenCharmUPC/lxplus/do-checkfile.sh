@@ -7,17 +7,17 @@ then
 fi
 
 # Max number of files to submit for each input
-MAXFILENO=2
+MAXFILENO=1000000
 
 # Exe parameters
-IsData=False
-
+IsData=True
+ApplyDRejection=pasor # no pasor 
 # 
-EXEFILE=Execute_Lcpks
-PIDfile=../../../CommonCode/root/DzeroUPC_dedxMap.root # wrt lxplus/.
+EXEFILE=Execute_Dzero
+PIDfile=../../../CommonCode/root/DzeroUPC_dedxMap.root # wrt lxplus/
 #
-PRIMARY="Lcpks_251218"
-LABELTAG="_tutorial" # e.g. versions or selections
+PRIMARY="Dzero_260113"
+LABELTAG="_Drej-pasor" # e.g. versions or selections
 
 ###############################################################################
 ## IMPORTANT:
@@ -26,21 +26,25 @@ LABELTAG="_tutorial" # e.g. versions or selections
 ## If your path does not include `crab_`, the script must be adjusted.
 ###############################################################################
 INPUTS=(
-    ## OPTION 1: /eos/cms/..
-    ## - The double quotes below are required when asterisks (*) are used.
-    "/eos/cms/store/group/phys_heavyions/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward23/crab_PbPbUPC_HIForward23_399966-399989_QuickAnalysis/251204_184915/000*"
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_250112_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1/260113_042410/0000
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_250112_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1/260113_042623/0000
 
-    ## OPTION 2: root:/redirector//store/...
-    ## - Do not use asterisks (*) for xrootd directory path
-    root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0_400098-400243_QuickAnalysis/251207_153448/0000
-    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0_400098-400243_QuickAnalysis/251207_153448/0001
-
-    ## OPTION 3: filelist.txt
-    ## - Must be .txt; One file per line ; No asterisks (*)
-    filelists/example.txt
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0/251227_162520/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward2/crab_PbPbUPC_HIForward2/251227_171556/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward4/crab_PbPbUPC_HIForward4/251227_171633/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward6/crab_PbPbUPC_HIForward6/251227_171846/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward8/crab_PbPbUPC_HIForward8/251227_171942/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward10/crab_PbPbUPC_HIForward10/251227_172110/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward12/crab_PbPbUPC_HIForward12/251228_175230/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward14/crab_PbPbUPC_HIForward14/251228_175327/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward16/crab_PbPbUPC_HIForward16/251228_175418/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward18/crab_PbPbUPC_HIForward18/251228_175501/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward20/crab_PbPbUPC_HIForward20/251228_175537/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward22/crab_PbPbUPC_HIForward22/251228_175617/000[0-6]
 )
 
-OUTPUTPRIDIR="/eos/cms/store/group/phys_heavyions/"$USER"/test_condor"
+OUTPUTPRIDIR="/eos/cms/store/group/phys_heavyions/"$USER"/Forest2025PbPb"
+LOGBASEDIR=$PWD # eos does not work for logs
 
 ######################################################
 ### don't change things below if you are just user ###
@@ -84,7 +88,17 @@ do
             REDIRECTOR=${INPUTDIR%%/store*}
             SUBPATH=${INPUTDIR/$REDIRECTOR/}
             REDIRECTOR=${REDIRECTOR%/}"/"
-            xrdfs $REDIRECTOR ls $SUBPATH | sed -e "s|^|$REDIRECTOR|1" > $INPUTFILELIST
+            if [[ "$SUBPATH" =~ \[[0-9]+-[0-9]+\] && ! "$CRABNAME" =~ \[[0-9]+-[0-9]+\] ]]; then
+                range="${SUBPATH##*[}" ; range="${range%%]*}"
+                low="${range%-*}" ; high="${range#*-}"
+                if (( low > high )) ; then rtmp=high ; high=low ; low=rtmp ; fi ;
+                rm $INPUTFILELIST
+                for ((i = low; i <= high; i++)); do
+                    xrdfs $REDIRECTOR ls ${SUBPATH/\[$range\]/$i} | sed -e "s|^|$REDIRECTOR|1" >> $INPUTFILELIST
+                done
+            else
+                xrdfs $REDIRECTOR ls $SUBPATH | sed -e "s|^|$REDIRECTOR|1" > $INPUTFILELIST
+            fi
         fi
     fi
     echo -e "\e[2mInjected files in\e[0m $INPUTFILELIST"
@@ -93,7 +107,7 @@ do
 
     ##
     OUTPUTDIR="${OUTPUTPRIDIR}/${OUTPUTSUBDIR}"
-    LOGDIR="logs/log_${OUTPUTSUBDIR}"
+    LOGDIR=$LOGBASEDIR"/logs/log_${OUTPUTSUBDIR}"
 
     echo -e "\e[2mOutput to\e[0m $OUTPUTDIR"
     ##
@@ -101,7 +115,7 @@ do
     if [ "$submit_jobs" -eq 1 ]
     then
         set -x
-        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData 
+        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $ApplyDRejection 
         set +x
     fi
 
