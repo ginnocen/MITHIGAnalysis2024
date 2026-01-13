@@ -16,10 +16,10 @@ CURRENTFOLDER=$PWD
     [[ x$ProjectBase == x ]] && source SetupAnalysis.sh
     cd CommonCode/
     rm -rf binary library
-    make || { cd $CURRENTFOLDER ; exit 2 ; }
+    make || { cd $CURRENTFOLDER ; return 2 ; }
 }
 cd $CURRENTFOLDER/../
-make || { cd $CURRENTFOLDER ; exit 2 ; }
+make || { cd $CURRENTFOLDER ; return 2 ; }
 cd $CURRENTFOLDER
 
 set +x
