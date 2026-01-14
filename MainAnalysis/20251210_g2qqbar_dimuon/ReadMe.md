@@ -9,6 +9,8 @@ They are designed to be run in sequence, and the outputs of one are the inputs t
 ```
 ./runAnalysis.sh
 ```
+If there is no PR on which to attach comments, I suggest we put questions or things to fix in this google doc (look for a tab that says "code development")
+https://docs.google.com/document/d/1eKEmvsQBWXX00XjW_cYrr_Yn29plBR8YZWor37caT10/edit?usp=sharing
 
 ### Efficiencies.cc
 
@@ -18,9 +20,10 @@ The purpose of Efficiencies.cc is to derive and save all of the corrections we w
 - IsData (i.e. not MC) parameter
 - pT Bins
 - Single muon pT cutoff
+- Charge selection (0 -> No selection, 1-> same sign, -1-> opposite sign)
 - makeplots (writes auxiliary plots to .pdf files + a plotting directory in the output root file)
 
-The file will produce an output file containing all of the necessary correction histograms
+The file will produce an output file containing all of the necessary correction histograms. For now it is simply inclusive jet yield (and efficiency and purity) alongside dimuon jet yield (alongside reconstruction efficiency and purity)
 
 ### MakeDistros.cc
 
@@ -30,7 +33,7 @@ MakeDistros.cc will produce distributions for the dimuons in DCA (product signif
 - Input file name
 - Efficiency file name (output of Efficiencies macro)
 - IsData 
-- Charge Selection (0 -> No selection, 1-> same sign, -1-> opposite sign)
+- Charge Selection 
 - pT bins
 - Single muon pT cutoff
 - makeplots 
