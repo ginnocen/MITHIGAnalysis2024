@@ -216,7 +216,7 @@ int main(int argc, char *argv[]) {
       /////////////////////////////
 
       if (IsData) {
-        bool incl_ZDCOr = true, incl_ZDCXORJet = true; // for trigger rejection
+        bool incl_ZDCOr = true, incl_ZDCXORJet = true, incl_ZB = true; // for trigger rejection
 
         if (Year == 2023) {
           MLambdaCUPC.isL1ZDCOr_Min400_Max10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
@@ -230,6 +230,7 @@ int main(int argc, char *argv[]) {
 
           incl_ZDCOr = MLambdaCUPC.isL1ZDCOr;
           incl_ZDCXORJet = MLambdaCUPC.isL1ZDCXORJet8;
+          // incl_ZB = ?
         }
         else if (Year == 2024 || Year == 2025) {
           MLambdaCUPC.isL1ZDCOr_Min400_Max10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
@@ -248,10 +249,12 @@ int main(int argc, char *argv[]) {
 
           incl_ZDCOr = MLambdaCUPC.isL1ZDCOr_Max10000 || MLambdaCUPC.isL1ZDCOr_Min400_Max10000 || MLambdaCUPC.isL1ZDCOr_Max400_Pixel || MLambdaCUPC.isL1ZDCXORJet12;
           incl_ZDCXORJet = MLambdaCUPC.isL1ZDCXORJet8 || MLambdaCUPC.isL1ZDCXORJet12 || MLambdaCUPC.isL1ZDCXORJet16;
+          incl_ZB = MLambdaCUPC.isZeroBias_Min400_Max10000 || MLambdaCUPC.isZeroBias_Max400_Pixel || MLambdaCUPC.isZeroBias || MLambdaCUPC.isZeroBias_Max10000;
         }
 
         if (ApplyTriggerRejection == 1 && !(incl_ZDCOr || incl_ZDCXORJet)) continue;
         if (ApplyTriggerRejection == 2 && !incl_ZDCOr) continue;
+        if (ApplyTriggerRejection == 3 && !incl_ZB) continue;
       } /* if (IsData) { */
 
       /////////////////////////////////////////////
