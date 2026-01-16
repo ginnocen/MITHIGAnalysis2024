@@ -10,14 +10,16 @@ fi
 MAXFILENO=1000000
 
 # Exe parameters
-IsData=True
-ApplyDRejection=pasor # no pasor 
+IsData=false
+ApplyDRejection=no # no pasor
+IsGammaNMCtype=false
 # 
 EXEFILE=Execute_Dzero
 PIDfile=../../../CommonCode/root/DzeroUPC_dedxMap.root # wrt lxplus/
 #
-PRIMARY="Dzero_260113"
-LABELTAG="_Drej-pasor" # e.g. versions or selections
+PRIMARY="Dzero_260115"
+LABELTAG="" # e.g. versions or selections
+[[ $ApplyDRejection != "no" ]] && LABELTAG="_Drej-"$ApplyDRejection # e.g. versions or selections
 
 ###############################################################################
 ## IMPORTANT:
@@ -26,8 +28,8 @@ LABELTAG="_Drej-pasor" # e.g. versions or selections
 ## If your path does not include `crab_`, the script must be adjusted.
 ###############################################################################
 INPUTS=(
-    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_250112_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1/260113_042410/0000
-    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_250112_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1/260113_042623/0000
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_250115_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1/260115_184035/0000
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_250115_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1/260115_184134/0000
 
     # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0/251227_162520/000[0-6]
     # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward2/crab_PbPbUPC_HIForward2/251227_171556/000[0-6]
@@ -112,10 +114,11 @@ do
     echo -e "\e[2mOutput to\e[0m $OUTPUTDIR"
     ##
 
+    [[ ($INPUTDIR == *BeamA* && $IsGammaNMCtype == false) || ($INPUTDIR == *BeamB* && $IsGammaNMCtype == true) ]] && { echo "error: mismatching between IsGammaNMCtype ("$IsGammaNMCtype") and Beam for MC." ; continue ; }
     if [ "$submit_jobs" -eq 1 ]
     then
         set -x
-        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $ApplyDRejection 
+        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $ApplyDRejection $IsGammaNMCtype
         set +x
     fi
 

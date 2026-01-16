@@ -2,8 +2,8 @@
 
 # https://batchdocs.web.cern.ch/local/submit.html
 
-if [[ $# -ne 7 ]]; then
-    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection]" 
+if [[ $# -ne 8 ]]; then
+    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection] [IsGammaNMCtype]"
     exit 1
 fi
 
@@ -14,6 +14,7 @@ MAXFILES=$4
 LOGDIR=$5
 IsData=$6
 ApplyDRejection=$7
+IsGammaNMCtype=$8
 
 SCRVERSION=${SCRAM_ARCH%%_*}
 runtimelimit="espresso" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
@@ -52,7 +53,7 @@ Universe     = vanilla
 Initialdir   = $PWD/
 Notification = Error
 Executable   = $PWD/tt-${tag}-checkfile.sh
-Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection
+Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection $IsGammaNMCtype
 Output       = $LOGDIR/log-${infn}.out
 Error        = $LOGDIR/log-${infn}.err
 Log          = $LOGDIR/log-${infn}.log

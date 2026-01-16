@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $# -ne 7 ]]; then
-    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection]" 
+if [[ $# -ne 8 ]]; then
+    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype]" 
     exit 1
 fi
 
@@ -12,6 +12,7 @@ OUTFILE=$4
 CRELEASE=$5
 IsData=$6
 ApplyDRejection=$7
+IsGammaNMCtype=$8
 
 echo "SCRAM_ARCH:          "$SCRAM_ARCH
 echo "PWD:                 "$PWD
@@ -44,7 +45,7 @@ scramv1 project CMSSW $CRELEASE # cmsrel
                --ApplyEventRejection false \
                --ApplyZDCGapRejection false \
                --ApplyDRejection $ApplyDRejection \
-               --PFTree particleFlowAnalyser/pftree \
+               --IsGammaNMCtype $IsGammaNMCtype \
                --Year 2025 \
                --IsData $IsData
 

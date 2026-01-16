@@ -10,10 +10,12 @@ private:
    std::string Self;
    std::map<std::string, std::string> Arguments;
    std::vector<std::string> ExtraArguments;
+   bool Verbose;
 public:
    CommandLine(int argc, char *argv[]);
    ~CommandLine();
    void Initialize(int argc, char *argv[]);
+   void SetVerbose(bool v = true) { Verbose = v; }
    std::string operator [](int Index);
    std::string operator [](std::string Key);
    std::string Get(int Index);
@@ -80,7 +82,7 @@ public:
    std::vector<bool> ParseBool(std::string Input, char Delimiter = ',');
 };
 
-CommandLine::CommandLine(int argc, char *argv[])
+CommandLine::CommandLine(int argc, char *argv[]) : Verbose(false)
 {
    Initialize(argc, argv);
 }
@@ -167,10 +169,20 @@ std::string CommandLine::Get(int Index, std::string Default)
    
 std::string CommandLine::Get(std::string Key, std::string Default)
 {
-   if(Arguments.find(Key) == Arguments.end())
-      return Default;
-
-   return Arguments[Key];
+  if(Arguments.find(Key) == Arguments.end()) {
+    if (Verbose) {
+      std::cout << "\e[2m" << std::left
+		<< std::setw(25) << Key << " : " << Default << " (default)"
+		<< "\e[0m" << std::endl;
+    }
+    return Default;
+  }
+  if (Verbose) {
+    std::cout << std::left
+              << std::setw(25) << Key << " : " << Arguments[Key]
+              << "\e[0m" << std::endl;
+  }
+  return Arguments[Key];
 }
 
 std::vector<std::string> CommandLine::GetStringVector(int Index, char Delimiter)

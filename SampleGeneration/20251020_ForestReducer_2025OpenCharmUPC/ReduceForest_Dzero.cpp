@@ -15,30 +15,14 @@ using namespace std;
 #include "TTree.h"
 
 #include "CommandLine.h"
-#include "CommonFunctions.h"
 #include "Messenger.h"
 #include "ProgressBar.h"
 
-#include "TrackResidualCorrector.h"
-#include "tnp_weight.h"
-#include "trackingEfficiency2017pp.h"
-#include "trackingEfficiency2018PbPb.h"
-#include "trackingEfficiency2023PbPb.h"
+#include "include/myhelper.h"
 
 #include "include/DzeroSelection.h"
 using namespace DzeroSelection;
 #include "include/PIDScoring.h"
-
-bool logical_or_vectBool(std::vector<bool>* vec) {
-    return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
-}
-
-// Helper function to convert a string to lowercase
-std::string toLower(const std::string& str) {
-    std::string lowerStr = str;
-    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
-    return lowerStr;
-}
 
 int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
@@ -47,11 +31,10 @@ int main(int argc, char *argv[]) {
   string VersionString = "V8";
 
   CommandLine CL(argc, argv);
-
+  CL.SetVerbose();
   vector<string> InputFileNames = CL.GetStringVector("Input");
   string OutputFileName = CL.Get("Output");
 
-  // bool DoGenLevel                    = CL.GetBool("DoGenLevel", true);
   bool IsData = CL.GetBool("IsData", false);
   bool IsGammaNMCtype = CL.GetBool("IsGammaNMCtype", true); // This is only meaningful when IsData==false. gammaN: BeamA, Ngamma: BeamB
   int Year = CL.GetInt("Year", 2023);
@@ -82,11 +65,11 @@ int main(int argc, char *argv[]) {
   // "PASSystDtrkPt":   reject !DpassCut23PASSystDtrkPt
   // "PASSystDalpha":   reject !DpassCut23PASSystDalpha
   // "PASSystDchi2cl":  reject !DpassCut23PASSystDchi2cl
-  string ApplyDRejection = toLower(CL.Get("ApplyDRejection", "no"));
+  string ApplyDRejection = myhelper::to_lower(CL.Get("ApplyDRejection", "no"));
   float DptThreshold = CL.GetDouble("DptThreshold", -1.);
-  string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
+
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
@@ -101,10 +84,7 @@ int main(int argc, char *argv[]) {
     "passystdsvpvsig", "passystdtrkpt", "passystdalpha", "passystdchi2cl"
   };
   // Validate the argument
-  if (allowedApplyDRejection.find(ApplyDRejection) != allowedApplyDRejection.end()) {
-    std::cout << "D filtering criterion: " << ApplyDRejection << std::endl;
-    // Add your program logic here
-  } else {
+  if (allowedApplyDRejection.find(ApplyDRejection) == allowedApplyDRejection.end()) {
     std::cerr << "[Warning] Invalid ApplyDRejection. Set to NO rejection. Allowed ApplyDRejection are: ";
     for (const auto& ele : allowedApplyDRejection) {
         std::cout << ele << ", ";
@@ -117,7 +97,6 @@ int main(int argc, char *argv[]) {
     *fdedxKaonCenter = 0, *fdedxKaonSigmaLo = 0, *fdedxKaonSigmaHi = 0,
     *fdedxProtCenter = 0, *fdedxProtSigmaLo = 0, *fdedxProtSigmaHi = 0;
   if (DoPID) {
-    std::cout<<"PID functions from: "<<RootPID<<std::endl;
     auto dedxFunctions = ImportPIDRoot(RootPID.c_str());
     fdedxPionCenter  = dedxFunctions[0];
     fdedxPionSigmaLo = dedxFunctions[1];
@@ -134,12 +113,9 @@ int main(int argc, char *argv[]) {
     auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
-    // Use PbPbTracks/trackTree as the default, else ppTracks/trackTree
-    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, InputFile->Get("PbPbTracks/trackTree")?
-                                                                     "PbPbTracks/trackTree":
-                                                                     "ppTracks/trackTree"); // ppTracks/trackTree
+    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, myhelper::find_tree_from_list(InputFile, { "PbPbTracks/trackTree", "ppTracks/trackTree" }));
     GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
-    PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
+    PFTreeMessenger MPF(InputFile, myhelper::find_tree_from_list(InputFile, { "particleFlowAnalyser/pftree" }));
     SkimTreeMessenger MSkim(InputFile); // skimanalysis/HltTree
     TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
     DzeroTreeMessenger MDzero(InputFile); // Dfinder/ntDkpi
