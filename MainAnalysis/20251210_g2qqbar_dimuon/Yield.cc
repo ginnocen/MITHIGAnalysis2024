@@ -39,7 +39,7 @@ using namespace std;
 
 using namespace std;
 
-tuple<float, float, float, float> LFYield_InvMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float, float> LFYield_InvMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
 
     //INVERSE MASS FITTING METHOD TO EXTRACT LF YIELD
     RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 10);
@@ -92,7 +92,7 @@ tuple<float, float, float, float> LFYield_InvMass(TNtuple* data_nt, TNtuple* nt_
     // CREATE FIT PLOT
     if(plotDir != nullptr) {
         plotDir->cd();
-        TCanvas* c = new TCanvas(Form("LFFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 800);
+        TCanvas* c = new TCanvas(Form("LFFit_invmass_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 800);
         c->Divide(1,2); 
 
         // Top pad: main fit
@@ -104,6 +104,11 @@ tuple<float, float, float, float> LFYield_InvMass(TNtuple* data_nt, TNtuple* nt_
         model.plotOn(frame, RooFit::Range("fitRange"), RooFit::NormRange("normRange"), RooFit::Name("model"));
         model.plotOn(frame, RooFit::Components(lfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("LF"));
         model.plotOn(frame, RooFit::Components(hfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen+2), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("HF"));
+        
+        // Calculate chi-square/ndf (2 floating parameters: nLF, nHF)
+        double chi2_ndf = frame->chiSquare("model", "data", 2);
+        cout << "Chi^2/ndf = " << chi2_ndf << endl;
+        
         frame->Draw();
 
         // Add legend
@@ -159,12 +164,21 @@ tuple<float, float, float, float> LFYield_InvMass(TNtuple* data_nt, TNtuple* nt_
         delete frame;
         delete framePull;
         delete c;
-    } 
-    return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError());
+        return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError(), chi2_ndf);
+    } else {
+        // Calculate chi2/ndf even when not plotting
+        RooPlot* frame = mass.frame();
+        data.plotOn(frame, RooFit::Name("data"));
+        model.plotOn(frame, RooFit::Range("fitRange"), RooFit::NormRange("normRange"), RooFit::Name("model"));
+        double chi2_ndf = frame->chiSquare("model", "data", 2);
+        cout << "Chi^2/ndf = " << chi2_ndf << endl;
+        delete frame;
+        return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError(), chi2_ndf);
+    }
 }
 
 
-tuple<float, float, float, float> LFYield_DCA(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float, float> LFYield_DCA(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
     
     RooRealVar fitVar("muDiDxy1Dxy2Sig", "muDiDxy1Dxy2Sig", -3, 4);
     RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
@@ -216,7 +230,7 @@ tuple<float, float, float, float> LFYield_DCA(TNtuple* data_nt, TNtuple* nt_uds,
     // CREATE FIT PLOT
     if(plotDir != nullptr) {
         plotDir->cd();
-        TCanvas* c = new TCanvas(Form("LFFit_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 800);
+        TCanvas* c = new TCanvas(Form("LFFit_DCA_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 800);
         c->Divide(1,2);
         
         // Top pad: main fit
@@ -232,6 +246,10 @@ tuple<float, float, float, float> LFYield_DCA(TNtuple* data_nt, TNtuple* nt_uds,
         
         // Plot full model over entire range (dotted)
         model.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kBlue), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("model_full"));
+        
+        // Calculate chi-square/ndf (2 floating parameters: nLF, nHF)
+        double chi2_ndf = frame->chiSquare("model", "data", 2);
+        cout << "Chi^2/ndf = " << chi2_ndf << endl;
         
         frame->GetXaxis()->SetLabelSize(0);
         frame->GetXaxis()->SetTitleSize(0);
@@ -291,10 +309,164 @@ tuple<float, float, float, float> LFYield_DCA(TNtuple* data_nt, TNtuple* nt_uds,
         delete frame;
         delete framePull;
         delete c;
+        return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError(), chi2_ndf);
+    } else {
+        // Calculate chi2/ndf even when not plotting
+        RooPlot* frame = fitVar.frame();
+        data.plotOn(frame, RooFit::Name("data"));
+        model.plotOn(frame, RooFit::Range("fitRange"), RooFit::NormRange("normRange"), RooFit::Name("model"));
+        double chi2_ndf = frame->chiSquare("model", "data", 2);
+        cout << "Chi^2/ndf = " << chi2_ndf << endl;
+        delete frame;
+        return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError(), chi2_ndf);
     }
-    
-    return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError());
 }
+
+
+tuple<float, float, float, float, float> LFYield_DR(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+ 
+    RooRealVar fitVar("muDR", "muDR", 0, 0.6);
+    RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
+    RooRealVar weight("weight", "weight", 0, 1e10);
+    RooArgSet vars(fitVar, jetpt, weight);
+    fitVar.setRange("fitRange", 0, 0.6);
+    fitVar.setRange("normRange", 0, 0.6);
+
+    // DATA
+    RooDataSet data("data", "data", data_nt, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    
+    // LIGHT FLAVOR TEMPLATE
+    RooDataSet templateLF("templateLF", "Light flavor", nt_uds, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    
+    // HEAVY FLAVOR TEMPLATE 
+    RooDataSet templateHF_other("tmp_other", "", nt_other, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_c("tmp_c", "", nt_c, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_cc("tmp_cc", "", nt_cc, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_b("tmp_b", "", nt_b, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    RooDataSet templateHF_bb("tmp_bb", "", nt_bb, vars, Form("JetPT < %f && JetPT >= %f", Jetptmax, Jetptmin), "weight");
+    
+    // APPEND HF TEMPLATES
+    RooDataSet templateHF("templateHF", "Heavy flavor", fitVar);
+    templateHF.append(templateHF_other);
+    templateHF.append(templateHF_c);
+    templateHF.append(templateHF_cc);
+    templateHF.append(templateHF_b);
+    templateHF.append(templateHF_bb);
+    
+    // PDFs
+    RooKeysPdf lfPdf("lfPdf", "Light flavor PDF", fitVar, templateLF, RooKeysPdf::MirrorLeft, 0.5);
+    RooKeysPdf hfPdf("hfPdf", "Heavy flavor PDF", fitVar, templateHF, RooKeysPdf::MirrorLeft, 0.5);
+    
+    // YIELDs
+    double nTotal = data.sumEntries();
+    RooRealVar nLF("nLF", "N light flavor", nTotal/2, 0, nTotal);
+    RooRealVar nHF("nHF", "N heavy flavor", nTotal/2, 0, nTotal);
+    RooAddPdf model("model", "LF+HF", RooArgList(lfPdf, hfPdf), RooArgList(nLF, nHF));
+    
+    // Fit to data in restricted range, but normalize over full range
+    RooFitResult* result = model.fitTo(data, 
+                                        RooFit::Range("fitRange"),      // Fit only here
+                                       RooFit::NormRange("normRange"),  // But yields are for full range
+                                       RooFit::Save());
+    
+    cout << "Light flavor yield: " << nLF.getVal() << " +/- " << nLF.getError() << endl;
+    cout << "Heavy flavor yield: " << nHF.getVal() << " +/- " << nHF.getError() << endl;
+    
+    // CREATE FIT PLOT
+    if(plotDir != nullptr) {
+        plotDir->cd();
+        TCanvas* c = new TCanvas(Form("LFFit_DR_pt%.0f_%.0f", Jetptmin, Jetptmax), "", 800, 800);
+        c->Divide(1,2);
+        
+        // Top pad: main fit
+        c->cd(1);
+        gPad->SetPad(0.0, 0.3, 1.0, 1.0);
+        gPad->SetBottomMargin(0.02);
+        
+        RooPlot* frame = fitVar.frame(RooFit::Title(Form("LF/HF Fit (%.0f < p_{T} < %.0f GeV)", Jetptmin, Jetptmax)));
+        data.plotOn(frame, RooFit::Name("data"));
+        model.plotOn(frame, RooFit::Range("fitRange"), RooFit::NormRange("normRange"), RooFit::Name("model"));
+        model.plotOn(frame, RooFit::Components(lfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kRed), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("LF"));
+        model.plotOn(frame, RooFit::Components(hfPdf), RooFit::LineStyle(kDashed), RooFit::LineColor(kGreen), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("HF"));
+        
+        // Plot full model over entire range (dotted)
+        model.plotOn(frame, RooFit::LineStyle(kDotted), RooFit::LineColor(kBlue), RooFit::Range("normRange"), RooFit::NormRange("normRange"), RooFit::Name("model_full"));
+        
+        // Calculate chi-square/ndf (2 floating parameters: nLF, nHF)
+        double chi2_ndf = frame->chiSquare("model", "data", 2);
+        cout << "Chi^2/ndf = " << chi2_ndf << endl;
+        
+        frame->GetXaxis()->SetLabelSize(0);
+        frame->GetXaxis()->SetTitleSize(0);
+        frame->Draw();
+        
+        // Add legend
+        TLegend* leg = new TLegend(0.65, 0.65, 0.88, 0.88);
+        leg->AddEntry(frame->findObject("data"), "Data", "lep");
+        leg->AddEntry(frame->findObject("model"), "Total Fit", "l");
+        leg->AddEntry(frame->findObject("LF"), "LF (scaled)", "l");
+        leg->AddEntry(frame->findObject("HF"), "HF (scaled)", "l");
+        leg->AddEntry(frame->findObject("model_full"), "Full PDF (extrapolated)", "l");
+        leg->Draw();
+        
+        // Bottom pad: residuals/pulls
+        c->cd(2);
+        gPad->SetPad(0.0, 0.0, 1.0, 0.3);
+        gPad->SetTopMargin(0.02);
+        gPad->SetBottomMargin(0.3);
+        
+        RooPlot* framePull = fitVar.frame(RooFit::Title(""));
+        RooHist* hpull = frame->pullHist("data", "model");
+        hpull->SetMarkerStyle(20);
+        hpull->SetMarkerSize(0.8);
+        framePull->addPlotable(hpull, "P0");
+        framePull->SetMinimum(-5);
+        framePull->SetMaximum(5);
+        framePull->GetYaxis()->SetTitle("Pull");
+        framePull->GetYaxis()->SetTitleSize(0.12);
+        framePull->GetYaxis()->SetLabelSize(0.10);
+        framePull->GetYaxis()->SetTitleOffset(0.35);
+        framePull->GetYaxis()->SetNdivisions(505);
+        framePull->GetXaxis()->SetTitleSize(0.12);
+        framePull->GetXaxis()->SetLabelSize(0.10);
+        framePull->GetXaxis()->SetTitleOffset(1.0);
+        framePull->Draw("lp");
+        
+        // Add horizontal lines at 0, +/-3
+        TLine* line0 = new TLine(framePull->GetXaxis()->GetXmin(), 0, framePull->GetXaxis()->GetXmax(), 0);
+        line0->SetLineColor(kBlack);
+        line0->SetLineStyle(2);
+        line0->Draw();
+        
+        TLine* line3 = new TLine(framePull->GetXaxis()->GetXmin(), 3, framePull->GetXaxis()->GetXmax(), 3);
+        line3->SetLineColor(kRed);
+        line3->SetLineStyle(2);
+        line3->Draw();
+        
+        TLine* lineM3 = new TLine(framePull->GetXaxis()->GetXmin(), -3, framePull->GetXaxis()->GetXmax(), -3);
+        lineM3->SetLineColor(kRed);
+        lineM3->SetLineStyle(2);
+        lineM3->Draw();
+        
+        c->Write();
+        c->SaveAs(Form("plots/LFFit_DR_pt%.0f_%.0f.pdf", Jetptmin, Jetptmax));
+        delete leg;
+        delete frame;
+        delete framePull;
+        delete c;
+        return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError(), chi2_ndf);
+    } else {
+        // Calculate chi2/ndf even when not plotting
+        RooPlot* frame = fitVar.frame();
+        data.plotOn(frame, RooFit::Name("data"));
+        model.plotOn(frame, RooFit::Range("fitRange"), RooFit::NormRange("normRange"), RooFit::Name("model"));
+        double chi2_ndf = frame->chiSquare("model", "data", 2);
+        cout << "Chi^2/ndf = " << chi2_ndf << endl;
+        delete frame;
+        return make_tuple(nLF.getVal(), nLF.getError(), nHF.getVal(), nHF.getError(), chi2_ndf);
+    }
+}
+
 
 int main(int argc, char *argv[]) {
     gStyle->SetOptStat(0);
@@ -308,6 +480,7 @@ int main(int argc, char *argv[]) {
     vector<double> ptBins = CL.GetDoubleVector("ptBins");
     bool doLF_DCA = CL.GetBool("doLF_DCA");
     bool doLF_invMass = CL.GetBool("doLF_invMass");
+    bool doLF_DR = CL.GetBool("doLF_DR");
     bool makeplots = CL.GetBool("makeplots");
 
     // IMPORT TREE
@@ -329,10 +502,18 @@ int main(int argc, char *argv[]) {
     TH1D* HeavyYields_DCA = new TH1D("HeavyYields_DCA", "Heavy Flavor Yields (DCA)", ptBins.size()-1, &ptBins[0]);
     TH1D* Fractions_DCA = new TH1D("Fractions_DCA", "HF Fraction (DCA)", ptBins.size()-1, &ptBins[0]);
     TH1D* FullYields_DCA = new TH1D("FullYields_DCA", "Total Yields (DCA)", ptBins.size()-1, &ptBins[0]);
+    TH1D* Chi2NDF_DCA = new TH1D("Chi2NDF_DCA", "#chi^{2}/ndf (DCA)", ptBins.size()-1, &ptBins[0]);
     TH1D* LightYields_InvMass = new TH1D("LightYields_InvMass", "Light Flavor Yields (inv mass)", ptBins.size()-1, &ptBins[0]);
     TH1D* HeavyYields_InvMass = new TH1D("HeavyYields_InvMass", "Heavy Flavor Yields (inv mass)", ptBins.size()-1, &ptBins[0]);
     TH1D* Fractions_InvMass = new TH1D("Fractions_InvMass", "HF Fraction (inv mass)", ptBins.size()-1, &ptBins[0]);
     TH1D* FullYields_InvMass = new TH1D("FullYields_InvMass", "Total Yields (inv mass)", ptBins.size()-1, &ptBins[0]);
+    TH1D* Chi2NDF_InvMass = new TH1D("Chi2NDF_InvMass", "#chi^{2}/ndf (inv mass)", ptBins.size()-1, &ptBins[0]);
+    TH1D* LightYields_DR = new TH1D("LightYields_DR", "Light Flavor Yields (DR)", ptBins.size()-1, &ptBins[0]);
+    TH1D* HeavyYields_DR = new TH1D("HeavyYields_DR", "Heavy Flavor Yields (DR)", ptBins.size()-1, &ptBins[0]);
+    TH1D* Fractions_DR = new TH1D("Fractions_DR", "HF Fraction (DR)", ptBins.size()-1, &ptBins[0]);
+    TH1D* FullYields_DR = new TH1D("FullYields_DR", "Total Yields (DR)", ptBins.size()-1, &ptBins[0]);
+    TH1D* Chi2NDF_DR = new TH1D("Chi2NDF_DR", "#chi^{2}/ndf (DR)", ptBins.size()-1, &ptBins[0]);
+
     
     // CREATE PLOTS DIRECTORY
     TDirectory* plotDir = nullptr;
@@ -344,6 +525,7 @@ int main(int argc, char *argv[]) {
     float LightYieldError = 0;
     float HeavyYield = 0;
     float HeavyYieldError = 0;
+    float chi2_ndf = 0;
     for(int i = 0; i < ptBins.size()-1; i++){
         
         float ptMin = ptBins[i];
@@ -361,7 +543,8 @@ int main(int argc, char *argv[]) {
         // LF
         if(doLF_DCA) {
             auto lfResult = LFYield_DCA(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
-            tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError) = lfResult;
+            tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError, chi2_ndf) = lfResult;
+            Chi2NDF_DCA->SetBinContent(i+1, chi2_ndf);
             LightYields_DCA->SetBinContent(i+1, LightYield);
             LightYields_DCA->SetBinError(i+1, LightYieldError);
             HeavyYields_DCA->SetBinContent(i+1, HeavyYield);
@@ -376,7 +559,8 @@ int main(int argc, char *argv[]) {
         // LF VIA INVMASS METHOD
         if(doLF_invMass) {
             auto lfResultMass = LFYield_InvMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
-            tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError) = lfResultMass;
+            tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError, chi2_ndf) = lfResultMass;
+            Chi2NDF_InvMass->SetBinContent(i+1, chi2_ndf);
             LightYields_InvMass->SetBinContent(i+1, LightYield);
             LightYields_InvMass->SetBinError(i+1, LightYieldError);
             HeavyYields_InvMass->SetBinContent(i+1, HeavyYield);
@@ -386,6 +570,21 @@ int main(int argc, char *argv[]) {
                                                   pow(( -1.0*HeavyYield/((HeavyYield + LightYield)*(HeavyYield + LightYield))),2)*LightYieldError*LightYieldError ));
             FullYields_InvMass->SetBinContent(i+1, LightYield + HeavyYield);
             FullYields_InvMass->SetBinError(i+1, sqrt(LightYieldError*LightYieldError + HeavyYieldError*HeavyYieldError)); // NOTE THESE UNCERTAINTIES ARE TREATED AS UNCORRELATED. THIS IS NOT TRUE AT ALL!
+        }
+
+        if(doLF_DR) {
+            auto lfResultDR = LFYield_DR(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError, chi2_ndf) = lfResultDR;
+            Chi2NDF_DR->SetBinContent(i+1, chi2_ndf);
+            LightYields_DR->SetBinContent(i+1, LightYield);
+            LightYields_DR->SetBinError(i+1, LightYieldError);
+            HeavyYields_DR->SetBinContent(i+1, HeavyYield);
+            HeavyYields_DR->SetBinError(i+1, HeavyYieldError);
+            Fractions_DR->SetBinContent(i+1, HeavyYield / (LightYield + HeavyYield));
+            Fractions_DR->SetBinError(i+1, sqrt( pow((1/(LightYield + HeavyYield) - HeavyYield/((HeavyYield + LightYield)*(HeavyYield + LightYield))),2)*HeavyYieldError*HeavyYieldError + 
+                                                  pow(( -1.0*HeavyYield/((HeavyYield + LightYield)*(HeavyYield + LightYield))),2)*LightYieldError*LightYieldError ));
+            FullYields_DR->SetBinContent(i+1, LightYield + HeavyYield);
+            FullYields_DR->SetBinError(i+1, sqrt(LightYieldError*LightYieldError + HeavyYieldError*HeavyYieldError)); // NOTE THESE UNCERTAINTIES ARE TREATED AS UNCORRELATED. THIS IS NOT TRUE AT ALL!
         }
         
         
@@ -399,12 +598,21 @@ int main(int argc, char *argv[]) {
         HeavyYields_DCA->Write();
         Fractions_DCA->Write();
         FullYields_DCA->Write();
+        Chi2NDF_DCA->Write();
     }
     if(doLF_invMass) {
         LightYields_InvMass->Write();
         HeavyYields_InvMass->Write();
         Fractions_InvMass->Write();
         FullYields_InvMass->Write();
+        Chi2NDF_InvMass->Write();
+    }
+    if(doLF_DR) {
+        LightYields_DR->Write();
+        HeavyYields_DR->Write();
+        Fractions_DR->Write();
+        FullYields_DR->Write();
+        Chi2NDF_DR->Write();
     }
 
     // SAVE COMMAND LINE PARAMS
@@ -416,6 +624,8 @@ int main(int argc, char *argv[]) {
     paramDoLF_DCA.Write();
     TNamed paramDoLFInvMass("doLF_invMass", doLF_invMass ? "true" : "false");
     paramDoLFInvMass.Write();
+    TNamed paramDoLFDR("doLF_DR", doLF_DR ? "true" : "false");
+    paramDoLFDR.Write();
     TNamed paramMakePlots("makeplots", makeplots ? "true" : "false");
     paramMakePlots.Write();
 
@@ -446,7 +656,17 @@ int main(int argc, char *argv[]) {
                 FullYields_InvMass->SetBinError(i, FullYields_InvMass->GetBinError(i) / binWidth);
             }
         }
-        
+        if(doLF_DR) {
+            for(int i = 1; i <= LightYields_DR->GetNbinsX(); i++) {
+                double binWidth = LightYields_DR->GetBinWidth(i);
+                LightYields_DR->SetBinContent(i, LightYields_DR->GetBinContent(i) / binWidth);
+                LightYields_DR->SetBinError(i, LightYields_DR->GetBinError(i) / binWidth);
+                HeavyYields_DR->SetBinContent(i, HeavyYields_DR->GetBinContent(i) / binWidth);
+                HeavyYields_DR->SetBinError(i, HeavyYields_DR->GetBinError(i) / binWidth);
+                FullYields_DR->SetBinContent(i, FullYields_DR->GetBinContent(i) / binWidth);
+                FullYields_DR->SetBinError(i, FullYields_DR->GetBinError(i) / binWidth);
+            }
+        }
         TCanvas* c1 = new TCanvas("c1", "", 800, 600);
         TLegend* leg = new TLegend(0.6, 0.7, 0.88, 0.88);
         
@@ -464,6 +684,9 @@ int main(int argc, char *argv[]) {
             FullYields_DCA->SetMarkerStyle(20);
             FullYields_DCA->SetMarkerColor(kRed);
             FullYields_DCA->SetLineColor(kRed);
+            Chi2NDF_DCA->SetMarkerStyle(20);
+            Chi2NDF_DCA->SetMarkerColor(kRed);
+            Chi2NDF_DCA->SetLineColor(kRed);
         }
         if(doLF_invMass) {
             LightYields_InvMass->SetMarkerStyle(24);
@@ -478,8 +701,27 @@ int main(int argc, char *argv[]) {
             FullYields_InvMass->SetMarkerStyle(24);
             FullYields_InvMass->SetMarkerColor(kBlue);
             FullYields_InvMass->SetLineColor(kBlue);
+            Chi2NDF_InvMass->SetMarkerStyle(24);
+            Chi2NDF_InvMass->SetMarkerColor(kBlue);
+            Chi2NDF_InvMass->SetLineColor(kBlue);
         }
-        
+        if(doLF_DR) {
+            LightYields_DR->SetMarkerStyle(25);
+            LightYields_DR->SetMarkerColor(kGreen+2);
+            LightYields_DR->SetLineColor(kGreen+2);
+            HeavyYields_DR->SetMarkerStyle(25);
+            HeavyYields_DR->SetMarkerColor(kGreen+2);
+            HeavyYields_DR->SetLineColor(kGreen+2);
+            Fractions_DR->SetMarkerStyle(25);
+            Fractions_DR->SetMarkerColor(kGreen+2);
+            Fractions_DR->SetLineColor(kGreen+2);
+            FullYields_DR->SetMarkerStyle(25);
+            FullYields_DR->SetMarkerColor(kGreen+2);
+            FullYields_DR->SetLineColor(kGreen+2);
+            Chi2NDF_DR->SetMarkerStyle(25);
+            Chi2NDF_DR->SetMarkerColor(kGreen+2);
+            Chi2NDF_DR->SetLineColor(kGreen+2);
+        }
         // Light Flavor Yields
         if(doLF_DCA) {
             LightYields_DCA->SetTitle("Light Flavor Yields");
@@ -493,7 +735,11 @@ int main(int argc, char *argv[]) {
             LightYields_InvMass->Draw("E SAME");
             leg->AddEntry(LightYields_InvMass, "Inv Mass Method", "lep");
         }
-        if(doLF_DCA || doLF_invMass) {
+        if(doLF_DR) {
+            LightYields_DR->Draw("E SAME");
+            leg->AddEntry(LightYields_DR, "DR Method", "lep");
+        }
+        if(doLF_DCA || doLF_invMass || doLF_DR) {
             leg->Draw();
             c1->SaveAs("plots/LightFlavorYield.pdf");
             leg->Clear();
@@ -512,7 +758,11 @@ int main(int argc, char *argv[]) {
             HeavyYields_InvMass->Draw("E SAME");
             leg->AddEntry(HeavyYields_InvMass, "Inv Mass Method", "lep");
         }
-        if(doLF_DCA || doLF_invMass) {
+        if(doLF_DR) {
+            HeavyYields_DR->Draw("E SAME");
+            leg->AddEntry(HeavyYields_DR, "DR Method", "lep");
+        }
+        if(doLF_DCA || doLF_invMass || doLF_DR) {
             leg->Draw();
             c1->SaveAs("plots/HeavyFlavorYield.pdf");
             leg->Clear();
@@ -532,7 +782,11 @@ int main(int argc, char *argv[]) {
             Fractions_InvMass->Draw("E SAME");
             leg->AddEntry(Fractions_InvMass, "Inv Mass Method", "lep");
         }
-        if(doLF_DCA || doLF_invMass) {
+        if(doLF_DR) {
+            Fractions_DR->Draw("E SAME");
+            leg->AddEntry(Fractions_DR, "DR Method", "lep");
+        }
+        if(doLF_DCA || doLF_invMass || doLF_DR) {
             leg->Draw();
             c1->SaveAs("plots/HeavyFlavorFraction.pdf");
             leg->Clear();
@@ -551,9 +805,55 @@ int main(int argc, char *argv[]) {
             FullYields_InvMass->Draw("E SAME");
             leg->AddEntry(FullYields_InvMass, "Inv Mass Method", "lep");
         }
-        if(doLF_DCA || doLF_invMass) {
+        if(doLF_DR) {
+            FullYields_DR->Draw("E SAME");
+            leg->AddEntry(FullYields_DR, "DR Method", "lep");
+        }
+        if(doLF_DCA || doLF_invMass || doLF_DR) {
             leg->Draw();
             c1->SaveAs("plots/TotalYield.pdf");
+        }
+        
+        // Chi^2/ndf
+        if(doLF_DCA) {
+            Chi2NDF_DCA->SetTitle("Fit Quality (#chi^{2}/ndf)");
+            Chi2NDF_DCA->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
+            Chi2NDF_DCA->GetYaxis()->SetTitle("#chi^{2}/ndf");
+            Chi2NDF_DCA->SetMinimum(0);
+            Chi2NDF_DCA->SetMaximum(5);
+            Chi2NDF_DCA->Draw("HIST");
+            //leg->AddEntry(Chi2NDF_DCA, "DCA Method", "lep");
+        }
+        if(doLF_invMass) {
+            if(doLF_DCA) {
+                Chi2NDF_InvMass->Draw("HIST SAME");
+            } else {
+                Chi2NDF_InvMass->SetTitle("Fit Quality (#chi^{2}/ndf)");
+                Chi2NDF_InvMass->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
+                Chi2NDF_InvMass->GetYaxis()->SetTitle("#chi^{2}/ndf");
+                Chi2NDF_InvMass->SetMinimum(0);
+                Chi2NDF_InvMass->SetMaximum(5);
+                Chi2NDF_InvMass->Draw("HIST");
+            }
+            //leg->AddEntry(Chi2NDF_InvMass, "Inv Mass Method", "lep");
+        }
+        if(doLF_DR) {
+            if(doLF_DCA || doLF_invMass) {
+                Chi2NDF_DR->Draw("HIST SAME");
+            } else {
+                Chi2NDF_DR->SetTitle("Fit Quality (#chi^{2}/ndf)");
+                Chi2NDF_DR->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
+                Chi2NDF_DR->GetYaxis()->SetTitle("#chi^{2}/ndf");
+                Chi2NDF_DR->SetMinimum(0);
+                Chi2NDF_DR->SetMaximum(5);
+                Chi2NDF_DR->Draw("HIST");
+            }
+            //leg->AddEntry(Chi2NDF_DR, "DR Method", "lep");
+        }
+        if(doLF_DCA || doLF_invMass || doLF_DR) {
+            leg->Draw();
+            c1->SaveAs("plots/Chi2NDF.pdf");
+            leg->Clear();
         }
         
         delete leg;

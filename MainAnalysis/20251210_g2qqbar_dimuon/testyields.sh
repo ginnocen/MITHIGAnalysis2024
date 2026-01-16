@@ -7,6 +7,7 @@ source clean.sh
     --ptBins 60,80,100,120,160,200,250,300 \
     --doLF_DCA true \
     --doLF_invMass true \
+    --doLF_DR true \
     --makeplots true \
 
 echo "DONE WITH YIELD FITTING"
