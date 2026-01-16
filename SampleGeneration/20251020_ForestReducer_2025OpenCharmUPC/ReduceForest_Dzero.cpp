@@ -15,30 +15,14 @@ using namespace std;
 #include "TTree.h"
 
 #include "CommandLine.h"
-#include "CommonFunctions.h"
 #include "Messenger.h"
 #include "ProgressBar.h"
 
-#include "TrackResidualCorrector.h"
-#include "tnp_weight.h"
-#include "trackingEfficiency2017pp.h"
-#include "trackingEfficiency2018PbPb.h"
-#include "trackingEfficiency2023PbPb.h"
+#include "include/myhelper.h"
 
 #include "include/DzeroSelection.h"
 using namespace DzeroSelection;
 #include "include/PIDScoring.h"
-
-bool logical_or_vectBool(std::vector<bool>* vec) {
-    return std::any_of(vec->begin(), vec->end(), [](bool b) { return b; });
-}
-
-// Helper function to convert a string to lowercase
-std::string toLower(const std::string& str) {
-    std::string lowerStr = str;
-    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(), ::tolower);
-    return lowerStr;
-}
 
 int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
@@ -47,11 +31,10 @@ int main(int argc, char *argv[]) {
   string VersionString = "V8";
 
   CommandLine CL(argc, argv);
-
+  CL.SetVerbose();
   vector<string> InputFileNames = CL.GetStringVector("Input");
   string OutputFileName = CL.Get("Output");
 
-  // bool DoGenLevel                    = CL.GetBool("DoGenLevel", true);
   bool IsData = CL.GetBool("IsData", false);
   bool IsGammaNMCtype = CL.GetBool("IsGammaNMCtype", true); // This is only meaningful when IsData==false. gammaN: BeamA, Ngamma: BeamB
   int Year = CL.GetInt("Year", 2023);
@@ -82,10 +65,11 @@ int main(int argc, char *argv[]) {
   // "PASSystDtrkPt":   reject !DpassCut23PASSystDtrkPt
   // "PASSystDalpha":   reject !DpassCut23PASSystDalpha
   // "PASSystDchi2cl":  reject !DpassCut23PASSystDchi2cl
-  string ApplyDRejection = toLower(CL.Get("ApplyDRejection", "no"));
-  string PFTreeName = CL.Get("PFTree", "particleFlowAnalyser/pftree");
+  string ApplyDRejection = myhelper::to_lower(CL.Get("ApplyDRejection", "no"));
+  float DptThreshold = CL.GetDouble("DptThreshold", -1.);
   string ZDCTreeName = CL.Get("ZDCTree", "zdcanalyzer/zdcrechit");
   bool HideProgressBar = CL.GetBool("HideProgressBar", false);
+
   TFile OutputFile(OutputFileName.c_str(), "RECREATE");
   TTree Tree("Tree", Form("Tree for UPC Dzero analysis (%s)", VersionString.c_str()));
   TTree InfoTree("InfoTree", "Information");
@@ -100,10 +84,7 @@ int main(int argc, char *argv[]) {
     "passystdsvpvsig", "passystdtrkpt", "passystdalpha", "passystdchi2cl"
   };
   // Validate the argument
-  if (allowedApplyDRejection.find(ApplyDRejection) != allowedApplyDRejection.end()) {
-    std::cout << "D filtering criterion: " << ApplyDRejection << std::endl;
-    // Add your program logic here
-  } else {
+  if (allowedApplyDRejection.find(ApplyDRejection) == allowedApplyDRejection.end()) {
     std::cerr << "[Warning] Invalid ApplyDRejection. Set to NO rejection. Allowed ApplyDRejection are: ";
     for (const auto& ele : allowedApplyDRejection) {
         std::cout << ele << ", ";
@@ -116,7 +97,6 @@ int main(int argc, char *argv[]) {
     *fdedxKaonCenter = 0, *fdedxKaonSigmaLo = 0, *fdedxKaonSigmaHi = 0,
     *fdedxProtCenter = 0, *fdedxProtSigmaLo = 0, *fdedxProtSigmaHi = 0;
   if (DoPID) {
-    std::cout<<"PID functions from: "<<RootPID<<std::endl;
     auto dedxFunctions = ImportPIDRoot(RootPID.c_str());
     fdedxPionCenter  = dedxFunctions[0];
     fdedxPionSigmaLo = dedxFunctions[1];
@@ -133,12 +113,9 @@ int main(int argc, char *argv[]) {
     auto* InputFile = TFile::Open(InputFileName.c_str());
 
     HiEventTreeMessenger MEvent(InputFile); // hiEvtAnalyzer/HiTree
-    // Use PbPbTracks/trackTree as the default, else ppTracks/trackTree
-    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, InputFile->Get("PbPbTracks/trackTree")?
-                                                                     "PbPbTracks/trackTree":
-                                                                     "ppTracks/trackTree"); // ppTracks/trackTree
+    PbPbUPCTrackTreeMessenger MTrackPbPbUPC(InputFile, myhelper::find_tree_from_list(InputFile, { "PbPbTracks/trackTree", "ppTracks/trackTree" }));
     GenParticleTreeMessenger MGen(InputFile); // HiGenParticleAna/hi
-    PFTreeMessenger MPF(InputFile, PFTreeName); // particleFlowAnalyser/pftree
+    PFTreeMessenger MPF(InputFile, myhelper::find_tree_from_list(InputFile, { "particleFlowAnalyser/pftree" }));
     SkimTreeMessenger MSkim(InputFile); // skimanalysis/HltTree
     TriggerTreeMessenger MTrigger(InputFile); // hltanalysis/HltTree
     DzeroTreeMessenger MDzero(InputFile); // Dfinder/ntDkpi
@@ -204,10 +181,10 @@ int main(int argc, char *argv[]) {
       }
       MDzeroUPC.nVtx = MTrackPbPbUPC.nVtx;
 
-      /////////////////////////////////////
-      ////////// Event selection //////////
-      /////////////////////////////////////
-
+      ///////////////////////////
+      ////////// Gen D //////////
+      ///////////////////////////
+      
       if (IsData == false) {
         MDzeroUPC.Gsize = MDzeroGen.Gsize;
         for (int iDGen = 0; iDGen < MDzeroGen.Gsize; iDGen++) {
@@ -223,98 +200,76 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.GisSignalCalcFeeddown->push_back(isSignalGen && isFeeddownGen);
         }
       }
-      if (IsData == true) {
-        if (Year == 2023) {
-          int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000");
-          int HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000");
-          int HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400");
-          int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023 =
-              MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
-          bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_2023 == 1 ||
-                           HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_2023 == 1;
-          bool isL1ZDCXORJet8 = HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000_2023 == 1 ||
-                                HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_2023 == 1;
-          MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
-          MDzeroUPC.isL1ZDCXORJet8 = isL1ZDCXORJet8;
-          MDzeroUPC.isL1ZDCXORJet12 = false;
-          MDzeroUPC.isL1ZDCXORJet16 = false;
-          if (ApplyTriggerRejection == 1 && IsData && (isL1ZDCOr == false && isL1ZDCXORJet8 == false)) continue;
-          if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
-        }
-        else if (Year == 2024){
-          int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v13");
-          int HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000_v2");
-          int HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster10000");
-          bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 == 1 || HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 == 1;
-          MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
-          MDzeroUPC.isL1ZDCXORJet8 = false;
-          MDzeroUPC.isL1ZDCXORJet12 = false;
-          MDzeroUPC.isL1ZDCXORJet16 = false;
-          if (ApplyTriggerRejection == 1 && IsData) std::cout << "Trigger rejection ZDCOR || ZDCXORJet8 not implemented for 2024" << std::endl;
-          if (ApplyTriggerRejection == 2 && IsData && isL1ZDCOr == false) continue;
-        }
-        else if (Year == 2025){
-          int HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
-          int HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400");
-          int HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000");
-          int HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000");
-          int HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000");
-          int HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000");
-          int HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000");
-          bool isL1ZDCOr =  HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 == 1;
-          bool isL1ZDCXORJet12 = HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000 == 1 ||
-                                HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000 == 1;
-          bool isL1ZDCXORJet16 = HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000 == 1 ||
-                                HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000 == 1;
-          // [Note] If we prescale the HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000 in the upcoming run, we will change to the following
-          //   bool isL1ZDCOr = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400 == 1 ||
-          //                    HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000 == 1;
-          MDzeroUPC.isL1ZDCOr = isL1ZDCOr;
-          MDzeroUPC.isL1ZDCOr_Min400 = HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000;
-          MDzeroUPC.isL1ZDCOr_Max400 = HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400;
-          MDzeroUPC.isL1ZDCXORJet8 = false;
-          MDzeroUPC.isL1ZDCXORJet12 = HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000;
-          MDzeroUPC.isL1ZDCXORJet16 = HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000;
 
-          // [Note] If we prescale the HLT_HIUPC_ZeroBias_MaxPixelCluster10000_v5 in the upcoming run, we will change to the following
-          // bool isZeroBias = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_SinglePixelTrack_MaxPixelTrack_v16") == 1 ||
-          //                 MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v15") == 1 ||
-          //                 MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MaxPixelCluster10000_v5") == 1;
-          MDzeroUPC.isZeroBias = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MaxPixelCluster10000");
-          MDzeroUPC.isZeroBias_Min400 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MinPixelCluster400_MaxPixelCluster10000");
-          MDzeroUPC.isZeroBias_Max400 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400");
-          if (ApplyTriggerRejection == 1 && IsData && (MDzeroUPC.isL1ZDCOr || MDzeroUPC.isL1ZDCOr_Min400 || MDzeroUPC.isL1ZDCOr_Max400 || MDzeroUPC.isL1ZDCXORJet12)==false) continue;
-          if (ApplyTriggerRejection == 2 && IsData && (MDzeroUPC.isL1ZDCOr || MDzeroUPC.isL1ZDCOr_Min400 || MDzeroUPC.isL1ZDCOr_Max400)==false) continue;
+      /////////////////////////////
+      ////////// Trigger //////////
+      /////////////////////////////
+      
+      if (IsData) {
+        bool incl_ZDCOr = true, incl_ZDCXORJet = true, incl_ZB = true; // for trigger rejection
+        
+        if (Year == 2023) {
+          MDzeroUPC.isL1ZDCOr_Min400_Max10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
+          MDzeroUPC.isL1ZDCOr_Max400_Pixel =  MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400");
+          MDzeroUPC.isL1ZDCOr = MDzeroUPC.isL1ZDCOr_Min400_Max10000 || MDzeroUPC.isL1ZDCOr_Max400_Pixel;
+          MDzeroUPC.isL1ZDCOr_Max10000 = false;
+          
+          MDzeroUPC.isL1ZDCXORJet8 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nXOR_MaxPixelCluster50000") || MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000");
+          MDzeroUPC.isL1ZDCXORJet12 = false;
+          MDzeroUPC.isL1ZDCXORJet16 = false;
+
+          incl_ZDCOr = MDzeroUPC.isL1ZDCOr;
+          incl_ZDCXORJet = MDzeroUPC.isL1ZDCXORJet8;
+          // incl_ZB = ?
         }
-      }
-      if (IsData == true) {
-        MDzeroUPC.ZDCsumPlus = MZDC.sumPlus;
-        MDzeroUPC.ZDCsumMinus = MZDC.sumMinus;
-        bool selectedBkgFilter = MSkim.ClusterCompatibilityFilter == 1 && MMETFilter.cscTightHalo2015Filter;
-        bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
-        if (ApplyEventRejection && IsData && (selectedBkgFilter == false || selectedVtxFilter == false)) continue;
-        MDzeroUPC.selectedBkgFilter = selectedBkgFilter;
-        MDzeroUPC.selectedVtxFilter = selectedVtxFilter;
-        bool ZDCgammaN = (MZDC.sumMinus > ZDCMinus1nThreshold && MZDC.sumPlus < ZDCPlus1nThreshold);
-        bool ZDCNgamma = (MZDC.sumMinus < ZDCMinus1nThreshold && MZDC.sumPlus > ZDCPlus1nThreshold);
-        MDzeroUPC.ZDCgammaN = ZDCgammaN;
-        MDzeroUPC.ZDCNgamma = ZDCNgamma;
-      } // end of if (IsData == true)
-      else { // if (IsData == false)
-        // MDzeroUPC.ZDCsumPlus = MZDC.sumPlus;
-        // MDzeroUPC.ZDCsumMinus = MZDC.sumMinus;
-        bool selectedBkgFilter = MSkim.ClusterCompatibilityFilter == 1; // METFilter always true for MC
-        bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
-        MDzeroUPC.selectedBkgFilter = selectedBkgFilter;
-        MDzeroUPC.selectedVtxFilter = selectedVtxFilter;
-        bool ZDCgammaN =  IsGammaNMCtype;
-        bool ZDCNgamma = !IsGammaNMCtype;
-        MDzeroUPC.ZDCgammaN = ZDCgammaN;
-        MDzeroUPC.ZDCNgamma = ZDCNgamma;
-      } // end of if (IsData == false)
+        else if (Year == 2024 || Year == 2025) {
+          MDzeroUPC.isL1ZDCOr_Min400_Max10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000");
+          MDzeroUPC.isL1ZDCOr_Max400_Pixel =  MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400");
+          MDzeroUPC.isL1ZDCOr = MDzeroUPC.isL1ZDCOr_Min400_Max10000 || MDzeroUPC.isL1ZDCOr_Max400_Pixel;
+          MDzeroUPC.isL1ZDCOr_Max10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZDC1nOR_MaxPixelCluster10000");
+
+          MDzeroUPC.isZeroBias_Min400_Max10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MinPixelCluster400_MaxPixelCluster10000");
+          MDzeroUPC.isZeroBias_Max400_Pixel = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400");
+          MDzeroUPC.isZeroBias = MDzeroUPC.isZeroBias_Min400_Max10000 || MDzeroUPC.isZeroBias_Max400_Pixel;
+          MDzeroUPC.isZeroBias_Max10000 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_ZeroBias_MaxPixelCluster10000");
+
+          MDzeroUPC.isL1ZDCXORJet8 = false;
+          MDzeroUPC.isL1ZDCXORJet12 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000") || MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000");
+          MDzeroUPC.isL1ZDCXORJet16 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000") || MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000");
+
+          incl_ZDCOr = MDzeroUPC.isL1ZDCOr_Max10000 || MDzeroUPC.isL1ZDCOr_Min400_Max10000 || MDzeroUPC.isL1ZDCOr_Max400_Pixel || MDzeroUPC.isL1ZDCXORJet12;
+          incl_ZDCXORJet = MDzeroUPC.isL1ZDCXORJet8 || MDzeroUPC.isL1ZDCXORJet12 || MDzeroUPC.isL1ZDCXORJet16;
+          incl_ZB = MDzeroUPC.isZeroBias_Min400_Max10000 || MDzeroUPC.isZeroBias_Max400_Pixel || MDzeroUPC.isZeroBias || MDzeroUPC.isZeroBias_Max10000;
+        }
+
+        if (ApplyTriggerRejection == 1 && !(incl_ZDCOr || incl_ZDCXORJet)) continue;
+        if (ApplyTriggerRejection == 2 && !incl_ZDCOr) continue;
+        if (ApplyTriggerRejection == 3 && !incl_ZB) continue;
+      } /* if (IsData) { */
+
+      /////////////////////////////////////////////
+      ////////// Offline event selection //////////
+      /////////////////////////////////////////////
+      
+      MDzeroUPC.ZDCsumPlus = IsData ? MZDC.sumPlus : -9999.;
+      MDzeroUPC.ZDCsumMinus = IsData ? MZDC.sumMinus : -9999.;
+      bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
+      MDzeroUPC.selectedVtxFilter = selectedVtxFilter;
+      MDzeroUPC.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
+      bool selectedBkgFilter = IsData ?
+        (MSkim.ClusterCompatibilityFilter && MMETFilter.cscTightHalo2015Filter) :
+        (MSkim.ClusterCompatibilityFilter);
+      MDzeroUPC.selectedBkgFilter = selectedBkgFilter;
+      bool ZDCgammaN = IsData ?
+        (MZDC.sumMinus > ZDCMinus1nThreshold && MZDC.sumPlus < ZDCPlus1nThreshold) :
+        (IsGammaNMCtype);
+      MDzeroUPC.ZDCgammaN = ZDCgammaN;
+      bool ZDCNgamma = IsData ?
+        (MZDC.sumMinus < ZDCMinus1nThreshold && MZDC.sumPlus > ZDCPlus1nThreshold) :
+        (!IsGammaNMCtype);
+      MDzeroUPC.ZDCNgamma = ZDCNgamma;
+
+      if (ApplyEventRejection && IsData && (selectedBkgFilter == false || selectedVtxFilter == false)) continue;
 
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
@@ -374,8 +329,9 @@ int main(int argc, char *argv[]) {
         bool DpassCut23PASSystDtrkPt_   = DpassCut23PASSystDtrkPt(MDzero, iD);
         bool DpassCut23PASSystDalpha_   = DpassCut23PASSystDalpha(MDzero, iD);
         bool DpassCut23PASSystDchi2cl_  = DpassCut23PASSystDchi2cl(MDzero, iD);
-        if (IsData)
-        {
+
+        if (MDzero.Dpt[iD] < DptThreshold) continue;
+        if (IsData) {
           if (ApplyDRejection=="or") { // OR for new cuts only
             if (!DpassCutNominal_           &&
                 !DpassCutSystDsvpvSig_      &&

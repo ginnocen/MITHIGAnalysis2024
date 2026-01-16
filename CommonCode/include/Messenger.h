@@ -1097,11 +1097,10 @@ public:
    //FIXME: these refer to best vertex positions calculated from the track tree
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    int nVtx;
-   bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
-   bool isZeroBias;
-   bool isL1ZDCOr_Min400, isL1ZDCOr_Max400;
-   bool isZeroBias_Min400, isZeroBias_Max400;
-   bool selectedBkgFilter, selectedVtxFilter;
+   bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+   bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
+   bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
+   bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter;
    float ZDCsumPlus;
    float ZDCsumMinus;
    float HFEMaxPlus;
@@ -1235,11 +1234,10 @@ public:
   //FIXME: these refer to best vertex positions calculated from the track tree
   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
   int nVtx;
-  bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
-  bool isZeroBias;
-  bool isL1ZDCOr_Min400, isL1ZDCOr_Max400;
-  bool isZeroBias_Min400, isZeroBias_Max400;
-  bool selectedBkgFilter, selectedVtxFilter;
+  bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+  bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
+  bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
+  bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter;
   float ZDCsumPlus;
   float ZDCsumMinus;
   float HFEMaxPlus;
@@ -1376,11 +1374,10 @@ public:
   //FIXME: these refer to best vertex positions calculated from the track tree
   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
   int nVtx;
-  bool isL1ZDCOr, isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
-  bool isZeroBias;
-  bool isL1ZDCOr_Min400, isL1ZDCOr_Max400;
-  bool isZeroBias_Min400, isZeroBias_Max400;
-  bool selectedBkgFilter, selectedVtxFilter;
+  bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
+  bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
+  bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
+  bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter;
   float ZDCsumPlus;
   float ZDCsumMinus;
   float HFEMaxPlus;
