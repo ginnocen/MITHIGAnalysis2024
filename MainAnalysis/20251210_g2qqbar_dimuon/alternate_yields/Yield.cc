@@ -39,7 +39,7 @@ using namespace std;
 
 using namespace std;
 
-tuple<float, float, float, float, float> Yields_InvMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float, float> LFYield_InvMass(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
 
     //INVERSE MASS FITTING METHOD TO EXTRACT LF YIELD
     RooRealVar mass("mumuMass", "Dimuon mass [GeV]", 0, 10);
@@ -178,7 +178,7 @@ tuple<float, float, float, float, float> Yields_InvMass(TNtuple* data_nt, TNtupl
 }
 
 
-tuple<float, float, float, float, float> Yields_DCA(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float, float> LFYield_DCA(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
     
     RooRealVar fitVar("muDiDxy1Dxy2Sig", "muDiDxy1Dxy2Sig", -3, 4);
     RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
@@ -323,7 +323,7 @@ tuple<float, float, float, float, float> Yields_DCA(TNtuple* data_nt, TNtuple* n
 }
 
 
-tuple<float, float, float, float, float> Yields_DR(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
+tuple<float, float, float, float, float> LFYield_DR(TNtuple* data_nt, TNtuple* nt_uds, TNtuple* nt_other, TNtuple* nt_c, TNtuple* nt_cc, TNtuple* nt_b, TNtuple* nt_bb, float Jetptmin, float Jetptmax, TDirectory* plotDir = nullptr){
  
     RooRealVar fitVar("muDR", "muDR", 0, 0.6);
     RooRealVar jetpt("JetPT", "Jet pT", 0, 1000);
@@ -542,7 +542,7 @@ int main(int argc, char *argv[]) {
         
         // LF
         if(doLF_DCA) {
-            auto lfResult = Yields_DCA(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            auto lfResult = LFYield_DCA(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
             tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError, chi2_ndf) = lfResult;
             Chi2NDF_DCA->SetBinContent(i+1, chi2_ndf);
             LightYields_DCA->SetBinContent(i+1, LightYield);
@@ -558,7 +558,7 @@ int main(int argc, char *argv[]) {
 
         // LF VIA INVMASS METHOD
         if(doLF_invMass) {
-            auto lfResultMass = Yields_InvMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            auto lfResultMass = LFYield_InvMass(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
             tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError, chi2_ndf) = lfResultMass;
             Chi2NDF_InvMass->SetBinContent(i+1, chi2_ndf);
             LightYields_InvMass->SetBinContent(i+1, LightYield);
@@ -573,7 +573,7 @@ int main(int argc, char *argv[]) {
         }
 
         if(doLF_DR) {
-            auto lfResultDR = Yields_DR(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
+            auto lfResultDR = LFYield_DR(nt, nt_uds, nt_other, nt_c, nt_cc, nt_b, nt_bb, ptMin, ptMax, plotDir);
             tie(LightYield, LightYieldError, HeavyYield, HeavyYieldError, chi2_ndf) = lfResultDR;
             Chi2NDF_DR->SetBinContent(i+1, chi2_ndf);
             LightYields_DR->SetBinContent(i+1, LightYield);
@@ -820,7 +820,7 @@ int main(int argc, char *argv[]) {
             Chi2NDF_DCA->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
             Chi2NDF_DCA->GetYaxis()->SetTitle("#chi^{2}/ndf");
             Chi2NDF_DCA->SetMinimum(0);
-            //Chi2NDF_DCA->SetMaximum(5);
+            Chi2NDF_DCA->SetMaximum(5);
             Chi2NDF_DCA->Draw("HIST");
             //leg->AddEntry(Chi2NDF_DCA, "DCA Method", "lep");
         }
@@ -832,7 +832,7 @@ int main(int argc, char *argv[]) {
                 Chi2NDF_InvMass->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
                 Chi2NDF_InvMass->GetYaxis()->SetTitle("#chi^{2}/ndf");
                 Chi2NDF_InvMass->SetMinimum(0);
-                //Chi2NDF_InvMass->SetMaximum(5);
+                Chi2NDF_InvMass->SetMaximum(5);
                 Chi2NDF_InvMass->Draw("HIST");
             }
             //leg->AddEntry(Chi2NDF_InvMass, "Inv Mass Method", "lep");
@@ -845,7 +845,7 @@ int main(int argc, char *argv[]) {
                 Chi2NDF_DR->GetXaxis()->SetTitle("Jet p_{T} [GeV]");
                 Chi2NDF_DR->GetYaxis()->SetTitle("#chi^{2}/ndf");
                 Chi2NDF_DR->SetMinimum(0);
-                //Chi2NDF_DR->SetMaximum(5);
+                Chi2NDF_DR->SetMaximum(5);
                 Chi2NDF_DR->Draw("HIST");
             }
             //leg->AddEntry(Chi2NDF_DR, "DR Method", "lep");

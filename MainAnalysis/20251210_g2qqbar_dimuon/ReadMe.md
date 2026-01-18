@@ -50,6 +50,7 @@ In Yields.cc we extract Light and Heavy flavor yields using a binless 1D templat
 - Pt bins
 - flag to do DCA-based estimation
 - flag to do Invariant Mass-based estimation
+- flag to do dR-based estimatino
 - makeplots
 
 Yields will save the HF and LF yields, HF fraction, and Total Yield to a root file. 

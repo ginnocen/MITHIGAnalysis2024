@@ -27,8 +27,12 @@ using namespace std;
 
 bool isDimuonSelected(DimuonJetMessenger *Dimuon, float muPtCut, int chargeSelection, bool isData){
 
-    // IMPLEMENT EVENT SELECTION HERE FOR DATA JETS
-    // NOTHING HAPPENS HERE IF MC
+    
+    if(isData) {
+        if(!Dimuon->HLT_HIAK4PFJet80_v1){
+            return false;
+        }
+    }
 
     if(!Dimuon->IsMuMuTagged){
         return false;
