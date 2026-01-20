@@ -371,6 +371,15 @@ int main(int argc, char *argv[])
                    IsGammaN), "RECREATE");
   gr->SetName("correctedYield"); gr->Write();
   gr_uncert->SetName("correctedYieldSyst"); gr_uncert->Write();
+  gr_ref->SetName("RefCorrectedYield"); gr_ref->Write();
+  gr_uncert_ref->SetName("RefCorrectedYieldSyst"); gr_uncert_ref->Write();
+
+  TLegend* leg = new TLegend(0.2, 0.78, 0.55, 0.90);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->AddEntry(gr, "2025 Data", "P");
+  leg->AddEntry(gr_ref, "HIN-25-002", "P");
+  leg->Draw();
 
   TLatex latex;
   latex.SetNDC();
