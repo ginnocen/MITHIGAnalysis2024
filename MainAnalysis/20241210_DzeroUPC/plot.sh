@@ -16,9 +16,12 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
   wSystTrk=$(echo $Plot | jq -r '.wSystTrk')
   wSystBR=$(echo $Plot | jq -r '.wSystBR')
   wSystEvtSel=$(echo $Plot | jq -r '.wSystEvtSel')
+  wSystPromptFrac=$(echo $Plot | jq -r '.wSystPromptFrac')
   wSystRapGapSel=$(echo $Plot | jq -r '.wSystRapGapSel')
   wSystDsvpv=$(echo $Plot | jq -r '.wSystDsvpv')
   wSystDtrkPt=$(echo $Plot | jq -r '.wSystDtrkPt')
+  wSystDalpha=$(echo $Plot | jq -r '.wSystDalpha')
+  wSystDchi2cl=$(echo $Plot | jq -r '.wSystDchi2cl')
   wSystFitPkBg=$(echo $Plot | jq -r '.wSystFitPkBg')
   wSystFitSiglAlpha=$(echo $Plot | jq -r '.wSystFitSiglAlpha')
   wSystFitSiglMean=$(echo $Plot | jq -r '.wSystFitSiglMean')
@@ -32,9 +35,12 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
   [ "$wSystTrk" != "null" ] && cmd="$cmd --wSystTrk $wSystTrk"
   [ "$wSystBR" != "null" ] && cmd="$cmd --wSystBR $wSystBR"
   [ "$wSystEvtSel" != "null" ] && cmd="$cmd --wSystEvtSel $wSystEvtSel"
+  [ "$wSystPromptFrac" != "null" ] && cmd="$cmd --wSystPromptFrac $wSystPromptFrac"
   [ "$wSystRapGapSel" != "null" ] && cmd="$cmd --wSystRapGapSel $wSystRapGapSel"
   [ "$wSystDsvpv" != "null" ] && cmd="$cmd --wSystDsvpv $wSystDsvpv"
   [ "$wSystDtrkPt" != "null" ] && cmd="$cmd --wSystDtrkPt $wSystDtrkPt"
+  [ "$wSystDalpha" != "null" ] && cmd="$cmd --wSystDalpha $wSystDalpha"
+  [ "$wSystDchi2cl" != "null" ] && cmd="$cmd --wSystDchi2cl $wSystDchi2cl"
   [ "$wSystFitPkBg" != "null" ] && cmd="$cmd --wSystFitPkBg $wSystFitPkBg"
   [ "$wSystFitSiglAlpha" != "null" ] && cmd="$cmd --wSystFitSiglAlpha $wSystFitSiglAlpha"
   [ "$wSystFitSiglMean" != "null" ] && cmd="$cmd --wSystFitSiglMean $wSystFitSiglMean"
