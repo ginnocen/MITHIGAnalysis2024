@@ -16,7 +16,8 @@
 using namespace std;
 using namespace RooFit;
 
-int getCorrectedYields(string rawYieldInput, string effInput, string outputMD)
+int getCorrectedYields(string rawYieldInput, string effInput, string outputMD,
+                       float luminosityForced=-1)
 {
 
   TFile rawYieldFile(rawYieldInput.c_str());
@@ -118,6 +119,7 @@ int getCorrectedYields(string rawYieldInput, string effInput, string outputMD)
   float lumitrigger = (parTriggerChoice==1)? lumipathinvnbZDCOR : // ZDCOR
                       (parTriggerChoice==2)? lumipathinvnbZDC   : // ZDCXORJet8
                       -999; // [WARN] Check this
+  if (luminosityForced > 0) lumitrigger = luminosityForced;
   float triggereff = 1.; // [WARN] Change this
   double cross = yield / (eff * lumitrigger * triggereff *
                           particle_antiparticlefactor * BR *
@@ -189,8 +191,9 @@ int main(int argc, char *argv[]) {
   string rawYieldInput    = CL.Get      ("rawYieldInput",    "output.root"); // Input raw yield file from MassFit
   string effInput         = CL.Get      ("effInput",      "output.root"); // Input eff file from ExecuteDzeroUPC
   string outputMD         = CL.Get      ("Output", "correctedYields.md");     // Output file
+  float luminosityForced  = CL.GetDouble("luminosityForced", -999.);  // Forced the luminosity to be the input
  
-  int retVal = getCorrectedYields(rawYieldInput, effInput, outputMD);
+  int retVal = getCorrectedYields(rawYieldInput, effInput, outputMD, luminosityForced );
 
   return retVal;
 }
