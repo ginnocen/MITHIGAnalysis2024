@@ -263,5 +263,32 @@ TGraphErrors gr_uncert_ref_Ngamma = TGraphErrors(1,
                              yValues_Ngamma, crossSection_Ngamma,
                              yErrors_Ngamma, systErrors_Ngamma);
 
+/////////////////////////////////
+// Results (2-5 pT) in HIN-2025-002
+/////////////////////////////////
+double yValues_gammaN_25002[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double crossSection_gammaN_25002[4]  = {2.1, 1.3, 0.62, 0.20};
+double yErrors_gammaN_25002[4]       = {0.5, 0.5, 0.5, 0.5};
+double crossErrors_gammaN_25002[4]   = {0.3, 0.15, 0.08, 0.06};
+double systErrors_gammaN_25002[4]    = {0.3, 0.20, 0.18, 0.07};
+TGraphErrors gr_ref_gammaN_25002 = TGraphErrors(4, 
+                             yValues_gammaN_25002, crossSection_gammaN_25002,
+                             yErrors_gammaN_25002, crossErrors_gammaN_25002);
+TGraphErrors gr_uncert_ref_gammaN_25002 = TGraphErrors(4, 
+                             yValues_gammaN_25002, crossSection_gammaN_25002,
+                             yErrors_gammaN_25002, systErrors_gammaN_25002);
+
+double yValues_Ngamma_25002[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double crossSection_Ngamma_25002[4]  = {0.25, 0.58, 1.25, 1.40};
+double yErrors_Ngamma_25002[4]       = {0.5, 0.5, 0.5, 0.5};
+double crossErrors_Ngamma_25002[4]   = {0.06, 0.10, 0.15, 0.30};
+double systErrors_Ngamma_25002[4]    = {0.10, 0.12, 0.25, 0.45};
+TGraphErrors gr_ref_Ngamma_25002 = TGraphErrors(4, 
+                             yValues_Ngamma_25002, crossSection_Ngamma_25002,
+                             yErrors_Ngamma_25002, crossErrors_Ngamma_25002);
+TGraphErrors gr_uncert_ref_Ngamma_25002 = TGraphErrors(4, 
+                             yValues_Ngamma_25002, crossSection_Ngamma_25002,
+                             yErrors_Ngamma_25002, systErrors_Ngamma_25002);
+
 
 
