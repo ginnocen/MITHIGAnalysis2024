@@ -63,6 +63,7 @@
 	```
 
 # Steps for Full Analysis
+- Slides: https://www.dropbox.com/scl/fi/srm11gxdaivbvrkz5jbpo/20250121_newAnalysisFramework.pdf?rlkey=02y94bcpxoha4zod0oog6bz7x&dl=0
 
 ### Setup Environment
 ```bash
@@ -107,3 +108,12 @@ bash plot.sh plotSettings/fullAnalysis.json
 ```
 
 Yield and efficiencty plots can be found in `plot/fullAnalysis/`.
+
+### 4. Commands to run the 2025 skim data
+```bash
+bash makeMicroTree.sh pt2-5_sampleSettings/fullAnalysis_skim2025.json
+bash massfit.sh pt2-5_fitSettings/fullAnalysis_useGammaNForNgammaForFitFunc.json
+bash plot.sh pt2-5_plotSettings/fullAnalysis_centralValuesOnly.json
+### mass fit plots will be at: fullAnalysis/*/MassFit/fit_result_full_param.pdf
+### corrected yield analysis will be at: plot/fullAnalysis/*pdf
+```
