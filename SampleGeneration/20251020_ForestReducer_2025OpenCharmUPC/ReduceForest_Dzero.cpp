@@ -245,6 +245,7 @@ int main(int argc, char *argv[]) {
         if (ApplyTriggerRejection == 1 && !(incl_ZDCOr || incl_ZDCXORJet)) continue;
         if (ApplyTriggerRejection == 2 && !incl_ZDCOr) continue;
         if (ApplyTriggerRejection == 3 && !incl_ZB) continue;
+        if (ApplyTriggerRejection == 4 && !(incl_ZB || incl_ZDCOr || incl_ZDCXORJet)) continue;
       } /* if (IsData) { */
 
       /////////////////////////////////////////////
@@ -256,6 +257,7 @@ int main(int argc, char *argv[]) {
       bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
       MDzeroUPC.selectedVtxFilter = selectedVtxFilter;
       MDzeroUPC.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
+      MDzeroUPC.cscTightHalo2015Filter = MMETFilter.cscTightHalo2015Filter;
       bool selectedBkgFilter = IsData ?
         (MSkim.ClusterCompatibilityFilter && MMETFilter.cscTightHalo2015Filter) :
         (MSkim.ClusterCompatibilityFilter);
@@ -363,6 +365,7 @@ int main(int argc, char *argv[]) {
           else if (ApplyDRejection=="passystdchi2cl"  && !DpassCut23PASSystDchi2cl_) continue;
         }
         countSelDzero++;
+
         MDzeroUPC.Dpt->push_back(             MDzero.Dpt[iD]);
         MDzeroUPC.Dy->push_back(              MDzero.Dy[iD]);
         MDzeroUPC.Dmass->push_back(           MDzero.Dmass[iD]);
@@ -371,8 +374,8 @@ int main(int argc, char *argv[]) {
         MDzeroUPC.DsvpvDisErr->push_back(     MDzero.DsvpvDisErr[iD]);
         MDzeroUPC.DsvpvDistance_2D->push_back(MDzero.DsvpvDistance_2D[iD]);
         MDzeroUPC.DsvpvDisErr_2D->push_back(  MDzero.DsvpvDisErr_2D[iD]);
-//        MDzeroUPC.Dip3d->push_back(           MDzero.Dip3d[iD]);
-//        MDzeroUPC.Dip3derr->push_back(        MDzero.Dip3derr[iD]);
+        MDzeroUPC.Dip3D->push_back(           MDzero.Dip3D[iD]);
+        MDzeroUPC.Dip3derr->push_back(        MDzero.Dip3derr[iD]);
         MDzeroUPC.Dalpha->push_back(          MDzero.Dalpha[iD]);
         MDzeroUPC.Ddtheta->push_back(         MDzero.Ddtheta[iD]);
         
