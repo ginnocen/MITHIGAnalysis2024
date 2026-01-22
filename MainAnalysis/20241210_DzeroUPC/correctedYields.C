@@ -17,7 +17,7 @@ using namespace std;
 using namespace RooFit;
 
 int getCorrectedYields(string rawYieldInput, string effInput, string outputMD,
-                       float luminosityForced=-1)
+                       float luminosity)
 {
 
   TFile rawYieldFile(rawYieldInput.c_str());
@@ -113,13 +113,19 @@ int getCorrectedYields(string rawYieldInput, string effInput, string outputMD,
 
   const float particle_antiparticlefactor = 2.;
   const float BR = 0.03947;
-  const float lumipathinvnbZDC = 1.379766654 / 1.11;
-  const float lumipathinvnbNotHFAND = 0.74130;
-  const float lumipathinvnbZDCOR = 0.007802890;
-  float lumitrigger = (parTriggerChoice==1)? lumipathinvnbZDCOR : // ZDCOR
-                      (parTriggerChoice==2)? lumipathinvnbZDC   : // ZDCXORJet8
-                      -999; // [WARN] Check this
-  if (luminosityForced > 0) lumitrigger = luminosityForced;
+
+  /* ************** Hardcoded luminosity for 2023 ****************
+   * const float lumipathinvnbZDC = 1.379766654 / 1.11;
+   * const float lumipathinvnbNotHFAND = 0.74130;
+   * const float lumipathinvnbZDCOR = 0.007802890;
+   * float lumitrigger = (parTriggerChoice==1)? lumipathinvnbZDCOR : // ZDCOR
+   *                     (parTriggerChoice==2)? lumipathinvnbZDC   : // ZDCXORJet8
+   *                      -999; // [WARN] Check this
+   * [TODO] We might want to do this for the 2025 analysis, once we
+   *        finalize on the lumi (from brilcalc, after preapproval).
+   *        At that point we can place a default lumi to the ZDCOR trigger
+   * ************************************************************* */
+  float lumitrigger = luminosity;
   float triggereff = 1.; // [WARN] Change this
   double cross = yield / (eff * lumitrigger * triggereff *
                           particle_antiparticlefactor * BR *
@@ -191,9 +197,14 @@ int main(int argc, char *argv[]) {
   string rawYieldInput    = CL.Get      ("rawYieldInput",    "output.root"); // Input raw yield file from MassFit
   string effInput         = CL.Get      ("effInput",      "output.root"); // Input eff file from ExecuteDzeroUPC
   string outputMD         = CL.Get      ("Output", "correctedYields.md");     // Output file
-  float luminosityForced  = CL.GetDouble("luminosityForced", -999.);  // Forced the luminosity to be the input
- 
-  int retVal = getCorrectedYields(rawYieldInput, effInput, outputMD, luminosityForced );
+  float luminosity        = CL.GetDouble("luminosity", -999.);  // Luminosity for the corrected yield
+
+  if (luminosity<0) {
+    printf("[Error] 'luminosity' is a required (positive) input. Exiting... ");
+    return 1;
+  }
+
+  int retVal = getCorrectedYields(rawYieldInput, effInput, outputMD, luminosity );
 
   return retVal;
 }

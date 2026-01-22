@@ -28,10 +28,10 @@ int main(int argc, char *argv[])
   float MinDzeroPT = CL.GetDouble("MinDzeroPT", 2);  // Minimum Dzero transverse momentum threshold for Dzero selection.
   float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 5);  // Maximum Dzero transverse momentum threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
-  bool UseMaxFitUncert = CL.GetBool("UseMaxFitUncert", false);
-
   vector<string> inputPoints      = CL.GetStringVector("InputPoints",    ""); // Input corrected yields md files
 
+  /* [TODO::Split Systematics Workflow] Identify this part to be separated from the plotting macro! */
+  bool UseMaxFitUncert = CL.GetBool("UseMaxFitUncert", false);
   double         wSystLumi        = CL.GetDouble("wSystLumi", 0.05);             // Include luminosity systematics (relative uncertainty)
   double         wSystTrk         = CL.GetDouble("wSystTrk", 0.046);             // Include tracking systematics (relative uncertainty)
   double         wSystBR          = CL.GetDouble("wSystBR", 0.0076);             // Include branching ratio systematics (relative uncertainty)
@@ -120,6 +120,17 @@ int main(int argc, char *argv[])
     }
   }
 
+  /* [TODO::Split Systematics Workflow] Identify this part to be separated from the plotting macro!
+   *   - The step-1 here can go into the Comp.C, which calculate the difference of the alternative versus nominal.
+   *   - The macro can be reused for different syst sources, different (pt,y) bins
+   *   - Expecting:
+   *      - Input: (nominal paths, systematics paths)
+   *      - What it does: diff all the pt*-y*_gammaN/Ngamma sub-folders
+   *      - Output: table-like structure
+   *                  | syst source | pT  | y   | gammaN | abs syst | rel syst |
+   *                  |-------------|-----|-----|--------|----------|----------|
+   *                  | rap gap     |(2,5)|(0,1)|   1    |   xxx    |   xxx%   |
+   */
   /////////////////////////////////
   // 1. Calculate the systematics uncertainties for each componenet
   /////////////////////////////////
@@ -211,6 +222,18 @@ int main(int argc, char *argv[])
                     MinDzeroPT, MaxDzeroPT, IsGammaN);
   }
 
+  /* [TODO::Split Systematics Workflow] Identify this part to be separated from the plotting macro!
+   *   - The step-2 (after subtracting the nominal values): we will do sumSyst.C to cook up the total systematics
+   *   - We will want to print the decomposition of the systematics source by source, in .md, .tex, and plot them in stack histogram
+   *   - Expecting:
+   *      - Input: table-like structure
+   *                  | syst source | pT  | y   | gammaN | abs syst | rel syst |
+   *                  |-------------|-----|-----|--------|----------|----------|
+   *                  | rap gap     |(2,5)|(0,1)|   1    |   xxx    |   xxx%   |
+   *      - What it does: consider how to sum the sources
+   *      - Output: an array of the total systematics values, in bins of y
+   *                => We will parse this to the plotting macro
+   */
   vector<double> systEvtSelUncert(nPoints);
   vector<double> systRapGapUncert(nPoints);
   vector<double> systDsvpvUncert(nPoints);
@@ -336,36 +359,18 @@ int main(int argc, char *argv[])
   gr_uncert->SetFillColorAlpha(kRed,0.3); // Set color for uncertainty band (you can adjust it)
   gr_uncert->Draw("2 SAME"); // Draw the uncertainty band
 
-  /////////////////////////////////
-  // [TODO] Need to add a flag to decide whether to overlay the HIN-24-003 result
-  /////////////////////////////////
-  TGraphErrors* gr_ref = (IsGammaN)? &gr_ref_gammaN_25002: &gr_ref_Ngamma_25002;
-  gr_ref->SetMarkerStyle(20);
-  gr_ref->SetMarkerSize(1.2);
-  gr_ref->SetLineColor(kBlack);
-  gr_ref->SetMarkerColor(kBlack);
-  gr_ref->SetLineWidth(2);
+  TLegend* leg = new TLegend(0.2, 0.78, 0.55, 0.90);
+  leg->SetFillStyle(0);
+  leg->SetBorderSize(0);
+  leg->AddEntry(gr, "2025 Data", "P");
 
-  gr_ref->Draw("P E1 SAME");
-
-  // Create the uncertainty band (systematic)
-  TGraphErrors* gr_uncert_ref = (IsGammaN)? &gr_uncert_ref_gammaN_25002: &gr_uncert_ref_Ngamma_25002;
-  gr_uncert_ref->SetFillColorAlpha(kBlack,0.3); // Set color for uncertainty band (you can adjust it)
-  gr_uncert_ref->Draw("2 SAME"); // Draw the uncertainty band
+  drawPubCurves(IsGammaN, leg);
+  leg->Draw();
 
   TFile *outFile = new TFile(Form("%s/histograms_pt%d-%d_IsGammaN%o.root", PlotDir.c_str(), (int) MinDzeroPT, (int) MaxDzeroPT,
                    IsGammaN), "RECREATE");
   gr->SetName("correctedYield"); gr->Write();
   gr_uncert->SetName("correctedYieldSyst"); gr_uncert->Write();
-  gr_ref->SetName("RefCorrectedYield"); gr_ref->Write();
-  gr_uncert_ref->SetName("RefCorrectedYieldSyst"); gr_uncert_ref->Write();
-
-  TLegend* leg = new TLegend(0.2, 0.78, 0.55, 0.90);
-  leg->SetFillStyle(0);
-  leg->SetBorderSize(0);
-  leg->AddEntry(gr, "2025 Data", "P");
-  leg->AddEntry(gr_ref, "HIN-25-002", "P");
-  leg->Draw();
 
   TLatex latex;
   latex.SetNDC();

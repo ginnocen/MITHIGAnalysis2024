@@ -236,59 +236,103 @@ void printRatioArr(const std::vector<double>& vec1,
   std::cout << std::endl;
 }
 
+/* ************** Archived publication results ****************
+ * [Todo] 1. To implement a class to host the cross-section curves (from previous publications or from MC predictions),
+ *        2. This will initiate the curve instances, and set the style
+ *        3. Users can just call the functions draw(), get() (,etc), to access those archived curves
+ * ************************************************************ */
 /////////////////////////////////
 // Results (2-5 pT) in HIN-2024-003
 /////////////////////////////////
-double yValues_gammaN[1]       = {0};
-double crossSection_gammaN[1]  = {1.07585};
-double yErrors_gammaN[1]       = {1};
-double crossErrors_gammaN[1]   = {0.10225};
-double systErrors_gammaN[1]    = {0.29048};
-TGraphErrors gr_ref_gammaN = TGraphErrors(1, 
-                             yValues_gammaN, crossSection_gammaN,
-                             yErrors_gammaN, crossErrors_gammaN);
-TGraphErrors gr_uncert_ref_gammaN = TGraphErrors(1, 
-                             yValues_gammaN, crossSection_gammaN,
-                             yErrors_gammaN, systErrors_gammaN);
+double CMSHIN24003_pt2to5_yValues_gammaN[1]       = {0};
+double CMSHIN24003_pt2to5_yErrors_gammaN[1]       = {1};
+double CMSHIN24003_pt2to5_crossSection_gammaN[1]  = {1.07585};
+double CMSHIN24003_pt2to5_crossStatUnc_gammaN[1]  = {0.10225};
+double CMSHIN24003_pt2to5_crossSystUnc_gammaN[1]  = {0.29048};
+TGraphErrors* CMSHIN24003_pt2to5_gammaN_stat = new TGraphErrors(1,
+                             CMSHIN24003_pt2to5_yValues_gammaN, CMSHIN24003_pt2to5_crossSection_gammaN,
+                             CMSHIN24003_pt2to5_yErrors_gammaN, CMSHIN24003_pt2to5_crossStatUnc_gammaN);
+TGraphErrors* CMSHIN24003_pt2to5_gammaN_syst = new TGraphErrors(1,
+                             CMSHIN24003_pt2to5_yValues_gammaN, CMSHIN24003_pt2to5_crossSection_gammaN,
+                             CMSHIN24003_pt2to5_yErrors_gammaN, CMSHIN24003_pt2to5_crossSystUnc_gammaN);
 
-double yValues_Ngamma[1]       = {0};
-double crossSection_Ngamma[1]  = {1.02555};
-double yErrors_Ngamma[1]       = {1};
-double crossErrors_Ngamma[1]   = {0.100667};
-double systErrors_Ngamma[1]    = {0.283257};
-TGraphErrors gr_ref_Ngamma = TGraphErrors(1, 
-                             yValues_Ngamma, crossSection_Ngamma,
-                             yErrors_Ngamma, crossErrors_Ngamma);
-TGraphErrors gr_uncert_ref_Ngamma = TGraphErrors(1, 
-                             yValues_Ngamma, crossSection_Ngamma,
-                             yErrors_Ngamma, systErrors_Ngamma);
+double CMSHIN24003_pt2to5_yValues_Ngamma[1]       = {0};
+double CMSHIN24003_pt2to5_yErrors_Ngamma[1]       = {1};
+double CMSHIN24003_pt2to5_crossSection_Ngamma[1]  = {1.02555};
+double CMSHIN24003_pt2to5_crossStatUnc_Ngamma[1]   = {0.100667};
+double CMSHIN24003_pt2to5_crossSystUnc_Ngamma[1]    = {0.283257};
+TGraphErrors* CMSHIN24003_pt2to5_Ngamma_stat = new TGraphErrors(1,
+                             CMSHIN24003_pt2to5_yValues_Ngamma, CMSHIN24003_pt2to5_crossSection_Ngamma,
+                             CMSHIN24003_pt2to5_yErrors_Ngamma, CMSHIN24003_pt2to5_crossStatUnc_Ngamma);
+TGraphErrors* CMSHIN24003_pt2to5_Ngamma_syst = new TGraphErrors(1,
+                             CMSHIN24003_pt2to5_yValues_Ngamma, CMSHIN24003_pt2to5_crossSection_Ngamma,
+                             CMSHIN24003_pt2to5_yErrors_Ngamma, CMSHIN24003_pt2to5_crossSystUnc_Ngamma);
 
 /////////////////////////////////
 // Results (2-5 pT) in HIN-2025-002
 /////////////////////////////////
-double yValues_gammaN_25002[4]       = {-1.5, -0.5, 0.5 ,1.5};
-double crossSection_gammaN_25002[4]  = {2.1, 1.3, 0.62, 0.20};
-double yErrors_gammaN_25002[4]       = {0.5, 0.5, 0.5, 0.5};
-double crossErrors_gammaN_25002[4]   = {0.3, 0.15, 0.08, 0.06};
-double systErrors_gammaN_25002[4]    = {0.3, 0.20, 0.18, 0.07};
-TGraphErrors gr_ref_gammaN_25002 = TGraphErrors(4, 
-                             yValues_gammaN_25002, crossSection_gammaN_25002,
-                             yErrors_gammaN_25002, crossErrors_gammaN_25002);
-TGraphErrors gr_uncert_ref_gammaN_25002 = TGraphErrors(4, 
-                             yValues_gammaN_25002, crossSection_gammaN_25002,
-                             yErrors_gammaN_25002, systErrors_gammaN_25002);
+double CMSHIN25002_pt2to5_yValues_gammaN[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN25002_pt2to5_yErrors_gammaN[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN25002_pt2to5_crossSection_gammaN[4]  = {1.812, 1.2586, 0.6666, 0.1865};
+double CMSHIN25002_pt2to5_crossStatUnc_gammaN[4]  = {0.2854, 0.1397, 0.0933, 0.0795};
+double CMSHIN25002_pt2to5_crossSystUnc_gammaN[4]  = {0.440474, 0.301792, 0.250459, 0.0842525};
+TGraphErrors* CMSHIN25002_pt2to5_gammaN_stat = new TGraphErrors(4,
+                             CMSHIN25002_pt2to5_yValues_gammaN, CMSHIN25002_pt2to5_crossSection_gammaN,
+                             CMSHIN25002_pt2to5_yErrors_gammaN, CMSHIN25002_pt2to5_crossStatUnc_gammaN);
+TGraphErrors* CMSHIN25002_pt2to5_gammaN_syst = new TGraphErrors(4,
+                             CMSHIN25002_pt2to5_yValues_gammaN, CMSHIN25002_pt2to5_crossSection_gammaN,
+                             CMSHIN25002_pt2to5_yErrors_gammaN, CMSHIN25002_pt2to5_crossSystUnc_gammaN);
 
-double yValues_Ngamma_25002[4]       = {-1.5, -0.5, 0.5 ,1.5};
-double crossSection_Ngamma_25002[4]  = {0.25, 0.58, 1.25, 1.40};
-double yErrors_Ngamma_25002[4]       = {0.5, 0.5, 0.5, 0.5};
-double crossErrors_Ngamma_25002[4]   = {0.06, 0.10, 0.15, 0.30};
-double systErrors_Ngamma_25002[4]    = {0.10, 0.12, 0.25, 0.45};
-TGraphErrors gr_ref_Ngamma_25002 = TGraphErrors(4, 
-                             yValues_Ngamma_25002, crossSection_Ngamma_25002,
-                             yErrors_Ngamma_25002, crossErrors_Ngamma_25002);
-TGraphErrors gr_uncert_ref_Ngamma_25002 = TGraphErrors(4, 
-                             yValues_Ngamma_25002, crossSection_Ngamma_25002,
-                             yErrors_Ngamma_25002, systErrors_Ngamma_25002);
+double CMSHIN25002_pt2to5_yValues_Ngamma[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN25002_pt2to5_yErrors_Ngamma[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN25002_pt2to5_crossSection_Ngamma[4]  = {0.3222, 0.6175, 1.3696, 1.294};
+double CMSHIN25002_pt2to5_crossStatUnc_Ngamma[4]  = {0.0887, 0.0899, 0.1594, 0.2699};
+double CMSHIN25002_pt2to5_crossSystUnc_Ngamma[4]  = {0.132515, 0.172208, 0.387299, 0.504916};
+TGraphErrors* CMSHIN25002_pt2to5_Ngamma_stat = new TGraphErrors(4,
+                             CMSHIN25002_pt2to5_yValues_Ngamma, CMSHIN25002_pt2to5_crossSection_Ngamma,
+                             CMSHIN25002_pt2to5_yErrors_Ngamma, CMSHIN25002_pt2to5_crossStatUnc_Ngamma);
+TGraphErrors* CMSHIN25002_pt2to5_Ngamma_syst = new TGraphErrors(4,
+                             CMSHIN25002_pt2to5_yValues_Ngamma, CMSHIN25002_pt2to5_crossSection_Ngamma,
+                             CMSHIN25002_pt2to5_yErrors_Ngamma, CMSHIN25002_pt2to5_crossSystUnc_Ngamma);
 
+// We will likely not use this in the short-term future.
+// If we have a class, than we can instantiate these results fairly easily (without duplicating the code)
+void drawPubCurves_CMSHIN24003(bool IsGammaN, TLegend* leg=nullptr)
+{
+  TGraphErrors* gr_stat = (IsGammaN)? CMSHIN24003_pt2to5_gammaN_stat: CMSHIN24003_pt2to5_Ngamma_stat;
+  TGraphErrors* gr_syst = (IsGammaN)? CMSHIN24003_pt2to5_gammaN_syst: CMSHIN24003_pt2to5_Ngamma_syst;
+
+  gr_stat->SetMarkerStyle(20);
+  gr_stat->SetMarkerSize(1.2);
+  gr_stat->SetLineColor(kBlack);
+  gr_stat->SetMarkerColor(kBlack);
+  gr_stat->SetLineWidth(2);
+
+  gr_syst->SetFillColorAlpha(kBlack,0.3);
+
+  gr_stat->Draw("P E1 SAME");
+  gr_syst->Draw("2 SAME");
+
+  if (leg) leg->AddEntry(gr_stat, "HIN-24-003", "P");
+}
+
+void drawPubCurves(bool IsGammaN, TLegend* leg=nullptr)
+{
+  TGraphErrors* gr_stat = (IsGammaN)? CMSHIN25002_pt2to5_gammaN_stat: CMSHIN25002_pt2to5_Ngamma_stat;
+  TGraphErrors* gr_syst = (IsGammaN)? CMSHIN25002_pt2to5_gammaN_syst: CMSHIN25002_pt2to5_Ngamma_syst;
+
+  gr_stat->SetMarkerStyle(20);
+  gr_stat->SetMarkerSize(1.2);
+  gr_stat->SetLineColor(kBlack);
+  gr_stat->SetMarkerColor(kBlack);
+  gr_stat->SetLineWidth(2);
+
+  gr_syst->SetFillColorAlpha(kBlack,0.3);
+
+  gr_stat->Draw("P E1 SAME");
+  gr_syst->Draw("2 SAME");
+
+  if (leg) leg->AddEntry(gr_stat, "HIN-25-002", "P");
+}
 
 
