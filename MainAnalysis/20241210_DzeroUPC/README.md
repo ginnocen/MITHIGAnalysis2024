@@ -112,7 +112,7 @@ Yield and efficiencty plots can be found in `plot/fullAnalysis/`.
 ### 4. Commands to run the 2025 skim data
 ```bash
 bash makeMicroTree.sh pt2-5_sampleSettings/fullAnalysis_skim2025.json
-bash massfit.sh pt2-5_fitSettings/fullAnalysis_useGammaNForNgammaForFitFunc_forceLumi.json
+bash massfit.sh pt2-5_fitSettings/fullAnalysis_useGammaNForNgammaForFitFunc.json
 ### force the lumi to be 0.060364110 * 2 / 24. , for input files using PD6 & 18 2025 ZDCOR sample
 bash plot.sh pt2-5_plotSettings/fullAnalysis_centralValuesOnly.json
 ### mass fit plots will be at: fullAnalysis/*/MassFit/fit_result_full_param.pdf
