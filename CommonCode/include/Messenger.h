@@ -167,6 +167,7 @@ public:
    int HBHENoiseRun2Loose;
    int PVFilter;
    int ClusterCompatibilityFilter;
+   int cscTightHalo2015Filter;
    int BeamScrapingFilter;
    int HFCoincidenceFilter;
    int HFCoincidenceFilter2Th4;
@@ -485,6 +486,8 @@ public:
     float DsvpvDisErr[DFINDERCOUNTMAX];
     float DsvpvDistance_2D[DFINDERCOUNTMAX];
     float DsvpvDisErr_2D[DFINDERCOUNTMAX];
+    float Dip3D[DFINDERCOUNTMAX];
+    float Dip3derr[DFINDERCOUNTMAX];
     float Dalpha[DFINDERCOUNTMAX];
     float Ddtheta[DFINDERCOUNTMAX];
     // Candidate gen info
@@ -1100,7 +1103,7 @@ public:
    bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
    bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
    bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
-   bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter;
+   bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter, cscTightHalo2015Filter;
    float ZDCsumPlus;
    float ZDCsumMinus;
    float HFEMaxPlus;
@@ -1144,7 +1147,7 @@ public:
    std::vector<float> *DsvpvDisErr;
    std::vector<float> *DsvpvDistance_2D;
    std::vector<float> *DsvpvDisErr_2D;
-   std::vector<float> *Dip3d;
+   std::vector<float> *Dip3D;
    std::vector<float> *Dip3derr;
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
@@ -1154,6 +1157,7 @@ public:
    std::vector<bool>  *DpassCut23PASSystDtrkPt;
    std::vector<bool>  *DpassCut23PASSystDalpha;
    std::vector<bool>  *DpassCut23PASSystDchi2cl;
+   std::vector<bool>  *DpassCutDefault; // included for backwards compatibility
    std::vector<bool>  *DpassCutNominal;
    std::vector<bool>  *DpassCutLoose;
    std::vector<bool>  *DpassCutSystDsvpvSig;
@@ -1237,7 +1241,7 @@ public:
   bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
   bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
   bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
-  bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter;
+  bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter, cscTightHalo2015Filter;
   float ZDCsumPlus;
   float ZDCsumMinus;
   float HFEMaxPlus;
@@ -1260,6 +1264,8 @@ public:
   std::vector<float> *DsvpvDisErr;
   std::vector<float> *DsvpvDistance_2D;
   std::vector<float> *DsvpvDisErr_2D;
+  std::vector<float> *Dip3D;
+  std::vector<float> *Dip3derr;
   std::vector<float> *Dalpha;
   std::vector<float> *Ddtheta;
   std::vector<float> *DtktkResmass;
@@ -1377,7 +1383,7 @@ public:
   bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
   bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
   bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
-  bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter;
+  bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter, cscTightHalo2015Filter;
   float ZDCsumPlus;
   float ZDCsumMinus;
   float HFEMaxPlus;
@@ -1400,6 +1406,8 @@ public:
   std::vector<float> *DsvpvDisErr;
   std::vector<float> *DsvpvDistance_2D;
   std::vector<float> *DsvpvDisErr_2D;
+  std::vector<float> *Dip3D;
+  std::vector<float> *Dip3derr;
   std::vector<float> *Dalpha;
   std::vector<float> *Ddtheta;
   std::vector<bool>  *DpassCutNominal;
@@ -1531,6 +1539,7 @@ public:
    float ZDCsumPlus;
    float ZDCsumMinus;
    int ClusterCompatibilityFilter;
+   int cscTightHalo2015Filter;
    int PVFilter;
    int mMaxL1HFAdcPlus, mMaxL1HFAdcMinus;
    float hiHF_pf, hiHFPlus_pf, hiHFMinus_pf;

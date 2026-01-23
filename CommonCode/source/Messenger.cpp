@@ -8,12 +8,13 @@
 #include "Messenger.h"
 
 // Preprocessor functions
-#define CheckAndSetBranch(TREE, BRANCH)     \
-if(TREE->GetBranch(#BRANCH))                \
-{                                           \
-  TREE->SetBranchStatus(#BRANCH, 1);        \
-  TREE->SetBranchAddress(#BRANCH, &BRANCH); \
-}
+#define CheckAndSetBranch(TREE, BRANCH)                                 \
+  if (TREE->GetBranch(#BRANCH)) {                                       \
+    TREE->SetBranchStatus(#BRANCH, 1);                                  \
+    TREE->SetBranchAddress(#BRANCH, &BRANCH);                           \
+  } else {                                                              \
+    std::cout<<__FUNCTION__<<": " #BRANCH " is not found in the input tree."<<std::endl; \
+  }
 
 namespace EmptyVectors
 {
@@ -2783,6 +2784,8 @@ bool DfinderMasterMessenger::Initialize()
     CheckAndSetBranch(Tree, DsvpvDistance);
     CheckAndSetBranch(Tree, DsvpvDistance_2D);
     CheckAndSetBranch(Tree, DsvpvDisErr_2D);
+    CheckAndSetBranch(Tree, Dip3D);
+    CheckAndSetBranch(Tree, Dip3derr);
     CheckAndSetBranch(Tree, Dalpha);
     CheckAndSetBranch(Tree, Ddtheta);
     // Candidate gen info
@@ -3547,6 +3550,7 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete DpassCut23PASSystDtrkPt;
       delete DpassCut23PASSystDalpha;
       delete DpassCut23PASSystDchi2cl;
+      delete DpassCutDefault; // included for backwards compatibility
       delete DpassCutNominal;
       delete DpassCutLoose;
       delete DpassCutSystDsvpvSig;
@@ -3584,7 +3588,7 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete DsvpvDisErr;
       delete DsvpvDistance_2D;
       delete DsvpvDisErr_2D;
-      delete Dip3d;
+      delete Dip3D;
       delete Dip3derr;
       delete Dalpha;
       delete Ddtheta;
@@ -3621,6 +3625,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    DpassCut23PASSystDtrkPt = nullptr;
    DpassCut23PASSystDalpha = nullptr;
    DpassCut23PASSystDchi2cl = nullptr;
+   DpassCutDefault = nullptr; // included for backwards compatibility
    DpassCutNominal = nullptr;
    DpassCutLoose = nullptr;
    DpassCutSystDsvpvSig = nullptr;
@@ -3658,7 +3663,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    DsvpvDisErr = nullptr;
    DsvpvDistance_2D = nullptr;
    DsvpvDisErr_2D = nullptr;
-   Dip3d = nullptr;
+   Dip3D = nullptr;
    Dip3derr = nullptr;
    Dalpha = nullptr;
    Ddtheta = nullptr;
@@ -3672,101 +3677,103 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    GisSignalCalcPrompt = nullptr;
    GisSignalCalcFeeddown = nullptr;
 
-   Tree->SetBranchAddress("Run", &Run);
-   Tree->SetBranchAddress("Event", &Event);
-   Tree->SetBranchAddress("Lumi", &Lumi);
-   Tree->SetBranchAddress("VX", &VX);
-   Tree->SetBranchAddress("VY", &VY);
-   Tree->SetBranchAddress("VZ", &VZ);
-   Tree->SetBranchAddress("VXError", &VXError);
-   Tree->SetBranchAddress("VYError", &VYError);
-   Tree->SetBranchAddress("VZError", &VZError);
-   Tree->SetBranchAddress("nVtx", &nVtx);
-   Tree->SetBranchAddress("isL1ZDCOr", &isL1ZDCOr);
-   Tree->SetBranchAddress("isL1ZDCOr_Min400_Max10000", &isL1ZDCOr_Min400_Max10000);
-   Tree->SetBranchAddress("isL1ZDCOr_Max400_Pixel", &isL1ZDCOr_Max400_Pixel);
-   Tree->SetBranchAddress("isL1ZDCOr_Max10000", &isL1ZDCOr_Max10000);
-   Tree->SetBranchAddress("isL1ZDCXORJet8", &isL1ZDCXORJet8);
-   Tree->SetBranchAddress("isL1ZDCXORJet12", &isL1ZDCXORJet12);
-   Tree->SetBranchAddress("isL1ZDCXORJet16", &isL1ZDCXORJet16);
-   Tree->SetBranchAddress("isZeroBias", &isZeroBias);
-   Tree->SetBranchAddress("isZeroBias_Min400_Max10000", &isZeroBias_Min400_Max10000);
-   Tree->SetBranchAddress("isZeroBias_Max400_Pixel", &isZeroBias_Max400_Pixel);
-   Tree->SetBranchAddress("isZeroBias_Max10000", &isZeroBias_Max10000);
-   Tree->SetBranchAddress("selectedBkgFilter", &selectedBkgFilter);
-   Tree->SetBranchAddress("selectedVtxFilter", &selectedVtxFilter);
-   Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
-   Tree->SetBranchAddress("ZDCsumPlus", &ZDCsumPlus);
-   Tree->SetBranchAddress("ZDCsumMinus", &ZDCsumMinus);
-   Tree->SetBranchAddress("HFEMaxPlus", &HFEMaxPlus);
-   Tree->SetBranchAddress("HFEMaxMinus", &HFEMaxMinus);
-   Tree->SetBranchAddress("ZDCgammaN", &ZDCgammaN);
-   Tree->SetBranchAddress("ZDCNgamma", &ZDCNgamma);
-   Tree->SetBranchAddress("gapgammaN", &gapgammaN);
-   Tree->SetBranchAddress("gapNgamma", &gapNgamma);
-   Tree->SetBranchAddress("gammaN", &gammaN);
-   Tree->SetBranchAddress("Ngamma", &Ngamma);
-   Tree->SetBranchAddress("nTrackInAcceptanceHP", &nTrackInAcceptanceHP);
-   Tree->SetBranchAddress("Dsize", &Dsize);
-   Tree->SetBranchAddress("Dpt", &Dpt);
-   Tree->SetBranchAddress("Dy", &Dy);
-   Tree->SetBranchAddress("Dmass", &Dmass);
-   Tree->SetBranchAddress("Dtrk1P", &Dtrk1P);
-   Tree->SetBranchAddress("Dtrk1Pt", &Dtrk1Pt);
-   Tree->SetBranchAddress("Dtrk1PtErr", &Dtrk1PtErr);
-   Tree->SetBranchAddress("Dtrk1Eta", &Dtrk1Eta);
-   Tree->SetBranchAddress("Dtrk1dedx", &Dtrk1dedx);
-   Tree->SetBranchAddress("Dtrk1MassHypo", &Dtrk1MassHypo);
-   Tree->SetBranchAddress("Dtrk1PixelHit", &Dtrk1PixelHit);
-   Tree->SetBranchAddress("Dtrk1StripHit", &Dtrk1StripHit);
-   Tree->SetBranchAddress("Dtrk1PionScore", &Dtrk1PionScore);
-   Tree->SetBranchAddress("Dtrk1KaonScore", &Dtrk1KaonScore);
-   Tree->SetBranchAddress("Dtrk1ProtScore", &Dtrk1ProtScore);
-   Tree->SetBranchAddress("Dtrk2P", &Dtrk2P);
-   Tree->SetBranchAddress("Dtrk2Pt", &Dtrk2Pt);
-   Tree->SetBranchAddress("Dtrk2PtErr", &Dtrk2PtErr);
-   Tree->SetBranchAddress("Dtrk2Eta", &Dtrk2Eta);
-   Tree->SetBranchAddress("Dtrk2dedx", &Dtrk2dedx);
-   Tree->SetBranchAddress("Dtrk2MassHypo", &Dtrk2MassHypo);
-   Tree->SetBranchAddress("Dtrk2PixelHit", &Dtrk2PixelHit);
-   Tree->SetBranchAddress("Dtrk2StripHit", &Dtrk2StripHit);
-   Tree->SetBranchAddress("Dtrk2PionScore", &Dtrk2PionScore);
-   Tree->SetBranchAddress("Dtrk2KaonScore", &Dtrk2KaonScore);
-   Tree->SetBranchAddress("Dtrk2ProtScore", &Dtrk2ProtScore);
-   Tree->SetBranchAddress("Dchi2cl", &Dchi2cl);
-   Tree->SetBranchAddress("DsvpvDistance", &DsvpvDistance);
-   Tree->SetBranchAddress("DsvpvDisErr", &DsvpvDisErr);
-   Tree->SetBranchAddress("DsvpvDistance_2D", &DsvpvDistance_2D);
-   Tree->SetBranchAddress("DsvpvDisErr_2D", &DsvpvDisErr_2D);
-   Tree->SetBranchAddress("Dip3d", &Dip3d);
-   Tree->SetBranchAddress("Dip3derr", &Dip3derr);
-   Tree->SetBranchAddress("Dalpha", &Dalpha);
-   Tree->SetBranchAddress("Ddtheta", &Ddtheta);
-   Tree->SetBranchAddress("DpassCut23PAS", &DpassCut23PAS);
-   Tree->SetBranchAddress("DpassCut23LowPt", &DpassCut23LowPt);
-   Tree->SetBranchAddress("DpassCut23PASSystDsvpvSig", &DpassCut23PASSystDsvpvSig);
-   Tree->SetBranchAddress("DpassCut23PASSystDtrkPt", &DpassCut23PASSystDtrkPt);
-   Tree->SetBranchAddress("DpassCut23PASSystDalpha", &DpassCut23PASSystDalpha);
-   Tree->SetBranchAddress("DpassCut23PASSystDchi2cl", &DpassCut23PASSystDchi2cl);
-   Tree->SetBranchAddress("DpassCutNominal", &DpassCutNominal);
-   Tree->SetBranchAddress("DpassCutDefault", &DpassCutNominal); // Cuts for backwards compatibility
-   Tree->SetBranchAddress("DpassCutLoose", &DpassCutLoose);
-   Tree->SetBranchAddress("DpassCutSystDsvpvSig", &DpassCutSystDsvpvSig);
-   Tree->SetBranchAddress("DpassCutSystDtrkPt", &DpassCutSystDtrkPt);
-   Tree->SetBranchAddress("DpassCutSystDalpha", &DpassCutSystDalpha);
-   Tree->SetBranchAddress("DpassCutSystDdtheta", &DpassCutSystDdtheta);
-   Tree->SetBranchAddress("DpassCutSystDalphaDdtheta", &DpassCutSystDalphaDdtheta);
-   Tree->SetBranchAddress("DpassCutSystDchi2cl", &DpassCutSystDchi2cl);
-   Tree->SetBranchAddress("Dgen", &Dgen);
-   Tree->SetBranchAddress("DisSignalCalc", &DisSignalCalc);
-   Tree->SetBranchAddress("DisSignalCalcPrompt", &DisSignalCalcPrompt);
-   Tree->SetBranchAddress("DisSignalCalcFeeddown", &DisSignalCalcFeeddown);
-   Tree->SetBranchAddress("Gsize", &Gsize);
-   Tree->SetBranchAddress("Gpt", &Gpt);
-   Tree->SetBranchAddress("Gy", &Gy);
-   Tree->SetBranchAddress("GisSignalCalc", &GisSignalCalc);
-   Tree->SetBranchAddress("GisSignalCalcPrompt", &GisSignalCalcPrompt);
-   Tree->SetBranchAddress("GisSignalCalcFeeddown", &GisSignalCalcFeeddown);
+   Tree->SetBranchStatus("*", 0);
+   CheckAndSetBranch(Tree, Run);
+   CheckAndSetBranch(Tree, Event);
+   CheckAndSetBranch(Tree, Lumi);
+   CheckAndSetBranch(Tree, VX);
+   CheckAndSetBranch(Tree, VY);
+   CheckAndSetBranch(Tree, VZ);
+   CheckAndSetBranch(Tree, VXError);
+   CheckAndSetBranch(Tree, VYError);
+   CheckAndSetBranch(Tree, VZError);
+   CheckAndSetBranch(Tree, nVtx);
+   CheckAndSetBranch(Tree, isL1ZDCOr);
+   CheckAndSetBranch(Tree, isL1ZDCOr_Min400_Max10000);
+   CheckAndSetBranch(Tree, isL1ZDCOr_Max400_Pixel);
+   CheckAndSetBranch(Tree, isL1ZDCOr_Max10000);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet8);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet12);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet16);
+   CheckAndSetBranch(Tree, isZeroBias);
+   CheckAndSetBranch(Tree, isZeroBias_Min400_Max10000);
+   CheckAndSetBranch(Tree, isZeroBias_Max400_Pixel);
+   CheckAndSetBranch(Tree, isZeroBias_Max10000);
+   CheckAndSetBranch(Tree, selectedBkgFilter);
+   CheckAndSetBranch(Tree, selectedVtxFilter);
+   CheckAndSetBranch(Tree, ClusterCompatibilityFilter);
+   CheckAndSetBranch(Tree, cscTightHalo2015Filter);
+   CheckAndSetBranch(Tree, ZDCsumPlus);
+   CheckAndSetBranch(Tree, ZDCsumMinus);
+   CheckAndSetBranch(Tree, HFEMaxPlus);
+   CheckAndSetBranch(Tree, HFEMaxMinus);
+   CheckAndSetBranch(Tree, ZDCgammaN);
+   CheckAndSetBranch(Tree, ZDCNgamma);
+   CheckAndSetBranch(Tree, gapgammaN);
+   CheckAndSetBranch(Tree, gapNgamma);
+   CheckAndSetBranch(Tree, gammaN);
+   CheckAndSetBranch(Tree, Ngamma);
+   CheckAndSetBranch(Tree, nTrackInAcceptanceHP);
+   CheckAndSetBranch(Tree, Dsize);
+   CheckAndSetBranch(Tree, Dpt);
+   CheckAndSetBranch(Tree, Dy);
+   CheckAndSetBranch(Tree, Dmass);
+   CheckAndSetBranch(Tree, Dtrk1P);
+   CheckAndSetBranch(Tree, Dtrk1Pt);
+   CheckAndSetBranch(Tree, Dtrk1PtErr);
+   CheckAndSetBranch(Tree, Dtrk1Eta);
+   CheckAndSetBranch(Tree, Dtrk1dedx);
+   CheckAndSetBranch(Tree, Dtrk1MassHypo);
+   CheckAndSetBranch(Tree, Dtrk1PixelHit);
+   CheckAndSetBranch(Tree, Dtrk1StripHit);
+   CheckAndSetBranch(Tree, Dtrk1PionScore);
+   CheckAndSetBranch(Tree, Dtrk1KaonScore);
+   CheckAndSetBranch(Tree, Dtrk1ProtScore);
+   CheckAndSetBranch(Tree, Dtrk2P);
+   CheckAndSetBranch(Tree, Dtrk2Pt);
+   CheckAndSetBranch(Tree, Dtrk2PtErr);
+   CheckAndSetBranch(Tree, Dtrk2Eta);
+   CheckAndSetBranch(Tree, Dtrk2dedx);
+   CheckAndSetBranch(Tree, Dtrk2MassHypo);
+   CheckAndSetBranch(Tree, Dtrk2PixelHit);
+   CheckAndSetBranch(Tree, Dtrk2StripHit);
+   CheckAndSetBranch(Tree, Dtrk2PionScore);
+   CheckAndSetBranch(Tree, Dtrk2KaonScore);
+   CheckAndSetBranch(Tree, Dtrk2ProtScore);
+   CheckAndSetBranch(Tree, Dchi2cl);
+   CheckAndSetBranch(Tree, DsvpvDistance);
+   CheckAndSetBranch(Tree, DsvpvDisErr);
+   CheckAndSetBranch(Tree, DsvpvDistance_2D);
+   CheckAndSetBranch(Tree, DsvpvDisErr_2D);
+   CheckAndSetBranch(Tree, Dip3D);
+   CheckAndSetBranch(Tree, Dip3derr);
+   CheckAndSetBranch(Tree, Dalpha);
+   CheckAndSetBranch(Tree, Ddtheta);
+   CheckAndSetBranch(Tree, DpassCut23PAS);
+   CheckAndSetBranch(Tree, DpassCut23LowPt);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDsvpvSig);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDtrkPt);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDalpha);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDchi2cl);
+   CheckAndSetBranch(Tree, DpassCutNominal);
+   CheckAndSetBranch(Tree, DpassCutDefault); // Cuts for backwards compatibility
+   CheckAndSetBranch(Tree, DpassCutLoose);
+   CheckAndSetBranch(Tree, DpassCutSystDsvpvSig);
+   CheckAndSetBranch(Tree, DpassCutSystDtrkPt);
+   CheckAndSetBranch(Tree, DpassCutSystDalpha);
+   CheckAndSetBranch(Tree, DpassCutSystDdtheta);
+   CheckAndSetBranch(Tree, DpassCutSystDalphaDdtheta);
+   CheckAndSetBranch(Tree, DpassCutSystDchi2cl);
+   CheckAndSetBranch(Tree, Dgen);
+   CheckAndSetBranch(Tree, DisSignalCalc);
+   CheckAndSetBranch(Tree, DisSignalCalcPrompt);
+   CheckAndSetBranch(Tree, DisSignalCalcFeeddown);
+   CheckAndSetBranch(Tree, Gsize);
+   CheckAndSetBranch(Tree, Gpt);
+   CheckAndSetBranch(Tree, Gy);
+   CheckAndSetBranch(Tree, GisSignalCalc);
+   CheckAndSetBranch(Tree, GisSignalCalcPrompt);
+   CheckAndSetBranch(Tree, GisSignalCalcFeeddown);
    return true;
 }
 
@@ -3840,7 +3847,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    DsvpvDisErr = new std::vector<float>();
    DsvpvDistance_2D = new std::vector<float>();
    DsvpvDisErr_2D = new std::vector<float>();
-   Dip3d = new std::vector<float>();
+   Dip3D = new std::vector<float>();
    Dip3derr = new std::vector<float>();
    Dalpha = new std::vector<float>();
    Ddtheta = new std::vector<float>();
@@ -3881,6 +3888,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("selectedBkgFilter",     &selectedBkgFilter, "selectedBkgFilter/O");
    Tree->Branch("selectedVtxFilter",     &selectedVtxFilter, "selectedVtxFilter/O");
    Tree->Branch("ClusterCompatibilityFilter",     &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/O");
+   Tree->Branch("cscTightHalo2015Filter",     &cscTightHalo2015Filter, "cscTightHalo2015Filter/O");
    Tree->Branch("ZDCgammaN",             &ZDCgammaN, "ZDCgammaN/O");
    Tree->Branch("ZDCNgamma",             &ZDCNgamma, "ZDCNgamma/O");
    Tree->Branch("gapgammaN",             &gapgammaN, "gapgammaN/O");
@@ -3924,7 +3932,7 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("DsvpvDisErr",           &DsvpvDisErr);
    Tree->Branch("DsvpvDistance_2D",      &DsvpvDistance_2D);
    Tree->Branch("DsvpvDisErr_2D",        &DsvpvDisErr_2D);
-   Tree->Branch("Dip3d",                 &Dip3d);
+   Tree->Branch("Dip3D",                 &Dip3D);
    Tree->Branch("Dip3derr",              &Dip3derr);
    Tree->Branch("Dalpha",                &Dalpha);
    Tree->Branch("Ddtheta",               &Ddtheta);
@@ -3985,6 +3993,7 @@ void DzeroUPCTreeMessenger::Clear()
    selectedBkgFilter = false;
    selectedVtxFilter = false;
    ClusterCompatibilityFilter = false;
+   cscTightHalo2015Filter = false;
    ZDCgammaN = false;
    ZDCNgamma = false;
    gapgammaN = false;
@@ -4027,7 +4036,7 @@ void DzeroUPCTreeMessenger::Clear()
    DsvpvDisErr->clear();
    DsvpvDistance_2D->clear();
    DsvpvDisErr_2D->clear();
-   Dip3d->clear();
+   Dip3D->clear();
    Dip3derr->clear();
    Dalpha->clear();
    Ddtheta->clear();
@@ -4083,6 +4092,7 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    selectedBkgFilter    = M.selectedBkgFilter;
    selectedVtxFilter    = M.selectedVtxFilter;
    ClusterCompatibilityFilter    = M.ClusterCompatibilityFilter;
+   cscTightHalo2015Filter    = M.cscTightHalo2015Filter;
    ZDCsumPlus           = M.ZDCsumPlus;
    ZDCsumMinus          = M.ZDCsumMinus;
    HFEMaxPlus           = M.HFEMaxPlus;
@@ -4125,7 +4135,7 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(DsvpvDisErr != nullptr && M.DsvpvDisErr != nullptr)   *DsvpvDisErr = *(M.DsvpvDisErr);
    if(DsvpvDistance_2D != nullptr && M.DsvpvDistance_2D != nullptr)   *DsvpvDistance_2D = *(M.DsvpvDistance_2D);
    if(DsvpvDisErr_2D != nullptr && M.DsvpvDisErr_2D != nullptr)   *DsvpvDisErr_2D = *(M.DsvpvDisErr_2D);
-   if(Dip3d != nullptr && M.Dip3d != nullptr)   *Dip3d = *(M.Dip3d);
+   if(Dip3D != nullptr && M.Dip3D != nullptr)   *Dip3D = *(M.Dip3D);
    if(Dip3derr != nullptr && M.Dip3derr != nullptr)   *Dip3derr = *(M.Dip3derr);
    if(Dalpha != nullptr && M.Dalpha != nullptr)   *Dalpha = *(M.Dalpha);
    if(Ddtheta != nullptr && M.Ddtheta != nullptr)   *Ddtheta = *(M.Ddtheta);
@@ -4225,6 +4235,8 @@ LambdaCpksUPCTreeMessenger::~LambdaCpksUPCTreeMessenger()
     delete DsvpvDisErr;
     delete DsvpvDistance_2D;
     delete DsvpvDisErr_2D;
+    delete Dip3D;
+    delete Dip3derr;
     delete Dalpha;
     delete Ddtheta;
     delete Dgen;
@@ -4303,6 +4315,8 @@ bool LambdaCpksUPCTreeMessenger::Initialize(bool Debug)
   DsvpvDisErr = nullptr;
   DsvpvDistance_2D = nullptr;
   DsvpvDisErr_2D = nullptr;
+  Dip3D = nullptr;
+  Dip3derr = nullptr;
   Dalpha = nullptr;
   Ddtheta = nullptr;
   Dgen = nullptr;
@@ -4374,6 +4388,7 @@ bool LambdaCpksUPCTreeMessenger::Initialize(bool Debug)
   Tree->SetBranchAddress("selectedBkgFilter",    &selectedBkgFilter);
   Tree->SetBranchAddress("selectedVtxFilter",    &selectedVtxFilter);
   Tree->SetBranchAddress("ClusterCompatibilityFilter",    &ClusterCompatibilityFilter);
+  Tree->SetBranchAddress("cscTightHalo2015Filter",    &cscTightHalo2015Filter);
   Tree->SetBranchAddress("ZDCsumPlus",           &ZDCsumPlus);
   Tree->SetBranchAddress("ZDCsumMinus",          &ZDCsumMinus);
   Tree->SetBranchAddress("HFEMaxPlus",           &HFEMaxPlus);
@@ -4395,6 +4410,8 @@ bool LambdaCpksUPCTreeMessenger::Initialize(bool Debug)
   Tree->SetBranchAddress("DsvpvDisErr",          &DsvpvDisErr);
   Tree->SetBranchAddress("DsvpvDistance_2D",     &DsvpvDistance_2D);
   Tree->SetBranchAddress("DsvpvDisErr_2D",       &DsvpvDisErr_2D);
+  Tree->SetBranchAddress("Dip3D",               &Dip3D);
+  Tree->SetBranchAddress("Dip3derr",               &Dip3derr);
   Tree->SetBranchAddress("Dalpha",               &Dalpha);
   Tree->SetBranchAddress("Ddtheta",              &Ddtheta);
   Tree->SetBranchAddress("DpassCutNominal",      &DpassCutNominal);
@@ -4493,6 +4510,8 @@ bool LambdaCpksUPCTreeMessenger::SetBranch(TTree *T)
   DsvpvDisErr = new std::vector<float>();
   DsvpvDistance_2D = new std::vector<float>();
   DsvpvDisErr_2D = new std::vector<float>();
+  Dip3D = new std::vector<float>();
+  Dip3derr = new std::vector<float>();
   Dalpha = new std::vector<float>();
   Ddtheta = new std::vector<float>();
   Dgen = new std::vector<int>();
@@ -4566,6 +4585,7 @@ bool LambdaCpksUPCTreeMessenger::SetBranch(TTree *T)
   Tree->Branch("selectedBkgFilter",     &selectedBkgFilter,     "selectedBkgFilter/O");
   Tree->Branch("selectedVtxFilter",     &selectedVtxFilter,     "selectedVtxFilter/O");
   Tree->Branch("ClusterCompatibilityFilter",     &ClusterCompatibilityFilter,     "ClusterCompatibilityFilter/O");
+  Tree->Branch("cscTightHalo2015Filter",     &cscTightHalo2015Filter,     "cscTightHalo2015Filter/O");
   Tree->Branch("ZDCgammaN",             &ZDCgammaN,             "ZDCgammaN/O");
   Tree->Branch("ZDCNgamma",             &ZDCNgamma,             "ZDCNgamma/O");
   Tree->Branch("gapgammaN",             &gapgammaN,             "gapgammaN/O");
@@ -4587,6 +4607,8 @@ bool LambdaCpksUPCTreeMessenger::SetBranch(TTree *T)
   Tree->Branch("DsvpvDisErr",           &DsvpvDisErr);
   Tree->Branch("DsvpvDistance_2D",      &DsvpvDistance_2D);
   Tree->Branch("DsvpvDisErr_2D",        &DsvpvDisErr_2D);
+  Tree->Branch("Dip3D",                &Dip3D);
+  Tree->Branch("Dip3derr",                &Dip3derr);
   Tree->Branch("Dalpha",                &Dalpha);
   Tree->Branch("Ddtheta",               &Ddtheta);
   Tree->Branch("DpassCutNominal",       &DpassCutNominal);
@@ -4673,6 +4695,7 @@ void LambdaCpksUPCTreeMessenger::Clear()
   selectedBkgFilter = false;
   selectedVtxFilter = false;
   ClusterCompatibilityFilter = false;
+  cscTightHalo2015Filter = false;
   ZDCgammaN = false;
   ZDCNgamma = false;
   gapgammaN = false;
@@ -4694,6 +4717,8 @@ void LambdaCpksUPCTreeMessenger::Clear()
   DsvpvDisErr->clear();
   DsvpvDistance_2D->clear();
   DsvpvDisErr_2D->clear();
+  Dip3D->clear();
+  Dip3derr->clear();
   Dalpha->clear();
   Ddtheta->clear();
   DpassCutNominal->clear();
@@ -4776,6 +4801,7 @@ void LambdaCpksUPCTreeMessenger::CopyNonTrack(LambdaCpksUPCTreeMessenger &M)
   selectedBkgFilter    = M.selectedBkgFilter;
   selectedVtxFilter    = M.selectedVtxFilter;
   ClusterCompatibilityFilter = M.ClusterCompatibilityFilter;
+  cscTightHalo2015Filter = M.cscTightHalo2015Filter;
   ZDCsumPlus           = M.ZDCsumPlus;
   ZDCsumMinus          = M.ZDCsumMinus;
   HFEMaxPlus           = M.HFEMaxPlus;
@@ -4806,6 +4832,10 @@ void LambdaCpksUPCTreeMessenger::CopyNonTrack(LambdaCpksUPCTreeMessenger &M)
     *DsvpvDistance_2D                 = *(M.DsvpvDistance_2D);
   if(DsvpvDisErr_2D         != nullptr && M.DsvpvDisErr_2D         != nullptr)
     *DsvpvDisErr_2D                   = *(M.DsvpvDisErr_2D);
+  if(Dip3D                 != nullptr && M.Dip3D                 != nullptr)
+    *Dip3D                           = *(M.Dip3D);
+  if(Dip3derr                 != nullptr && M.Dip3derr                 != nullptr)
+    *Dip3derr                           = *(M.Dip3derr);
   if(Dalpha                 != nullptr && M.Dalpha                 != nullptr)
     *Dalpha                           = *(M.Dalpha);
   if(Ddtheta                != nullptr && M.Ddtheta                != nullptr)
@@ -4981,6 +5011,8 @@ LambdaCpkpiUPCTreeMessenger::~LambdaCpkpiUPCTreeMessenger()
     delete DsvpvDisErr;
     delete DsvpvDistance_2D;
     delete DsvpvDisErr_2D;
+    delete Dip3D;
+    delete Dip3derr;
     delete Dalpha;
     delete Ddtheta;
     delete Dgen;
@@ -5061,6 +5093,8 @@ bool LambdaCpkpiUPCTreeMessenger::Initialize(bool Debug)
   DsvpvDisErr = nullptr;
   DsvpvDistance_2D = nullptr;
   DsvpvDisErr_2D = nullptr;
+  Dip3D = nullptr;
+  Dip3derr = nullptr;
   Dalpha = nullptr;
   Ddtheta = nullptr;
   Dgen = nullptr;
@@ -5134,6 +5168,7 @@ bool LambdaCpkpiUPCTreeMessenger::Initialize(bool Debug)
   Tree->SetBranchAddress("selectedBkgFilter",    &selectedBkgFilter);
   Tree->SetBranchAddress("selectedVtxFilter",    &selectedVtxFilter);
   Tree->SetBranchAddress("ClusterCompatibilityFilter",    &ClusterCompatibilityFilter);
+  Tree->SetBranchAddress("cscTightHalo2015Filter",    &cscTightHalo2015Filter);
   Tree->SetBranchAddress("ZDCsumPlus",           &ZDCsumPlus);
   Tree->SetBranchAddress("ZDCsumMinus",          &ZDCsumMinus);
   Tree->SetBranchAddress("HFEMaxPlus",           &HFEMaxPlus);
@@ -5155,6 +5190,8 @@ bool LambdaCpkpiUPCTreeMessenger::Initialize(bool Debug)
   Tree->SetBranchAddress("DsvpvDisErr",          &DsvpvDisErr);
   Tree->SetBranchAddress("DsvpvDistance_2D",     &DsvpvDistance_2D);
   Tree->SetBranchAddress("DsvpvDisErr_2D",       &DsvpvDisErr_2D);
+  Tree->SetBranchAddress("Dip3D",               &Dip3D);
+  Tree->SetBranchAddress("Dip3derr",               &Dip3derr);
   Tree->SetBranchAddress("Dalpha",               &Dalpha);
   Tree->SetBranchAddress("Ddtheta",              &Ddtheta);
   Tree->SetBranchAddress("DpassCutNominal",      &DpassCutNominal);
@@ -5255,6 +5292,8 @@ bool LambdaCpkpiUPCTreeMessenger::SetBranch(TTree *T)
   DsvpvDisErr = new std::vector<float>();
   DsvpvDistance_2D = new std::vector<float>();
   DsvpvDisErr_2D = new std::vector<float>();
+  Dip3D = new std::vector<float>();
+  Dip3derr = new std::vector<float>();
   Dalpha = new std::vector<float>();
   Ddtheta = new std::vector<float>();
   Dgen = new std::vector<int>();
@@ -5330,6 +5369,7 @@ bool LambdaCpkpiUPCTreeMessenger::SetBranch(TTree *T)
   Tree->Branch("selectedBkgFilter",     &selectedBkgFilter,     "selectedBkgFilter/O");
   Tree->Branch("selectedVtxFilter",     &selectedVtxFilter,     "selectedVtxFilter/O");
   Tree->Branch("ClusterCompatibilityFilter",     &ClusterCompatibilityFilter,     "ClusterCompatibilityFilter/O");
+  Tree->Branch("cscTightHalo2015Filter",     &cscTightHalo2015Filter,     "cscTightHalo2015Filter/O");
   Tree->Branch("ZDCgammaN",             &ZDCgammaN,             "ZDCgammaN/O");
   Tree->Branch("ZDCNgamma",             &ZDCNgamma,             "ZDCNgamma/O");
   Tree->Branch("gapgammaN",             &gapgammaN,             "gapgammaN/O");
@@ -5351,6 +5391,8 @@ bool LambdaCpkpiUPCTreeMessenger::SetBranch(TTree *T)
   Tree->Branch("DsvpvDisErr",           &DsvpvDisErr);
   Tree->Branch("DsvpvDistance_2D",      &DsvpvDistance_2D);
   Tree->Branch("DsvpvDisErr_2D",        &DsvpvDisErr_2D);
+  Tree->Branch("Dip3D",                &Dip3D);
+  Tree->Branch("Dip3derr",                &Dip3derr);
   Tree->Branch("Dalpha",                &Dalpha);
   Tree->Branch("Ddtheta",               &Ddtheta);
   Tree->Branch("DpassCutNominal",       &DpassCutNominal);
@@ -5439,6 +5481,7 @@ void LambdaCpkpiUPCTreeMessenger::Clear()
   selectedBkgFilter = false;
   selectedVtxFilter = false;
   ClusterCompatibilityFilter = false;
+  cscTightHalo2015Filter = false;
   ZDCgammaN = false;
   ZDCNgamma = false;
   gapgammaN = false;
@@ -5460,6 +5503,8 @@ void LambdaCpkpiUPCTreeMessenger::Clear()
   DsvpvDisErr->clear();
   DsvpvDistance_2D->clear();
   DsvpvDisErr_2D->clear();
+  Dip3D->clear();
+  Dip3derr->clear();
   Dalpha->clear();
   Ddtheta->clear();
   DpassCutNominal->clear();
@@ -5544,6 +5589,7 @@ void LambdaCpkpiUPCTreeMessenger::CopyNonTrack(LambdaCpkpiUPCTreeMessenger &M)
   selectedBkgFilter    = M.selectedBkgFilter;
   selectedVtxFilter    = M.selectedVtxFilter;
   ClusterCompatibilityFilter    = M.ClusterCompatibilityFilter;
+  cscTightHalo2015Filter    = M.cscTightHalo2015Filter;
   ZDCsumPlus           = M.ZDCsumPlus;
   ZDCsumMinus          = M.ZDCsumMinus;
   HFEMaxPlus           = M.HFEMaxPlus;
@@ -5575,6 +5621,10 @@ void LambdaCpkpiUPCTreeMessenger::CopyNonTrack(LambdaCpkpiUPCTreeMessenger &M)
     *DsvpvDistance_2D                 = *(M.DsvpvDistance_2D);
   if(DsvpvDisErr_2D         != nullptr && M.DsvpvDisErr_2D         != nullptr)
     *DsvpvDisErr_2D                   = *(M.DsvpvDisErr_2D);
+  if(Dip3D                 != nullptr && M.Dip3D                 != nullptr)
+    *Dip3D                           = *(M.Dip3D);
+  if(Dip3derr                 != nullptr && M.Dip3derr                 != nullptr)
+    *Dip3derr                           = *(M.Dip3derr);
   if(Dalpha                 != nullptr && M.Dalpha                 != nullptr)
     *Dalpha                           = *(M.Dalpha);
   if(Ddtheta                != nullptr && M.Ddtheta                != nullptr)
@@ -5895,6 +5945,7 @@ bool ChargedHadronRAATreeMessenger::Initialize(int saveTriggerBits, bool Debug, 
    Tree->SetBranchAddress("ZDCsumMinus", &ZDCsumMinus);
    Tree->SetBranchAddress("PVFilter", &PVFilter);
    Tree->SetBranchAddress("ClusterCompatibilityFilter", &ClusterCompatibilityFilter);
+   Tree->SetBranchAddress("cscTightHalo2015Filter", &cscTightHalo2015Filter);
    Tree->SetBranchAddress("mMaxL1HFAdcPlus", &mMaxL1HFAdcPlus);
    Tree->SetBranchAddress("mMaxL1HFAdcMinus", &mMaxL1HFAdcMinus);
    Tree->SetBranchAddress("hiHF_pf", &hiHF_pf);
@@ -6142,6 +6193,7 @@ bool ChargedHadronRAATreeMessenger::SetBranch(TTree *T, int saveTriggerBits, boo
    Tree->Branch("ZDCsumPlus",                 &ZDCsumPlus, "ZDCsumPlus/F");
    Tree->Branch("ZDCsumMinus",                &ZDCsumMinus, "ZDCsumMinus/F");
    Tree->Branch("ClusterCompatibilityFilter", &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/I");
+   Tree->Branch("cscTightHalo2015Filter", &cscTightHalo2015Filter, "cscTightHalo2015Filter/I");
    Tree->Branch("mMaxL1HFAdcPlus",            &mMaxL1HFAdcPlus, "mMaxL1HFAdcPlus/I");
    Tree->Branch("mMaxL1HFAdcMinus",           &mMaxL1HFAdcMinus, "mMaxL1HFAdcMinus/I");
    Tree->Branch("hiHF_pf",                    &hiHF_pf, "hiHF_pf/F");
@@ -6344,6 +6396,7 @@ void ChargedHadronRAATreeMessenger::Clear()
    ZDCsumMinus = -9999.;
    PVFilter = 0;
    ClusterCompatibilityFilter = 0;
+   cscTightHalo2015Filter = 0;
    mMaxL1HFAdcPlus = 0;
    mMaxL1HFAdcMinus = 0;
    hiHF_pf = 0.;

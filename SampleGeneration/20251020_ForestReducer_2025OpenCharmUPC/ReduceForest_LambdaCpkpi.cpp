@@ -254,6 +254,7 @@ int main(int argc, char *argv[]) {
         if (ApplyTriggerRejection == 1 && !(incl_ZDCOr || incl_ZDCXORJet)) continue;
         if (ApplyTriggerRejection == 2 && !incl_ZDCOr) continue;
         if (ApplyTriggerRejection == 3 && !incl_ZB) continue;
+        if (ApplyTriggerRejection == 4 && !(incl_ZB || incl_ZDCOr || incl_ZDCXORJet)) continue;
       } /* if (IsData) { */
 
       /////////////////////////////////////////////
@@ -265,6 +266,7 @@ int main(int argc, char *argv[]) {
       bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
       MLambdaCUPC.selectedVtxFilter = selectedVtxFilter;
       MLambdaCUPC.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
+      MLambdaCUPC.cscTightHalo2015Filter = MMETFilter.cscTightHalo2015Filter;
       bool selectedBkgFilter = IsData ?
         (MSkim.ClusterCompatibilityFilter && MMETFilter.cscTightHalo2015Filter) :
         (MSkim.ClusterCompatibilityFilter);
