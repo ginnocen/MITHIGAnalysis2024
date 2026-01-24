@@ -78,6 +78,7 @@ int main(int argc, char *argv[]) {
     int chargeSelection = CL.GetInt("chargeSelection", 1);
     vector<double> ptBins = CL.GetDoubleVector("ptBins");
     float muPtSelection = CL.GetDouble("muPt",3.5);
+    bool weightMC = CL.GetBool("weightMC", false);
     int useWeightVariation = CL.GetInt("useWeightVariation",0);
     bool makeplots = CL.GetBool("makeplots", false);
 
@@ -89,6 +90,10 @@ int main(int argc, char *argv[]) {
     TFile* effFile = TFile::Open(efficiencies.c_str());
     TH2D* DimJetEfficiency = (TH2D*)effFile->Get("DimJetEfficiency");
 
+    // IMPORT DATA-MC WEIGHTS
+    TFile* Zcorrection = TFile::Open("Zcorrection.root");
+    TH1D* weight_histo = (TH1D*)Zcorrection->Get("weight_histo");
+
     // OUTPUT FILE
     TFile* outFile = new TFile(output.c_str(), "RECREATE");
     outFile->cd();
@@ -97,36 +102,56 @@ int main(int argc, char *argv[]) {
     TH2D* hInvMass = new TH2D("hInvMass", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 70, 0, 10);
     TH2D* hDCAProductSig = new TH2D("hDCAProductSig", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, -3, 4);
     TH2D* hmuDR = new TH2D("hmuDR", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 0.6);
+    TH2D* hmumuPt = new TH2D("hmumuPt", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 200);
+    TH2D* hmumuZ = new TH2D("hmumuZ", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 1);
+    TH2D* hCharges = new TH2D("hCharges", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 3, -1, 2);
     hInvMass->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
     hDCAProductSig->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hmuDR->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    hmumuPt->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    hmumuZ->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    hCharges->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+    TNtuple* ntDimuon = new TNtuple("ntDimuon", "", "mumuMass:muDiDxy1Dxy2Sig:muDR:mumuPt:mumuZ:Charge:JetPT:weight");
+
     TH2D* hEfficiency = (TH2D*)DimJetEfficiency->Clone("hEfficiency");
     hEfficiency->Reset();
-    TNtuple* ntDimuon = new TNtuple("ntDimuon", "", "mumuMass:muDiDxy1Dxy2Sig:muDR:JetPT:weight");
 
     // FLAVOR HISTOGRAMS + NTUPLES (FOR TEMPLATES)
     vector<TH2D*> hInvMass_flavors;     
     vector<TH2D*> hmuDCAProductSig_flavors;
     vector<TH2D*> hmuDR_flavors;
+    vector<TH2D*> hmumuPt_flavors;
+    vector<TH2D*> hmumuZ_flavors;
+    vector<TH2D*> hCharges_flavors;
     vector<TH2D*> hEfficiency_flavors;
     vector<TNtuple*> nt_flavors;
     vector<string> flavorNames;
     flavorNames = {"other", "uds", "c", "cc", "b", "bb"};
     for(int i = 0; i < 6; i++) {
+        
         hInvMass_flavors.push_back(new TH2D(Form("hInvMass_%s", flavorNames[i].c_str()), "", ptBins.size()-1, ptBins.front(), ptBins.back(), 70, 0, 10));
         hmuDCAProductSig_flavors.push_back(new TH2D(Form("hDCAProductSig_%s", flavorNames[i].c_str()), "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, -3, 4));
         hmuDR_flavors.push_back(new TH2D(Form("hmuDR_%s", flavorNames[i].c_str()), "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 0.6));
+        hmumuPt_flavors.push_back(new TH2D(Form("hmumuPt_%s", flavorNames[i].c_str()), "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 200));
+        hmumuZ_flavors.push_back(new TH2D(Form("hmumuZ_%s", flavorNames[i].c_str()), "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 1));
+        hCharges_flavors.push_back(new TH2D(Form("hCharges_%s", flavorNames[i].c_str()), "", ptBins.size()-1, ptBins.front(), ptBins.back(), 3, -1, 2));
+        hEfficiency_flavors.push_back((TH2D*)DimJetEfficiency->Clone(Form("hEfficiency_%s", flavorNames[i].c_str())));
+
         hInvMass_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
         hmuDCAProductSig_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
         hmuDR_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
-        hEfficiency_flavors.push_back((TH2D*)DimJetEfficiency->Clone(Form("hEfficiency_%s", flavorNames[i].c_str())));
+        hmumuPt_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+        hmumuZ_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
+        hCharges_flavors[i]->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
         hEfficiency_flavors[i]->Reset();
-        nt_flavors.push_back(new TNtuple(Form("nt_%s", flavorNames[i].c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:muDR:JetPT:weight"));
+
+        nt_flavors.push_back(new TNtuple(Form("nt_%s", flavorNames[i].c_str()), "", "mumuMass:muDiDxy1Dxy2Sig:muDR:mumuPt:mumuZ:Charge:JetPT:weight"));
     }
 
     // JETS LOOP
-    float weight = 0;
+    float weight = 1;
     unsigned long nentries = t->GetEntries();
+
     ProgressBar Bar(cout, nentries);
     for(int i = 0; i < nentries; i++){
 
@@ -140,14 +165,23 @@ int main(int argc, char *argv[]) {
         if(isDimuonSelected(t, muPtSelection, chargeSelection, isData)){
             
             // WEIGHTS REMOVED FOR INITIAL FITTING CHECKS
-            //weight = 1 / DimJetEfficiency->GetBinContent(DimJetEfficiency->FindBin(t->JetPT, t->JetEta)); // DISCUSS WHERE TO ENTER THE WEIGHTS 
-            //if(!isData){weight *= t->MuMuWeight}; --> will definitely want to use these weights to generate a DATA template fom MC
             weight = 1;
+            if(!isData && weightMC){
+                weight *= t->MuMuWeight;
+                float z = t->mumuPt / t->JetPT;
+                weight *= (weight_histo->GetBinContent(weight_histo->FindBin(z))); 
+                weight *= t->EventWeight;
+                
+                //cout << "weight: " << weight << endl;
+            }
 
             hInvMass->Fill(t->JetPT, t->mumuMass, weight);
             hDCAProductSig->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
             hmuDR->Fill(t->JetPT, t->muDR, weight);
-            ntDimuon->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight); 
+            hmumuPt->Fill(t->JetPT, t->mumuPt, weight);
+            hmumuZ->Fill(t->JetPT, t->mumuPt / t->JetPT, weight);
+            hCharges->Fill(t->JetPT, t->muCharge1 * t->muCharge2, weight);
+            ntDimuon->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->mumuPt, t->mumuPt / t->JetPT, t->muCharge1 * t->muCharge2, t->JetPT, weight);
             hEfficiency->Fill(t->JetPT, t->JetEta, 1/weight);
 
             if(isData){continue;} // ONLY MAKE TEMPLATES WITH MC 
@@ -156,7 +190,10 @@ int main(int argc, char *argv[]) {
             hInvMass_flavors[flavorclass]->Fill(t->JetPT, t->mumuMass, weight);
             hmuDCAProductSig_flavors[flavorclass]->Fill(t->JetPT, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), weight);
             hmuDR_flavors[flavorclass]->Fill(t->JetPT, t->muDR, weight);
-            nt_flavors[flavorclass]->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->JetPT, weight);
+            hmumuPt_flavors[flavorclass]->Fill(t->JetPT, t->mumuPt, weight);
+            hmumuZ_flavors[flavorclass]->Fill(t->JetPT, t->mumuPt / t->JetPT, weight);
+            hCharges_flavors[flavorclass]->Fill(t->JetPT, t->muCharge1 * t->muCharge2, weight);
+            nt_flavors[flavorclass]->Fill(t->mumuMass, log10(abs(t->muDiDxy1Dxy2 / t->muDiDxy1Dxy2Err)), t->muDR, t->mumuPt, t->mumuPt / t->JetPT, t->muCharge1 * t->muCharge2, t->JetPT, weight);
             hEfficiency_flavors[flavorclass]->Fill(t->JetPT, t->JetEta, 1/weight);
 
         }
@@ -168,6 +205,9 @@ int main(int argc, char *argv[]) {
     hInvMass->Write();
     hDCAProductSig->Write();
     hmuDR->Write();
+    hmumuPt->Write();
+    hmumuZ->Write();
+    hCharges->Write();
     ntDimuon->Write();
     hEfficiency->Write();
     if(!isData){
@@ -175,6 +215,9 @@ int main(int argc, char *argv[]) {
             hInvMass_flavors[i]->Write();
             hmuDCAProductSig_flavors[i]->Write();
             hmuDR_flavors[i]->Write();
+            hmumuPt_flavors[i]->Write();
+            hmumuZ_flavors[i]->Write();
+            hCharges_flavors[i]->Write();
             nt_flavors[i]->Write();
             hEfficiency_flavors[i]->Write();
         }
@@ -191,6 +234,8 @@ int main(int argc, char *argv[]) {
     paramCharge.Write();
     TNamed paramMuPt("muPtSelection", std::to_string(muPtSelection).c_str());
     paramMuPt.Write();
+    TNamed paramWeightMC("weightMC", weightMC ? "true" : "false");
+    paramWeightMC.Write();
     TNamed paramWeightVar("useWeightVariation", std::to_string(useWeightVariation).c_str());
     paramWeightVar.Write();
     TNamed makeplotsParam("makeplots", makeplots ? "true" : "false");
@@ -235,6 +280,36 @@ int main(int argc, char *argv[]) {
             h_dr->Draw("HIST");
             c3->SaveAs(Form("plots/dr_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
             delete c3;
+
+            // mumuPt projection
+            TCanvas* c4 = new TCanvas(Form("c_mumuPt_incl_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+            TH1D* h_mumuPt = hmumuPt->ProjectionY(Form("h_mumuPt_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+            h_mumuPt->SetLineColor(kBlack);
+            h_mumuPt->SetLineWidth(2);
+            h_mumuPt->SetTitle(Form("Dimuon p_{T} (%.0f < p_{T} < %.0f GeV);p_{T,#mu#mu} [GeV];Entries", ptMin, ptMax));
+            h_mumuPt->Draw("HIST");
+            c4->SaveAs(Form("plots/mumuPt_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            delete c4;
+
+            // mumuZ projection
+            TCanvas* c6 = new TCanvas(Form("c_mumuZ_incl_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+            TH1D* h_mumuZ = hmumuZ->ProjectionY(Form("h_mumuZ_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+            h_mumuZ->SetLineColor(kBlack);
+            h_mumuZ->SetLineWidth(2);
+            h_mumuZ->SetTitle(Form("Dimuon Rapidity (%.0f < p_{T} < %.0f GeV);y_{#mu#mu};Entries", ptMin, ptMax));
+            h_mumuZ->Draw("HIST");
+            c6->SaveAs(Form("plots/mumuZ_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            delete c6;  
+
+            // Charges
+            TCanvas* c5 = new TCanvas(Form("c_charges_incl_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+            TH1D* h_charges = hCharges->ProjectionY(Form("h_charges_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+            h_charges->SetLineColor(kBlack);
+            h_charges->SetLineWidth(2);
+            h_charges->SetTitle(Form("Dimuon Charge Product (%.0f < p_{T} < %.0f GeV);Charge Product;Entries", ptMin, ptMax));
+            h_charges->Draw("HIST");
+            c5->SaveAs(Form("plots/charges_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            delete c5;
         }
 
         if(!isData){
@@ -319,6 +394,82 @@ int main(int argc, char *argv[]) {
                 leg_dr->Draw();
                 c_dr_overlay->SaveAs(Form("plots/dr_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
                 delete c_dr_overlay;
+
+                // mumuPt overlay
+                TCanvas* c_mumuPt_overlay = new TCanvas(Form("c_mumuPt_overlay_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+                TH1D* h_mumuPt_incl = hmumuPt->ProjectionY(Form("h_mumuPt_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+                h_mumuPt_incl->SetLineColor(colors[0]);
+                h_mumuPt_incl->SetLineWidth(2);
+                h_mumuPt_incl->SetStats(0);
+                h_mumuPt_incl->SetTitle(Form("Dimuon p_{T} (%.0f < p_{T} < %.0f GeV);p_{T,#mu#mu} [GeV];Entries", ptMin, ptMax));
+                h_mumuPt_incl->Draw("HIST");
+                
+                TLegend* leg_mumuPt = new TLegend(0.65, 0.45, 0.88, 0.88);
+                leg_mumuPt->AddEntry(h_mumuPt_incl, "Inclusive", "l");
+
+                vector<TH1D*> h_mumuPt_flavors;
+                for(int i = 0; i < 6; i++) {
+                    TH1D* h = hmumuPt_flavors[i]->ProjectionY(Form("h_mumuPt_%s_pt%.0f_%.0f", flavorNames[i].c_str(), ptMin, ptMax), iBin, iBin);
+                    h->SetLineColor(colors[i+1]);
+                    h->SetLineWidth(2);
+                    h->Draw("HIST SAME");
+                    h_mumuPt_flavors.push_back(h);  
+                    leg_mumuPt->AddEntry(h, flavorNames[i].c_str(), "l");
+                }
+                leg_mumuPt->Draw();
+                c_mumuPt_overlay->SaveAs(Form("plots/mumuPt_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                delete c_mumuPt_overlay;
+
+                // mumuZ overlay
+                TCanvas* c_mumuZ_overlay = new TCanvas(Form("c_mumuZ_overlay_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+                TH1D* h_mumuZ_incl = hmumuZ->ProjectionY(Form("h_mumuZ_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+                h_mumuZ_incl->SetLineColor(colors[0]);
+                h_mumuZ_incl->SetLineWidth(2);
+                h_mumuZ_incl->SetStats(0);
+                h_mumuZ_incl->SetTitle(Form("Dimuon Rapidity (%.0f < p_{T} < %.0f GeV);y_{#mu#mu};Entries", ptMin, ptMax));
+                h_mumuZ_incl->Draw("HIST");
+
+                TLegend* leg_mumuZ = new TLegend(0.65, 0.45, 0.88, 0.88);
+                leg_mumuZ->AddEntry(h_mumuZ_incl, "Inclusive", "l");
+
+                vector<TH1D*> h_mumuZ_flavors;
+                for(int i = 0; i < 6; i++) {
+                    TH1D* h = hmumuZ_flavors[i]->ProjectionY(Form("h_mumuZ_%s_pt%.0f_%.0f", flavorNames[i].c_str(), ptMin, ptMax), iBin, iBin);
+                    h->SetLineColor(colors[i+1]);
+                    h->SetLineWidth(2);
+                    h->Draw("HIST SAME");
+                    h_mumuZ_flavors.push_back(h);  
+                    leg_mumuZ->AddEntry(h, flavorNames[i].c_str(), "l");
+                }
+                leg_mumuZ->Draw();
+                c_mumuZ_overlay->SaveAs(Form("plots/mumuZ_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                delete c_mumuZ_overlay;
+
+                // Charge overlay
+                TCanvas* c_charge_overlay = new TCanvas(Form("c_charge_overlay_pt%.0f_%.0f", ptMin, ptMax), "", 800, 600);
+                TH1D* h_charge_incl = hCharges->ProjectionY(Form("h_charge_incl_pt%.0f_%.0f", ptMin, ptMax), iBin, iBin);
+                h_charge_incl->SetLineColor(colors[0]);
+                h_charge_incl->SetLineWidth(2);
+                h_charge_incl->SetStats(0);
+                h_charge_incl->SetTitle(Form("Dimuon Charge Product (%.0f < p_{T} < %.0f GeV);Charge Product;Entries", ptMin, ptMax));
+                h_charge_incl->Draw("HIST");
+
+                TLegend* leg_charge = new TLegend(0.65, 0.45, 0.88, 0.88);
+                leg_charge->AddEntry(h_charge_incl, "Inclusive", "l");
+
+                vector<TH1D*> h_charge_flavors;
+                for(int i = 0; i < 6; i++) {
+                    TH1D* h = hCharges_flavors[i]->ProjectionY(Form("h_charge_%s_pt%.0f_%.0f", flavorNames[i].c_str(), ptMin, ptMax), iBin, iBin);
+                    h->SetLineColor(colors[i+1]);
+                    h->SetLineWidth(2);
+                    h->Draw("HIST SAME");
+                    h_charge_flavors.push_back(h);  
+                    leg_charge->AddEntry(h, flavorNames[i].c_str(), "l");
+                }
+                leg_charge->Draw();
+                c_charge_overlay->SaveAs(Form("plots/charge_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                delete c_charge_overlay;
+
             }
         }
 

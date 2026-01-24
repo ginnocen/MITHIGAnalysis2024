@@ -12,92 +12,122 @@ INPUT_MC6="/data00/g2ccbar/mc2018/skim_011226_6/mergedfile.root"
 
 INPUT_DATA="/data00/g2ccbar/data2018/supermerged.root"
 
-# Run MakeDistros in parallel for all MC files
-./MakeDistros \
+chargesel=0
+doMC=true
+doData=false
+outname_MC="mcdistros_weighted.root"
+outname_DATA="datadistros.root"
+
+if [ "$doMC" = true ]; then
+    # Run MakeDistros in parallel for all MC files
+    ./MakeDistros \
     --Input $INPUT_MC0 \
     --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_0.root" \
     --IsData false \
-    --chargeSelection 0 \
+    --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
-    --makeplots false &
+    --weightMC true \
+    --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC1 \
     --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_1.root" \
     --IsData false \
-    --chargeSelection 0 \
+    --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
-    --makeplots false &
+    --weightMC true \
+    --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC2 \
     --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_2.root" \
     --IsData false \
-    --chargeSelection 0 \
+    --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
-    --makeplots false &
+    --weightMC true \
+    --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC3 \
     --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_3.root" \
     --IsData false \
-    --chargeSelection 0 \
+    --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
-    --makeplots false &
+    --weightMC true \
+    --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC4 \
     --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_4.root" \
     --IsData false \
-    --chargeSelection 0 \
+    --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
-    --makeplots false &
+    --weightMC true \
+    --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC5 \
     --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_5.root" \
     --IsData false \
-    --chargeSelection 0 \
+    --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
-    --makeplots false &
+    --weightMC true \
+    --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC6 \
     --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_6.root" \
     --IsData false \
-    --chargeSelection 0 \
+    --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
     --muPt 3.5 \
-    --makeplots false &
+    --weightMC true \
+    --makeplots true &
+fi
+
+if [ "$doData" = true ]; then
+    echo "Creating data distributions..."
+    ./MakeDistros \
+        --Input $INPUT_DATA \
+        --Input_Efficiency "testefficiencies.root" \
+        --Output $outname_DATA \
+        --IsData true \
+        --chargeSelection $chargesel \
+        --ptBins 60,80,100,120,160,200,250,300 \
+        --muPt 3.5 \
+        --weightMC false \
+        --makeplots true &
+fi
 
 # Wait for all parallel jobs to complete
 wait
 
-echo "All MC distributions created. Merging with hadd..."
-hadd -f mcdistros.root mcdistros_0.root mcdistros_1.root mcdistros_2.root mcdistros_3.root mcdistros_4.root mcdistros_5.root mcdistros_6.root
+if [ "$doMC" = true ]; then
+    echo "All MC distributions created. Merging with hadd..."
+    hadd -f $outname_MC mcdistros_0.root mcdistros_1.root mcdistros_2.root mcdistros_3.root mcdistros_4.root mcdistros_5.root mcdistros_6.root
+fi
 
-echo "Creating data distributions..."
-./MakeDistros \
-    --Input $INPUT_DATA \
-    --Input_Efficiency "testefficiencies.root" \
-    --Output "datadistros.root" \
-    --IsData true \
-    --chargeSelection 0 \
-    --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
-    --makeplots true \
+if [ "$doMC" = true ]; then
+    rm mcdistros_0.root
+    rm mcdistros_1.root
+    rm mcdistros_2.root
+    rm mcdistros_3.root
+    rm mcdistros_4.root
+    rm mcdistros_5.root
+    rm mcdistros_6.root
+fi
 
 echo "DONE"
