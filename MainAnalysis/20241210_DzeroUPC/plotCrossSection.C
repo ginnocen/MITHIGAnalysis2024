@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
   string         wSystFitMassWindow  = CL.Get("wSystFitMassWindow", "MassFit_systFitMassWindow");
   string         nominalSampleRST = CL.Get    ("nominalSampleRST", "fullAnalysis");// Nominal sample directory name
   string         nominalFitRST    = CL.Get    ("nominalFitRST", "MassFit");        // Nominal fit directory name
-
+  
   /////////////////////////////////
   // 0. Extract the points from the vector of .md
   /////////////////////////////////
@@ -338,7 +338,9 @@ int main(int argc, char *argv[])
   hFrame->GetXaxis()->SetTitle("D^{0} y");
   hFrame->SetStats(0);
   hFrame->GetYaxis()->SetTitleOffset(1.5);
-  hFrame->GetYaxis()->SetRangeUser(0, 3.5);
+  if (MinDzeroPT == 2 && MaxDzeroPT == 5) hFrame->GetYaxis()->SetRangeUser(0, 3.5);
+  else if (MinDzeroPT == 5 && MaxDzeroPT == 8) hFrame->GetYaxis()->SetRangeUser(0, 0.3);
+  else if (MinDzeroPT == 8 && MaxDzeroPT == 12) hFrame->GetYaxis()->SetRangeUser(0, 0.04);
   hFrame->Draw();
 
   TGraphErrors* gr = new TGraphErrors(nPoints, yValues.data(), correctedYieldValues.data(), yErrors.data(), correctedYieldErrors.data());
@@ -363,8 +365,19 @@ int main(int argc, char *argv[])
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->AddEntry(gr, "2025 Data", "P");
-
-  drawPubCurves(IsGammaN, leg);
+  
+  if (MinDzeroPT == 2 && MaxDzeroPT == 5) {
+    if (IsGammaN) drawPubCurves_CMSHIN25002_pt2to5_gammaN(leg);
+    else          drawPubCurves_CMSHIN25002_pt2to5_Ngamma(leg);
+  }
+  else if (MinDzeroPT == 5 && MaxDzeroPT == 8) {
+    if (IsGammaN) drawPubCurves_CMSHIN24003_pt5to8_gammaN(leg);
+    else          drawPubCurves_CMSHIN24003_pt5to8_Ngamma(leg);
+  }
+  else if (MinDzeroPT == 8 && MaxDzeroPT == 12) {
+    if (IsGammaN) drawPubCurves_CMSHIN24003_pt8to12_gammaN(leg);
+    else          drawPubCurves_CMSHIN24003_pt8to12_Ngamma(leg);
+  }
   leg->Draw();
 
   TFile *outFile = new TFile(Form("%s/histograms_pt%d-%d_IsGammaN%o.root", PlotDir.c_str(), (int) MinDzeroPT, (int) MaxDzeroPT,

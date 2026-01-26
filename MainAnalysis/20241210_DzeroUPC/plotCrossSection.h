@@ -241,9 +241,12 @@ void printRatioArr(const std::vector<double>& vec1,
  *        2. This will initiate the curve instances, and set the style
  *        3. Users can just call the functions draw(), get() (,etc), to access those archived curves
  * ************************************************************ */
+ 
 /////////////////////////////////
-// Results (2-5 pT) in HIN-2024-003
+// Results from HIN-2024-003
 /////////////////////////////////
+
+// pt 2-5, gammaN
 double CMSHIN24003_pt2to5_yValues_gammaN[1]       = {0};
 double CMSHIN24003_pt2to5_yErrors_gammaN[1]       = {1};
 double CMSHIN24003_pt2to5_crossSection_gammaN[1]  = {1.07585};
@@ -256,11 +259,12 @@ TGraphErrors* CMSHIN24003_pt2to5_gammaN_syst = new TGraphErrors(1,
                              CMSHIN24003_pt2to5_yValues_gammaN, CMSHIN24003_pt2to5_crossSection_gammaN,
                              CMSHIN24003_pt2to5_yErrors_gammaN, CMSHIN24003_pt2to5_crossSystUnc_gammaN);
 
+// pt 2-5, Ngamma
 double CMSHIN24003_pt2to5_yValues_Ngamma[1]       = {0};
 double CMSHIN24003_pt2to5_yErrors_Ngamma[1]       = {1};
 double CMSHIN24003_pt2to5_crossSection_Ngamma[1]  = {1.02555};
-double CMSHIN24003_pt2to5_crossStatUnc_Ngamma[1]   = {0.100667};
-double CMSHIN24003_pt2to5_crossSystUnc_Ngamma[1]    = {0.283257};
+double CMSHIN24003_pt2to5_crossStatUnc_Ngamma[1]  = {0.100667};
+double CMSHIN24003_pt2to5_crossSystUnc_Ngamma[1]  = {0.283257};
 TGraphErrors* CMSHIN24003_pt2to5_Ngamma_stat = new TGraphErrors(1,
                              CMSHIN24003_pt2to5_yValues_Ngamma, CMSHIN24003_pt2to5_crossSection_Ngamma,
                              CMSHIN24003_pt2to5_yErrors_Ngamma, CMSHIN24003_pt2to5_crossStatUnc_Ngamma);
@@ -268,9 +272,102 @@ TGraphErrors* CMSHIN24003_pt2to5_Ngamma_syst = new TGraphErrors(1,
                              CMSHIN24003_pt2to5_yValues_Ngamma, CMSHIN24003_pt2to5_crossSection_Ngamma,
                              CMSHIN24003_pt2to5_yErrors_Ngamma, CMSHIN24003_pt2to5_crossSystUnc_Ngamma);
 
+// pt 2-5, merged (obtained from HEPData)
+double CMSHIN24003_pt2to5_yValues_merged[1]       = {0.0};
+double CMSHIN24003_pt2to5_yErrors_merged[1]       = {1.0};
+double CMSHIN24003_pt2to5_crossSection_merged[1]  = {2.15};
+double CMSHIN24003_pt2to5_crossStatUnc_merged[1]  = {0.15};
+double CMSHIN24003_pt2to5_crossSystUnc_merged[1]  = {0.58};
+TGraphErrors* CMSHIN24003_pt2to5_merged_stat = new TGraphErrors(1,
+                             CMSHIN24003_pt2to5_yValues_merged, CMSHIN24003_pt2to5_crossSection_merged,
+                             CMSHIN24003_pt2to5_yErrors_merged, CMSHIN24003_pt2to5_crossStatUnc_merged);
+TGraphErrors* CMSHIN24003_pt2to5_merged_syst = new TGraphErrors(1,
+                             CMSHIN24003_pt2to5_yValues_merged, CMSHIN24003_pt2to5_crossSection_merged,
+                             CMSHIN24003_pt2to5_yErrors_merged, CMSHIN24003_pt2to5_crossSystUnc_merged);
+
+// pt 5-8, gammaN (obtained from PlotDigitizer of AN plots)
+double CMSHIN24003_pt5to8_yValues_gammaN[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN24003_pt5to8_yErrors_gammaN[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN24003_pt5to8_crossSection_gammaN[4]  = {0.087, 0.096, 0.051, 0.023};
+double CMSHIN24003_pt5to8_crossStatUnc_gammaN[4]  = {0.005, 0.004, 0.003, 0.001};
+double CMSHIN24003_pt5to8_crossSystUnc_gammaN[4]  = {0.028, 0.027, 0.014, 0.011};
+TGraphErrors* CMSHIN24003_pt5to8_gammaN_stat = new TGraphErrors(4,
+                             CMSHIN24003_pt5to8_yValues_gammaN, CMSHIN24003_pt5to8_crossSection_gammaN,
+                             CMSHIN24003_pt5to8_yErrors_gammaN, CMSHIN24003_pt5to8_crossStatUnc_gammaN);
+TGraphErrors* CMSHIN24003_pt5to8_gammaN_syst = new TGraphErrors(4,
+                             CMSHIN24003_pt5to8_yValues_gammaN, CMSHIN24003_pt5to8_crossSection_gammaN,
+                             CMSHIN24003_pt5to8_yErrors_gammaN, CMSHIN24003_pt5to8_crossSystUnc_gammaN);
+
+// pt 5-8, Ngamma (obtained from PlotDigitizer of AN plots)
+double CMSHIN24003_pt5to8_yValues_Ngamma[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN24003_pt5to8_yErrors_Ngamma[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN24003_pt5to8_crossSection_Ngamma[4]  = {0.017, 0.053, 0.101, 0.093};
+double CMSHIN24003_pt5to8_crossStatUnc_Ngamma[4]  = {0.001, 0.003, 0.004, 0.005};
+double CMSHIN24003_pt5to8_crossSystUnc_Ngamma[4]  = {0.006, 0.014, 0.028, 0.031};
+TGraphErrors* CMSHIN24003_pt5to8_Ngamma_stat = new TGraphErrors(4,
+                             CMSHIN24003_pt5to8_yValues_Ngamma, CMSHIN24003_pt5to8_crossSection_Ngamma,
+                             CMSHIN24003_pt5to8_yErrors_Ngamma, CMSHIN24003_pt5to8_crossStatUnc_Ngamma);
+TGraphErrors* CMSHIN24003_pt5to8_Ngamma_syst = new TGraphErrors(4,
+                             CMSHIN24003_pt5to8_yValues_Ngamma, CMSHIN24003_pt5to8_crossSection_Ngamma,
+                             CMSHIN24003_pt5to8_yErrors_Ngamma, CMSHIN24003_pt5to8_crossSystUnc_Ngamma);
+
+// pt 5-8, merged (obtained from HEPData)
+double CMSHIN24003_pt5to8_yValues_merged[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN24003_pt5to8_yErrors_merged[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN24003_pt5to8_crossSection_merged[4]  = {0.181, 0.197, 0.104, 0.041};
+double CMSHIN24003_pt5to8_crossStatUnc_merged[4]  = {0.007, 0.005, 0.004, 0.002};
+double CMSHIN24003_pt5to8_crossSystUnc_merged[4]  = {0.059, 0.055, 0.029, 0.018};
+TGraphErrors* CMSHIN24003_pt5to8_merged_stat = new TGraphErrors(4,
+                             CMSHIN24003_pt5to8_yValues_merged, CMSHIN24003_pt5to8_crossSection_merged,
+                             CMSHIN24003_pt5to8_yErrors_merged, CMSHIN24003_pt5to8_crossStatUnc_merged);
+TGraphErrors* CMSHIN24003_pt5to8_merged_syst = new TGraphErrors(4,
+                             CMSHIN24003_pt5to8_yValues_merged, CMSHIN24003_pt5to8_crossSection_merged,
+                             CMSHIN24003_pt5to8_yErrors_merged, CMSHIN24003_pt5to8_crossSystUnc_merged);
+
+// pt 8-12, gammaN (obtained from PlotDigitizer of AN plots)
+double CMSHIN24003_pt8to12_yValues_gammaN[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN24003_pt8to12_yErrors_gammaN[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN24003_pt8to12_crossSection_gammaN[4]  = {0.0165, 0.0165, 0.0083, 0.0023};
+double CMSHIN24003_pt8to12_crossStatUnc_gammaN[4]  = {0.0010, 0.0006, 0.0005, 0.0004};
+double CMSHIN24003_pt8to12_crossSystUnc_gammaN[4]  = {0.0043, 0.0036, 0.0021, 0.0006};
+TGraphErrors* CMSHIN24003_pt8to12_gammaN_stat = new TGraphErrors(4,
+                             CMSHIN24003_pt8to12_yValues_gammaN, CMSHIN24003_pt8to12_crossSection_gammaN,
+                             CMSHIN24003_pt8to12_yErrors_gammaN, CMSHIN24003_pt8to12_crossStatUnc_gammaN);
+TGraphErrors* CMSHIN24003_pt8to12_gammaN_syst = new TGraphErrors(4,
+                             CMSHIN24003_pt8to12_yValues_gammaN, CMSHIN24003_pt8to12_crossSection_gammaN,
+                             CMSHIN24003_pt8to12_yErrors_gammaN, CMSHIN24003_pt8to12_crossSystUnc_gammaN);
+
+// pt 8-12, Ngamma (obtained from PlotDigitizer of AN plots)
+double CMSHIN24003_pt8to12_yValues_Ngamma[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN24003_pt8to12_yErrors_Ngamma[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN24003_pt8to12_crossSection_Ngamma[4]  = {0.0017, 0.0075, 0.0155, 0.0160};
+double CMSHIN24003_pt8to12_crossStatUnc_Ngamma[4]  = {0.0004, 0.0005, 0.0006, 0.0010};
+double CMSHIN24003_pt8to12_crossSystUnc_Ngamma[4]  = {0.0006, 0.0020, 0.0039, 0.0044};
+TGraphErrors* CMSHIN24003_pt8to12_Ngamma_stat = new TGraphErrors(4,
+                             CMSHIN24003_pt8to12_yValues_Ngamma, CMSHIN24003_pt8to12_crossSection_Ngamma,
+                             CMSHIN24003_pt8to12_yErrors_Ngamma, CMSHIN24003_pt8to12_crossStatUnc_Ngamma);
+TGraphErrors* CMSHIN24003_pt8to12_Ngamma_syst = new TGraphErrors(4,
+                             CMSHIN24003_pt8to12_yValues_Ngamma, CMSHIN24003_pt8to12_crossSection_Ngamma,
+                             CMSHIN24003_pt8to12_yErrors_Ngamma, CMSHIN24003_pt8to12_crossSystUnc_Ngamma);
+
+// pt 8-12, merged (obtained from HEPData)
+double CMSHIN24003_pt8to12_yValues_merged[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN24003_pt8to12_yErrors_merged[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN24003_pt8to12_crossSection_merged[4]  = {0.181, 0.197, 0.104, 0.041};
+double CMSHIN24003_pt8to12_crossStatUnc_merged[4]  = {0.007, 0.005, 0.004, 0.002};
+double CMSHIN24003_pt8to12_crossSystUnc_merged[4]  = {0.059, 0.055, 0.029, 0.018};
+TGraphErrors* CMSHIN24003_pt8to12_merged_stat = new TGraphErrors(4,
+                             CMSHIN24003_pt8to12_yValues_merged, CMSHIN24003_pt8to12_crossSection_merged,
+                             CMSHIN24003_pt8to12_yErrors_merged, CMSHIN24003_pt8to12_crossStatUnc_merged);
+TGraphErrors* CMSHIN24003_pt8to12_merged_syst = new TGraphErrors(4,
+                             CMSHIN24003_pt8to12_yValues_merged, CMSHIN24003_pt8to12_crossSection_merged,
+                             CMSHIN24003_pt8to12_yErrors_merged, CMSHIN24003_pt8to12_crossSystUnc_merged);
+
 /////////////////////////////////
 // Results (2-5 pT) in HIN-2025-002
 /////////////////////////////////
+
+// pt 2-5, gammaN
 double CMSHIN25002_pt2to5_yValues_gammaN[4]       = {-1.5, -0.5, 0.5 ,1.5};
 double CMSHIN25002_pt2to5_yErrors_gammaN[4]       = {0.5, 0.5, 0.5, 0.5};
 double CMSHIN25002_pt2to5_crossSection_gammaN[4]  = {1.812, 1.2586, 0.6666, 0.1865};
@@ -283,6 +380,7 @@ TGraphErrors* CMSHIN25002_pt2to5_gammaN_syst = new TGraphErrors(4,
                              CMSHIN25002_pt2to5_yValues_gammaN, CMSHIN25002_pt2to5_crossSection_gammaN,
                              CMSHIN25002_pt2to5_yErrors_gammaN, CMSHIN25002_pt2to5_crossSystUnc_gammaN);
 
+// pt 2-5, Ngamma
 double CMSHIN25002_pt2to5_yValues_Ngamma[4]       = {-1.5, -0.5, 0.5 ,1.5};
 double CMSHIN25002_pt2to5_yErrors_Ngamma[4]       = {0.5, 0.5, 0.5, 0.5};
 double CMSHIN25002_pt2to5_crossSection_Ngamma[4]  = {0.3222, 0.6175, 1.3696, 1.294};
@@ -295,13 +393,23 @@ TGraphErrors* CMSHIN25002_pt2to5_Ngamma_syst = new TGraphErrors(4,
                              CMSHIN25002_pt2to5_yValues_Ngamma, CMSHIN25002_pt2to5_crossSection_Ngamma,
                              CMSHIN25002_pt2to5_yErrors_Ngamma, CMSHIN25002_pt2to5_crossSystUnc_Ngamma);
 
+// pt 2-5, merged
+double CMSHIN25002_pt2to5_yValues_merged[4]       = {-1.5, -0.5, 0.5 ,1.5};
+double CMSHIN25002_pt2to5_yErrors_merged[4]       = {0.5, 0.5, 0.5, 0.5};
+double CMSHIN25002_pt2to5_crossSection_merged[4]  = {0, 0, 0, 0};
+double CMSHIN25002_pt2to5_crossStatUnc_merged[4]  = {0, 0, 0, 0};
+double CMSHIN25002_pt2to5_crossSystUnc_merged[4]  = {0, 0, 0, 0};
+TGraphErrors* CMSHIN25002_pt2to5_merged_stat = new TGraphErrors(4,
+                             CMSHIN25002_pt2to5_yValues_merged, CMSHIN25002_pt2to5_crossSection_merged,
+                             CMSHIN25002_pt2to5_yErrors_merged, CMSHIN25002_pt2to5_crossStatUnc_merged);
+TGraphErrors* CMSHIN25002_pt2to5_merged_syst = new TGraphErrors(4,
+                             CMSHIN25002_pt2to5_yValues_merged, CMSHIN25002_pt2to5_crossSection_merged,
+                             CMSHIN25002_pt2to5_yErrors_merged, CMSHIN25002_pt2to5_crossSystUnc_merged);
+
 // We will likely not use this in the short-term future.
 // If we have a class, than we can instantiate these results fairly easily (without duplicating the code)
-void drawPubCurves_CMSHIN24003(bool IsGammaN, TLegend* leg=nullptr)
+void drawPubCurves(TGraphErrors* gr_stat, TGraphErrors* gr_syst, TLegend* leg=nullptr, TString leg_txt="")
 {
-  TGraphErrors* gr_stat = (IsGammaN)? CMSHIN24003_pt2to5_gammaN_stat: CMSHIN24003_pt2to5_Ngamma_stat;
-  TGraphErrors* gr_syst = (IsGammaN)? CMSHIN24003_pt2to5_gammaN_syst: CMSHIN24003_pt2to5_Ngamma_syst;
-
   gr_stat->SetMarkerStyle(20);
   gr_stat->SetMarkerSize(1.2);
   gr_stat->SetLineColor(kBlack);
@@ -313,26 +421,49 @@ void drawPubCurves_CMSHIN24003(bool IsGammaN, TLegend* leg=nullptr)
   gr_stat->Draw("P E1 SAME");
   gr_syst->Draw("2 SAME");
 
-  if (leg) leg->AddEntry(gr_stat, "HIN-24-003", "P");
+  if (leg) leg->AddEntry(gr_stat, leg_txt, "P");
 }
 
-void drawPubCurves(bool IsGammaN, TLegend* leg=nullptr)
-{
-  TGraphErrors* gr_stat = (IsGammaN)? CMSHIN25002_pt2to5_gammaN_stat: CMSHIN25002_pt2to5_Ngamma_stat;
-  TGraphErrors* gr_syst = (IsGammaN)? CMSHIN25002_pt2to5_gammaN_syst: CMSHIN25002_pt2to5_Ngamma_syst;
-
-  gr_stat->SetMarkerStyle(20);
-  gr_stat->SetMarkerSize(1.2);
-  gr_stat->SetLineColor(kBlack);
-  gr_stat->SetMarkerColor(kBlack);
-  gr_stat->SetLineWidth(2);
-
-  gr_syst->SetFillColorAlpha(kBlack,0.3);
-
-  gr_stat->Draw("P E1 SAME");
-  gr_syst->Draw("2 SAME");
-
-  if (leg) leg->AddEntry(gr_stat, "HIN-25-002", "P");
+// CMS-HIN-24-003: Dpt 2-5, Dy -1-1 (merged)
+void drawPubCurves_CMSHIN24003_pt2to5_gammaN(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt2to5_gammaN_stat, CMSHIN24003_pt2to5_gammaN_syst, leg, "HIN-24-003");
+}
+void drawPubCurves_CMSHIN24003_pt2to5_Ngamma(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt2to5_Ngamma_stat, CMSHIN24003_pt2to5_Ngamma_syst, leg, "HIN-24-003");
+}
+void drawPubCurves_CMSHIN24003_pt2to5_merged(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt2to5_merged_stat, CMSHIN24003_pt2to5_merged_syst, leg, "HIN-24-003");
 }
 
+// CMS-HIN-24-003: Dpt 5-8, Dy -2-2 (differential)
+void drawPubCurves_CMSHIN24003_pt5to8_gammaN(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt5to8_gammaN_stat, CMSHIN24003_pt5to8_gammaN_syst, leg, "HIN-24-003");
+}
+void drawPubCurves_CMSHIN24003_pt5to8_Ngamma(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt5to8_Ngamma_stat, CMSHIN24003_pt5to8_Ngamma_syst, leg, "HIN-24-003");
+}
+void drawPubCurves_CMSHIN24003_pt5to8_merged(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt5to8_merged_stat, CMSHIN24003_pt5to8_merged_syst, leg, "HIN-24-003");
+}
 
+// CMS-HIN-24-003: Dpt 8-12, Dy -2-2 (differential)
+void drawPubCurves_CMSHIN24003_pt8to12_gammaN(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt8to12_gammaN_stat, CMSHIN24003_pt8to12_gammaN_syst, leg, "HIN-24-003");
+}
+void drawPubCurves_CMSHIN24003_pt8to12_Ngamma(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt8to12_Ngamma_stat, CMSHIN24003_pt8to12_Ngamma_syst, leg, "HIN-24-003");
+}
+void drawPubCurves_CMSHIN24003_pt8to12_merged(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN24003_pt8to12_merged_stat, CMSHIN24003_pt8to12_merged_syst, leg, "HIN-24-003");
+}
+
+// CMS-HIN-25-002: Dpt 2-5, Dy -2-2 (differential)
+void drawPubCurves_CMSHIN25002_pt2to5_gammaN(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN25002_pt2to5_gammaN_stat, CMSHIN25002_pt2to5_gammaN_syst, leg, "HIN-25-002");
+}
+void drawPubCurves_CMSHIN25002_pt2to5_Ngamma(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN25002_pt2to5_Ngamma_stat, CMSHIN25002_pt2to5_Ngamma_syst, leg, "HIN-25-002");
+}
+void drawPubCurves_CMSHIN25002_pt2to5_merged(TLegend* leg=nullptr) {
+  drawPubCurves(CMSHIN25002_pt2to5_merged_stat, CMSHIN25002_pt2to5_merged_syst, leg, "HIN-25-002");
+}
