@@ -167,9 +167,9 @@ int main(int argc, char *argv[]) {
             // WEIGHTS REMOVED FOR INITIAL FITTING CHECKS
             weight = 1;
             if(!isData && weightMC){
-                weight *= t->MuMuWeight;
-                float z = t->mumuPt / t->JetPT;
-                weight *= (weight_histo->GetBinContent(weight_histo->FindBin(z))); 
+                //weight *= t->MuMuWeight;
+                //float z = t->mumuPt / t->JetPT;
+                //weight *= (weight_histo->GetBinContent(weight_histo->FindBin(z))); 
                 weight *= t->EventWeight;
                 
                 //cout << "weight: " << weight << endl;

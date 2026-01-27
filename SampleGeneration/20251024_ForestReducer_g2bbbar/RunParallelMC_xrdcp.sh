@@ -2,12 +2,15 @@
 source clean.sh
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Get parameters (defaults: N=0, LETTER=A)
-N=${1:-0}
+# Get parameters
+PATHSAMPLE="$1"
+OUTPUT="$2"
 
-NAME="skim_011226_${N}"
-PATHSAMPLE="/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8/crab_g2qqbar_MC_sample_jan6/260106_195418/000${N}"
-OUTPUT="/data00/g2ccbar/mc2018/$NAME"
+if [ -z "$PATHSAMPLE" ] || [ -z "$OUTPUT" ]; then
+    echo "Usage: $0 <input_path> <output_path>"
+    echo "Example: $0 /store/group/... /data00/output/skim"
+    exit 1
+fi
 
 ### SKIMMER PARAMETERS ###
 ISDATA=false
@@ -18,7 +21,7 @@ MINJETPT=0
 FRACTION=1.0
 
 ### OTHER PARAMETERS ###
-MAXCORES=40  
+MAXCORES=50  
 NFILES=-1
 XRDSERV="root://eoscms.cern.ch/" # eos xrootd server, path should start /store/group...
 
@@ -34,9 +37,9 @@ mkdir -p $OUTPUT
 mkdir -p "${OUTPUT}/temp_inputs/"
 
 
-# Loop through each file in the file list
+# Loop through each file in the file list (recursively search all subdirectories)
 COUNTER=0
-for FILEPATH in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep 'HiForest'); do
+for FILEPATH in $(xrdfs $XRDSERV ls -R $PATHSAMPLE | grep 'HiForest'); do
 
     if [ $NFILES -gt 0 ] && [ $COUNTER -ge $NFILES ]; then
         break
@@ -58,6 +61,7 @@ for FILEPATH in $(xrdfs $XRDSERV ls $PATHSAMPLE | grep 'HiForest'); do
         --MinJetPT $MINJETPT \
         --Fraction $FRACTION
         rm $LOCALFILE
+        echo "FINISHED job $COUNTER: $FILEPATH"
     ) &
 
     wait_for_slot
@@ -66,5 +70,6 @@ done
 wait
 
 hadd -f $OUTPUT/mergedfile.root $OUTPUT/output_*.root
+rm -f $OUTPUT/output_*.root
 rm -rf "${OUTPUT}/temp_inputs/"
 echo "Processing COMPLETE"
