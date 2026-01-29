@@ -10,104 +10,112 @@ INPUT_MC4="/data00/g2ccbar/mc2018/skim_011226_4/mergedfile.root"
 INPUT_MC5="/data00/g2ccbar/mc2018/skim_011226_5/mergedfile.root"
 INPUT_MC6="/data00/g2ccbar/mc2018/skim_011226_6/mergedfile.root"
 
-INPUT_DATA="/data00/g2ccbar/data2018/supermerged.root"
+INPUT_DATA_HighEG="/data00/g2ccbar/data2018/highEGfull.root"
+INPUT_DATA_LowEG="/data00/g2ccbar/data2018/lowEGfull.root"
 
 chargesel=0
+muPt=3.5
+
 doMC=true
-doData=false
-outname_MC="mcdistros_weighted.root"
-outname_DATA="datadistros.root"
+doData=true
+outname_MC="mcdistros_pthat.root"
+outname_DATA_1="highEG.root"
+outname_DATA_2="lowEG.root"
 
 if [ "$doMC" = true ]; then
     # Run MakeDistros in parallel for all MC files
     ./MakeDistros \
     --Input $INPUT_MC0 \
-    --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_0.root" \
     --IsData false \
     --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
+    --muPt $muPt \
     --weightMC true \
     --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC1 \
-    --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_1.root" \
     --IsData false \
     --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
+    --muPt $muPt \
     --weightMC true \
     --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC2 \
-    --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_2.root" \
     --IsData false \
     --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
+    --muPt $muPt \
     --weightMC true \
     --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC3 \
-    --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_3.root" \
     --IsData false \
     --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
+    --muPt $muPt \
     --weightMC true \
     --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC4 \
-    --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_4.root" \
     --IsData false \
     --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
+    --muPt $muPt \
     --weightMC true \
     --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC5 \
-    --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_5.root" \
     --IsData false \
     --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
+    --muPt $muPt \
     --weightMC true \
     --makeplots true &
 
 ./MakeDistros \
     --Input $INPUT_MC6 \
-    --Input_Efficiency "testefficiencies.root" \
     --Output "mcdistros_6.root" \
     --IsData false \
     --chargeSelection $chargesel \
     --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
-    --weightMC true \
+    --muPt $muPt \
+    --weightMC  true\
     --makeplots true &
 fi
 
 if [ "$doData" = true ]; then
     echo "Creating data distributions..."
     ./MakeDistros \
-        --Input $INPUT_DATA \
-        --Input_Efficiency "testefficiencies.root" \
-        --Output $outname_DATA \
+        --Input $INPUT_DATA_HighEG \
+        --Output $outname_DATA_1 \
         --IsData true \
+        --DataTrigger 80 \
         --chargeSelection $chargesel \
         --ptBins 60,80,100,120,160,200,250,300 \
-        --muPt 3.5 \
+        --muPt $muPt \
+        --weightMC false \
+        --makeplots true &
+
+    ./MakeDistros \
+        --Input $INPUT_DATA_LowEG \
+        --Output $outname_DATA_2 \
+        --IsData true \
+        --DataTrigger 60 \
+        --chargeSelection $chargesel \
+        --ptBins 60,80,100,120,160,200,250,300 \
+        --muPt $muPt \
         --weightMC false \
         --makeplots true &
 fi

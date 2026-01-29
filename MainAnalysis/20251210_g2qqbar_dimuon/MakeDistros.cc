@@ -25,12 +25,18 @@ using namespace std;
 
 using namespace std;
 
-bool isDimuonSelected(DimuonJetMessenger *Dimuon, float muPtCut, int chargeSelection, bool isData){
+bool isDimuonSelected(DimuonJetMessenger *Dimuon, float muPtCut, int chargeSelection, bool isData, int DataTrigger){
 
-    
     if(isData) {
-        if(!Dimuon->HLT_HIAK4PFJet80_v1){
-            return false;
+        if(DataTrigger == 80){
+            if(!Dimuon->HLT_HIAK4PFJet80_v1){
+                return false;
+            }
+        }
+        if(DataTrigger == 60){
+            if(!Dimuon->HLT_HIAK4PFJet60_v1){
+                return false;
+            }
         }
     }
 
@@ -72,27 +78,18 @@ int main(int argc, char *argv[]) {
     cout << "Filling Distributions" << endl;
     CommandLine CL(argc, argv);
     string file = CL.Get("Input");
-    string efficiencies = CL.Get("Input_Efficiency");
     string output = CL.Get("Output");
     bool isData = CL.GetBool("IsData");
+    int DataTrigger = CL.GetInt("DataTrigger", 0);
     int chargeSelection = CL.GetInt("chargeSelection", 1);
     vector<double> ptBins = CL.GetDoubleVector("ptBins");
     float muPtSelection = CL.GetDouble("muPt",3.5);
     bool weightMC = CL.GetBool("weightMC", false);
-    int useWeightVariation = CL.GetInt("useWeightVariation",0);
     bool makeplots = CL.GetBool("makeplots", false);
 
     // IMPORT TREE
     TFile* input = TFile::Open(file.c_str());
     DimuonJetMessenger *t = new DimuonJetMessenger(input, "Tree");
-
-    // IMPORT EFFICIENCIES
-    TFile* effFile = TFile::Open(efficiencies.c_str());
-    TH2D* DimJetEfficiency = (TH2D*)effFile->Get("DimJetEfficiency");
-
-    // IMPORT DATA-MC WEIGHTS
-    TFile* Zcorrection = TFile::Open("Zcorrection.root");
-    TH1D* weight_histo = (TH1D*)Zcorrection->Get("weight_histo");
 
     // OUTPUT FILE
     TFile* outFile = new TFile(output.c_str(), "RECREATE");
@@ -105,6 +102,7 @@ int main(int argc, char *argv[]) {
     TH2D* hmumuPt = new TH2D("hmumuPt", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 200);
     TH2D* hmumuZ = new TH2D("hmumuZ", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 50, 0, 1);
     TH2D* hCharges = new TH2D("hCharges", "", ptBins.size()-1, ptBins.front(), ptBins.back(), 3, -1, 2);
+
     hInvMass->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
     hDCAProductSig->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hmuDR->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
@@ -162,7 +160,7 @@ int main(int argc, char *argv[]) {
 
         t->GetEntry(i);
 
-        if(isDimuonSelected(t, muPtSelection, chargeSelection, isData)){
+        if(isDimuonSelected(t, muPtSelection, chargeSelection, isData, DataTrigger)){
             
             // WEIGHTS REMOVED FOR INITIAL FITTING CHECKS
             weight = 1;
@@ -173,6 +171,9 @@ int main(int argc, char *argv[]) {
                 weight *= t->EventWeight;
                 
                 //cout << "weight: " << weight << endl;
+            }
+            if(isData && DataTrigger == 60){
+                weight *= 6.338; // so that we can easily hadd the two trigger batches
             }
 
             hInvMass->Fill(t->JetPT, t->mumuMass, weight);
@@ -226,18 +227,16 @@ int main(int argc, char *argv[]) {
     // SAVE COMMAND LINE PARAMS
     TNamed paramFile("InputFile", file.c_str());
     paramFile.Write();
-    TNamed paramEffFile("Input_Efficiency", efficiencies.c_str());
-    paramEffFile.Write();
     TNamed paramIsData("IsData", isData ? "true" : "false");
     paramIsData.Write();
     TNamed paramCharge("chargeSelection", std::to_string(chargeSelection).c_str());
     paramCharge.Write();
     TNamed paramMuPt("muPtSelection", std::to_string(muPtSelection).c_str());
     paramMuPt.Write();
+    TNamed paramDataTrigger("DataTrigger", std::to_string(DataTrigger).c_str());
+    paramDataTrigger.Write();
     TNamed paramWeightMC("weightMC", weightMC ? "true" : "false");
     paramWeightMC.Write();
-    TNamed paramWeightVar("useWeightVariation", std::to_string(useWeightVariation).c_str());
-    paramWeightVar.Write();
     TNamed makeplotsParam("makeplots", makeplots ? "true" : "false");
     makeplotsParam.Write();
 
@@ -259,6 +258,7 @@ int main(int argc, char *argv[]) {
             h_mass->SetTitle(Form("Dimuon Mass (%.0f < p_{T} < %.0f GeV);m_{#mu#mu} [GeV];Entries", ptMin, ptMax));
             h_mass->Draw("HIST");
             c1->SaveAs(Form("plots/mass_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c1->Write("mass_incl_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
             delete c1;
             
             // DCA projection
@@ -269,6 +269,7 @@ int main(int argc, char *argv[]) {
             h_dca->SetTitle(Form("DCA Product Sig (%.0f < p_{T} < %.0f GeV);log_{10}(|DCA_{1}#timesDCA_{2}|/#sigma);Entries", ptMin, ptMax));
             h_dca->Draw("HIST");
             c2->SaveAs(Form("plots/dca_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c2->Write("dca_incl_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
             delete c2;
             
             // DR projection
@@ -279,6 +280,7 @@ int main(int argc, char *argv[]) {
             h_dr->SetTitle(Form("#mu#mu #DeltaR (%.0f < p_{T} < %.0f GeV);#DeltaR(#mu,#mu);Entries", ptMin, ptMax));
             h_dr->Draw("HIST");
             c3->SaveAs(Form("plots/dr_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c3->Write("dr_incl_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
             delete c3;
 
             // mumuPt projection
@@ -289,6 +291,7 @@ int main(int argc, char *argv[]) {
             h_mumuPt->SetTitle(Form("Dimuon p_{T} (%.0f < p_{T} < %.0f GeV);p_{T,#mu#mu} [GeV];Entries", ptMin, ptMax));
             h_mumuPt->Draw("HIST");
             c4->SaveAs(Form("plots/mumuPt_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c4->Write("mumuPt_incl_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
             delete c4;
 
             // mumuZ projection
@@ -299,6 +302,7 @@ int main(int argc, char *argv[]) {
             h_mumuZ->SetTitle(Form("Dimuon Rapidity (%.0f < p_{T} < %.0f GeV);y_{#mu#mu};Entries", ptMin, ptMax));
             h_mumuZ->Draw("HIST");
             c6->SaveAs(Form("plots/mumuZ_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c6->Write("mumuZ_incl_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
             delete c6;  
 
             // Charges
@@ -309,6 +313,7 @@ int main(int argc, char *argv[]) {
             h_charges->SetTitle(Form("Dimuon Charge Product (%.0f < p_{T} < %.0f GeV);Charge Product;Entries", ptMin, ptMax));
             h_charges->Draw("HIST");
             c5->SaveAs(Form("plots/charges_incl_pt%.0f_%.0f.pdf", ptMin, ptMax));
+            c5->Write("charges_incl_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
             delete c5;
         }
 
@@ -343,6 +348,7 @@ int main(int argc, char *argv[]) {
                 }
                 leg_mass->Draw();
                 c_mass_overlay->SaveAs(Form("plots/mass_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_mass_overlay->Write("mass_overlay_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
                 delete c_mass_overlay;
                 
                 // DCA overlay
@@ -368,6 +374,7 @@ int main(int argc, char *argv[]) {
                 }
                 leg_dca->Draw();
                 c_dca_overlay->SaveAs(Form("plots/dca_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_dca_overlay->Write("dca_overlay_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
                 delete c_dca_overlay;
                 
                 // DR overlay
@@ -393,6 +400,7 @@ int main(int argc, char *argv[]) {
                 }
                 leg_dr->Draw();
                 c_dr_overlay->SaveAs(Form("plots/dr_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_dr_overlay->Write("dr_overlay_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
                 delete c_dr_overlay;
 
                 // mumuPt overlay
@@ -418,6 +426,7 @@ int main(int argc, char *argv[]) {
                 }
                 leg_mumuPt->Draw();
                 c_mumuPt_overlay->SaveAs(Form("plots/mumuPt_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_mumuPt_overlay->Write("mumuPt_overlay_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
                 delete c_mumuPt_overlay;
 
                 // mumuZ overlay
@@ -443,6 +452,7 @@ int main(int argc, char *argv[]) {
                 }
                 leg_mumuZ->Draw();
                 c_mumuZ_overlay->SaveAs(Form("plots/mumuZ_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_mumuZ_overlay->Write("mumuZ_overlay_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
                 delete c_mumuZ_overlay;
 
                 // Charge overlay
@@ -468,6 +478,7 @@ int main(int argc, char *argv[]) {
                 }
                 leg_charge->Draw();
                 c_charge_overlay->SaveAs(Form("plots/charge_overlay_pt%.0f_%.0f.pdf", ptMin, ptMax));
+                c_charge_overlay->Write("charge_overlay_pt"+to_string((int)ptMin)+"_"+to_string((int)ptMax));
                 delete c_charge_overlay;
 
             }
