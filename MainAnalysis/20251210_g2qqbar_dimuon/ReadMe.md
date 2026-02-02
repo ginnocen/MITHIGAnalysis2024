@@ -27,15 +27,17 @@ The file will produce an output file containing all of the necessary correction 
 
 ### MakeDistros.cc
 
-MakeDistros.cc will produce distributions for the dimuons in DCA (product significance), Mass, and DR between the muons. When operating on a MC sample, the macro will build individual distributions for each jet flavor class to be used as templates in the yield extraction. When operating on a Data sample, the macro will create the overall distributions to be used as an input for template fitting in the next step. Small TNtuples are also created to allow for a binless fitting. Right now it is not used, but MakeDistros macro inherits the efficiency corrections from the previous macro to allow the option to apply these corrections while constructing the template shapes. 
+MakeDistros.cc will produce distributions for the dimuons in DCA (product significance), Mass, and DR between the muons. When operating on a MC sample, the macro will build individual distributions for each jet flavor class to be used as templates in the yield extraction. When operating on a Data sample, the macro will create the overall distributions to be used as an input for template fitting in the next step. This macro additionally will stitch the various data spectra/triggers together. Small TNtuples are also created to allow for a binless fitting. Right now it is not used, but MakeDistros macro inherits the efficiency corrections from the previous macro to allow the option to apply these corrections while constructing the template shapes. 
 
  As inputs the macro uses 
 - Input file name
-- Efficiency file name (output of Efficiencies macro)
+- Output file name
 - IsData 
+- DataTrigger (40, 60, or 80 for different jet triggers)
 - Charge Selection 
 - pT bins
 - Single muon pT cutoff
+- WeightMC (applies pThat + other MC weights)
 - makeplots 
 
 MakeDistros will save all of the above template and inclusive histograms to a root file 
@@ -48,9 +50,11 @@ In Yields.cc we extract Light and Heavy flavor yields using a binless 1D templat
 - Template file name 
 - Output file name
 - Pt bins
-- flag to do DCA-based estimation
-- flag to do Invariant Mass-based estimation
-- flag to do dR-based estimatino
+- variables (string vector of variable names to fit simultaneously)
+- kde (kernel widths)
+- fitrangeMin 
+- fitrangeMax (fit range boundaries, float vector)
+- chargeSelection
 - makeplots
 
 Yields will save the HF and LF yields, HF fraction, and Total Yield to a root file. 
