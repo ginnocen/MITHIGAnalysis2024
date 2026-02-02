@@ -160,6 +160,7 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.Run = MEvent.Run;
       MDzeroUPC.Lumi = MEvent.Lumi;
       MDzeroUPC.Event = MEvent.Event;
+      MDzeroUPC.ProcessID = MEvent.ProcessID;
 
       ////////////////////////////
       ////////// Vertex //////////

@@ -169,6 +169,7 @@ int main(int argc, char *argv[]) {
       MLambdaCUPC.Run = MEvent.Run;
       MLambdaCUPC.Lumi = MEvent.Lumi;
       MLambdaCUPC.Event = MEvent.Event;
+      MLambdaCUPC.ProcessID = MEvent.ProcessID;
 
       ////////////////////////////
       ////////// Vertex //////////

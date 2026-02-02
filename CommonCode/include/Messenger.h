@@ -89,6 +89,7 @@ public:
    float hiHFMinus_pfle3;
    float Ncoll;
    float Npart;
+   int   ProcessID;
 public:
    HiEventTreeMessenger(TFile &File);
    HiEventTreeMessenger(TFile *File);
@@ -1097,6 +1098,7 @@ public:
    int Run;
    long long Event;
    int Lumi;
+   int ProcessID;
    //FIXME: these refer to best vertex positions calculated from the track tree
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    int nVtx;
@@ -1235,6 +1237,7 @@ public:
   int Run;
   long long Event;
   int Lumi;
+  int ProcessID;
   //FIXME: these refer to best vertex positions calculated from the track tree
   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
   int nVtx;
@@ -1377,6 +1380,7 @@ public:
   int Run;
   long long Event;
   int Lumi;
+  int ProcessID;
   //FIXME: these refer to best vertex positions calculated from the track tree
   float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
   int nVtx;
