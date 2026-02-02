@@ -10,33 +10,26 @@ INPUT="/data00/g2ccbar/mc2018/skim_011226_0/mergedfile.root"
     --Input $INPUT \
     --Output "testefficiencies.root" \
     --IsData false \
-    --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
+    --ptBins 100,120,160,200,250 \
+    --muPt 4 \
     --chargeSelection 0 \
     --makeplots true \
 
 echo "DONE WITH EFFICIENCIES"
 
-./MakeDistros \
-    --Input $INPUT \
-    --Input_Efficiency "testefficiencies.root" \
-    --Output "testdistros.root" \
-    --IsData false \
-    --chargeSelection 0 \
-    --ptBins 60,80,100,120,160,200,250,300 \
-    --muPt 3.5 \
-    --makeplots true \
-
+./makefullmc_templates.sh
 echo "DONE WITH DISTRIBUTIONS"
 
 ./ExecuteYield \
-    --Input "testdistros.root" \
-    --Templates "testdistros.root" \
-    --Output "testyields.root" \
-    --ptBins 60,80,100,120,160,200,250,300 \
-    --doLF_DCA true \
-    --doLF_invMass true \
-    --doLF_DR true \
+    --Input "data_distros.root" \
+    --Templates "mcdistros_pthat.root" \
+    --Output "testyields2.root" \
+    --ptBins 100,120,160,200,250 \
+    --variables muDR,mumuZ \
+    --kde 1.3,1.1 \
+    --fitRangeMin 0.0,0.0 \
+    --fitRangeMax 0.6,1.0 \
+    --chargeSelection 0 \
     --makeplots true \
 
 echo "DONE WITH YIELD FITTING"

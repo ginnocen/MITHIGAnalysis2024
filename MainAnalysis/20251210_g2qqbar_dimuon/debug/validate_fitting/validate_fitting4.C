@@ -3,8 +3,8 @@
 void validate_fitting4(){
 
     int chargesel = 1;
-    TFile*f = TFile::Open("../../alternate_yields/testyields.root");
-    TFile* ftruth = TFile::Open("../../mcdistros.root");
+    TFile*f = TFile::Open("../../testyields2.root");
+    TFile* ftruth = TFile::Open("../../mcdistros_nopthat.root");
 
     // fit results
     TH1D* h_dr_lf = (TH1D*)f->Get("Yields_uds");

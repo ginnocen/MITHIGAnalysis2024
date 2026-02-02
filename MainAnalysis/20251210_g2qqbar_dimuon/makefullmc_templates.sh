@@ -14,13 +14,12 @@ INPUT_DATA_HighEG="/data00/g2ccbar/data2018/highEGfull.root"
 INPUT_DATA_LowEG="/data00/g2ccbar/data2018/lowEGfull.root"
 
 chargesel=0
-muPt=3.5
+muPt=4.0
 
 doMC=true
-doData=true
+doData=false
 outname_MC="mcdistros_pthat.root"
-outname_DATA_1="highEG.root"
-outname_DATA_2="lowEG.root"
+outname_DATA="data_distros2.root"
 
 if [ "$doMC" = true ]; then
     # Run MakeDistros in parallel for all MC files
@@ -99,7 +98,7 @@ if [ "$doData" = true ]; then
     echo "Creating data distributions..."
     ./MakeDistros \
         --Input $INPUT_DATA_HighEG \
-        --Output $outname_DATA_1 \
+        --Output "HighEG.root" \
         --IsData true \
         --DataTrigger 80 \
         --chargeSelection $chargesel \
@@ -110,9 +109,9 @@ if [ "$doData" = true ]; then
 
     ./MakeDistros \
         --Input $INPUT_DATA_LowEG \
-        --Output $outname_DATA_2 \
+        --Output "LowEG.root" \
         --IsData true \
-        --DataTrigger 60 \
+        --DataTrigger 40 \
         --chargeSelection $chargesel \
         --ptBins 60,80,100,120,160,200,250,300 \
         --muPt $muPt \
@@ -136,6 +135,12 @@ if [ "$doMC" = true ]; then
     rm mcdistros_4.root
     rm mcdistros_5.root
     rm mcdistros_6.root
+fi
+
+if [ "$doData" = true ]; then
+    hadd -f $outname_DATA HighEG.root LowEG.root
+    rm HighEG.root
+    rm LowEG.root
 fi
 
 echo "DONE"
