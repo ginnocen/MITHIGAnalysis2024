@@ -279,13 +279,13 @@ void templates(
     if(!logy){
         h_mc->SetMinimum(0);
     }
-    h_mc->Draw("HIST L E");
-    h_other->Draw("HIST L E SAME");
-    h_udsg->Draw("HIST L E SAME");
-    h_c->Draw("HIST L E SAME");
-    h_b->Draw("HIST L E SAME");
-    h_cc->Draw("HIST L E SAME");
-    h_bb->Draw("HIST L E SAME");    
+    h_mc->Draw("HIST ");
+    h_other->Draw("HIST  SAME");
+    h_udsg->Draw("HIST  SAME");
+    h_c->Draw("HIST  SAME");
+    h_b->Draw("HIST  SAME");
+    h_cc->Draw("HIST  SAME");
+    h_bb->Draw("HIST  SAME");    
 
 
     TLegend* leg = new TLegend(0.55,0.55,0.88,0.88);
@@ -304,7 +304,7 @@ void templates(
     text->SetTextFont(42);
     text->DrawLatex(0.55, 0.50, Form("Mu1 p_{T} > %.1f, Mu2 p_{T} > %.1f", mupt_cut1, mupt_cut2));
     text->DrawLatex(0.55, 0.47, Form("Jet p_{T} #in [%.0f, %.0f] GeV", jetpt_min, jetpt_max));
-    text->DrawLatex(0.55, 0.44, chargesel == 0 ? "Inclusive Charge" : (chargesel == 1 ? "Opposite-sign" : "Same-sign"));
+    text->DrawLatex(0.55, 0.44, chargesel == 0 ? "Inclusive Charge" : (chargesel == -1 ? "Opposite-sign" : "Same-sign"));
     text->DrawLatex(0.55, 0.41, Form("other fraction: %.3f", h_other->Integral() / h_mc->Integral()));
     text->DrawLatex(0.55, 0.38, Form("udsg fraction: %.3f", h_udsg->Integral() / h_mc->Integral()));
     text->DrawLatex(0.55, 0.35, Form("c fraction: %.3f", h_c->Integral() / h_mc->Integral()));
@@ -362,23 +362,23 @@ void datamccomp(){
         
         // Dimuon pT 
         datamc(T_hi, T_lo, T_mc, trigger, "Dimuon pT", "mumuPt", "Dimuon pT (GeV)", 30, 0, 200, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/datamc_dimuonpt_%.0f_%.0f.pdf", jptmin, jptmax));
-        templates(T_hi, T_lo, T_mc, trigger, "Dimuon pT", "mumuPt", "Dimuon pT (GeV)", 30, 0, 200, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/templates_dimuonpt_%.0f_%.0f.pdf", jptmin, jptmax));
+        templates(T_hi, T_lo, T_mc, trigger, "Dimuon pT", "mumuPt", "Dimuon pT (GeV)", 30, 0, 200, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, true, false, Form("plots/templates_dimuonpt_%.0f_%.0f.pdf", jptmin, jptmax));
 
         // Z
         datamc(T_hi, T_lo, T_mc, trigger, "Fragmentation Function", "mumuPt / JetPT", "Z", 20, 0, 1, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/datamc_z_%.0f_%.0f.pdf", jptmin, jptmax));
-        templates(T_hi, T_lo, T_mc, trigger, "Fragmentation Function", "mumuPt / JetPT", "Z", 20, 0, 1, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/templates_z_%.0f_%.0f.pdf", jptmin, jptmax));
+        templates(T_hi, T_lo, T_mc, trigger, "Fragmentation Function", "mumuPt / JetPT", "Z", 20, 0, 1, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, true, false, Form("plots/templates_z_%.0f_%.0f.pdf", jptmin, jptmax));
 
         // Mass
         datamc(T_hi, T_lo, T_mc, trigger, "Dimuon Mass", "mumuMass", "Mass (GeV)", 50, 0, 7, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/datamc_mass_%.0f_%.0f.pdf", jptmin, jptmax));
-        templates(T_hi, T_lo, T_mc, trigger, "Dimuon Mass", "mumuMass", "Mass (GeV)", 50, 0, 7, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/templates_mass_%.0f_%.0f.pdf", jptmin, jptmax));
+        templates(T_hi, T_lo, T_mc, trigger, "Dimuon Mass", "mumuMass", "Mass (GeV)", 50, 0, 7, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, true, false, Form("plots/templates_mass_%.0f_%.0f.pdf", jptmin, jptmax));
 
         // dR
         datamc(T_hi, T_lo, T_mc, trigger, "DR", "muDR", "#DeltaR", 20, 0, 0.6, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/datamc_dR_%.0f_%.0f.pdf", jptmin, jptmax));
-        templates(T_hi, T_lo, T_mc, trigger, "DR", "muDR", "#DeltaR", 20, 0, 0.6, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/templates_dR_%.0f_%.0f.pdf", jptmin, jptmax));
+        templates(T_hi, T_lo, T_mc, trigger, "DR", "muDR", "#DeltaR", 20, 0, 0.6, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, true, false, Form("plots/templates_dR_%.0f_%.0f.pdf", jptmin, jptmax));
 
         // DCA
-        datamc(T_hi, T_lo, T_mc, trigger, "Dimuon DCA", "log10(abs(muDiDxy1Dxy2 / muDiDxy1Dxy2Err))", "DCAxy Product Significance", 20, -3, 4, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/datamc_DCA_%.0f_%.0f.pdf", jptmin, jptmax));
-        templates(T_hi, T_lo, T_mc, trigger, "Dimuon DCA", "log10(abs(muDiDxy1Dxy2 / muDiDxy1Dxy2Err))", "DCAxy Product Significance", 20, -3, 4, 0, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/templates_DCA_%.0f_%.0f.pdf", jptmin, jptmax));
+        datamc(T_hi, T_lo, T_mc, trigger, "Dimuon DCA", "log10(abs(muDiDxy1Dxy2 / muDiDxy1Dxy2Err))", "DCAxy Product Significance", 20, -3, 4, -1, 4, 4, 0, 1, -3, jptmin, jptmax, false, false, false, Form("plots/datamc_DCA_%.0f_%.0f.pdf", jptmin, jptmax));
+        templates(T_hi, T_lo, T_mc, trigger, "Dimuon DCA", "log10(abs(muDiDxy1Dxy2 / muDiDxy1Dxy2Err))", "DCAxy Product Significance", 20, -3, 4, -1, 4, 4, 0, 1, -3, jptmin, jptmax, false, true, false, Form("plots/templates_DCA_%.0f_%.0f.pdf", jptmin, jptmax));
 
     }
     
