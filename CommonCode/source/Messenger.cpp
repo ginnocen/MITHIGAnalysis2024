@@ -2784,6 +2784,7 @@ bool DfinderMasterMessenger::Initialize()
     CheckAndSetBranch(Tree, Dmass);
     CheckAndSetBranch(Tree, Dchi2cl);
     CheckAndSetBranch(Tree, DsvpvDistance);
+    CheckAndSetBranch(Tree, DsvpvDisErr);
     CheckAndSetBranch(Tree, DsvpvDistance_2D);
     CheckAndSetBranch(Tree, DsvpvDisErr_2D);
     CheckAndSetBranch(Tree, Dip3D);
