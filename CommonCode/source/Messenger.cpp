@@ -1848,7 +1848,7 @@ bool SingleMuTreeMessenger::Initialize(){
     SingleMuIsTracker = nullptr;
     SingleMuHybridSoft = nullptr;
     SingleMuSoft = nullptr;
-
+    SingleMuIsHighPurity = nullptr;
     GenSingleMuPT = nullptr;
     GenSingleMuEta = nullptr;
     GenSingleMuPhi = nullptr;
@@ -1865,6 +1865,7 @@ bool SingleMuTreeMessenger::Initialize(){
     Tree->SetBranchAddress("recoIsGood", &SingleMuIsGood);
     Tree->SetBranchAddress("recoIsGlobal", &SingleMuIsGlobal);
     Tree->SetBranchAddress("recoIsTracker", &SingleMuIsTracker);
+    Tree->SetBranchAddress("innerIsHighPurityTrack", &SingleMuIsHighPurity);
     Tree->SetBranchAddress("recoIDHybridSoft", &SingleMuHybridSoft);
     Tree->SetBranchAddress("recoIDSoft", &SingleMuSoft);
 

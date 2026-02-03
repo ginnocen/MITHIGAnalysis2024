@@ -746,6 +746,7 @@ public:
    std::vector<bool> *SingleMuIsGood;
    std::vector<bool> *SingleMuIsGlobal;
    std::vector<bool> *SingleMuIsTracker;
+   std::vector<bool> *SingeMuIsHighPurity;
    std::vector<bool> *SingleMuHybridSoft;
    std::vector<bool> *SingleMuSoft;
 
