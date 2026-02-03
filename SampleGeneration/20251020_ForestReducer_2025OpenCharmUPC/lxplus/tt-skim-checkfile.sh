@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $# -ne 8 ]]; then
-    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype]" 
+if [[ $# -ne 10 ]]; then
+    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection]" 
     exit 1
 fi
 
@@ -13,6 +13,8 @@ CRELEASE=$5
 IsData=$6
 ApplyDRejection=$7
 IsGammaNMCtype=$8
+Year=$9
+ApplyTriggerRejection=${10}
 
 echo "SCRAM_ARCH:          "$SCRAM_ARCH
 echo "PWD:                 "$PWD
@@ -41,13 +43,14 @@ scramv1 project CMSSW $CRELEASE # cmsrel
     ./$EXEFILE --Input $input_file \
                --Output $OUTFILE \
                --RootPID DzeroUPC_dedxMap.root \
-               --ApplyTriggerRejection 0 \
+               --ApplyTriggerRejection $ApplyTriggerRejection \
                --ApplyEventRejection false \
-               --ApplyZDCGapRejection false \
+               --ApplyZDCGapRejection 0 \
                --ApplyDRejection $ApplyDRejection \
                --IsGammaNMCtype $IsGammaNMCtype \
-               --Year 2025 \
-               --IsData $IsData
+               --Year $Year \
+               --IsData $IsData \
+               --HideProgressBar true
 
     ls
     

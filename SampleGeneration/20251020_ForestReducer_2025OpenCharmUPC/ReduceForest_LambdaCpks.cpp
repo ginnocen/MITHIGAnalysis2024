@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   float ZDCPlus1nThreshold = CL.GetDouble("ZDCPlus1nThreshold", 1100.);
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
-  bool ApplyZDCGapRejection = CL.GetBool("ApplyZDCGapRejection", false);
+  int ApplyZDCGapRejection = CL.GetInteger("ApplyZDCGapRejection", 0);
 
   // options for how to reject non-selected D candidates (case-insensitive)
   // "NO":            keep all D's
@@ -262,28 +262,30 @@ int main(int argc, char *argv[]) {
       /////////////////////////////////////////////
       ////////// Offline event selection //////////
       /////////////////////////////////////////////
-
-      MLambdaCUPC.ZDCsumPlus = IsData ? MZDC.sumPlus : -9999.;
-      MLambdaCUPC.ZDCsumMinus = IsData ? MZDC.sumMinus : -9999.;
-      bool selectedVtxFilter = MSkim.PVFilter == 1 && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.;
-      MLambdaCUPC.selectedVtxFilter = selectedVtxFilter;
+      MLambdaCUPC.selectedVtxFilter = (MSkim.PVFilter && fabs(MTrackPbPbUPC.zVtx->at(0)) < 15.);
       MLambdaCUPC.ClusterCompatibilityFilter = MSkim.ClusterCompatibilityFilter;
       MLambdaCUPC.cscTightHalo2015Filter = MMETFilter.cscTightHalo2015Filter;
-      bool selectedBkgFilter = IsData ?
+      MLambdaCUPC.selectedBkgFilter = IsData ?
         (MSkim.ClusterCompatibilityFilter && MMETFilter.cscTightHalo2015Filter) :
         (MSkim.ClusterCompatibilityFilter);
-      MLambdaCUPC.selectedBkgFilter = selectedBkgFilter;
-      bool ZDCgammaN = IsData ?
+
+      if (ApplyEventRejection && IsData && !(MLambdaCUPC.selectedBkgFilter && MLambdaCUPC.selectedVtxFilter)) continue;
+
+      /////////////////////////
+      ////////// ZDC //////////
+      /////////////////////////
+      MLambdaCUPC.ZDCsumPlus = IsData ? MZDC.sumPlus : -9999.;
+      MLambdaCUPC.ZDCsumMinus = IsData ? MZDC.sumMinus : -9999.;
+      MLambdaCUPC.ZDCgammaN = IsData ?
         (MZDC.sumMinus > ZDCMinus1nThreshold && MZDC.sumPlus < ZDCPlus1nThreshold) :
         (IsGammaNMCtype);
-      MLambdaCUPC.ZDCgammaN = ZDCgammaN;
-      bool ZDCNgamma = IsData ?
+      MLambdaCUPC.ZDCNgamma = IsData ?
         (MZDC.sumMinus < ZDCMinus1nThreshold && MZDC.sumPlus > ZDCPlus1nThreshold) :
         (!IsGammaNMCtype);
-      MLambdaCUPC.ZDCNgamma = ZDCNgamma;
 
-      if (ApplyEventRejection && IsData && (selectedBkgFilter == false || selectedVtxFilter == false)) continue;
-
+      //////////////////////////////////
+      ////////// Rapidity gap //////////
+      //////////////////////////////////
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
       float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3., 5.2);
@@ -296,7 +298,6 @@ int main(int argc, char *argv[]) {
       MLambdaCUPC.gapNgamma = gapNgamma;
       bool gammaN_default = MLambdaCUPC.ZDCgammaN && gapgammaN;
       bool Ngamma_default = MLambdaCUPC.ZDCNgamma && gapNgamma;
-      // if (ApplyZDCGapRejection && IsData && gammaN_default == false && Ngamma_default == false) continue;
       for (const auto& gapgammaN_threshold : MLambdaCUPC.gapEThresh_gammaN) {
         bool gapgammaN_ = GetMaxEnergyHF(&MPF, 3.0, 5.2) < gapgammaN_threshold;
         bool gammaN_ = MLambdaCUPC.ZDCgammaN && gapgammaN_;
@@ -308,8 +309,12 @@ int main(int argc, char *argv[]) {
         MLambdaCUPC.Ngamma->push_back(Ngamma_);
       }
       /////// cut on the loosest rapidity gap selection
-      if (ApplyZDCGapRejection && IsData && MLambdaCUPC.gammaN_EThreshLoose() == false && MLambdaCUPC.Ngamma_EThreshLoose() == false) continue;
+      if (ApplyZDCGapRejection==1 && IsData && !(MLambdaCUPC.gammaN_EThreshLoose() || MLambdaCUPC.Ngamma_EThreshLoose())) continue;
+      if (ApplyZDCGapRejection==2 && IsData && !(MLambdaCUPC.ZDCsumPlus <= 1500 || MLambdaCUPC.ZDCsumMinus <= 1500)) continue; // pzdcEnergyFilter0nOr https://github.com/CmsHI/cmssw/blob/forest_CMSSW_15_1_X/HeavyIonsAnalysis/ZDCAnalysis/python/HiZDCfilter_cfi.py#L18C1-L18C21
 
+      //////////////////////////////////
+      ////////// Multiplicity //////////
+      //////////////////////////////////
       int nTrackInAcceptanceHP = 0;
       for (int iTrack = 0; iTrack < MTrackPbPbUPC.nTrk; iTrack++) {
         if (MTrackPbPbUPC.trkPt->at(iTrack) <= 0.5)

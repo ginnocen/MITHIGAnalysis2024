@@ -2,8 +2,8 @@
 
 # https://batchdocs.web.cern.ch/local/submit.html
 
-if [[ $# -ne 8 ]]; then
-    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection] [IsGammaNMCtype]"
+if [[ $# -ne 10 ]]; then
+    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection]"
     exit 1
 fi
 
@@ -15,6 +15,8 @@ LOGDIR=$5
 IsData=$6
 ApplyDRejection=$7
 IsGammaNMCtype=$8
+Year=$9
+ApplyTriggerRejection=${10}
 
 SCRVERSION=${SCRAM_ARCH%%_*}
 runtimelimit="espresso" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
@@ -53,11 +55,11 @@ Universe     = vanilla
 Initialdir   = $PWD/
 Notification = Error
 Executable   = $PWD/tt-${tag}-checkfile.sh
-Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection $IsGammaNMCtype
+Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection
 Output       = $LOGDIR/log-${infn}.out
 Error        = $LOGDIR/log-${infn}.err
 Log          = $LOGDIR/log-${infn}.log
-+AccountingGroup = "group_u_CMST3.all"
+# +AccountingGroup = "group_u_CMST3.all"
 # +AccountingGroup = "group_u_CMS.u_zh.priority"
 +JobFlavour = "$runtimelimit"
 MY.WantOS = "$SCRVERSION"
