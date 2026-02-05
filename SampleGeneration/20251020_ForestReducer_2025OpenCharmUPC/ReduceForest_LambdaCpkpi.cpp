@@ -308,7 +308,7 @@ int main(int argc, char *argv[]) {
         MLambdaCUPC.Ngamma->push_back(Ngamma_);
       }
       /////// cut on the loosest rapidity gap selection
-      if (ApplyZDCGapRejection && IsData && MLambdaCUPC.gammaN_EThreshLoose() == false && MLambdaCUPC.Ngamma_EThreshLoose() == false) continue;
+      if (ApplyZDCGapRejection==1 && IsData && !(MDzeroUPC.gammaN_EThreshLoose() || MDzeroUPC.Ngamma_EThreshLoose())) continue;
       if (ApplyZDCGapRejection==2 && IsData && !(MLambdaCUPC.ZDCsumPlus <= 1500 || MLambdaCUPC.ZDCsumMinus <= 1500)) continue; // pzdcEnergyFilter0nOr https://github.com/CmsHI/cmssw/blob/forest_CMSSW_15_1_X/HeavyIonsAnalysis/ZDCAnalysis/python/HiZDCfilter_cfi.py#L18C1-L18C21
 
       //////////////////////////////////
