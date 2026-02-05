@@ -27,6 +27,8 @@ echo "DESTINATION:         "$DESTINATION
 source /cvmfs/cms.cern.ch/cmsset_default.sh
 scramv1 project CMSSW $CRELEASE # cmsrel
 
+INFILE_NAME=$PWD/${INFILE##*/}
+
 [[ -d $CRELEASE/src ]] && {
     cd $CRELEASE/src
     eval `scram runtime -sh` # cmsenv
@@ -35,8 +37,9 @@ scramv1 project CMSSW $CRELEASE # cmsrel
     root --version
 
     input_file=$INFILE
+    rm -f $INFILE_NAME
     xrdcp $INFILE .
-    [[ -f $PWD/${INFILE##*/} ]] && input_file=$PWD/${INFILE##*/} || echo "xrdcp failed."
+    [[ -f $INFILE_NAME ]] && input_file=$INFILE_NAME || echo "xrdcp failed."
 
     set -x
     
@@ -64,6 +67,6 @@ scramv1 project CMSSW $CRELEASE # cmsrel
 
 rm -rf $EXEFILE $CRELEASE
 rm DzeroUPC_dedxMap.root
-rm $PWD/${INFILE##*/}
+rm $INFILE_NAME
 rm $OUTFILE
 rm -v x509*
