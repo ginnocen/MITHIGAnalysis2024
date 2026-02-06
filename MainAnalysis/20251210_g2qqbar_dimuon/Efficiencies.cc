@@ -67,6 +67,7 @@ vector<int> isSelected(DimuonJetMessenger *Jet, float muPtCut, int chargeSelecti
         if(Jet->GenIsMuMuTagged == 1){
             indices[2] = 1;
             if(Jet->GenMuPt1 < muPtCut || Jet->GenMuPt2 < muPtCut){indices[2] = 0;}
+            if(chargeSelection != 0 && Jet->muCharge1 * Jet->muCharge2 != chargeSelection){indices[2] = 0;}
         }
     }
 
@@ -100,19 +101,19 @@ int main(int argc, char *argv[]) {
     // DECLARE RECO HISTS
     TFile* outFile = new TFile(output.c_str(), "RECREATE");
     outFile->cd();
-    TH2D* hRecoInclusiveJets = new TH2D("hRecoInclusiveJets","hRecoInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
-    TH2D* hFakeInclusiveJets = new TH2D("hFakeInclusiveJets","hFakeInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
-    TH2D* hGenDimJets = new TH2D("hGenDimJets","hGenDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
-    TH2D* hRecoDimJets = new TH2D("hRecoDimJets","hRecoDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
-    TH2D* hFakeDimJets = new TH2D("hFakeDimJets","hFakeDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
-    hRecoInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data()); 
+    TH2D* hRecoInclusiveJets = new TH2D("hRecoInclusiveJets","hRecoInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.0, 2.0);
+    TH2D* hFakeInclusiveJets = new TH2D("hFakeInclusiveJets","hFakeInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.0, 2.0);
+    TH2D* hGenDimJets = new TH2D("hGenDimJets","hGenDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.0, 2.0);
+    TH2D* hRecoDimJets = new TH2D("hRecoDimJets","hRecoDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.0, 2.0);
+    TH2D* hFakeDimJets = new TH2D("hFakeDimJets","hFakeDimJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.0, 2.0);
+    hRecoInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hFakeInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hGenDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hRecoDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     hFakeDimJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
 
     // DECLARE GEN HIST
-    TH2D* hGenInclusiveJets = new TH2D("hGenInclusiveJets","hGenInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.4, 2.4);
+    TH2D* hGenInclusiveJets = new TH2D("hGenInclusiveJets","hGenInclusiveJets", ptBins.size()-1, ptBins.front(), ptBins.back(), 10, -2.0, 2.0);
     hGenInclusiveJets->GetXaxis()->Set(ptBins.size()-1, ptBins.data());
     
     // DECLARE NTUPLES

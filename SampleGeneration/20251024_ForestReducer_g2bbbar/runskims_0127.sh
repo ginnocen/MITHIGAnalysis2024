@@ -1,14 +1,16 @@
 #!/bin/bash
 
-doMC=false
+doMC=true
 doHighEG=false
 doLowEG=false
+
+
 
 if [ $doMC = true ]; then
     echo "Starting MC processing"
 
     # DO THE MC
-    nohup ./RunParallelMC_xrdcp.sh /eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8 /data00/g2ccbar/mc2018/skim_0127 > logs/process_mc.log 2>&1 &
+    nohup ./RunParallelMC_xrdcp.sh /eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8 /data00/g2ccbar/mc2018/skim_0204 > logs/process_mc1.log 2>&1 &
     wait
     echo "done with MC"
 
@@ -21,7 +23,7 @@ if [ $doHighEG = true ]; then
 
     # DO THE HIGH EG DATA
 
-    nohup ./RunParallelData_xrdcp.sh /eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_HFfindersA /data00/g2ccbar/data2018/highEG_A/skim_0127 > logs/process_data_highEG.log 2>&1 &
+    nohup ./RunParallelData_xrdcp.sh /eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_HFfindersA /data00/g2ccbar/data2018/highEG_A/skim_0127 > logs/process_data_highEGA.log 2>&1 &
     wait 
     nohup ./RunParallelData_xrdcp.sh /eos/cms/store/group/phys_heavyions/aholterm/g2qqbar/HighEGJet/crab_btagged_and_svtagged_jets_DATA_HFfindersB /data00/g2ccbar/data2018/highEG_B/skim_0127 > logs/process_data_highEGB.log 2>&1 &
     wait

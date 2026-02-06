@@ -19,7 +19,7 @@ void cutdownskims(){
     // Define your cut condition
     const char* cut_higheg = "HLT_HIAK4PFJet80_v1 && IsMuMuTagged";
     const char* cut_loweg = "HLT_HIAK4PFJet60_v1 && IsMuMuTagged";
-    const char* cut_mc = "IsMuMuTagged";
+    const char* cut_mc = "IsMuMuTagged || GenIsMuMuTagged";
 
     // Copy only events passing the cut
     TTree* tree_filtered = tree->CopyTree(cut_higheg);

@@ -262,13 +262,13 @@ int main(int argc, char *argv[]) {
         MMuMuJet.PN_g = MJet.PN_g[ijet];
         MMuMuJet.PN_pu = MJet.PN_pu[ijet];
 
+        // # of vertices + tracks 
+        MMuMuJet.jtNsvtx = MJet.jtNsvtx[ijet];
+        MMuMuJet.jtNtrk = MJet.jtNtrk[ijet];
+
         if (svtx) {
 
           // ADD SVTX INFORMATION
-
-          MMuMuJet.jtNsvtx = MJet.jtNsvtx[ijet];
-          MMuMuJet.jtNtrk = MJet.jtNtrk[ijet];
-          MMuMuJet.jtptCh = MJet.jtptCh[ijet];
 
           for (int isvtx = 0; isvtx < MJet.nsvtx; isvtx++) {
 
@@ -441,6 +441,7 @@ int main(int argc, char *argv[]) {
           muDR = sqrt(muDeta * muDeta + muDphi * muDphi);
         } // end if dimuon pair found
 
+        MMuMuJet.nMu = nMu;
         MMuMuJet.IsMuMuTagged = isJetMuonTagged;
         MMuMuJet.muPt1= muPt1;
         MMuMuJet.muPt2= muPt2;
@@ -581,7 +582,7 @@ int main(int argc, char *argv[]) {
           
         } // end if dimuon pair found ll 
         
-
+        MMuMuJet.nGenMu = nGenMu;
         MMuMuJet.GenIsMuMuTagged = GenIsJetMuonTagged;
         MMuMuJet.mumuIsGenMatched = GenIsRecoMatched;
         MMuMuJet.GenMuMuMass = GenMuMuMass;
@@ -734,6 +735,9 @@ bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
   if ((M->SingleMuIsTracker->at(i) == 0 && M->SingleMuIsGlobal->at(i) == 0) || M->SingleMuSoft->at(i) == 0 ||
       M->SingleMuIsGood->at(i) == 0)
     return false; // REPLACING HYBRID SOFT WITH SOFT
+  //if ((M->SingleMuIsTracker->at(i) == 0 && M->SingleMuIsGlobal->at(i) == 0) || M->SingleMuHybridSoft->at(i) == 0 ||
+  //    M->SingleMuIsGood->at(i) == 0 || M->SingleMuIsHighPurity->at(i) == 0)
+  //  return false; // REPLACING HYBRID SOFT WITH SOFT
 
   return true;
 }
