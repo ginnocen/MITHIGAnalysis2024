@@ -27,26 +27,26 @@ cd ../
 set -x
 
 ### 2025 ###
-[[ -f HiForest_2025-HIForward0-6014.root ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0/251227_162520/0006/HiForest_2025PbPbUPC_6014.root HiForest_2025-HIForward0-6014.root
-./Execute_Dzero --Input HiForest_2025-HIForward0-6014.root \
-    --Output skim_2025-HIForward0-6014_Dzero_DRejection-pasor.root --Year 2025 --IsData true \
-    --ApplyTriggerRejection 0 \
-    --ApplyEventRejection false \
-    --ApplyZDCGapRejection 0 \
-    --ApplyDRejection pasor \
-    --Fraction 1.0 \
-    --HideProgressBar false
-
-### 2023 reForest ###
-# [[ -f HiForest_2023-HIForward0-Jan24Reco-260201Forest_1222.root ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Jan2024ReReco_2025Reforest/HIForward0/crab_2023PbPbUPC_Jan2024ReReco_20260201Forest_HIForward0/260201_192238/0001/HiForest_2023PbPbUPC_Jan24Reco_1222.root HiForest_2023-HIForward0-Jan24Reco-260201Forest_1222.root
-# ./Execute_Dzero --Input HiForest_2023-HIForward0-Jan24Reco-260201Forest_1222.root \
-#                 --Output skim_2023-HIForward0-Jan24Reco-260201Forest_1222_Dzero_DRejection-pasor_TriggerRejection-2.root --Year 2023 --IsData true \
-#                 --ApplyTriggerRejection 2 \
+# [[ -f HiForest_2025-HIForward0-6014.root ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0/251227_162520/0006/HiForest_2025PbPbUPC_6014.root HiForest_2025-HIForward0-6014.root
+# ./Execute_Dzero --Input HiForest_2025-HIForward0-6014.root \
+#                 --Output skim_2025-HIForward0-6014_Dzero_DRejection-pasor.root --Year 2025 --IsData true \
+#                 --ApplyTriggerRejection 0 \
 #                 --ApplyEventRejection false \
 #                 --ApplyZDCGapRejection 0 \
 #                 --ApplyDRejection pasor \
 #                 --Fraction 1.0 \
 #                 --HideProgressBar false
+
+### 2023 reForest ###
+# [[ -f HiForest_2023-HIForward0-Jan24Reco-260201Forest_1222.root ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Jan2024ReReco_2025Reforest/HIForward0/crab_2023PbPbUPC_Jan2024ReReco_20260201Forest_HIForward0/260201_192238/0001/HiForest_2023PbPbUPC_Jan24Reco_1222.root HiForest_2023-HIForward0-Jan24Reco-260201Forest_1222.root
+# ./Execute_Dzero --Input HiForest_2023-HIForward0-Jan24Reco-260201Forest_1222.root \
+    #                 --Output skim_2023-HIForward0-Jan24Reco-260201Forest_1222_Dzero_DRejection-pasor_TriggerRejection-2.root --Year 2023 --IsData true \
+    #                 --ApplyTriggerRejection 2 \
+    #                 --ApplyEventRejection false \
+    #                 --ApplyZDCGapRejection 0 \
+    #                 --ApplyDRejection pasor \
+    #                 --Fraction 1.0 \
+    #                 --HideProgressBar false
 
 ### 2023 ###
 # [[ -f HiForest_2023-HIForward2-Jan24Reco-375064-710.root ]] || xrdcp root://xrootd.cmsaf.mit.edu//store/user/jdlanfg/public/run3_2023Data_Jan2024ReReco/Run3_2023UPC_375064/HIForward2/crab_Run3_2023UPC_Jan2024ReReco_375064_HIForward2/250212_172509/0000/HiForestMiniAOD_710.root HiForest_2023-HIForward2-Jan24Reco-375064-710.root
@@ -59,16 +59,16 @@ set -x
     # --Fraction 1.0 \
     # --HideProgressBar false
 
-### 2025 MC ###
-# [[ -f HiForestMiniAOD_2024-MC-126.root ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_232519/0000/HiForestMiniAOD_126.root HiForestMiniAOD_2024-MC-126.root
-# ./Execute_Dzero --Input HiForestMiniAOD_2024-MC-126.root \
-#     --Output skim_2024-MC.root --Year 2025 --IsData false \
-#     --ApplyTriggerRejection 0 \
-#     --ApplyEventRejection false \
-#     --ApplyZDCGapRejection 0 \
-#     --ApplyDRejection no \
-#     --Fraction 1.0 \
-#     --HideProgressBar false
+### 2024 MC ###
+[[ -f HiForest_2024-MC-126.root ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_232519/0000/HiForestMiniAOD_126.root HiForest_2024-MC-126.root
+./Execute_Dzero --Input HiForest_2024-MC-126.root \
+        --Output skim_2024-MC.root --Year 2025 --IsData false \
+        --ApplyTriggerRejection 0 \
+        --ApplyEventRejection false \
+        --ApplyZDCGapRejection 0 \
+        --ApplyDRejection no \
+        --Fraction 1.0 \
+        --HideProgressBar false
 
 set +x 
 

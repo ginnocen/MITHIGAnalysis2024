@@ -24,6 +24,8 @@ using namespace std;
 using namespace DzeroSelection;
 #include "include/PIDScoring.h"
 
+#include "include/clusComp.h"
+
 int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
 
@@ -161,6 +163,12 @@ int main(int argc, char *argv[]) {
       MDzeroUPC.Event = MEvent.Event;
       MDzeroUPC.ProcessID = MEvent.ProcessID;
 
+      MDzeroUPC.clusComp_nPixHits = MEvent.clusComp_nPixHits;
+      if (MEvent.clusComp_z0) {
+        clusComp cc = { .nPixHits = MEvent.clusComp_nPixHits, .z0 = MEvent.clusComp_z0, .nHit = MEvent.clusComp_nHit, .chi = MEvent.clusComp_chi };
+        MDzeroUPC.clusComp_quality = determineQuality(cc, -20.0, 20.05);
+      }
+      
       ////////////////////////////
       ////////// Vertex //////////
       ////////////////////////////
@@ -473,6 +481,7 @@ int main(int argc, char *argv[]) {
 
   OutputFile.Close();
 
+  std::cout<<"Closed."<<std::endl;
   return 0;
 }
 

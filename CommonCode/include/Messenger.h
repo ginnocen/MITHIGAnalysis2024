@@ -90,6 +90,10 @@ public:
    float Ncoll;
    float Npart;
    int   ProcessID;
+  int clusComp_nPixHits;
+  std::vector<float>* clusComp_z0;
+  std::vector<int>* clusComp_nHit;
+  std::vector<float>* clusComp_chi;
 public:
    HiEventTreeMessenger(TFile &File);
    HiEventTreeMessenger(TFile *File);
@@ -746,7 +750,7 @@ public:
    std::vector<bool> *SingleMuIsGood;
    std::vector<bool> *SingleMuIsGlobal;
    std::vector<bool> *SingleMuIsTracker;
-   std::vector<bool> *SingeMuIsHighPurity;
+   std::vector<bool> *SingleMuIsHighPurity;
    std::vector<bool> *SingleMuHybridSoft;
    std::vector<bool> *SingleMuSoft;
 
@@ -1100,6 +1104,8 @@ public:
    long long Event;
    int Lumi;
    int ProcessID;
+  int clusComp_nPixHits;
+  double clusComp_quality;
    //FIXME: these refer to best vertex positions calculated from the track tree
    float VX, VY, VZ, VXError, VYError, VZError; //best vertex from track tree
    int nVtx;

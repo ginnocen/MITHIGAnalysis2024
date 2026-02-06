@@ -121,6 +121,14 @@ bool HiEventTreeMessenger::Initialize()
    else                                 Npart = 0.;
    if(Tree->GetBranch("ProcessID"))     Tree->SetBranchAddress("ProcessID", &ProcessID);
    else                                 ProcessID = -999;
+   if(Tree->GetBranch("clusComp_nPixHits"))     Tree->SetBranchAddress("clusComp_nPixHits", &clusComp_nPixHits);
+   else                                 clusComp_nPixHits = -999;
+   if(Tree->GetBranch("clusComp_z0"))     Tree->SetBranchAddress("clusComp_z0", &clusComp_z0);
+   else                                 clusComp_z0 = nullptr;
+   if(Tree->GetBranch("clusComp_nHit"))     Tree->SetBranchAddress("clusComp_nHit", &clusComp_nHit);
+   else                                 clusComp_nHit = nullptr;
+   if(Tree->GetBranch("clusComp_chi"))     Tree->SetBranchAddress("clusComp_chi", &clusComp_chi);
+   else                                 clusComp_chi = nullptr;
    return true;
 }
 
@@ -3543,7 +3551,7 @@ DzeroUPCTreeMessenger::DzeroUPCTreeMessenger(TTree *DzeroUPCTree, bool Debug)
 
 DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
 {
-   if(Initialized == true && WriteMode == true)
+  if (Initialized && WriteMode)
    {
       delete gammaN;
       delete Ngamma;
@@ -3554,7 +3562,7 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete DpassCut23PASSystDtrkPt;
       delete DpassCut23PASSystDalpha;
       delete DpassCut23PASSystDchi2cl;
-      delete DpassCutDefault; // included for backwards compatibility
+      // delete DpassCutDefault; // included for backwards compatibility
       delete DpassCutNominal;
       delete DpassCutLoose;
       delete DpassCutSystDsvpvSig;
@@ -3686,6 +3694,8 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    CheckAndSetBranch(Tree, Event);
    CheckAndSetBranch(Tree, Lumi);
    CheckAndSetBranch(Tree, ProcessID);
+   CheckAndSetBranch(Tree, clusComp_nPixHits);
+   CheckAndSetBranch(Tree, clusComp_quality);
    CheckAndSetBranch(Tree, VX);
    CheckAndSetBranch(Tree, VY);
    CheckAndSetBranch(Tree, VZ);
@@ -3873,6 +3883,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Event",                 &Event, "Event/L");
    Tree->Branch("Lumi",                  &Lumi, "Lumi/I");
    Tree->Branch("ProcessID",             &ProcessID, "ProcessID/I");
+   Tree->Branch("clusComp_nPixHits",     &clusComp_nPixHits, "clusComp_nPixHits/I");
+   Tree->Branch("clusComp_quality",      &clusComp_quality, "clusComp_quality/D");
    Tree->Branch("VX",                    &VX, "VX/F");
    Tree->Branch("VY",                    &VY, "VY/F");
    Tree->Branch("VZ",                    &VZ, "VZ/F");
@@ -3979,6 +3991,8 @@ void DzeroUPCTreeMessenger::Clear()
    Event = -999;
    Lumi = -999;
    ProcessID = -999;
+   clusComp_nPixHits = 0;
+   clusComp_quality = 0;
    VX = 0.;
    VY = 0.;
    VZ = 0.;
@@ -4079,6 +4093,8 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    Event                = M.Event;
    Lumi                 = M.Lumi;
    ProcessID            = M.ProcessID;
+   clusComp_nPixHits    = M.clusComp_nPixHits;
+   clusComp_quality     = M.clusComp_quality;
    VX                   = M.VX;
    VY                   = M.VY;
    VZ                   = M.VZ;
