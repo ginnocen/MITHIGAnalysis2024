@@ -21,7 +21,7 @@ echo "DONE WITH EFFICIENCIES"
 echo "DONE WITH DISTRIBUTIONS"
 
 ./ExecuteYield \
-    --Input "data_distros.root" \
+    --Input "data_distros_60.root" \
     --Templates "mcdistros_pthat.root" \
     --Output "testyields2.root" \
     --ptBins 100,120,160,200,250 \
