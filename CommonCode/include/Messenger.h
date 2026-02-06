@@ -1246,6 +1246,19 @@ public:
 
 };
 
+class DzeroUPCMicroTreeMessenger: public DzeroUPCTreeMessenger
+{
+private:
+   bool WriteMode;
+   bool Initialized;
+public:
+   DzeroUPCMicroTreeMessenger(TFile &File, std::string TreeName = "tree", bool Debug = false);
+   DzeroUPCMicroTreeMessenger(TFile *File, std::string TreeName = "tree", bool Debug = false);
+   DzeroUPCMicroTreeMessenger(TTree *DzeroUPCTree = nullptr, bool Debug = false);
+   bool Initialize(TTree *DzeroUPCTree, bool Debug = false);
+   bool Initialize(bool Debug = false);
+};
+
 class LambdaCpksUPCTreeMessenger
 {
 public:
