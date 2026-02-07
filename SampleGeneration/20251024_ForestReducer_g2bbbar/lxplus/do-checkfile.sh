@@ -12,6 +12,7 @@ MAXFILENO=5
 IsData=true
 MinJetPT=0
 IsPP=true
+useHybrid=false
 
 # 
 EXEFILE=Execute
@@ -98,7 +99,7 @@ do
 
     if [ "$submit_jobs" -eq 1 ] ; then
         set -x
-        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $MinJetPT $IsPP
+        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $MinJetPT $IsPP $useHybrid
         set +x
     fi
 

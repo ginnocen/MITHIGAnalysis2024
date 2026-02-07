@@ -2,8 +2,8 @@
 
 # https://batchdocs.web.cern.ch/local/submit.html
 
-if [[ $# -ne 8 ]]; then
-    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [MinJetPT] [IsPP]"
+if [[ $# -ne 9 ]]; then
+    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [MinJetPT] [IsPP] [UseHybrid]"
     exit 1
 fi
 
@@ -15,7 +15,7 @@ LOGDIR=$5
 IsData=$6
 MinJetPT=$7
 IsPP=$8
-
+USEHYBRID=$9
 SCRVERSION=${SCRAM_ARCH%%_*}
 runtimelimit="espresso" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
 

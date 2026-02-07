@@ -31,6 +31,7 @@ cd ../
             --IsData true \
             --IsPP true \
             --svtx true \
+            --useHybrid false \
             --PFJetCollection ak3PFJetAnalyzer/t \
             --MinJetPT 0 \
             --Fraction 1.0

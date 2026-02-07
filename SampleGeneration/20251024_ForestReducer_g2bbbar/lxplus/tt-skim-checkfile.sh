@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $# -ne 8 ]]; then
-    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [MinJetPT] [IsPP]"
+if [[ $# -ne 9 ]]; then
+    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [MinJetPT] [IsPP] [UseHybrid]"
     exit 1
 fi
 
@@ -13,6 +13,7 @@ CRELEASE=$5
 IsData=$6
 MinJetPT=$7
 IsPP=$8
+USEHYBRID=$9
 
 echo "SCRAM_ARCH:          "$SCRAM_ARCH
 echo "PWD:                 "$PWD
@@ -43,6 +44,7 @@ scramv1 project CMSSW $CRELEASE
               --IsData $IsData \
               --IsPP $IsPP \
               --svtx true \
+              --useHybrid $USEHYBRID \
               --MinJetPT $MinJetPT \
               --PFJetCollection ak3PFJetAnalyzer/t \
               --Fraction 1.0

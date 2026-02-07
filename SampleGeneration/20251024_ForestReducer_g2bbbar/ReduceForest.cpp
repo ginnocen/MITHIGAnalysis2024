@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc, char *argv[]);
 double GetHFSum(PFTreeMessenger *M);
 double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent = -1);
-bool isMuonSelected(SingleMuTreeMessenger *M, int i);
+bool isMuonSelected(SingleMuTreeMessenger *M, int i, bool useHybrid);
 bool isGenMuonSelected(SingleMuTreeMessenger *M, int i);
 bool isFakeJet(JetTreeMessenger *MJet, int ijet);
 bool isDimuonGenMatched(SingleMuTreeMessenger *M, int gen1, int gen2, int mu1, int mu2);
@@ -35,9 +35,9 @@ int main(int argc, char *argv[]) {
   bool IsData = CL.GetBool("IsData", false);
   bool IsPP = CL.GetBool("IsPP", false);
   bool svtx = CL.GetBool("svtx", false);
-  int Year = CL.GetInt("Year", 2018);
   double Fraction = CL.GetDouble("Fraction", 1.00);
   double MinJetPT = CL.GetDouble("MinJetPT", 30);
+  bool useHybrid = CL.GetBool("useHybrid", false);
   string PFJetCollection = CL.Get("PFJetCollection", "akCs3PFJetAnalyzer/t");
   string PFTreeName = IsPP ? "pfcandAnalyzer/pfTree" : "particleFlowAnalyser/pftree";
   PFTreeName = CL.Get("PFTree", PFTreeName);
@@ -52,8 +52,8 @@ int main(int argc, char *argv[]) {
   MMuMuJet.SetBranch(&Tree);
   MGenMuMuJet.SetBranch(&GenTree);
 
-  std::vector<int> mt1;
-  std::vector<int> mt2;
+  std::vector<int> mt1 = {-1, -1};
+  std::vector<int> mt2 = {-1, -1};
 
   for (const auto& InputFileName : InputFileNames) {
 
@@ -356,30 +356,35 @@ int main(int argc, char *argv[]) {
 
         int nSingleMu = MSingleMu.SingleMuPT->size();
         for (int isinglemu1 = 0; isinglemu1 < nSingleMu; isinglemu1++) {
-          if (isMuonSelected(&MSingleMu, isinglemu1) == false) continue;
+          if (isMuonSelected(&MSingleMu, isinglemu1, useHybrid) == false) continue;
+          
+          float jetEta = MJet.JetEta[ijet];
+          float jetPhi = MJet.JetPhi[ijet];
+          float muEta1 = MSingleMu.SingleMuEta->at(isinglemu1);
+          float muPhi1 = MSingleMu.SingleMuPhi->at(isinglemu1);
+          float dPhiMu1Jet_ = DeltaPhi(muPhi1, jetPhi);
+          float dEtaMu1Jet_ = muEta1 - jetEta;
+          float dRmu1Jet = sqrt(dPhiMu1Jet_ * dPhiMu1Jet_ + dEtaMu1Jet_ * dEtaMu1Jet_);
+          if (dRmu1Jet > 0.3) continue;
           nMu++;
+
           for (int isinglemu2 = isinglemu1 + 1; isinglemu2 < nSingleMu; isinglemu2++) {
-            if (isMuonSelected(&MSingleMu, isinglemu2) == false) continue;
+            if (isMuonSelected(&MSingleMu, isinglemu2, useHybrid) == false) continue;
             // if (charge1 == charge2)
             // continue;
-            float jetEta = MJet.JetEta[ijet];
-            float jetPhi = MJet.JetPhi[ijet];
-            float muEta1 = MSingleMu.SingleMuEta->at(isinglemu1);
-            float muPhi1 = MSingleMu.SingleMuPhi->at(isinglemu1);
+            
+
             float muEta2 = MSingleMu.SingleMuEta->at(isinglemu2);
             float muPhi2 = MSingleMu.SingleMuPhi->at(isinglemu2);
             int muCharge1 = MSingleMu.SingleMuCharge->at(isinglemu1);
             int muCharge2 = MSingleMu.SingleMuCharge->at(isinglemu2);
-            float dPhiMu1Jet_ = DeltaPhi(muPhi1, jetPhi);
-            float dEtaMu1Jet_ = muEta1 - jetEta;
             float dPhiMu2Jet_ = DeltaPhi(muPhi2, jetPhi);
             float dEtaMu2Jet_ = muEta2 - jetEta;
-            float dRmu1Jet = sqrt(dPhiMu1Jet_ * dPhiMu1Jet_ + dEtaMu1Jet_ * dEtaMu1Jet_);
             float dRmu2Jet = sqrt(dPhiMu2Jet_ * dPhiMu2Jet_ + dEtaMu2Jet_ * dEtaMu2Jet_);
-            if (dRmu1Jet > 0.3)
-              continue;
             if (dRmu2Jet > 0.3)
               continue;
+
+            
             TLorentzVector Mu1, Mu2;
             Mu1.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu1), muEta1, muPhi1, M_MU);
             Mu2.SetPtEtaPhiM(MSingleMu.SingleMuPT->at(isinglemu2), muEta2, muPhi2, M_MU);
@@ -397,7 +402,10 @@ int main(int argc, char *argv[]) {
         if (maxmumuPt > 0. && maxMu1Index >= 0 && maxMu2Index >= 0) {
           //cout << " reco pair at entry " << iE << endl;
           isJetMuonTagged = true;
-  
+          
+          mt1 = mu_trackmatch(&MJet, ijet, muPt1, muEta1, muPhi1);
+          mt2 = mu_trackmatch(&MJet, ijet, muPt2, muEta2, muPhi2);
+
           muPt1 = MSingleMu.SingleMuPT->at(maxMu1Index);
           muPt2 = MSingleMu.SingleMuPT->at(maxMu2Index);
           muEta1 = MSingleMu.SingleMuEta->at(maxMu1Index);
@@ -473,9 +481,6 @@ int main(int argc, char *argv[]) {
         MMuMuJet.muDphi= muDphi;
         MMuMuJet.muDR= muDR;
 
-        mt1 = mu_trackmatch(&MJet, ijet, muPt1, muEta1, muPhi1);
-        mt2 = mu_trackmatch(&MJet, ijet, muPt2, muEta2, muPhi2);
-
         MMuMuJet.trkIdx_mu1 = mt1[0];
         MMuMuJet.trkIdx_mu2 = mt2[0];
         MMuMuJet.svtxIdx_mu1 = mt1[1];
@@ -516,19 +521,22 @@ int main(int argc, char *argv[]) {
         
         for(int igen1 = 0; igen1 < nGenSingleMu; igen1++){ 
           if(isGenMuonSelected(&MSingleMu, igen1) == false) continue;
+
+          float jetEta = MJet.JetEta[ijet];
+          float jetPhi = MJet.JetPhi[ijet];
+          float dPhiMu1Jet_ = DeltaPhi(MSingleMu.GenSingleMuPhi->at(igen1), jetPhi);
+          float dEtaMu1Jet_ = MSingleMu.GenSingleMuEta->at(igen1) - jetEta;
+          float dRMu1Jet = sqrt(dPhiMu1Jet_*dPhiMu1Jet_ + dEtaMu1Jet_*dEtaMu1Jet_);
+          if (dRMu1Jet > 0.3) continue;
           nGenMu++;
-            for(int igen2 = igen1 + 1; igen2 < nGenSingleMu; igen2++){
+          
+          for(int igen2 = igen1 + 1; igen2 < nGenSingleMu; igen2++){
               if(isGenMuonSelected(&MSingleMu, igen2) == false) continue;
 
-              float jetEta = MJet.JetEta[ijet];
-              float jetPhi = MJet.JetPhi[ijet];
-              float dPhiMu1Jet_ = DeltaPhi(MSingleMu.GenSingleMuPhi->at(igen1), jetPhi);
-              float dEtaMu1Jet_ = MSingleMu.GenSingleMuEta->at(igen1) - jetEta;
+              
               float dPhiMu2Jet_ = DeltaPhi(MSingleMu.GenSingleMuPhi->at(igen2), jetPhi);
               float dEtaMu2Jet_ = MSingleMu.GenSingleMuEta->at(igen2) - jetEta;
-              float dRMu1Jet = sqrt(dPhiMu1Jet_*dPhiMu1Jet_ + dEtaMu1Jet_*dEtaMu1Jet_);
               float dRMu2Jet = sqrt(dPhiMu2Jet_*dPhiMu2Jet_ + dEtaMu2Jet_*dEtaMu2Jet_);
-              if (dRMu1Jet > 0.3) continue;
               if (dRMu2Jet > 0.3) continue;
 
               if(isJetMuonTagged && GenIsRecoMatched == false){
@@ -562,8 +570,8 @@ int main(int argc, char *argv[]) {
           GenMuEta2 = MSingleMu.GenSingleMuEta->at(maxGenMu2Index); 
           GenMuPhi1 = MSingleMu.GenSingleMuPhi->at(maxGenMu1Index);
           GenMuPhi2 = MSingleMu.GenSingleMuPhi->at(maxGenMu2Index); 
-          GenMuCharge1 = (int) MSingleMu.GenSingleMuPID->at(maxGenMu1Index) / 13;
-          GenMuCharge2 = (int) MSingleMu.GenSingleMuPID->at(maxGenMu2Index) / 13;
+          GenMuCharge1 = (int) MSingleMu.GenSingleMuPID->at(maxGenMu1Index) / -13;
+          GenMuCharge2 = (int) MSingleMu.GenSingleMuPID->at(maxGenMu2Index) / -13;
 
           TLorentzVector Mu1, Mu2;
           Mu1.SetPtEtaPhiM(GenMuPt1, GenMuEta1, GenMuPhi1, M_MU);
@@ -585,6 +593,8 @@ int main(int argc, char *argv[]) {
         MMuMuJet.nGenMu = nGenMu;
         MMuMuJet.GenIsMuMuTagged = GenIsJetMuonTagged;
         MMuMuJet.mumuIsGenMatched = GenIsRecoMatched;
+        MMuMuJet.GenMuCharge1 = GenMuCharge1;
+        MMuMuJet.GenMuCharge2 = GenMuCharge2;
         MMuMuJet.GenMuMuMass = GenMuMuMass;
         MMuMuJet.GenMuMuPt = GenMuMuPt;
         MMuMuJet.GenMuMuPhi = GenMuMuPhi;
@@ -723,21 +733,23 @@ double GetGenHFSum(GenParticleTreeMessenger *M, int SubEvent) {
   return Sum;
 }
 
-bool isMuonSelected(SingleMuTreeMessenger *M, int i) {
+bool isMuonSelected(SingleMuTreeMessenger *M, int i, bool useHybrid) {
   if (M == nullptr)
     return false;
   if (M->Tree == nullptr)
     return false;
-  if (M->SingleMuPT->at(i) < 3.5)
+  if (M->SingleMuPT->at(i) < 4.0)
     return false;
   if (fabs(M->SingleMuEta->at(i)) > 2.3)
     return false;
-  if ((M->SingleMuIsTracker->at(i) == 0 && M->SingleMuIsGlobal->at(i) == 0) || M->SingleMuSoft->at(i) == 0 ||
-      M->SingleMuIsGood->at(i) == 0)
-    return false; // REPLACING HYBRID SOFT WITH SOFT
-  //if ((M->SingleMuIsTracker->at(i) == 0 && M->SingleMuIsGlobal->at(i) == 0) || M->SingleMuHybridSoft->at(i) == 0 ||
-  //    M->SingleMuIsGood->at(i) == 0 || M->SingleMuIsHighPurity->at(i) == 0)
-  //  return false; // REPLACING HYBRID SOFT WITH SOFT
+  if(useHybrid){
+    if ((M->SingleMuIsTracker->at(i) == 0 && M->SingleMuIsGlobal->at(i) == 0) || M->SingleMuHybridSoft->at(i) == 0 ||
+      M->SingleMuIsGood->at(i) == 0 || M->SingleMuIsHighPurity->at(i) == 0) return false; // HYBRID + HIGH PURITY
+  }
+  else {
+    if ((M->SingleMuIsTracker->at(i) == 0 && M->SingleMuIsGlobal->at(i) == 0) || M->SingleMuSoft->at(i) == 0 ||
+        M->SingleMuIsGood->at(i) == 0) return false; // REPLACING HYBRID SOFT WITH SOFT
+  }
 
   return true;
 }
@@ -747,7 +759,7 @@ bool isGenMuonSelected(SingleMuTreeMessenger *M, int i) {
     return false;
   if (M->Tree == nullptr)
     return false;
-  if (M->GenSingleMuPT->at(i) < 3.5)
+  if (M->GenSingleMuPT->at(i) < 4.0)
     return false;
   if (fabs(M->GenSingleMuEta->at(i)) > 2.3)
     return false;

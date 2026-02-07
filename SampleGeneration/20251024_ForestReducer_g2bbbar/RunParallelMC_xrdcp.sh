@@ -17,6 +17,7 @@ ISDATA=false
 ISPP=true
 DOSVTX=false
 PFJETS=ak3PFJetAnalyzer/t
+USEHYBRID=false
 MINJETPT=0
 FRACTION=1.0
 
@@ -56,6 +57,7 @@ for FILEPATH in $(xrdfs $XRDSERV ls -R $PATHSAMPLE | grep 'HiForest'); do
         --IsData $ISDATA \
         --IsPP $ISPP \
         --svtx $DOSVTX \
+        --useHybrid $USEHYBRID \
         --Output "$OUTPUT/output_$COUNTER.root" \
         --PFJetCollection $PFJETS \
         --MinJetPT $MINJETPT \
