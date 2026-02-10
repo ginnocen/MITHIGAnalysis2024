@@ -1112,7 +1112,7 @@ public:
    bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
    bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
    bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
-  bool isNotBptxOR;
+  bool isNotBptxOR, isUnpairedBunchBptxMinus, isUnpairedBunchBptxPlus;
    bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter, cscTightHalo2015Filter;
    float ZDCsumPlus;
    float ZDCsumMinus;
@@ -1252,7 +1252,7 @@ public:
   bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
   bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
   bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
-  int isNotBptxOR;
+  bool isNotBptxOR, isUnpairedBunchBptxMinus, isUnpairedBunchBptxPlus;
   bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter, cscTightHalo2015Filter;
   float ZDCsumPlus;
   float ZDCsumMinus;
@@ -1396,7 +1396,7 @@ public:
   bool isL1ZDCXORJet8, isL1ZDCXORJet12, isL1ZDCXORJet16;
   bool isL1ZDCOr, isL1ZDCOr_Min400_Max10000, isL1ZDCOr_Max400_Pixel, isL1ZDCOr_Max10000;
   bool isZeroBias, isZeroBias_Min400_Max10000, isZeroBias_Max400_Pixel, isZeroBias_Max10000;
-  int isNotBptxOR;
+  bool isNotBptxOR, isUnpairedBunchBptxMinus, isUnpairedBunchBptxPlus;
   bool selectedBkgFilter, selectedVtxFilter, ClusterCompatibilityFilter, cscTightHalo2015Filter;
   float ZDCsumPlus;
   float ZDCsumMinus;

@@ -241,7 +241,6 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.isL1ZDCXORJet8 = false;
           MDzeroUPC.isL1ZDCXORJet12 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nXOR_MaxPixelCluster10000") || MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000");
           MDzeroUPC.isL1ZDCXORJet16 = MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000") || MTrigger.CheckTriggerStartWith("HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000");
-          MDzeroUPC.isNotBptxOR = MTrigger.CheckTriggerStartWith("HLT_HIL1NotBptxOR");
 
           //
           incl_ZDCOr = MDzeroUPC.isL1ZDCOr_Max10000 || MDzeroUPC.isL1ZDCOr_Min400_Max10000 || MDzeroUPC.isL1ZDCOr_Max400_Pixel || MDzeroUPC.isL1ZDCXORJet12;
@@ -249,11 +248,14 @@ int main(int argc, char *argv[]) {
           incl_ZB = MDzeroUPC.isZeroBias_Min400_Max10000 || MDzeroUPC.isZeroBias_Max400_Pixel || MDzeroUPC.isZeroBias || MDzeroUPC.isZeroBias_Max10000;
         }
 
+        MDzeroUPC.isNotBptxOR = MTrigger.CheckTriggerStartWith("HLT_HIL1NotBptxOR_v");
+        MDzeroUPC.isUnpairedBunchBptxMinus = MTrigger.CheckTriggerStartWith("HLT_HIL1UnpairedBunchBptxMinus_v");
+        MDzeroUPC.isUnpairedBunchBptxPlus = MTrigger.CheckTriggerStartWith("HLT_HIL1UnpairedBunchBptxPlus_v");
+
         if (ApplyTriggerRejection == 1 && !(incl_ZDCOr || incl_ZDCXORJet)) continue;
         if (ApplyTriggerRejection == 2 && !incl_ZDCOr) continue;
         if (ApplyTriggerRejection == 3 && !incl_ZB) continue;
         if (ApplyTriggerRejection == 4 && !(incl_ZB || incl_ZDCOr || incl_ZDCXORJet)) continue;
-        if (ApplyTriggerRejection == 5 && !MDzeroUPC.isNotBptxOR) continue;
       } /* if (IsData) { */
       
       /////////////////////////////////////////////
