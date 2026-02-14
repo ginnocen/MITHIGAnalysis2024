@@ -5,7 +5,7 @@ config = config()
 config.General.transferOutputs = True
 config.General.requestName = 'g2qqbar_MC_sample_HERWIG'
 
-config.JobType.psetName = 'recipe5.py'
+config.JobType.psetName = 'recipe5_MC.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.allowUndistributedCMSSW = True
 #config.Data.inputDataset = '/QCD_pThat-15_Dijet_TuneCP5_5p02TeV-pythia8/RunIISummer20UL17pp5TeVMiniAODv2-106X_mc2017_realistic_forppRef5TeV_v3-v3/MINIAODSIM'

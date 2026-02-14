@@ -7,7 +7,7 @@ config.General.transferOutputs = True
 config.General.requestName = 'g2bbbars_DATA_HFfindersC'
 
 config.section_('JobType')
-config.JobType.psetName = 'recipe5_dataunpacked.py'
+config.JobType.psetName = 'recipe5_DATA.py'
 config.JobType.pluginName = 'Analysis'
 config.JobType.allowUndistributedCMSSW = True
 
