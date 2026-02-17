@@ -81,9 +81,11 @@ public:
    float hiHF_pf;
    float hiHFPlus_pf;
    float hiHFMinus_pf;
+   float hiHFPlus_pfle;
    float hiHFPlus_pfle1;
    float hiHFPlus_pfle2;
    float hiHFPlus_pfle3;
+   float hiHFMinus_pfle;
    float hiHFMinus_pfle1;
    float hiHFMinus_pfle2;
    float hiHFMinus_pfle3;
