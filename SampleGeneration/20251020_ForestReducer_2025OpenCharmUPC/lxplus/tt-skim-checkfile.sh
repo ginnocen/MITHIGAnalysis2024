@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $# -ne 10 ]]; then
-    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection]" 
+if [[ $# -ne 12 ]]; then
+    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection]" 
     exit 1
 fi
 
@@ -15,6 +15,8 @@ ApplyDRejection=$7
 IsGammaNMCtype=$8
 Year=$9
 ApplyTriggerRejection=${10}
+DptThreshold=${11}
+ApplyZDCGapRejection=${12}
 
 echo "SCRAM_ARCH:          "$SCRAM_ARCH
 echo "PWD:                 "$PWD
@@ -48,8 +50,9 @@ INFILE_NAME=$PWD/${INFILE##*/}
                --RootPID DzeroUPC_dedxMap.root \
                --ApplyTriggerRejection $ApplyTriggerRejection \
                --ApplyEventRejection false \
-               --ApplyZDCGapRejection 0 \
+               --ApplyZDCGapRejection $ApplyZDCGapRejection \
                --ApplyDRejection $ApplyDRejection \
+               --DptThreshold $DptThreshold \
                --IsGammaNMCtype $IsGammaNMCtype \
                --Year $Year \
                --IsData $IsData \
