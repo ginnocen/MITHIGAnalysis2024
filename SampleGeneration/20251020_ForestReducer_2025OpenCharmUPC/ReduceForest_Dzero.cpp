@@ -27,7 +27,7 @@ using namespace DzeroSelection;
 #include "include/clusComp.h"
 
 int main(int argc, char *argv[]);
-double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax);
+double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax, double ptMin = 0.);
 
 int main(int argc, char *argv[]) {
   string VersionString = "V8";
@@ -281,12 +281,16 @@ int main(int argc, char *argv[]) {
       //////////////////////////////////
       // Loop through the specified ranges for gapgammaN and gapNgamma
       // gammaN[4] and Ngamma[4] are nominal selection criteria
-      float EMaxHFPlus = GetMaxEnergyHF(&MPF, 3., 5.2);
-      float EMaxHFMinus = GetMaxEnergyHF(&MPF, -5.2, -3.);
-      MDzeroUPC.HFEMaxPlus = EMaxHFPlus;
-      MDzeroUPC.HFEMaxMinus = EMaxHFMinus;
-      bool gapgammaN = EMaxHFPlus < 9.2;
-      bool gapNgamma = EMaxHFMinus < 8.6;
+      MDzeroUPC.HFEMaxPlus = GetMaxEnergyHF(&MPF, 3., 5.2);
+      MDzeroUPC.HFEMaxMinus = GetMaxEnergyHF(&MPF, -5.2, -3.);
+      MDzeroUPC.HFEMaxPlus_forest = (MEvent.hiHFPlus_pfle1 >= 0 ? MEvent.hiHFPlus_pfle1 : MEvent.hiHFPlus_pfle);
+      MDzeroUPC.HFEMaxMinus_forest = (MEvent.hiHFMinus_pfle1 >= 0 ? MEvent.hiHFMinus_pfle1 : MEvent.hiHFMinus_pfle);
+      MDzeroUPC.HFEMaxPlus_eta5 = GetMaxEnergyHF(&MPF, 3., 5.);
+      MDzeroUPC.HFEMaxMinus_eta5 = GetMaxEnergyHF(&MPF, -5., -3.);
+      MDzeroUPC.HFEMaxPlus_pt0p1 = GetMaxEnergyHF(&MPF, 3., 5.2, 0.1);
+      MDzeroUPC.HFEMaxMinus_pt0p1 = GetMaxEnergyHF(&MPF, -5.2, -3., 0.1);
+      bool gapgammaN = MDzeroUPC.HFEMaxPlus < 9.2;
+      bool gapNgamma = MDzeroUPC.HFEMaxMinus < 8.6;
       MDzeroUPC.gapgammaN = gapgammaN;
       MDzeroUPC.gapNgamma = gapNgamma;
       bool gammaN_default = MDzeroUPC.ZDCgammaN && gapgammaN;
@@ -304,6 +308,7 @@ int main(int argc, char *argv[]) {
       /////// cut on the loosest rapidity gap selection
       if (ApplyZDCGapRejection==1 && IsData && !(MDzeroUPC.gammaN_EThreshLoose() || MDzeroUPC.Ngamma_EThreshLoose())) continue; 
       if (ApplyZDCGapRejection==2 && IsData && !(MDzeroUPC.ZDCsumPlus <= 1500 || MDzeroUPC.ZDCsumMinus <= 1500)) continue; // pzdcEnergyFilter0nOr https://github.com/CmsHI/cmssw/blob/forest_CMSSW_15_1_X/HeavyIonsAnalysis/ZDCAnalysis/python/HiZDCfilter_cfi.py#L18C1-L18C21
+      if (ApplyZDCGapRejection==3 && IsData && !(MDzeroUPC.ZDCgammaN || MDzeroUPC.ZDCNgamma)) continue;
 
       //////////////////////////////////
       ////////// Multiplicity //////////
@@ -488,7 +493,7 @@ int main(int argc, char *argv[]) {
 // ============================================================================ //
 // Function to Retrieve Maximum Energy in HF Region within Specified Eta Range
 // ============================================================================ //
-double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.) {
+double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax, double ptMin) {
   if (M == nullptr)
     return -1;
   if (M->Tree == nullptr)
@@ -496,6 +501,7 @@ double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin = 3., double etaMax = 5.
 
   double EMax = 0;
   for (int iPF = 0; iPF < M->ID->size(); iPF++) {
+    if (M->PT->at(iPF) <= ptMin) continue;
     if ((M->ID->at(iPF) == 6 || M->ID->at(iPF) == 7) && M->Eta->at(iPF) > etaMin && M->Eta->at(iPF) < etaMax) {
       if (M->E->at(iPF) > EMax)
         EMax = M->E->at(iPF);

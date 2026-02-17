@@ -121,7 +121,7 @@ vector<vector<float>> DalphaCutValue_syst = {
 vector<vector<float>> DalphaCutValue_loose = {
   {3.2,  -1,  0,  1,  -2.4,  2.4}, // Covers full signal
   {2.3,  -1,  1,  2,  -2.4,  2.4}, // Set at end of signal plateau
-  {2.3,  -1,  2,  5,  -2.4,  2.4}, // Set at end of signal plateau
+  {3.2,  -1,  2,  5,  -2.4,  2.4}, // Set at end of signal plateau
   {1.0,  -1,  5, 12,  -2.4,  2.4}
 };
 
@@ -160,7 +160,7 @@ vector<vector<float>> DdthetaCutValue_syst = {
 vector<vector<float>> DdthetaCutValue_loose = {
   {3.2,  -1,  0,  1,  -2.4,  2.4}, // Covers full signal
   {2.5,  -1,  1,  2,  -2.4,  2.4}, // Set at end of signal plateau
-  {2.5,  -1,  2,  5,  -2.4,  2.4}, // Set at end of signal plateau
+  {3.2,  -1,  2,  5,  -2.4,  2.4}, // Set at end of signal plateau
   {1.0,  -1,  5, 12,  -2.4,  2.4}
 };
 
@@ -182,7 +182,7 @@ vector<vector<float>> DsvpvSigCutValue_syst = {
 vector<vector<float>> DsvpvSigCutValue_loose = {
   {1.5, 1,  0,  1, -2.4, 2.4},
   {1.5, 1,  1,  2, -2.4, 2.4},
-  {1.5, 1,  2,  5, -2.4, 2.4},
+  {0.5, 1,  2,  5, -2.4, 2.4},
   {2.0, 1,  5, 12, -2.4, 2.4},
 };
 

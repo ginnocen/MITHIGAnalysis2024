@@ -1116,7 +1116,14 @@ public:
    float ZDCsumPlus;
    float ZDCsumMinus;
    float HFEMaxPlus;
+   float HFEMaxPlus_forest;
+   float HFEMaxPlus_eta5;
+   float HFEMaxPlus_pt0p1;
    float HFEMaxMinus;
+   float HFEMaxMinus_forest;
+   float HFEMaxMinus_eta5;
+   float HFEMaxMinus_pt0p1;
+
    //booleans
    bool ZDCgammaN, ZDCNgamma;
    bool gapgammaN, gapNgamma;
