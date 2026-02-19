@@ -15,6 +15,7 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 	MaxDzeroY=$(echo $MicroTree | jq -r '.MaxDzeroY')
 	IsGammaN=$(echo $MicroTree | jq -r '.IsGammaN')
 	TriggerChoice=$(echo $MicroTree | jq -r '.TriggerChoice')
+	BkgFilterChoice=$(echo $MicroTree | jq -r '.BkgFilterChoice')
 	IsData=$(echo $MicroTree | jq -r '.IsData')
 	DoSystRapGap=$(echo $MicroTree | jq -r '.DoSystRapGap')
 	DoSystD=$(echo $MicroTree | jq -r '.DoSystD')
@@ -39,6 +40,7 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 			[ $GptGyWeightFileName != null ] && cmd="$cmd --GptGyWeightFileName $GptGyWeightFileName"
 			[ $DoMultReweighting != null ] && cmd="$cmd --DoMultReweighting $DoMultReweighting"
 			[ $MultWeightFileName != null ] && cmd="$cmd --MultWeightFileName $MultWeightFileName"
+			[ $BkgFilterChoice != null ] && cmd="$cmd --BkgFilterChoice $BkgFilterChoice" || cmd="$cmd --BkgFilterChoice 1"
 
 	echo "Executing >>>>>>"
 	echo $cmd
