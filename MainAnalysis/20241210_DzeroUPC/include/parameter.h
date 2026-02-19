@@ -6,11 +6,12 @@ namespace fs = std::filesystem;
 //============================================================//
 class Parameters {
 public:
-    Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN, int TriggerChoice, bool IsData, float scaleFactor = 1.0,
+    Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN,
+                int TriggerChoice, int BkgFilterChoice, bool IsData, float scaleFactor = 1.0,
                 int in_DoSystRapGap = 0, int in_DoSystD = 0,
                 bool in_DoGptGyReweighting = false, string in_GptGyWeightFileName = "",
                 bool in_DoMultReweighting = false, string in_MultWeightFileName = "" )
-	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor)
+	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), BkgFilterChoice(BkgFilterChoice),  IsData(IsData), scaleFactor(scaleFactor)
     {
         if (in_DoSystRapGap > 9) {
             // Custom HF energy threshold will be set to in_DoSystRapGap/10.
@@ -57,7 +58,8 @@ public:
    float MinDzeroY;       // Lower limit of Dzero rapidity
    float MaxDzeroY;       // Upper limit of Dzero rapidity
    bool IsGammaN;         // GammaN analysis (or NGamma)
-   int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
+   int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8, 3 = isL1ZDCXORJet12, 4 = isL1ZDCXORJet16
+   int BkgFilterChoice;   // 1 = CCF + halo, 2 = halo only
    bool IsData;           // Data or MC
    float scaleFactor;     // Scale factor
    int DoSystRapGap;      // Systematic study: apply the alternative event selections
@@ -83,7 +85,15 @@ public:
        cout << "MinDzeroY: " << MinDzeroY << endl;
        cout << "MaxDzeroY: " << MaxDzeroY << endl;
        cout << "IsGammaN: " << IsGammaN << endl; 
-       cout << "TriggerChoice: " << TriggerChoice << endl;
+       cout << "TriggerChoice: " << ((TriggerChoice==0)? "None" :
+                                     (TriggerChoice==1)? "isL1ZDCOr" :
+                                     (TriggerChoice==2)? "isL1ZDCXORJet8" :
+                                     (TriggerChoice==3)? "isL1ZDCXORJet12" :
+                                     (TriggerChoice==4)? "isL1ZDCXORJet16" :)
+                                 << endl;
+       cout << "BkgFilterChoice: " << (TriggerChoice==1)? "ClusterCompatibilityFilter + cscTightHalo2015Filter" :
+                                      (TriggerChoice==2)? "cscTightHalo2015Filter only")
+                                   << endl;
        cout << "IsData: " << IsData << endl;
        cout << "Scale factor: " << scaleFactor << endl;
        cout << "DoSystRapGap: " << ((DoSystRapGap==0)? "No" :
@@ -123,6 +133,8 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hIsGammaN->SetBinContent(1, par.IsGammaN);
     TH1D* hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
     hTriggerChoice->SetBinContent(1, par.TriggerChoice);
+    TH1D* hBkgFilterChoice = new TH1D("parBkgFilterChoice", "parBkgFilterChoice", 1, 0, 1);
+    hBkgFilterChoice->SetBinContent(1, par.BkgFilterChoice);
     TH1D* hIsData = new TH1D("parIsData", "parIsData", 1, 0, 1);
     hIsData->SetBinContent(1, par.IsData);
     TH1D* hScaleFactor = new TH1D("parScaleFactor", "parScaleFactor", 1, 0, 1);
@@ -143,6 +155,7 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hMaxDzeroY->Write();
     hIsGammaN->Write();
     hTriggerChoice->Write();
+    hBkgFilterChoice->Write();
     hIsData->Write();
     hScaleFactor->Write();
     hDoSystRapGap->Write();
@@ -157,6 +170,7 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     delete hMaxDzeroY;
     delete hIsGammaN;
     delete hTriggerChoice;
+    delete hBkgFilterChoice;
     delete hIsData;
     delete hScaleFactor;
     delete hDoSystRapGap;

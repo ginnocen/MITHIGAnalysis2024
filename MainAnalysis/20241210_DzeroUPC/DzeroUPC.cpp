@@ -46,10 +46,18 @@ bool eventSelection(DzeroUPCMicroTreeMessenger *b, const Parameters &par) {
       return false;
     if (par.TriggerChoice == 2 && b->isL1ZDCXORJet8 == false)
       return false;
+    if (par.TriggerChoice == 3 && b->isL1ZDCXORJet12 == false)
+      return false;
+    if (par.TriggerChoice == 4 && b->isL1ZDCXORJet16 == false)
+      return false;
   }
-
-  if (b->selectedBkgFilter == false || b->selectedVtxFilter == false)
-    return false;
+  
+  if (par.BkgFilterChoice == 1 &&
+      (b->selectedBkgFilter == false || b->selectedVtxFilter == false)
+    ) return false;
+  if (par.BkgFilterChoice == 2 &&
+      (b->cscTightHalo2015Filter == false || b->selectedVtxFilter == false)
+    ) return false;
 
   if (par.DoSystRapGap==-1)
   {
@@ -332,7 +340,8 @@ int main(int argc, char *argv[]) {
   float MinDzeroY = CL.GetDouble("MinDzeroY", -2);   // Minimum Dzero rapidity threshold for Dzero selection.
   float MaxDzeroY = CL.GetDouble("MaxDzeroY", +2);   // Maximum Dzero rapidity threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
-  int TriggerChoice = CL.GetInt("TriggerChoice", 2); // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
+  int TriggerChoice = CL.GetInt("TriggerChoice", 2); // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8, 3 = isL1ZDCXORJet12, 4 = isL1ZDCXORJet16,
+  int BkgFilterChoice = CL.GetInt("BkgFilterChoice", 1); // 1 = CCF + halo; 2 = halo only
   float scaleFactor = CL.GetDouble("scaleFactor", 1); // Scale factor for the number of events to be processed.
   int DoSystRapGap = CL.GetInt("DoSystRapGap", 0);   // Systematic study: apply the alternative event selections
                                                      // 0 = nominal, 1 = tight, -1: loose
@@ -346,7 +355,7 @@ int main(int argc, char *argv[]) {
   string MultWeightFileName= CL.Get      ("MultWeightFileName", "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights/testWeight.root");
 
   bool IsData = CL.GetBool("IsData", 0);              // Data or MC
-  Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, IsData, scaleFactor,
+  Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, BkgFilterChoice, IsData, scaleFactor,
                  DoSystRapGap, DoSystD,
                  DoGptGyReweighting, GptGyWeightFileName,
                  DoMultReweighting, MultWeightFileName);
