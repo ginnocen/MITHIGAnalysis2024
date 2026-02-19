@@ -4233,6 +4233,11 @@ bool DzeroUPCTreeMessenger::FillEntry()
    return true;
 }
 
+// ============================================================================
+// Write/Read Skim: DzeroUPCMicroTreeMessenger
+// Optimized version of skim messenger for faster microtree generation
+// ============================================================================
+
 DzeroUPCMicroTreeMessenger::DzeroUPCMicroTreeMessenger(TFile &File, std::string TreeName, bool Debug)
 {
    Initialized = false;
@@ -4354,8 +4359,8 @@ bool DzeroUPCMicroTreeMessenger::Initialize(bool Debug)
    CheckAndSetBranch(Tree, isL1ZDCOr_Max400_Pixel);
 //   CheckAndSetBranch(Tree, isL1ZDCOr_Max10000);
    CheckAndSetBranch(Tree, isL1ZDCXORJet8);
-//   CheckAndSetBranch(Tree, isL1ZDCXORJet12);
-//   CheckAndSetBranch(Tree, isL1ZDCXORJet16);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet12);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet16);
 //   CheckAndSetBranch(Tree, isZeroBias);
 //   CheckAndSetBranch(Tree, isZeroBias_Min400_Max10000);
 //   CheckAndSetBranch(Tree, isZeroBias_Max400_Pixel);
@@ -4367,7 +4372,13 @@ bool DzeroUPCMicroTreeMessenger::Initialize(bool Debug)
    CheckAndSetBranch(Tree, ZDCsumPlus);
    CheckAndSetBranch(Tree, ZDCsumMinus);
    CheckAndSetBranch(Tree, HFEMaxPlus);
+   CheckAndSetBranch(Tree, HFEMaxPlus_forest);
+   CheckAndSetBranch(Tree, HFEMaxPlus_eta5);
+   CheckAndSetBranch(Tree, HFEMaxPlus_pt0p1);
    CheckAndSetBranch(Tree, HFEMaxMinus);
+   CheckAndSetBranch(Tree, HFEMaxMinus_forest);
+   CheckAndSetBranch(Tree, HFEMaxMinus_eta5);
+   CheckAndSetBranch(Tree, HFEMaxMinus_pt0p1);
    CheckAndSetBranch(Tree, ZDCgammaN);
    CheckAndSetBranch(Tree, ZDCNgamma);
    CheckAndSetBranch(Tree, gapgammaN);

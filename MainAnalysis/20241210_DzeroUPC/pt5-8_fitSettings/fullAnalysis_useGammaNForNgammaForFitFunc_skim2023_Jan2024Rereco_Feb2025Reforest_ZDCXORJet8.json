@@ -1,0 +1,46 @@
+{
+  "FitDir": "MassFit",
+  "luminosity": 1.096820881,
+  "MicroTrees": [
+    {
+      "dataInput": "fullAnalysis/pt5-8_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt5-8_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt5-8_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt5-8_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt5-8_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt5-8_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt5-8_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis/pt5-8_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis/pt5-8_y1-2_IsGammaN0/MC.root"
+    }
+  ]
+}

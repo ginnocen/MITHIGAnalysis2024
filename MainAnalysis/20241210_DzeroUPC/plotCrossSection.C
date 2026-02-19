@@ -17,9 +17,9 @@
 #include <algorithm> // For std::max_element
 
 #include "plotCrossSection.h"
+#include <RooRealVar.h>
 
 using namespace std;
-
 
 int main(int argc, char *argv[])
 {
@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
   float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 5);  // Maximum Dzero transverse momentum threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
   vector<string> inputPoints      = CL.GetStringVector("InputPoints",    ""); // Input corrected yields md files
+  float PDFraction = CL.GetDouble("PDFraction", 1.);  // Fraction of PDs used (scales results accordingly)
 
   /* [TODO::Split Systematics Workflow] Identify this part to be separated from the plotting macro! */
   bool UseMaxFitUncert = CL.GetBool("UseMaxFitUncert", false);
@@ -361,10 +362,11 @@ int main(int argc, char *argv[])
   gr_uncert->SetFillColorAlpha(kRed,0.3); // Set color for uncertainty band (you can adjust it)
   gr_uncert->Draw("2 SAME"); // Draw the uncertainty band
 
-  TLegend* leg = new TLegend(0.2, 0.78, 0.55, 0.90);
+  TLegend* leg = new TLegend(0.15, 0.78, 0.55, 0.90);
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
-  leg->AddEntry(gr, "2025 Data", "P");
+  leg->SetTextSize(0.035);
+  leg->AddEntry(gr, "2025 Data", "PE");
   
   if (MinDzeroPT == 2 && MaxDzeroPT == 5) {
     if (IsGammaN) drawPubCurves_CMSHIN25002_pt2to5_gammaN(leg);
@@ -392,7 +394,7 @@ int main(int argc, char *argv[])
   // latex.DrawLatex(0.15, 0.92, "CMS #it{Preliminary} 1.38 nb^{-1} (5.36 TeV PbPb)");
   // latex.DrawLatex(0.15, 0.86, "UPCs, ZDC Xn0n w/ gap");
   // latex.DrawLatex(0.15, 0.82, "Global uncert. #pm 5.05%");
-  latex.DrawLatex(0.6, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
+  latex.DrawLatex(0.65, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
 
   c1->Update();
   c1->SaveAs(Form("%s/correctedYieldValuesPlot_pt%d-%d_IsGammaN%o.pdf",
@@ -401,6 +403,79 @@ int main(int argc, char *argv[])
                   IsGammaN));
   delete gr;
   delete hFrame;
+
+  /////////////////////////////////
+  // 2.5 Plot Raw Yield (iff Dpt 5-8)
+  /////////////////////////////////
+  if (MinDzeroPT == 5 && MaxDzeroPT == 8) {
+    TGraphErrors* gRawYield = new TGraphErrors(4, yValues.data(), rawYieldValues.data(), yErrors.data(), rawYieldErrors.data());
+    gRawYield->Scale(1/PDFraction);
+    gRawYield->SetMarkerStyle(20);
+    gRawYield->SetMarkerColor(kRed);
+    gRawYield->SetLineColor(kRed);
+    gRawYield->SetLineWidth(2);
+    
+    TFile* fHIN24003_RawYield_Dpt5_8_Dym2_m1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-2.0--1.0.root", "READ");
+    TFile* fHIN24003_RawYield_Dpt5_8_Dym1_0 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-1.0-0.0.root", "READ");
+    TFile* fHIN24003_RawYield_Dpt5_8_Dy0_1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y0.0-1.0.root", "READ");
+    TFile* fHIN24003_RawYield_Dpt5_8_Dy1_2 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y1.0-2.0.root", "READ");
+    std::vector<double> HIN24003_rawYieldValues;
+    std::vector<double> HIN24003_rawYieldErrors = {0., 0., 0., 0.};
+    if (IsGammaN) {
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dym2_m1->Get("nsigGammaN_Nominal"))->getValV());
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dym1_0->Get("nsigGammaN_Nominal"))->getValV());
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy0_1->Get("nsigGammaN_Nominal"))->getValV());
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy1_2->Get("nsigGammaN_Nominal"))->getValV());
+    }
+    else {
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dym2_m1->Get("nsigNGamma_Nominal"))->getValV());
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dym1_0->Get("nsigNGamma_Nominal"))->getValV());
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy0_1->Get("nsigNGamma_Nominal"))->getValV());
+      HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy1_2->Get("nsigNGamma_Nominal"))->getValV());
+    }
+    TGraphErrors* gHIN24003_RawYield = new TGraphErrors(4, yValues.data(), HIN24003_rawYieldValues.data(), yErrors.data(), HIN24003_rawYieldErrors.data());
+    gHIN24003_RawYield->SetMarkerStyle(20);
+    gHIN24003_RawYield->SetMarkerColor(kBlack);
+    gHIN24003_RawYield->SetLineColor(kBlack);
+    gHIN24003_RawYield->SetLineWidth(2);
+    
+    double RawYieldYMax = *std::max_element(rawYieldValues.begin(), rawYieldValues.end());
+    double HIN24003_RawYieldYMax = *std::max_element(HIN24003_rawYieldValues.begin(), HIN24003_rawYieldValues.end());
+    if (RawYieldYMax < HIN24003_RawYieldYMax) RawYieldYMax = HIN24003_RawYieldYMax;
+    
+    TH1F* hFrameRY = new TH1F("hFrame", " ", 100, -2.2, 2.2);
+    hFrameRY->GetYaxis()->SetTitle("Raw Yield");
+    hFrameRY->GetXaxis()->SetTitle("D^{0} y");
+    hFrameRY->SetStats(0);
+    hFrameRY->GetYaxis()->SetTitleOffset(1.5);
+    hFrameRY->GetYaxis()->SetRangeUser(0, 1.3 * RawYieldYMax);
+    hFrameRY->Draw();
+    
+    gRawYield->Draw("P E1 SAME");
+    gHIN24003_RawYield->Draw("P E1 SAME");
+    leg->Draw();
+    latex.DrawLatex(0.65, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
+    
+    c1->Update();
+    c1->SaveAs(Form(
+      "%s/RawYieldPlot_HIN24003Comparison_pt%d-%d_IsGammaN%o.pdf",
+      PlotDir.c_str(),
+      (int) MinDzeroPT, (int) MaxDzeroPT,
+      IsGammaN)
+    );
+    
+    fHIN24003_RawYield_Dpt5_8_Dym2_m1->Close();
+    fHIN24003_RawYield_Dpt5_8_Dym1_0->Close();
+    fHIN24003_RawYield_Dpt5_8_Dy0_1->Close();
+    fHIN24003_RawYield_Dpt5_8_Dy1_2->Close();
+    
+    delete gRawYield;
+    delete gHIN24003_RawYield;
+    delete fHIN24003_RawYield_Dpt5_8_Dym2_m1;
+    delete fHIN24003_RawYield_Dpt5_8_Dym1_0;
+    delete fHIN24003_RawYield_Dpt5_8_Dy0_1;
+    delete fHIN24003_RawYield_Dpt5_8_Dy1_2;
+  }
 
   /////////////////////////////////
   // 3. Plot RFB

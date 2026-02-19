@@ -1,5 +1,6 @@
 PlotSettingCard=${1}
 PlotDir=$(jq -r '.PlotDir' $PlotSettingCard)
+PDFraction=$(jq -r '.PDFraction' $PlotSettingCard)
 mkdir -p $PlotDir
 cp $PlotSettingCard $PlotDir/plotConfig.json
 PlotSettingCard=$PlotDir/plotConfig.json
@@ -30,6 +31,7 @@ jq -c '.Plots[]' $PlotSettingCard | while read Plot; do
   nominalFitRST=$(echo $Plot | jq -r '.nominalFitRST')
 
   cmd="./PlotCrossSection --PlotDir $PlotDir --MinDzeroPT $MinDzeroPT --MaxDzeroPT $MaxDzeroPT --IsGammaN $IsGammaN --InputPoints $InputPoints"
+  [ "$PDFraction" != "null" ] && cmd="$cmd --PDFraction $PDFraction"
   [ "$UseMaxFitUncert" != "null" ] && cmd="$cmd --UseMaxFitUncert $UseMaxFitUncert"
   [ "$wSystLumi" != "null" ] && cmd="$cmd --wSystLumi $wSystLumi"
   [ "$wSystTrk" != "null" ] && cmd="$cmd --wSystTrk $wSystTrk"
