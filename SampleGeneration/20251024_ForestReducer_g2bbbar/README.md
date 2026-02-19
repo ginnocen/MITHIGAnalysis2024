@@ -1,14 +1,30 @@
+G2QQBar Skimmer 
 
-This is an alternative to the 20250409_ForestReducerMuMuJet_svtx skimmer configuration. It is meant to be identical in function, and simply to organize the skimmed information in a slightly different way. 
+The skimmer code occupies ReduceForest.cpp. To compile this code, run clean.sh. To quickly test the skimmer, run ```./testskim_forGM.sh```
 
-In the older skimmer, each Tree entry was an event, so Jet (and mumu-tagged Jet) information was entirely stored in std::vectors. Consequently, all of the tracking and secondary vertex information was stored in "std::vector<std::vector<type>>" form. This required the use of additional libraries to read, and resulted in a very slow processing time - as each of these vectors could have varying lengths. 
 
-To complement the old approach, this skimmer produces two trees, "Tree" which contains each reco-level jet as an entry (the previous skim tree has been flattened, so all event level information is still accessible for this object), and for example secondary vertex or track information is stored now as std:vectors instead of vector<vector<>> form. This makes reading the array and filling histograms faster, and more straightforward. As Gen-Level gets can be decoupled from the reco-level jets, I also include a "GenTree" written to the output files which allows you to access Gen-Jet information in the exact same fashion. 
+The skimmer takes arguments to specify whether the dataset is Data/MC, ppref/PbPb, to include secondary vertex and track properties in the output skim or not, the minimum Jet pT, the fraction of events, and the jet collection name (as this changes between PbPb and pp datasets), alongside the input and output files. 
 
-Each Tree here is generated with an "DimuonJetMessenger" object defined in the "DimuonJetMessenger.h" file. I keep it locally here to avoid confusion with the real Messenger.h file in CommonCode.
+```
+./Execute \
+    --Input HiForestMiniAOD_123.root \
+    --IsData false \
+    --IsPP true \
+    --svtx true \
+    --Output tested2.root \
+    --MinJetPT 30 \
+    --Fraction 1.00 \
+    --PFJetCollection ak3PFJetAnalyzer/t
+```
 
-I have included an extremely detailed "debug.C" macro within this folder to compare the outputs of the older skimmer and this version. They are 100% identical in their information. 
+The skimmer relies on two source files: 
+```
+/MITHIGAnalysis/CommonCode/source/Messenger.cpp
+/MITHIGAnalysis/CommonCode/source/DimuonMessenger.cpp
+```
+and the corresponding header files in Commoncode/include. 
+The skimmer loops over each event, and then over each reco jet. For each jet above the minimum jet pT threshold and within some kinematic cuts, it will fill basic vertex and jet information. If the "--svtx" flag is set to "true," vectors of track and secondary vertex information will be written to the output TTree via the DimuonMessenger object. For each reco jet, the skimmer then loops over all reco muons in the event. If there is a pair (or more) of reco muons within R=0.3 of the jet, satisfying selection quality criteria, the skimmer will write dimuon kinematic properties to the skimmer (regarding the pair of muons with the highest dimuon pT). Then, if we are running over MC, the skimmer passes over all gen level muons. A similar selection is applied, and Gen-matching booleans are filled to reflect if identified reco dimuon jets match identified gen dimuon jets. Finally, tag and probe weights for any selected dimuons are calculated and written to the output tree. Finally, the skimmer does a loop over all Gen-jets within the sample and records their kinematic and matching properties (for use with unfolding). 
 
-The skim generation workflow in this directory is identical to the previous skim folders. The only necessary changes one would need to make are the input / output files as well as arguments in the skim submission scripts (e.g RunParallelMC.sh), and then they can run out of the box. 
+The skim is formatted such that there are two trees outputted "Tree" and "GenTree". Each entry in one of these trees corresponds to a single jet. Event information (i.e. Vertex position, pThat) is duplicated and stored for each jet within an event. 
 
 Please let me (Abraham) know if there are any issues. Thank you!
