@@ -9,10 +9,10 @@ fi
 MAXFILENO=1000000
 
 # Exe parameters
-# Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=3 ; # Data 2025
-# Year=2023 ; IsData=true ; ApplyDRejection=pas ; ApplyTriggerRejection=4 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # Data 2023
-# Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ; ApplyZDCGapRejection=0 ; # MC 2024
-IsGammaNMCtype=false
+Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # Data 2025
+# Year=2023 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # Data 2023
+# Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # MC 2024
+IsGammaNMCtype=true
 #
 PRIMARY="Dzero_260212-hfle"
 LABELTAG="" # e.g. versions or selections
@@ -34,11 +34,11 @@ PIDfile=../../../CommonCode/root/DzeroUPC_dedxMap.root # wrt lxplus/
 ###############################################################################
 INPUTS=(
     # ------ gammaN -> IsGammaNMCtype=true
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_232519/0000
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_nonprompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1/260121_000439/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260218_200449/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_nonprompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260219_200038/0000
     # ------ Ngamma -> IsGammaNMCtype=false
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_233803/0000
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_nonprompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1/260121_000604/0000
+    # # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_233803/0000
+    # # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_nonprompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1/260121_000604/0000
 
     # ------ Data -> 2025
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0/251227_162520/000[0-6]
@@ -77,27 +77,29 @@ INPUTS=(
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Jan2024ReReco_2025Reforest/HIForward19/crab_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForward19/260213_222333/000[0-1]
     
     # ------ Data -> clusComp
-    # '/eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIEmptyBX/crab_HiForest_260206_HIEmptyBX_HIRun2025A_PromptReco_v1_PF0p1/260206_025751/000*'
-    # '/eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIEmptyBX/crab_HiForest_260209_HIEmptyBX_HIRun2023A_PromptReco_v2/260210_174311/0000'
-    # '/eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIForward0/crab_HiForest_260206_HIForward0_HIRun2023A_16Jan2024_hltZDCOr-PV-zdc0nOr/260206_045122/000*'
-    # 2023 high rate ZB
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIPhysicsRawPrime0/crab_HiForest_260209_HIPhysicsRawPrime0_HIRun2023A_ZB_374970/260210_020631/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIPhysicsRawPrime1/crab_HiForest_260209_HIPhysicsRawPrime1_HIRun2023A_ZB_374970/260210_022745/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIPhysicsRawPrime2/crab_HiForest_260209_HIPhysicsRawPrime2_HIRun2023A_ZB_374970/260210_022804/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIPhysicsRawPrime3/crab_HiForest_260209_HIPhysicsRawPrime3_HIRun2023A_ZB_374970/260210_022829/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIPhysicsRawPrime4/crab_HiForest_260209_HIPhysicsRawPrime4_HIRun2023A_ZB_374970/260210_022849/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/HIPhysicsRawPrime5/crab_HiForest_260209_HIPhysicsRawPrime5_HIRun2023A_ZB_374970/260210_033602/0000
+    # 2025 EmptyBX
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIEmptyBX_HIRun2025A_PromptReco_v1_noHP/260219_194030/0000
+    # 2023 EmptyBX
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIEmptyBX_HIRun2023A_PromptReco_v2/260219_210631/0000
     # 2025 high rate ZB
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime0/crab_HiForest_260209_HIPhysicsRawPrime0_HIRun2025A_highrZB_399572_399766/260210_032459/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime1/crab_HiForest_260209_HIPhysicsRawPrime1_HIRun2025A_highrZB_399572_399766/260210_032547/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime2/crab_HiForest_260209_HIPhysicsRawPrime2_HIRun2025A_highrZB_399572_399766/260210_032609/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime3/crab_HiForest_260209_HIPhysicsRawPrime3_HIRun2025A_highrZB_399572_399766/260210_032705/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime4/crab_HiForest_260209_HIPhysicsRawPrime4_HIRun2025A_highrZB_399572_399766/260210_033636/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime5/crab_HiForest_260209_HIPhysicsRawPrime5_HIRun2025A_highrZB_399572_399766/260210_033717/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime6/crab_HiForest_260209_HIPhysicsRawPrime6_HIRun2025A_highrZB_399766/260210_034314/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime7/crab_HiForest_260209_HIPhysicsRawPrime7_HIRun2025A_highrZB_399766/260210_034339/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime8/crab_HiForest_260209_HIPhysicsRawPrime8_HIRun2025A_highrZB_399766/260210_034421/0000
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/HIPhysicsRawPrime9/crab_HiForest_260209_HIPhysicsRawPrime9_HIRun2025A_highrZB_399766/260210_034610/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime0_HIRun2025A_highrZB_399766/260219_195114/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime1_HIRun2025A_highrZB_399766/260219_201619/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime2_HIRun2025A_highrZB_399766/260219_203507/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime4_HIRun2025A_highrZB_399766/260219_203628/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime5_HIRun2025A_highrZB_399766/260219_203907/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime6_HIRun2025A_highrZB_399766/260219_225853/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime7_HIRun2025A_highrZB_399766/260219_225941/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime8_HIRun2025A_highrZB_399766/260219_230030/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime9_HIRun2025A_highrZB_399766/260219_230144/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime10_HIRun2025A_highrZB_399766/260219_230232/0000
+    # 2023 high rate ZB
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime0_HIRun2023A_ZB_374970/260219_211205/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime1_HIRun2023A_ZB_374970/260219_211240/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime2_HIRun2023A_ZB_374970/260219_211409/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime3_HIRun2023A_ZB_374970/260219_211435/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime4_HIRun2023A_ZB_374970/260219_211507/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime5_HIRun2023A_ZB_374970/260219_211609/0000
+
 )
 
 OUTPUTPRIDIR="/eos/cms/store/group/phys_heavyions/"$USER"/Forest"${Year}"PbPb"

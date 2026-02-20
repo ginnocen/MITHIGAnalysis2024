@@ -245,6 +245,10 @@ int main(int argc, char *argv[]) {
           incl_ZDCXORJet = MDzeroUPC.isL1ZDCXORJet8 || MDzeroUPC.isL1ZDCXORJet12 || MDzeroUPC.isL1ZDCXORJet16;
           incl_ZB = MDzeroUPC.isZeroBias_Min400_Max10000 || MDzeroUPC.isZeroBias_Max400_Pixel || MDzeroUPC.isZeroBias || MDzeroUPC.isZeroBias_Max10000;
         }
+        
+        MDzeroUPC.isNotBptxOR = MTrigger.CheckTriggerStartWith("HLT_HIL1NotBptxOR_v");
+        MDzeroUPC.isUnpairedBunchBptxMinus = MTrigger.CheckTriggerStartWith("HLT_HIL1UnpairedBunchBptxMinus_v");
+        MDzeroUPC.isUnpairedBunchBptxPlus = MTrigger.CheckTriggerStartWith("HLT_HIL1UnpairedBunchBptxPlus_v");
 
         if (ApplyTriggerRejection == 1 && !(incl_ZDCOr || incl_ZDCXORJet)) continue;
         if (ApplyTriggerRejection == 2 && !incl_ZDCOr) continue;
