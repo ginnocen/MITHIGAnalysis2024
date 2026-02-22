@@ -78,13 +78,14 @@ INPUTS=(
     
     # ------ Data -> clusComp
     # 2025 EmptyBX
-    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIEmptyBX_HIRun2025A_PromptReco_v1_noHP/260219_194030/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIEmptyBX_HIRun2025A_PromptReco_v1/260219_194030/0000
     # 2023 EmptyBX
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIEmptyBX_HIRun2023A_PromptReco_v2/260219_210631/0000
     # 2025 high rate ZB
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime0_HIRun2025A_highrZB_399766/260219_195114/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime1_HIRun2025A_highrZB_399766/260219_201619/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime2_HIRun2025A_highrZB_399766/260219_203507/0000
+    # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime3_HIRun2025A_highrZB_399766/260219_203544/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime4_HIRun2025A_highrZB_399766/260219_203628/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime5_HIRun2025A_highrZB_399766/260219_203907/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime6_HIRun2025A_highrZB_399766/260219_225853/0000
