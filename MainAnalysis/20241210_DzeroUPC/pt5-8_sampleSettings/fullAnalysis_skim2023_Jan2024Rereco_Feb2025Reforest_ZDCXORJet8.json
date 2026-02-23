@@ -1,0 +1,269 @@
+{
+  "MicroTreeDir": "fullAnalysis",
+  "MicroTrees": [
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 1,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -2,
+      "MaxDzeroY": -1,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": -1,
+      "MaxDzeroY": 0,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 0,
+      "MaxDzeroY": 1,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "Data.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/2023Reforest/Dzero_260212-hfle_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForwardALL_Drej-pasor_Trig-4.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": true
+    },
+    {
+      "MicroTreeBaseName": "MC.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimMC/Dzero_260123_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    },
+    {
+      "MicroTreeBaseName": "MC_inclusive.root",
+      "Input": "/data00/UPCD0LowPtAnalysis_2023ZDCORData_2023reco/SkimsMC/20250227_v4_OldPthat5_Inclusive_BeamA/mergedfile.root",
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "MinDzeroY": 1,
+      "MaxDzeroY": 2,
+      "IsGammaN": 0,
+      "TriggerChoice": 2,
+      "IsData": false
+    }
+  ]
+}

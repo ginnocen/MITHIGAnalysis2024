@@ -1,0 +1,48 @@
+{
+  "PlotDir": "plot/fullAnalysis/",
+  "PDFraction": 1.,
+  "Plots": [
+    {
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "IsGammaN": 1,
+      "InputPoints": "fullAnalysis/pt5-8_y-2--1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt5-8_y-1-0_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt5-8_y0-1_IsGammaN1/MassFit/correctedYields.md,fullAnalysis/pt5-8_y1-2_IsGammaN1/MassFit/correctedYields.md",
+      "UseMaxFitUncert": true,
+      "wSystLumi": 0,
+      "wSystTrk": 0,
+      "wSystBR": 0,
+      "wSystEvtSel": false,
+      "wSystPromptFrac": 0,
+      "wSystRapGapSel": "no,no",
+      "wSystDsvpv": "no",
+      "wSystDtrkPt": "no",
+      "wSystDalpha": "no",
+      "wSystDchi2cl": "no",
+      "wSystFitPkBg": "no",
+      "wSystFitSiglMean": "no",
+      "wSystFitSiglAlpha": "no",
+      "wSystFitMassWindow": "no"
+    },
+    {
+      "MinDzeroPT": 5,
+      "MaxDzeroPT": 8,
+      "IsGammaN": 0,
+      "InputPoints": "fullAnalysis/pt5-8_y-2--1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt5-8_y-1-0_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt5-8_y0-1_IsGammaN0/MassFit/correctedYields.md,fullAnalysis/pt5-8_y1-2_IsGammaN0/MassFit/correctedYields.md",
+      "UseMaxFitUncert": true,
+      "wSystLumi": 0,
+      "wSystTrk": 0,
+      "wSystBR": 0,
+      "wSystEvtSel": false,
+      "wSystPromptFrac": 0,
+      "wSystRapGapSel": "no,no",
+      "wSystDsvpv": "no",
+      "wSystDtrkPt": "no",
+      "wSystDalpha": "no",
+      "wSystDchi2cl": "no",
+      "wSystFitPkBg": "no",
+      "wSystFitSiglMean": "no",
+      "wSystFitSiglAlpha": "no",
+      "wSystFitMassWindow": "no"
+    }
+  ]
+}

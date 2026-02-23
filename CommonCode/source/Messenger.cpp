@@ -4251,6 +4251,218 @@ bool DzeroUPCTreeMessenger::FillEntry()
 }
 
 // ============================================================================
+// Write/Read Skim: DzeroUPCMicroTreeMessenger
+// Optimized version of skim messenger for faster microtree generation
+// ============================================================================
+
+DzeroUPCMicroTreeMessenger::DzeroUPCMicroTreeMessenger(TFile &File, std::string TreeName, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Tree = (TTree *)File.Get(TreeName.c_str());
+   Initialize(Debug);
+}
+
+DzeroUPCMicroTreeMessenger::DzeroUPCMicroTreeMessenger(TFile *File, std::string TreeName, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   if(File != nullptr)
+      Tree = (TTree *)File->Get(TreeName.c_str());
+   else
+      Tree = nullptr;
+   Initialize(Debug);
+}
+
+DzeroUPCMicroTreeMessenger::DzeroUPCMicroTreeMessenger(TTree *DzeroUPCTree, bool Debug)
+{
+   Initialized = false;
+   WriteMode = false;
+
+   Initialize(DzeroUPCTree, Debug);
+}
+
+bool DzeroUPCMicroTreeMessenger::Initialize(TTree *DzeroUPCTree, bool Debug)
+{
+   Tree = DzeroUPCTree;
+   return Initialize(Debug);
+}
+
+bool DzeroUPCMicroTreeMessenger::Initialize(bool Debug)
+{
+   if(Tree == nullptr)
+      return false;
+
+   Initialized = true;
+   Ngamma = nullptr;
+   gammaN = nullptr;
+   Dpt = nullptr;
+   DpassCut23PAS = nullptr;
+   DpassCut23LowPt = nullptr;
+   DpassCut23PASSystDsvpvSig = nullptr;
+   DpassCut23PASSystDtrkPt = nullptr;
+   DpassCut23PASSystDalpha = nullptr;
+   DpassCut23PASSystDchi2cl = nullptr;
+   DpassCutDefault = nullptr; // included for backwards compatibility
+   DpassCutNominal = nullptr;
+   DpassCutLoose = nullptr;
+   DpassCutSystDsvpvSig = nullptr;
+   DpassCutSystDtrkPt = nullptr;
+   DpassCutSystDalpha = nullptr;
+   DpassCutSystDdtheta = nullptr;
+   DpassCutSystDalphaDdtheta = nullptr;
+   DpassCutSystDchi2cl = nullptr;
+   Dy = nullptr;
+   Dmass = nullptr;
+   Dtrk1P = nullptr;
+   Dtrk1Pt = nullptr;
+   Dtrk1PtErr = nullptr;
+   Dtrk1Eta = nullptr;
+   Dtrk1dedx = nullptr;
+   Dtrk1MassHypo = nullptr;
+   Dtrk1PixelHit = nullptr;
+   Dtrk1StripHit = nullptr;
+   Dtrk1PionScore = nullptr;
+   Dtrk1KaonScore = nullptr;
+   Dtrk1ProtScore = nullptr;
+   Dtrk2P = nullptr;
+   Dtrk2Pt = nullptr;
+   Dtrk2PtErr = nullptr;
+   Dtrk2Eta = nullptr;
+   Dtrk2dedx = nullptr;
+   Dtrk2MassHypo = nullptr;
+   Dtrk2PixelHit = nullptr;
+   Dtrk2StripHit = nullptr;
+   Dtrk2PionScore = nullptr;
+   Dtrk2KaonScore = nullptr;
+   Dtrk2ProtScore = nullptr;
+   Dchi2cl = nullptr;
+   DsvpvDistance = nullptr;
+   DsvpvDisErr = nullptr;
+   DsvpvDistance_2D = nullptr;
+   DsvpvDisErr_2D = nullptr;
+   Dip3D = nullptr;
+   Dip3derr = nullptr;
+   Dalpha = nullptr;
+   Ddtheta = nullptr;
+   Dgen = nullptr;
+   DisSignalCalc = nullptr;
+   DisSignalCalcPrompt = nullptr;
+   DisSignalCalcFeeddown = nullptr;
+   Gpt = nullptr;
+   Gy = nullptr;
+   GisSignalCalc = nullptr;
+   GisSignalCalcPrompt = nullptr;
+   GisSignalCalcFeeddown = nullptr;
+
+   Tree->SetBranchStatus("*", 0);
+   CheckAndSetBranch(Tree, Run);
+   CheckAndSetBranch(Tree, Event);
+   CheckAndSetBranch(Tree, Lumi);
+//   CheckAndSetBranch(Tree, ProcessID);
+//   CheckAndSetBranch(Tree, clusComp_nPixHits);
+//   CheckAndSetBranch(Tree, clusComp_quality);
+//   CheckAndSetBranch(Tree, VX);
+//   CheckAndSetBranch(Tree, VY);
+//   CheckAndSetBranch(Tree, VZ);
+//   CheckAndSetBranch(Tree, VXError);
+//   CheckAndSetBranch(Tree, VYError);
+//   CheckAndSetBranch(Tree, VZError);
+   CheckAndSetBranch(Tree, nVtx);
+   CheckAndSetBranch(Tree, isL1ZDCOr);
+   CheckAndSetBranch(Tree, isL1ZDCOr_Min400_Max10000);
+   CheckAndSetBranch(Tree, isL1ZDCOr_Max400_Pixel);
+//   CheckAndSetBranch(Tree, isL1ZDCOr_Max10000);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet8);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet12);
+   CheckAndSetBranch(Tree, isL1ZDCXORJet16);
+//   CheckAndSetBranch(Tree, isZeroBias);
+//   CheckAndSetBranch(Tree, isZeroBias_Min400_Max10000);
+//   CheckAndSetBranch(Tree, isZeroBias_Max400_Pixel);
+//   CheckAndSetBranch(Tree, isZeroBias_Max10000);
+   CheckAndSetBranch(Tree, selectedBkgFilter);
+   CheckAndSetBranch(Tree, selectedVtxFilter);
+   CheckAndSetBranch(Tree, ClusterCompatibilityFilter);
+   CheckAndSetBranch(Tree, cscTightHalo2015Filter);
+   CheckAndSetBranch(Tree, ZDCsumPlus);
+   CheckAndSetBranch(Tree, ZDCsumMinus);
+   CheckAndSetBranch(Tree, HFEMaxPlus);
+   CheckAndSetBranch(Tree, HFEMaxPlus_forest);
+   CheckAndSetBranch(Tree, HFEMaxPlus_eta5);
+   CheckAndSetBranch(Tree, HFEMaxPlus_pt0p1);
+   CheckAndSetBranch(Tree, HFEMaxMinus);
+   CheckAndSetBranch(Tree, HFEMaxMinus_forest);
+   CheckAndSetBranch(Tree, HFEMaxMinus_eta5);
+   CheckAndSetBranch(Tree, HFEMaxMinus_pt0p1);
+   CheckAndSetBranch(Tree, ZDCgammaN);
+   CheckAndSetBranch(Tree, ZDCNgamma);
+   CheckAndSetBranch(Tree, gapgammaN);
+   CheckAndSetBranch(Tree, gapNgamma);
+   CheckAndSetBranch(Tree, gammaN);
+   CheckAndSetBranch(Tree, Ngamma);
+   CheckAndSetBranch(Tree, nTrackInAcceptanceHP);
+   CheckAndSetBranch(Tree, Dsize);
+   CheckAndSetBranch(Tree, Dpt);
+   CheckAndSetBranch(Tree, Dy);
+   CheckAndSetBranch(Tree, Dmass);
+//   CheckAndSetBranch(Tree, Dtrk1P);
+   CheckAndSetBranch(Tree, Dtrk1Pt);
+   CheckAndSetBranch(Tree, Dtrk1PtErr);
+//   CheckAndSetBranch(Tree, Dtrk1Eta);
+//   CheckAndSetBranch(Tree, Dtrk1dedx);
+//   CheckAndSetBranch(Tree, Dtrk1MassHypo);
+   CheckAndSetBranch(Tree, Dtrk1PixelHit);
+   CheckAndSetBranch(Tree, Dtrk1StripHit);
+//   CheckAndSetBranch(Tree, Dtrk1PionScore);
+//   CheckAndSetBranch(Tree, Dtrk1KaonScore);
+//   CheckAndSetBranch(Tree, Dtrk1ProtScore);
+   CheckAndSetBranch(Tree, Dtrk2P);
+   CheckAndSetBranch(Tree, Dtrk2Pt);
+   CheckAndSetBranch(Tree, Dtrk2PtErr);
+//   CheckAndSetBranch(Tree, Dtrk2Eta);
+//   CheckAndSetBranch(Tree, Dtrk2dedx);
+//   CheckAndSetBranch(Tree, Dtrk2MassHypo);
+   CheckAndSetBranch(Tree, Dtrk2PixelHit);
+   CheckAndSetBranch(Tree, Dtrk2StripHit);
+//   CheckAndSetBranch(Tree, Dtrk2PionScore);
+//   CheckAndSetBranch(Tree, Dtrk2KaonScore);
+//   CheckAndSetBranch(Tree, Dtrk2ProtScore);
+//   CheckAndSetBranch(Tree, Dchi2cl);
+//   CheckAndSetBranch(Tree, DsvpvDistance);
+//   CheckAndSetBranch(Tree, DsvpvDisErr);
+//   CheckAndSetBranch(Tree, DsvpvDistance_2D);
+//   CheckAndSetBranch(Tree, DsvpvDisErr_2D);
+//   CheckAndSetBranch(Tree, Dip3D);
+//   CheckAndSetBranch(Tree, Dip3derr);
+   CheckAndSetBranch(Tree, Dalpha);
+   CheckAndSetBranch(Tree, Ddtheta);
+   CheckAndSetBranch(Tree, DpassCut23PAS);
+   CheckAndSetBranch(Tree, DpassCut23LowPt);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDsvpvSig);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDtrkPt);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDalpha);
+   CheckAndSetBranch(Tree, DpassCut23PASSystDchi2cl);
+//   CheckAndSetBranch(Tree, DpassCutNominal);
+//   CheckAndSetBranch(Tree, DpassCutDefault); // Cuts for backwards compatibility
+//   CheckAndSetBranch(Tree, DpassCutLoose);
+//   CheckAndSetBranch(Tree, DpassCutSystDsvpvSig);
+//   CheckAndSetBranch(Tree, DpassCutSystDtrkPt);
+//   CheckAndSetBranch(Tree, DpassCutSystDalpha);
+//   CheckAndSetBranch(Tree, DpassCutSystDdtheta);
+//   CheckAndSetBranch(Tree, DpassCutSystDalphaDdtheta);
+//   CheckAndSetBranch(Tree, DpassCutSystDchi2cl);
+   CheckAndSetBranch(Tree, Dgen);
+//   CheckAndSetBranch(Tree, DisSignalCalc);
+   CheckAndSetBranch(Tree, Gsize);
+   CheckAndSetBranch(Tree, Gpt);
+   CheckAndSetBranch(Tree, Gy);
+   CheckAndSetBranch(Tree, GisSignalCalc);
+   return true;
+}
+
+// ============================================================================
 // Write/Read Skim: LambdaCpksUPCTreeMessenger
 // ============================================================================
 
