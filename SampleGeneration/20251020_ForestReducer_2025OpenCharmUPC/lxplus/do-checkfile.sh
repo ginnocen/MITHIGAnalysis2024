@@ -9,12 +9,12 @@ fi
 MAXFILENO=1000000
 
 # Exe parameters
-Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # Data 2025
-# Year=2023 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # Data 2023
+Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=3 ; # Data 2025
+# Year=2023 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # Data 2023
 # Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # MC 2024
 IsGammaNMCtype=true
 #
-PRIMARY="Dzero_260212-hfle"
+PRIMARY="Dzero_260223-bdt"
 LABELTAG="" # e.g. versions or selections
 #
 [[ $ApplyDRejection != "no" ]] && LABELTAG+="_Drej-"$ApplyDRejection 
@@ -24,7 +24,7 @@ LABELTAG="" # e.g. versions or selections
 
 # 
 EXEFILE=Execute_Dzero
-PIDfile=../../../CommonCode/root/DzeroUPC_dedxMap.root # wrt lxplus/
+COPYfiles='../../../CommonCode/root/DzeroUPC_dedxMap.root ../data/TMVAClassification_BDT.weights.xml' # wrt lxplus/
 
 ###############################################################################
 ## IMPORTANT:
@@ -186,6 +186,6 @@ done
 if [[ "$prep_jobs" -gt 0 ]] ; then
     echo
     cp -v ../$EXEFILE .
-    cp -v $PIDfile .
+    cp -v $COPYfiles .
 fi
 
