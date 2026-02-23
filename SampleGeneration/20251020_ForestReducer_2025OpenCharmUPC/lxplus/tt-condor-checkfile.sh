@@ -21,7 +21,7 @@ DptThreshold=${11}
 ApplyZDCGapRejection=${12}
 
 SCRVERSION=${SCRAM_ARCH%%_*}
-runtimelimit="microcentury" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
+runtimelimit="espresso" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
 
 PROXYFILE=$HOME/$(ls $HOME -lt | grep $USER | grep -m 1 x509 | awk '{print $NF}')
 
@@ -68,7 +68,7 @@ MY.WantOS = "$SCRVERSION"
 should_transfer_files = YES
 use_x509userproxy = True
 x509userproxy = $PROXYFILE
-transfer_input_files = ${EXEFILE},DzeroUPC_dedxMap.root
+transfer_input_files = ${EXEFILE},DzeroUPC_dedxMap.root,TMVAClassification_BDT.weights.xml
 Queue 
 EOF
 

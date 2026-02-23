@@ -48,6 +48,7 @@ INFILE_NAME=$PWD/${INFILE##*/}
     ./$EXEFILE --Input $input_file \
                --Output $OUTFILE \
                --RootPID DzeroUPC_dedxMap.root \
+               --WeightMVA TMVAClassification_BDT.weights.xml \
                --ApplyTriggerRejection $ApplyTriggerRejection \
                --ApplyEventRejection false \
                --ApplyZDCGapRejection $ApplyZDCGapRejection \
@@ -70,6 +71,7 @@ INFILE_NAME=$PWD/${INFILE##*/}
 
 rm -rf $EXEFILE $CRELEASE
 rm DzeroUPC_dedxMap.root
+rm TMVAClassification_BDT.weights.xml
 rm $INFILE_NAME
 rm $OUTFILE
 rm -v x509*

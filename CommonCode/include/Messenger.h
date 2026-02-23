@@ -1185,6 +1185,7 @@ public:
    std::vector<bool>  *DpassCutSystDdtheta;
    std::vector<bool>  *DpassCutSystDalphaDdtheta;
    std::vector<bool>  *DpassCutSystDchi2cl;
+   std::vector<float> *Dmva;
    std::vector<int>   *Dgen;
    std::vector<bool>  *DisSignalCalc;
    std::vector<bool>  *DisSignalCalcPrompt;
