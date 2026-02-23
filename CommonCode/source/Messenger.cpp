@@ -1001,6 +1001,9 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.push_back("HLT_HIUPC_SingleJet8_ZDC1nAsymXOR_MaxPixelCluster50000_v1");
    Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v8");
    Name.push_back("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_v8");
+   Name.push_back("HLT_HIL1NotBptxOR_v10"); // v10 in goodZDC JSON, it begins from v8
+   Name.push_back("HLT_HIL1UnpairedBunchBptxMinus_v10");
+   Name.push_back("HLT_HIL1UnpairedBunchBptxPlus_v10");
 
    // 2018 triggers
    Name.push_back("HLT_HIMinimumBias_SinglePixelTrack_NpixBypass_part0_v1");
@@ -1282,12 +1285,11 @@ void TriggerTreeMessenger::FillTriggerNames()
    // muon triggers for mumu analysis
    Name.push_back("HLT_HIL3DoubleMuOpen_v1");
 
-   // 2025 HI ZB trigger
+   // 2025 HI trigger
    Name.push_back("HLT_HIUPC_ZeroBias_SinglePixelTrack_MaxPixelTrack_v16");
    Name.push_back("HLT_HIUPC_ZeroBias_SinglePixelTrackLowPt_MaxPixelCluster400_v15");
    Name.push_back("HLT_HIUPC_ZeroBias_MinPixelCluster400_MaxPixelCluster10000_v16");
    Name.push_back("HLT_HIUPC_ZeroBias_MaxPixelCluster10000_v5");
-
    Name.push_back("HLT_HIUPC_ZDC1nOR_SingLePixelTrack_MaxPixelTrack_v16");
    Name.push_back("HLT_HIUPC_ZDC1nOR_SinglePixelTrackLowPt_MaxPixelCluster400_v15");
    Name.push_back("HLT_HIUPC_ZDC1nOR_MinPixelCluster400_MaxPixelCluster10000_v16");
@@ -1296,6 +1298,9 @@ void TriggerTreeMessenger::FillTriggerNames()
    Name.push_back("HLT_HIUPC_SingleJet12_ZDC1nAsymXOR_MaxPixelCluster10000_v4");
    Name.push_back("HLT_HIUPC_SingleJet16_ZDC1nXOR_MaxPixelCluster10000_v4");
    Name.push_back("HLT_HIUPC_SingleJet16_ZDC1nAsymXOR_MaxPixelCluster10000_v4");
+   Name.push_back("HLT_HIL1NotBptxOR_v15");
+   Name.push_back("HLT_HIL1UnpairedBunchBptxMinus_v15");
+   Name.push_back("HLT_HIL1UnpairedBunchBptxPlus_v15");
 
    // 2018 ppref HI ZB Trigger
    Name.push_back("HLT_HIZeroBias_part0_v6");
@@ -3718,6 +3723,9 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    CheckAndSetBranch(Tree, isZeroBias_Min400_Max10000);
    CheckAndSetBranch(Tree, isZeroBias_Max400_Pixel);
    CheckAndSetBranch(Tree, isZeroBias_Max10000);
+   CheckAndSetBranch(Tree, isNotBptxOR);
+   CheckAndSetBranch(Tree, isUnpairedBunchBptxMinus);
+   CheckAndSetBranch(Tree, isUnpairedBunchBptxPlus);
    CheckAndSetBranch(Tree, selectedBkgFilter);
    CheckAndSetBranch(Tree, selectedVtxFilter);
    CheckAndSetBranch(Tree, ClusterCompatibilityFilter);
@@ -3913,6 +3921,9 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("isZeroBias_Min400_Max10000",     &isZeroBias_Min400_Max10000, "isZeroBias_Min400_Max10000/O");
    Tree->Branch("isZeroBias_Max400_Pixel",     &isZeroBias_Max400_Pixel, "isZeroBias_Max400_Pixel/O");
    Tree->Branch("isZeroBias_Max10000",     &isZeroBias_Max10000, "isZeroBias_Max10000/O");
+   Tree->Branch("isNotBptxOR",     &isNotBptxOR, "isNotBptxOR/O");
+   Tree->Branch("isUnpairedBunchBptxMinus",     &isUnpairedBunchBptxMinus, "isUnpairedBunchBptxMinus/O");
+   Tree->Branch("isUnpairedBunchBptxPlus",     &isUnpairedBunchBptxPlus, "isUnpairedBunchBptxPlus/O");
    Tree->Branch("selectedBkgFilter",     &selectedBkgFilter, "selectedBkgFilter/O");
    Tree->Branch("selectedVtxFilter",     &selectedVtxFilter, "selectedVtxFilter/O");
    Tree->Branch("ClusterCompatibilityFilter",     &ClusterCompatibilityFilter, "ClusterCompatibilityFilter/O");
@@ -4027,6 +4038,9 @@ void DzeroUPCTreeMessenger::Clear()
    isZeroBias_Min400_Max10000 = false;
    isZeroBias_Max400_Pixel = false;
    isZeroBias_Max10000 = false;
+   isNotBptxOR = false;
+   isUnpairedBunchBptxMinus = false;
+   isUnpairedBunchBptxPlus = false;
    selectedBkgFilter = false;
    selectedVtxFilter = false;
    ClusterCompatibilityFilter = false;
@@ -4135,6 +4149,9 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    isZeroBias_Min400_Max10000 = M.isZeroBias_Min400_Max10000;
    isZeroBias_Max400_Pixel = M.isZeroBias_Max400_Pixel;
    isZeroBias_Max10000 = M.isZeroBias_Max10000;
+   isNotBptxOR = M.isNotBptxOR;
+   isUnpairedBunchBptxMinus = M.isUnpairedBunchBptxMinus;
+   isUnpairedBunchBptxPlus = M.isUnpairedBunchBptxPlus;
    selectedBkgFilter    = M.selectedBkgFilter;
    selectedVtxFilter    = M.selectedVtxFilter;
    ClusterCompatibilityFilter    = M.ClusterCompatibilityFilter;
@@ -4437,7 +4454,7 @@ bool LambdaCpksUPCTreeMessenger::Initialize(bool Debug)
   Tree->SetBranchAddress("isZeroBias",           &isZeroBias);
   Tree->SetBranchAddress("isZeroBias_Min400_Max10000",    &isZeroBias_Min400_Max10000);
   Tree->SetBranchAddress("isZeroBias_Max400_Pixel",    &isZeroBias_Max400_Pixel);
-  Tree->SetBranchAddress("isZeroBias_Max10000",    &isZeroBias_Max10000);
+  Tree->SetBranchAddress("isZeroBias_Max10000",    &isZeroBias_Max10000);  
   Tree->SetBranchAddress("selectedBkgFilter",    &selectedBkgFilter);
   Tree->SetBranchAddress("selectedVtxFilter",    &selectedVtxFilter);
   Tree->SetBranchAddress("ClusterCompatibilityFilter",    &ClusterCompatibilityFilter);
