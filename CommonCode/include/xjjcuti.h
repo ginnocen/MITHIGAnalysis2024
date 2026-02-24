@@ -18,30 +18,28 @@
 #include <chrono>
 #include <random>
 
+#ifndef MAKE_HAS_METHOD
 #define MAKE_HAS_METHOD(method)                                         \
   template <typename T, typename = void>                                \
   struct has_method_##method : std::false_type {};                      \
   template <typename T>                                                 \
   struct has_method_##method<T, std::void_t<decltype(std::declval<const T&>().method())>> \
     : std::true_type {};
+#endif
+
+#ifndef __XJJLOG
+#define __XJJLOG std::cout<<__FUNCTION__<<": "
+#endif
 
 namespace xjjc
 {
   const std::vector<std::string> speciallist = { " ", "/", "(", ")", "^", "#", "%", "$", ",", ".", "*", "&", ":", "{", "}", ";", "|" };
-
-  template<typename T, size_t N> void init_array(T (&array)[N], T value = T{});
-
-  template<typename T, size_t N> int find_ibin(const T (&array)[N], T value); // overflow: -1
-  template<typename T> int find_ibin(const std::vector<T> &array, T value); // overflow: -1
-  template<typename T, size_t N> int find_iedge(const T (&array)[N], T value); // overflow: -1
-  template<typename T> int find_iedge(const std::vector<T> &array, T value); // overflow: -1
 
   template<typename T> std::string number_to_string(T param);
   float string_to_number(const std::string& param);
   template<typename T> std::string number_remove_zero(T param);
   template<typename T> std::string number_range_string(T val1, T val2, const std::string& var, const std::string& opt);
   template<typename T> std::string number_range_string(T val1, T val2, const std::string& var, T over1=0, T over2=1.e+3, const std::string& unit="");
-  int number_digit(int i, int n);
   template<typename T> std::string to_string(const T& s);
   template<typename T> T str_convert(const std::string& s);
   template<typename T> std::vector<T> str_convert_vector(const std::string& s, const std::string& divider = ",");
@@ -51,13 +49,6 @@ namespace xjjc
   void progressbar_summary(const int& total);
 
   template<typename T> char* gettype(T exp);
-
-  template<class T> bool sortbydes(const T &a, const T &b) { return a > b; }
-  template<class T1, class T2> bool sortbyfirst_des(const std::pair<T1,T2> &a, const std::pair<T1,T2> &b) { return a.first > b.first; }
-  template<class T1, class T2> bool sortbyfirst_as(const std::pair<T1,T2> &a, const std::pair<T1,T2> &b) { return a.first < b.first; }
-  template<class T1, class T2> bool sortbysecond_des(const std::pair<T1,T2> &a, const std::pair<T1,T2> &b) { return a.second > b.second; }
-  template<class T1, class T2> bool sortbysecond_as(const std::pair<T1,T2> &a, const std::pair<T1,T2> &b) { return a.second < b.second; }
-  // template<class T1, class T2> std::map<T1, T2>::iterator findbysecond(std::map<T1, T2>& map_, T2 value_);
 
   template<class T> void vec_append(std::vector<T>& a, const std::vector<T>& b) { a.insert(a.end(), b.begin(), b.end()); }
   template<class T1, class T2> std::vector<T2> vec_cast(const std::vector<T1>& a);
@@ -78,7 +69,7 @@ namespace xjjc
   std::vector<std::string> str_divide_once(const std::string& str, const std::string& div);
   std::vector<std::string> str_divide_once_back(const std::string& str, const std::string& div);
 
-  std::string str_getdir(const std::string& filename);
+  std::string str_dir_from_file(const std::string& filename) { return str_replaceall(filename, str_divide_once_back(filename, "/").back(), ""); }
   std::string str_tag_from_file(const std::string& filename) { return str_erasestar(str_erasestar(filename, "*/"), ".*"); }
   std::string str_tolower(const std::string& str);
   std::string str_toupper(const std::string& str);
@@ -99,52 +90,9 @@ namespace xjjc
   template<typename T> void print_vec_v(const std::vector<T>& vstrs, uint8_t opt = 1);
   template<typename T> void print_vec_h(const std::vector<T>& vstrs, uint8_t opt = 1);
 
-  void prt_divider(const std::string& color="\e[0m", int len=35) { std::cout<<color<<std::string(len, '-')<<"\e[0m"<<std::endl; }
 }
 
 /* ---------- */
-
-template<typename T, size_t N>
-void xjjc::init_array(T (&array)[N], T value/* = T{}*/) {
-  for(std::size_t i = 0; i < N; ++i)
-    array[i]  = value;
-}
-
-template<typename T, size_t N>
-int xjjc::find_ibin(const T (&array)[N], T value) {
-  for (std::size_t i = 0; i + 1 < N; ++i) {
-    if (value >= array[i] && value < array[i+1])
-      return static_cast<int>(i);
-  }
-  return -1;
-}
-
-template<typename T>
-int xjjc::find_ibin(const std::vector<T> &array, T value) {
-  for(std::size_t i = 0; i < (array.size()-1); ++i) {
-    if(value >= array[i] && value < array[i+1])
-      return static_cast<int>(i);
-  }
-  return -1;
-}
-
-template<typename T, size_t N>
-int xjjc::find_iedge(const T (&array)[N], T value) {
-  for (std::size_t i = 0; i < N; ++i) {
-    if (value == array[i])
-      return static_cast<int>(i);
-  }
-  return -1;
-}
-
-template<typename T>
-int xjjc::find_iedge(const std::vector<T> &array, T value) {
-  for (std::size_t i = 0; i < array.size(); ++i) {
-    if (value == array[i])
-      return static_cast<int>(i);
-  }
-  return -1;
-}
 
 template<typename T>
 std::string xjjc::number_to_string(T param) {
@@ -214,14 +162,6 @@ std::string xjjc::number_range_string(T val1, T val2, const std::string& var, T 
   return number_range_string(val1, val2, var, "") + str_unit;
 }
 
-
-int xjjc::number_digit(int i, int n) {
-  if(n < 0) return 0;
-  int i1 = i%((int)std::pow(10, n+1));
-  if(n==0) return i1;
-  int i2 = std::floor(float(i1/std::pow(10, n-1)));
-  return i2;
-}
 
 template<typename T>
 std::string xjjc::to_string(const T& s) {
@@ -424,10 +364,6 @@ std::vector<std::string> xjjc::str_divide_once_back(const std::string& str, cons
   return token;
 }
 
-std::string xjjc::str_getdir(const std::string& filename) {
-  return str_replaceall(filename, str_divide(filename, "/").back(), "");
-}
-
 std::string xjjc::str_tolower(const std::string& str) {
   std::string newstr(str);
   std::transform(newstr.begin(), newstr.end(), newstr.begin(),
@@ -584,6 +520,3 @@ template<class T> std::vector<std::vector<std::vector<T>>> xjjc::array3d(int n1,
   return v;
 }
 
-#ifndef __PRMYERR
-#define __PRMYERR(info) { std::cout<<"\e[42m("<<__FUNCTION__<<")\e[0m \e[31;1merror: \e[0m"<<#info<<std::endl; }
-#endif
