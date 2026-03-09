@@ -366,7 +366,8 @@ int main(int argc, char *argv[])
   leg->SetFillStyle(0);
   leg->SetBorderSize(0);
   leg->SetTextSize(0.035);
-  leg->AddEntry(gr, "2025 Data", "PE");
+//  leg->AddEntry(gr, "2025 Data", "PE");
+  leg->AddEntry(gr, "2023 Reforest", "PE");
   
   if (MinDzeroPT == 2 && MaxDzeroPT == 5) {
     if (IsGammaN) drawPubCurves_CMSHIN25002_pt2to5_gammaN(leg);
@@ -407,18 +408,45 @@ int main(int argc, char *argv[])
   /////////////////////////////////
   // 2.5 Plot Raw Yield (iff Dpt 5-8)
   /////////////////////////////////
-  if (MinDzeroPT == 5 && MaxDzeroPT == 8) {
-    TGraphErrors* gRawYield = new TGraphErrors(4, yValues.data(), rawYieldValues.data(), yErrors.data(), rawYieldErrors.data());
-    gRawYield->Scale(1/PDFraction);
-    gRawYield->SetMarkerStyle(20);
-    gRawYield->SetMarkerColor(kRed);
-    gRawYield->SetLineColor(kRed);
-    gRawYield->SetLineWidth(2);
+  
+  TGraphErrors* gRawYield = new TGraphErrors(4, yValues.data(), rawYieldValues.data(), yErrors.data(), rawYieldErrors.data());
+  gRawYield->Scale(1/PDFraction);
+  gRawYield->SetMarkerStyle(20);
+  gRawYield->SetMarkerColor(kRed);
+  gRawYield->SetLineColor(kRed);
+  gRawYield->SetLineWidth(2);
+  
+  TFile* fHIN25002_RawYield_Dpt2_5_gammaN;
+  TFile* fHIN25002_RawYield_Dpt2_5_Ngamma;
+  TFile* fHIN24003_RawYield_Dpt5_8_Dym2_m1;
+  TFile* fHIN24003_RawYield_Dpt5_8_Dym1_0;
+  TFile* fHIN24003_RawYield_Dpt5_8_Dy0_1;
+  TFile* fHIN24003_RawYield_Dpt5_8_Dy1_2;
+  double RawYieldYMax = *std::max_element(rawYieldValues.begin(), rawYieldValues.end());
+  TGraphErrors* gHIN24003_RawYield;
+  TGraphErrors* gHIN25002_RawYield;
+  
+  if (MinDzeroPT == 2 && MaxDzeroPT == 5) {
+    fHIN25002_RawYield_Dpt2_5_gammaN = TFile::Open("../20250404_DzeroUPC_HIN-25-002-Preliminary_Frozen/plot/fullAnalysis/histograms_pt2-5_IsGammaN1.root", "READ");
     
-    TFile* fHIN24003_RawYield_Dpt5_8_Dym2_m1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-2.0--1.0.root", "READ");
-    TFile* fHIN24003_RawYield_Dpt5_8_Dym1_0 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-1.0-0.0.root", "READ");
-    TFile* fHIN24003_RawYield_Dpt5_8_Dy0_1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y0.0-1.0.root", "READ");
-    TFile* fHIN24003_RawYield_Dpt5_8_Dy1_2 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y1.0-2.0.root", "READ");
+    fHIN25002_RawYield_Dpt2_5_Ngamma = TFile::Open("../20250404_DzeroUPC_HIN-25-002-Preliminary_Frozen/plot/fullAnalysis/histograms_pt2-5_IsGammaN0.root", "READ");
+    
+    if (IsGammaN) gHIN25002_RawYield = (TGraphErrors*) fHIN25002_RawYield_Dpt2_5_gammaN->Get("RawYield");
+    else gHIN25002_RawYield = (TGraphErrors*) fHIN25002_RawYield_Dpt2_5_Ngamma->Get("RawYield");
+    gHIN25002_RawYield->SetMarkerStyle(20);
+    gHIN25002_RawYield->SetMarkerColor(kBlack);
+    gHIN25002_RawYield->SetLineColor(kBlack);
+    gHIN25002_RawYield->SetLineWidth(2);
+    
+    double HIN25002_RawYieldYMax = gHIN25002_RawYield->GetMaximum();
+    if (RawYieldYMax < HIN25002_RawYieldYMax) RawYieldYMax = HIN25002_RawYieldYMax;
+  }
+  if (MinDzeroPT == 5 && MaxDzeroPT == 8) {
+    fHIN24003_RawYield_Dpt5_8_Dym2_m1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-2.0--1.0.root", "READ");
+    fHIN24003_RawYield_Dpt5_8_Dym1_0 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-1.0-0.0.root", "READ");
+    fHIN24003_RawYield_Dpt5_8_Dy0_1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y0.0-1.0.root", "READ");
+    fHIN24003_RawYield_Dpt5_8_Dy1_2 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y1.0-2.0.root", "READ");
+    
     std::vector<double> HIN24003_rawYieldValues;
     std::vector<double> HIN24003_rawYieldErrors = {0., 0., 0., 0.};
     if (IsGammaN) {
@@ -426,49 +454,61 @@ int main(int argc, char *argv[])
       HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dym1_0->Get("nsigGammaN_Nominal"))->getValV());
       HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy0_1->Get("nsigGammaN_Nominal"))->getValV());
       HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy1_2->Get("nsigGammaN_Nominal"))->getValV());
-    }
-    else {
+    } else {
       HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dym2_m1->Get("nsigNGamma_Nominal"))->getValV());
       HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dym1_0->Get("nsigNGamma_Nominal"))->getValV());
       HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy0_1->Get("nsigNGamma_Nominal"))->getValV());
       HIN24003_rawYieldValues.push_back(((RooRealVar*) fHIN24003_RawYield_Dpt5_8_Dy1_2->Get("nsigNGamma_Nominal"))->getValV());
     }
-    TGraphErrors* gHIN24003_RawYield = new TGraphErrors(4, yValues.data(), HIN24003_rawYieldValues.data(), yErrors.data(), HIN24003_rawYieldErrors.data());
+    gHIN24003_RawYield = new TGraphErrors(4, yValues.data(), HIN24003_rawYieldValues.data(), yErrors.data(), HIN24003_rawYieldErrors.data());
     gHIN24003_RawYield->SetMarkerStyle(20);
     gHIN24003_RawYield->SetMarkerColor(kBlack);
     gHIN24003_RawYield->SetLineColor(kBlack);
     gHIN24003_RawYield->SetLineWidth(2);
     
-    double RawYieldYMax = *std::max_element(rawYieldValues.begin(), rawYieldValues.end());
     double HIN24003_RawYieldYMax = *std::max_element(HIN24003_rawYieldValues.begin(), HIN24003_rawYieldValues.end());
     if (RawYieldYMax < HIN24003_RawYieldYMax) RawYieldYMax = HIN24003_RawYieldYMax;
-    
-    TH1F* hFrameRY = new TH1F("hFrame", " ", 100, -2.2, 2.2);
-    hFrameRY->GetYaxis()->SetTitle("Raw Yield");
-    hFrameRY->GetXaxis()->SetTitle("D^{0} y");
-    hFrameRY->SetStats(0);
-    hFrameRY->GetYaxis()->SetTitleOffset(1.5);
-    hFrameRY->GetYaxis()->SetRangeUser(0, 1.3 * RawYieldYMax);
-    hFrameRY->Draw();
-    
-    gRawYield->Draw("P E1 SAME");
-    gHIN24003_RawYield->Draw("P E1 SAME");
-    leg->Draw();
-    latex.DrawLatex(0.65, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
-    
-    c1->Update();
+  }
+  
+  TH1F* hFrameRY = new TH1F("hFrame", " ", 100, -2.2, 2.2);
+  hFrameRY->GetYaxis()->SetTitle("Raw Yield");
+  hFrameRY->GetXaxis()->SetTitle("D^{0} y");
+  hFrameRY->SetStats(0);
+  hFrameRY->GetYaxis()->SetTitleOffset(1.5);
+  hFrameRY->GetYaxis()->SetRangeUser(0, 1.3 * RawYieldYMax);
+  hFrameRY->Draw();
+  if (MinDzeroPT == 2 && MaxDzeroPT == 5) gHIN25002_RawYield->Draw("P E1 SAME");
+  if (MinDzeroPT == 5 && MaxDzeroPT == 8) gHIN24003_RawYield->Draw("P E1 SAME");
+  gRawYield->Draw("P E1 SAME");
+  leg->Draw();
+  latex.DrawLatex(0.65, 0.82, Form("%d < D_{p_{T}} < %d (GeV)", (int) MinDzeroPT, (int) MaxDzeroPT));
+  
+  c1->Update();
+  if (MinDzeroPT == 2 && MaxDzeroPT == 5) {
+    c1->SaveAs(Form(
+      "%s/RawYieldPlot_HIN25002Comparison_pt%d-%d_IsGammaN%o.pdf",
+      PlotDir.c_str(),
+      (int) MinDzeroPT, (int) MaxDzeroPT,
+      IsGammaN)
+    );
+    fHIN25002_RawYield_Dpt2_5_gammaN->Close();
+    fHIN25002_RawYield_Dpt2_5_Ngamma->Close();
+    delete gRawYield;
+    delete gHIN25002_RawYield;
+    delete fHIN25002_RawYield_Dpt2_5_gammaN;
+    delete fHIN25002_RawYield_Dpt2_5_Ngamma;
+  }
+  if (MinDzeroPT == 5 && MaxDzeroPT == 8) {
     c1->SaveAs(Form(
       "%s/RawYieldPlot_HIN24003Comparison_pt%d-%d_IsGammaN%o.pdf",
       PlotDir.c_str(),
       (int) MinDzeroPT, (int) MaxDzeroPT,
       IsGammaN)
     );
-    
     fHIN24003_RawYield_Dpt5_8_Dym2_m1->Close();
     fHIN24003_RawYield_Dpt5_8_Dym1_0->Close();
     fHIN24003_RawYield_Dpt5_8_Dy0_1->Close();
     fHIN24003_RawYield_Dpt5_8_Dy1_2->Close();
-    
     delete gRawYield;
     delete gHIN24003_RawYield;
     delete fHIN24003_RawYield_Dpt5_8_Dym2_m1;

@@ -3,13 +3,13 @@
   "MicroTrees": [
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": -2,
       "MaxDzeroY": -1,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -21,8 +21,8 @@
       "MinDzeroY": -2,
       "MaxDzeroY": -1,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -33,19 +33,19 @@
       "MinDzeroY": -2,
       "MaxDzeroY": -1,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": -1,
       "MaxDzeroY": 0,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -57,8 +57,8 @@
       "MinDzeroY": -1,
       "MaxDzeroY": 0,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -69,19 +69,19 @@
       "MinDzeroY": -1,
       "MaxDzeroY": 0,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": 0,
       "MaxDzeroY": 1,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -93,8 +93,8 @@
       "MinDzeroY": 0,
       "MaxDzeroY": 1,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -105,19 +105,19 @@
       "MinDzeroY": 0,
       "MaxDzeroY": 1,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": 1,
       "MaxDzeroY": 2,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -129,8 +129,8 @@
       "MinDzeroY": 1,
       "MaxDzeroY": 2,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -141,19 +141,19 @@
       "MinDzeroY": 1,
       "MaxDzeroY": 2,
       "IsGammaN": 1,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": -2,
       "MaxDzeroY": -1,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -165,8 +165,8 @@
       "MinDzeroY": -2,
       "MaxDzeroY": -1,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -177,19 +177,19 @@
       "MinDzeroY": -2,
       "MaxDzeroY": -1,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": -1,
       "MaxDzeroY": 0,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -201,8 +201,8 @@
       "MinDzeroY": -1,
       "MaxDzeroY": 0,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -213,19 +213,19 @@
       "MinDzeroY": -1,
       "MaxDzeroY": 0,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": 0,
       "MaxDzeroY": 1,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -237,8 +237,8 @@
       "MinDzeroY": 0,
       "MaxDzeroY": 1,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -249,19 +249,19 @@
       "MinDzeroY": 0,
       "MaxDzeroY": 1,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
-      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260123_PbPbUPC_HIForward0to10Even_Drej-pasor.root",
+      "Input": "/data/UPCD0analysis_2025data/SkimData/Dzero_260212-hfle_PbPbUPC_HIForward0-10-2_Dpt-2_ZDCgap-3_Dsize_xbr.root",
       "MinDzeroPT": 5,
       "MaxDzeroPT": 8,
       "MinDzeroY": 1,
       "MaxDzeroY": 2,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
+      "TriggerChoice": 4,
       "BkgFilterChoice": 2,
       "IsData": true
     },
@@ -273,8 +273,8 @@
       "MinDzeroY": 1,
       "MaxDzeroY": 2,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     },
     {
@@ -285,8 +285,8 @@
       "MinDzeroY": 1,
       "MaxDzeroY": 2,
       "IsGammaN": 0,
-      "TriggerChoice": 3,
-      "BkgFilterChoice": 2,
+      "TriggerChoice": 1,
+      "BkgFilterChoice": 1,
       "IsData": false
     }
   ]
