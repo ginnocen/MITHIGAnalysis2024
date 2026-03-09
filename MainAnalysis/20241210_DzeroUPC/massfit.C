@@ -40,9 +40,14 @@ using namespace RooFit;
 using namespace std;
 
 #define DMASS 1.86484
-#define DMASSMIN 1.66
-#define DMASSMAX 2.16
-#define DMASSNBINS 48
+
+#define DMASS_UNBINNEDFIT_MIN 1.66
+#define DMASS_UNBINNEDFIT_MAX 2.16
+#define DMASS_UNBINNEDFIT_NBINS 48
+
+#define DMASS_UNBINNEDFIT_MIN_24003 1.68
+#define DMASS_UNBINNEDFIT_MAX_24003 2.05
+#define DMASS_UNBINNEDFIT_NBINS_24003 74
 
 struct ParamsBase {
   std::map<std::string, RooRealVar*> params; // Store RooRealVar objects
@@ -197,7 +202,7 @@ struct SignalParams : public ParamsBase {
     if (sigAlphaRange > 0.)
     {
       alpha.setConstant(false);
-      alpha.setRange(0.0, 0.0 + sigAlphaRange);
+      alpha.setRange(0.0 - sigAlphaRange, 0.0 + sigAlphaRange);
     }
   }
 };
@@ -892,7 +897,7 @@ int main(int argc, char *argv[]) {
   ///// for fitting systematics study
   bool doSyst_sig      = CL.GetBool  ("doSyst_sig", false); // do systematics study for the signal
   double sigMeanRange  = CL.GetDouble("sigMeanRange", 0.015); // let signal mean float within <D0_mass> +/- <value>
-  double sigAlphaRange = CL.GetDouble("sigAlphaRange", 1.2); // let signal width float by <MC_width> * (1 + <value>)
+  double sigAlphaRange = CL.GetDouble("sigAlphaRange", 0.25); // let signal width float by <MC_width> * (1 + <value>)
   bool doSyst_comb     = CL.GetBool  ("doSyst_comb", false); // do systematics study for the combinatorics background
   bool doPkkk          = CL.GetBool  ("doPkkk", true); // include KK peak in background model
   bool doPkpp          = CL.GetBool  ("doPkpp", true); // include pipi peak in background model
@@ -909,16 +914,6 @@ int main(int argc, char *argv[]) {
   if (doSyst_sig) {
     sigMeanRange = 0.;
     sigAlphaRange = 0.;
-  }
-  
-  // Varied mass window systematic
-  double DmassMin = DMASSMIN;
-  double DmassMax = DMASSMAX;
-  int DmassNBins = DMASSNBINS;
-  if (systMassWin.size() == 3) {
-    DmassMin = systMassWin[0];
-    DmassMax = systMassWin[1];
-    DmassNBins = int(systMassWin[2]);
   }
   
   string output        = CL.Get      ("Output",  "fit.root");    // Output file
@@ -955,6 +950,21 @@ int main(int argc, char *argv[]) {
   if (hist) parIsGammaN = (int) hist->GetBinContent(1);
   hist = dynamic_cast<TH1D*>(dataDir->Get("parTriggerChoice"));
   if (hist) parTriggerChoice = (int) hist->GetBinContent(1);
+  
+  // Varied mass window systematic
+  double DmassMin = DMASS_UNBINNEDFIT_MIN;
+  double DmassMax = DMASS_UNBINNEDFIT_MAX;
+  int DmassNBins = DMASS_UNBINNEDFIT_NBINS;
+  if (parMinDzeroPT == 5) {
+    DmassMin = DMASS_UNBINNEDFIT_MIN_24003;
+    DmassMax = DMASS_UNBINNEDFIT_MAX_24003;
+    DmassNBins = DMASS_UNBINNEDFIT_NBINS_24003;
+  }
+  if (systMassWin.size() == 3) {
+    DmassMin = systMassWin[0];
+    DmassMax = systMassWin[1];
+    DmassNBins = int(systMassWin[2]);
+  }
 
   // Construct the formatted string
   std::ostringstream plotTitle;
