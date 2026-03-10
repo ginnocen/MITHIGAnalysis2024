@@ -3580,6 +3580,7 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete DpassCutSystDdtheta;
       delete DpassCutSystDalphaDdtheta;
       delete DpassCutSystDchi2cl;
+      for (auto& [_, br] : Dmva) delete br;
       delete Dy;
       delete Dmass;
       delete Dtrk1P;
@@ -3655,6 +3656,7 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    DpassCutSystDdtheta = nullptr;
    DpassCutSystDalphaDdtheta = nullptr;
    DpassCutSystDchi2cl = nullptr;
+   for (auto& [_, br] : Dmva) br = nullptr;
    Dy = nullptr;
    Dmass = nullptr;
    Dtrk1P = nullptr;
@@ -3797,6 +3799,11 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    CheckAndSetBranch(Tree, DpassCutSystDdtheta);
    CheckAndSetBranch(Tree, DpassCutSystDalphaDdtheta);
    CheckAndSetBranch(Tree, DpassCutSystDchi2cl);
+   for (auto& [m, br] : Dmva) {
+     auto brname = "Dmva_" + m;
+     Tree->SetBranchStatus(brname.c_str(), 1);
+     Tree->SetBranchStatus(brname.c_str(), &br);
+   }
    CheckAndSetBranch(Tree, Dgen);
    CheckAndSetBranch(Tree, DisSignalCalc);
    CheckAndSetBranch(Tree, DisSignalCalcPrompt);
@@ -3851,6 +3858,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    DpassCutSystDalphaDdtheta = new std::vector<bool>();
    DpassCutSystDdtheta = new std::vector<bool>();
    DpassCutSystDchi2cl = new std::vector<bool>();
+   for (const auto& m : mva_methods_)
+     Dmva[m] = new std::vector<float>();
    Dy = new std::vector<float>();
    Dmass = new std::vector<float>();
    Dtrk1Pt = new std::vector<float>();
@@ -3995,6 +4004,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("DpassCutSystDalphaDdtheta",&DpassCutSystDalphaDdtheta);
    Tree->Branch("DpassCutSystDdtheta",   &DpassCutSystDdtheta);
    Tree->Branch("DpassCutSystDchi2cl",   &DpassCutSystDchi2cl);
+   for (auto& [m, br] : Dmva)
+     Tree->Branch(Form("Dmva_%s", m.c_str()),   &br);
    Tree->Branch("Dgen",                  &Dgen);
    Tree->Branch("DisSignalCalc",         &DisSignalCalc);
    Tree->Branch("DisSignalCalcPrompt",   &DisSignalCalcPrompt);
@@ -4111,6 +4122,7 @@ void DzeroUPCTreeMessenger::Clear()
    DpassCutSystDalphaDdtheta->clear();
    DpassCutSystDdtheta->clear();
    DpassCutSystDchi2cl->clear();
+   for (auto& [_, br] : Dmva) br->clear();
    Dgen->clear();
    DisSignalCalc->clear();
    DisSignalCalcPrompt->clear();
@@ -4222,6 +4234,8 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(DpassCutSystDdtheta != nullptr && M.DpassCutSystDdtheta != nullptr)   *DpassCutSystDdtheta = *(M.DpassCutSystDdtheta);
    if(DpassCutSystDalphaDdtheta != nullptr && M.DpassCutSystDalphaDdtheta != nullptr)   *DpassCutSystDalphaDdtheta = *(M.DpassCutSystDalphaDdtheta);
    if(DpassCutSystDchi2cl != nullptr && M.DpassCutSystDchi2cl != nullptr)   *DpassCutSystDchi2cl = *(M.DpassCutSystDchi2cl);
+   for (auto& [m, _] : Dmva)
+     if(Dmva.at(m) != nullptr && M.Dmva.at(m) != nullptr) *(Dmva.at(m)) = *(M.Dmva.at(m));
    if(Dgen != nullptr && M.Dgen != nullptr)   *Dgen = *(M.Dgen);
    if(DisSignalCalc != nullptr && M.DisSignalCalc != nullptr)   *DisSignalCalc = *(M.DisSignalCalc);
    if(DisSignalCalcPrompt != nullptr && M.DisSignalCalcPrompt != nullptr)   *DisSignalCalcPrompt = *(M.DisSignalCalcPrompt);
