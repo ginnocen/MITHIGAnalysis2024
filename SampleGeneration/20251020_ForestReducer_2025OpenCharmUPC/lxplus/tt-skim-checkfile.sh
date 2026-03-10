@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $# -ne 12 ]]; then
-    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection]" 
+if [[ $# -ne 13 ]]; then
+    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection] [WeightMVA]"
     exit 1
 fi
 
@@ -17,6 +17,7 @@ Year=$9
 ApplyTriggerRejection=${10}
 DptThreshold=${11}
 ApplyZDCGapRejection=${12}
+WeightMVA=${13}
 
 echo "SCRAM_ARCH:          "$SCRAM_ARCH
 echo "PWD:                 "$PWD
@@ -43,12 +44,14 @@ INFILE_NAME=$PWD/${INFILE##*/}
     xrdcp $INFILE .
     [[ -f $INFILE_NAME ]] && input_file=$INFILE_NAME || echo "xrdcp failed."
 
+    tar -xzvf weights.tar.gz
+    
     set -x
     
     ./$EXEFILE --Input $input_file \
                --Output $OUTFILE \
                --RootPID DzeroUPC_dedxMap.root \
-               --WeightMVA TMVAClassification_BDT.weights.xml \
+               --WeightMVA $WeightMVA \
                --ApplyTriggerRejection $ApplyTriggerRejection \
                --ApplyEventRejection false \
                --ApplyZDCGapRejection $ApplyZDCGapRejection \
@@ -67,11 +70,12 @@ INFILE_NAME=$PWD/${INFILE##*/}
         xrdcp ${OUTFILE} root://eoscms.cern.ch//${SRM_PATH}/$OUTFILE
     fi
     set +x
+
 }
 
 rm -rf $EXEFILE $CRELEASE
 rm DzeroUPC_dedxMap.root
-rm TMVAClassification_BDT.weights.xml
+rm -rf weights.tar.gz weights
 rm $INFILE_NAME
 rm $OUTFILE
 rm -v x509*

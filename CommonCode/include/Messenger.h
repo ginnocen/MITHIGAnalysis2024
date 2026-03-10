@@ -1185,7 +1185,7 @@ public:
    std::vector<bool>  *DpassCutSystDdtheta;
    std::vector<bool>  *DpassCutSystDalphaDdtheta;
    std::vector<bool>  *DpassCutSystDchi2cl;
-   std::vector<float> *Dmva;
+  std::map<std::string, std::vector<float>*> Dmva;
    std::vector<int>   *Dgen;
    std::vector<bool>  *DisSignalCalc;
    std::vector<bool>  *DisSignalCalcPrompt;
@@ -1206,6 +1206,7 @@ public:
    // from tight to loose
    const std::vector<float> gapEThresh_gammaN = {4.3, 5.5, 6.4, 7.8, 9.2, 10.6, 12.5, 15.0, 16.2};
    const std::vector<float> gapEThresh_Ngamma = {4.5, 5.5, 6.5, 7.6, 8.6, 10.0, 12.0, 15.0, 16.0};
+  const std::vector<std::string> mva_methods_ = { "BDT", "BDTG" };
 
 public:   // Derived quantities
    bool GoodPhotonuclear; //FIXME: currently not implemented

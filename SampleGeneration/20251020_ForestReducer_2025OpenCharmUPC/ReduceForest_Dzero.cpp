@@ -27,7 +27,6 @@ using namespace DzeroSelection;
 #include "include/clusComp.h"
 #include "include/mvaprod.h"
 
-int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax, double ptMin = 0.);
 
 int main(int argc, char *argv[]) {
@@ -113,11 +112,8 @@ int main(int argc, char *argv[]) {
     fdedxProtSigmaHi = dedxFunctions[8];
   }
 
-  std::unique_ptr<mytmva::mvaprod> mva = std::make_unique<mytmva::mvaprod>(WeightMVA);
-  if (!mva->valid()) {
-    mva.reset();
-  }
-
+  auto mvas = mytmva::dir_to_weights(WeightMVA);
+  
   for (const auto& InputFileName : InputFileNames) {
     auto* InputFile = TFile::Open(InputFileName.c_str());
 
@@ -480,8 +476,15 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
         }
 
-        float mvaval = (mva ? mva->evalmva(value, iD) : -999);
-        MDzeroUPC.Dmva->push_back(mvaval);
+        auto idxpt = mytmva::whichbin(MDzero.Dpt[iD], mytmva::ptbins),
+          idxy = mytmva::whichbin(MDzero.Dpt[iD], mytmva::ybins);
+        auto& mva = mvas.at(idxpt).at(idxy);
+        for (auto& [m, br] : MDzeroUPC.Dmva) {
+          float mvaval = -999.;
+          if (mva.find(m) != mva.end() && mva.at(m))
+            mvaval = mva.at(m)->evalmva(value, iD);
+          br->push_back(mvaval);
+        }
       }
       MDzeroUPC.Dsize = countSelDzero;
       MDzeroUPC.FillEntry();

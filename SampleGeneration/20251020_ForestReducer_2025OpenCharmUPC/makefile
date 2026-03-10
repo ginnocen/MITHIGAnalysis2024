@@ -1,7 +1,24 @@
-default: Execute_Dzero
+CXX = g++
+BUILD = build
 
-Execute_Dzero: ReduceForest_Dzero.cpp
-	g++ ReduceForest_Dzero.cpp -o Execute_Dzero \
-	`root-config --cflags --glibs` \
-	 -lTMVA -lTMVAGui -lXMLIO -lstdc++fs -lEG \
-	-I$(ProjectBase)/CommonCode/include $(ProjectBase)/CommonCode/library/Messenger.o
+CXXFLAGS = -I$(ProjectBase)/CommonCode/include `root-config --cflags`
+LDFLAGS  = `root-config --glibs` -lTMVA -lTMVAGui -lXMLIO -lstdc++fs -lEG \
+           $(ProjectBase)/CommonCode/library/Messenger.o
+
+TARGET = Execute_Dzero
+SRC = ReduceForest_Dzero.cpp
+OBJ = $(BUILD)/ReduceForest_Dzero.o
+DEP = $(BUILD)/ReduceForest_Dzero.d
+
+default: $(TARGET)
+
+$(TARGET): $(OBJ)
+	$(CXX) $^ -o $@ $(LDFLAGS)
+
+$(BUILD)/%.o: %.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) -MMD -MP -c $< -o $@
+
+$(BUILD):
+	mkdir -p $(BUILD)
+
+-include $(DEP)

@@ -6,15 +6,15 @@ if [[ $0 != *.sh ]] ; then
 fi
 
 # Max number of files to submit for each input
-MAXFILENO=1000000
+MAXFILENO=5
 
 # Exe parameters
-Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=3 ; # Data 2025
+# Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=3 ; # Data 2025
 # Year=2023 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # Data 2023
-# Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=0 ; ApplyZDCGapRejection=0 ; # MC 2024
+Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # MC 2024
 IsGammaNMCtype=true
 #
-PRIMARY="Dzero_260223-bdt"
+PRIMARY="Dzero_260310-ydiffmva"
 LABELTAG="" # e.g. versions or selections
 #
 [[ $ApplyDRejection != "no" ]] && LABELTAG+="_Drej-"$ApplyDRejection 
@@ -24,7 +24,8 @@ LABELTAG="" # e.g. versions or selections
 
 # 
 EXEFILE=Execute_Dzero
-COPYfiles='../../../CommonCode/root/DzeroUPC_dedxMap.root ../data/TMVAClassification_BDT.weights.xml' # wrt lxplus/
+COPYfiles='../../../CommonCode/root/DzeroUPC_dedxMap.root' # wrt ./
+MVAfiles='../data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA_0-1-2-3-4-5-6*'
 
 ###############################################################################
 ## IMPORTANT:
@@ -34,7 +35,7 @@ COPYfiles='../../../CommonCode/root/DzeroUPC_dedxMap.root ../data/TMVAClassifica
 ###############################################################################
 INPUTS=(
     # ------ gammaN -> IsGammaNMCtype=true
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260218_200449/0000
+    root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260218_200449/0000
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_nonprompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260219_200038/0000
     # ------ Ngamma -> IsGammaNMCtype=false
     # # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_233803/0000
@@ -175,9 +176,12 @@ do
     [[ ($INPUTDIR == *BeamA* && $IsGammaNMCtype == false) || ($INPUTDIR == *BeamB* && $IsGammaNMCtype == true) ]] && { echo -e "\e[31merror:\e[0m mismatching between IsGammaNMCtype ("$IsGammaNMCtype") and Beam for MC." ; continue ; }
     [[ ($INPUTDIR == *ythia* && $IsData == true) || ($INPUTDIR == *HIForward* && $IsData == false) ]] && { echo -e "\e[31merror:\[0m mismatching between IsData ("$IsData") and INPUTDIR "$INPUTDIR ; continue ; }
 
+    WeightMVA=${MVAfiles##*/}
+    WeightMVA='weights/'${WeightMVA%'*'}
+
     if [ "$submit_jobs" -eq 1 ] ; then
         set -x
-        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection
+        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection $WeightMVA
         set +x
     fi
 
@@ -187,5 +191,14 @@ if [[ "$prep_jobs" -gt 0 ]] ; then
     echo
     cp -v ../$EXEFILE .
     cp -v $COPYfiles .
+
+    rm -r weights.tar.gz weights
+    mkdir -p weights
+    for dir in $MVAfiles ; do
+        cp -r $dir weights/
+        rm weights/${dir##*/}/*.C
+    done
+    tar -czvf weights.tar.gz weights/
+    rm -r weights
 fi
 
