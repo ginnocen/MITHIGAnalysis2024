@@ -24,6 +24,14 @@ void plotMassfitComparison(
       DmassMax = 2.06;
     }
     
+    TString fHIN25002Str = "/home/data/public/yuchenc/RST_redo0326_MCReweighting_cf_PR101_nomp3_ANv4GL/fullAnalysis/dmassDataPoint_archived25002.root";
+    TFile* fHIN25002;
+    if (DptMin == 2) {
+      cout << "Opening " << fHIN25002Str.Data() << "...";
+      fHIN25002 = TFile::Open(fHIN25002Str, "READ");
+      cout << " Opened!" << endl;
+    }
+    
     for (int iDy = 0; iDy < DyBins.size()-1; iDy++) {
       float DyMin = DyBins[iDy];
       float DyMax = DyBins[iDy+1];
@@ -63,21 +71,11 @@ void plotMassfitComparison(
         TH1D* hDmassReforest = (TH1D*) (fReforest->Get(hDmassStr))->Clone("hDmassReforest");
         
         TString histStr;
-        TFile* fHIN25002;
         if (DptMin == 2) {
           histStr = Form(
             "dmass_%s_SystNominal_dpt_2_5_dy_m1p0_1p0_hlt1_floatwidth_exp",
             gNStr.Data()
           );
-          
-          TString fHIN25002Str = Form(
-            "/home/data/public/yuchenc/RST_redo0326_MCReweighting_cf_PR101_nomp3_ANv4GL/fullAnalysis/pt%.0f-%.0f_y%.0f-%.0f_IsGammaN%d/Data.root",
-            DptMin, DptMax, DyMin, DyMax, gammaN
-          );
-          cout << "Opening " << fHIN25002Str.Data() << "...";
-          fHIN25002 = TFile::Open(fHIN25002Str, "READ");
-          cout << " Opened!" << endl;
-          cout << "Accessing hist: hDmass" << endl;
         }
         else if (DptMin == 5) {
           TString DyStr;
@@ -91,8 +89,13 @@ void plotMassfitComparison(
         }
         cout << "Accessing hist: " << histStr.Data() << endl;
         TH1D* hDmassHIN24003 = (TH1D*) (fHIN24003->Get(histStr))->Clone("hDmassHIN24003");
+        
         TH1D* hDmassHIN25002;
-        if (DptMin == 2) hDmassHIN25002 = (TH1D*) (fHIN25002->Get("hDmass"))->Clone("hDmassHIN25002");
+        TString hDmassHIN25002Str = Form(
+          "pt%.0f-%.0f_y%.0f-%.0f_IsGammaN%d__Dmass",
+          DptMin, DptMax, DyMin, DyMax, gammaN
+        );
+        if (DptMin == 2) hDmassHIN25002 = (TH1D*) (fHIN25002->Get(hDmassHIN25002Str))->Clone("hDmassHIN25002");
         
         TCanvas* canvas = new TCanvas("canvas", "", 600, 600);
         
@@ -109,8 +112,8 @@ void plotMassfitComparison(
         
         TH1D* hDmassBase = new TH1D(
           "hDmassBase",
-          Form("%.0f < Dp_{T} < %.0f, %.0f < Dy < %.0f, %s;; Counts",
-            DptMin, DptMax, DyMin, DyMax, gNStr.Data()
+          Form("%.0f < Dp_{T} < %.0f, %.0f < Dy < %.0f, %s;; Events / (%.4f GeV)",
+            DptMin, DptMax, DyMin, DyMax, gNStr.Data(), hDmassReforest->GetBinWidth(1)
           ),
           DmassNbins, DmassMin, DmassMax
         );
@@ -147,7 +150,6 @@ void plotMassfitComparison(
               hDmassHIN25002->GetMaximum(), hDmassReforest->GetMaximum()
             )
           );
-          hDmassHIN25002->Draw("same");
         }
         else if (DptMin == 5) {
           for (int iBin = 1; iBin <= hDmassHIN24003->GetNbinsX(); iBin++) {
@@ -164,7 +166,6 @@ void plotMassfitComparison(
           hDmassHIN24003->SetMarkerColor(kBlack);
           hDmassHIN24003->SetLineColor(kBlack);
           hDmassHIN24003->SetMarkerStyle(20);
-          hDmassHIN24003->Draw("same");
         }
         for (int iBin = 1; iBin <= hDmassReforest->GetNbinsX(); iBin++) {
           nDFullReg += hDmassReforest->GetBinContent(iBin);
@@ -177,14 +178,14 @@ void plotMassfitComparison(
               xSigMax = hDmassReforest->GetBinLowEdge(iBin+1);
           }
         }
-        TLine* lSigMin = new TLine(xSigMin, 0.0, xSigMin, 0.5 * hDmassBase->GetMaximum());
-        TLine* lSigMax = new TLine(xSigMax, 0.0, xSigMax, 0.5 * hDmassBase->GetMaximum());
-        lSigMin->SetLineColor(kGray+1);
-        lSigMin->SetLineStyle(2);
-        lSigMin->Draw();
-        lSigMax->SetLineColor(kGray+1);
-        lSigMax->SetLineStyle(2);
-        lSigMax->Draw();
+        TBox* bSigRegion = new TBox(
+          xSigMin, 0.0, xSigMax, hDmassBase->GetMaximum()
+        );
+        bSigRegion->SetFillColorAlpha(kAzure-4, 0.25);
+        bSigRegion->SetLineWidth(0);
+        bSigRegion->Draw();
+        if (DptMin == 5 || DyMin == -1 || DyMax == 1) hDmassHIN24003->Draw("same");
+        if (DptMin ==2) hDmassHIN25002->Draw("same");
         hDmassReforest->SetMarkerColor(kRed);
         hDmassReforest->SetLineColor(kRed);
         hDmassReforest->SetMarkerStyle(24);
@@ -205,16 +206,14 @@ void plotMassfitComparison(
         latex.SetNDC();
         latex.SetTextSize(0.030);
         latex.SetTextFont(42);
-        latex.DrawLatex(0.15, 0.86, Form("N_{%.3f-%.3f}^{Reforest} = %d", xSigMin, xSigMax, nDSigReg));
+        latex.SetTextColor(kAzure-5);
+        latex.DrawLatex(0.15, 0.85, Form("N_{%.3f-%.3f}^{Reforest} = %d", xSigMin, xSigMax, nDSigReg));
+        if (DptMin == 2) latex.DrawLatex(0.15, 0.79, Form("N_{%.3f-%.3f}^{HIN-25-002} = %d", xSigMin, xSigMax, nDSigReg_25002));
+        if (DptMin == 5) latex.DrawLatex(0.15, 0.79, Form("N_{%.3f-%.3f}^{HIN-24-003} = %d", xSigMin, xSigMax, nDSigReg_24003));
+        latex.SetTextColor(kBlack);
         latex.DrawLatex(0.15, 0.72, Form("N_{Full Region}^{Reforest} = %d", nDFullReg));
-        if (DptMin == 2) {
-          latex.DrawLatex(0.15, 0.80, Form("N_{%.3f-%.3f}^{HIN-25-002} = %d", xSigMin, xSigMax, nDSigReg_25002));
-          latex.DrawLatex(0.15, 0.66, Form("N_{Full Region}^{HIN-25-002} = %d", nDFullReg_25002));
-        }
-        if (DptMin == 5) {
-          latex.DrawLatex(0.15, 0.80, Form("N_{%.3f-%.3f}^{HIN-24-003} = %d", xSigMin, xSigMax, nDSigReg_24003));
-          latex.DrawLatex(0.15, 0.66, Form("N_{Full Region}^{HIN-24-003} = %d", nDFullReg_24003));
-        }
+        if (DptMin == 2) latex.DrawLatex(0.15, 0.66, Form("N_{Full Region}^{HIN-25-002} = %d", nDFullReg_25002));
+        if (DptMin == 5) latex.DrawLatex(0.15, 0.66, Form("N_{Full Region}^{HIN-24-003} = %d", nDFullReg_24003));
         
         TPad* pMassRatio = new TPad("pMassRatio", "", 0.0, 0.0, 1.0, 0.3);
         pMassRatio->SetMargin(0.1, 0.1, 0.1/0.3, 0.0);
@@ -235,6 +234,12 @@ void plotMassfitComparison(
         hMassRatio->Draw();
         hMassRatio->SetMinimum(0.725);
         hMassRatio->SetMaximum(1.275);
+        TBox* bSigRegionRatio = new TBox(
+          xSigMin, hMassRatio->GetMinimum(), xSigMax, hMassRatio->GetMaximum()
+        );
+        bSigRegionRatio->SetFillColorAlpha(kAzure-4, 0.25);
+        bSigRegionRatio->SetLineWidth(0);
+        bSigRegionRatio->Draw();
         TLine* unity = new TLine(DmassMin, 1.0, DmassMax, 1.0);
         unity->SetLineColor(kGray+1);
         unity->SetLineStyle(2);
@@ -242,18 +247,20 @@ void plotMassfitComparison(
         TH1D* hRatioReforest = (TH1D*) hDmassReforest->Clone("hRatioReforest");
         if (DptMin == 2) {
           hRatioReforest->Divide(hDmassHIN25002);
-          hRatioReforest->Draw("hist same");
+          hRatioReforest->SetMarkerStyle(0);
+          hRatioReforest->Draw("same");
         }
         if (DptMin == 5) {
           hRatioReforest->Divide(hDmassHIN24003);
-          hRatioReforest->Draw("hist same");
+          hRatioReforest->SetMarkerStyle(0);
+          hRatioReforest->Draw("same");
         }
         
         canvas->cd();
         canvas->Update();
-        system("mkdir -p plot/massFit/HIN24003_comparisons");
+        system("mkdir -p plot/massFit/HIN24003_HIN25002_comparisons");
         canvas->SaveAs(Form(
-          "plot/massFit/HIN24003_comparisons/Dpt%.0f-%.0f_Dy%.0f-%.0f_gammaN%d.pdf",
+          "plot/massFit/HIN24003_HIN25002_comparisons/Dpt%.0f-%.0f_Dy%.0f-%.0f_gammaN%d.pdf",
           DptMin, DptMax, DyMin, DyMax, gammaN
         ));
         
@@ -267,6 +274,7 @@ void plotMassfitComparison(
       }
       fHIN24003->Close();
     }
+    fHIN25002->Close();
   }
 }
 

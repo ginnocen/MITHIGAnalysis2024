@@ -29,7 +29,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -44,7 +46,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -74,7 +78,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -89,7 +95,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -119,7 +127,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -134,7 +144,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -164,7 +176,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -179,7 +193,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -209,7 +225,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -224,7 +242,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -254,7 +274,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -269,7 +291,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -299,7 +323,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -314,7 +340,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -344,7 +372,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -359,7 +389,9 @@
       "HFMaxRapDefn": -1,
       "DoTrkPtErrFilter": true,
       "DoTrkHitFilter": true,
-      "IsData": false
+      "IsData": false,
+      "DoGptGyReweighting": true,
+      "DoMultReweighting": true
     }
   ]
 }
