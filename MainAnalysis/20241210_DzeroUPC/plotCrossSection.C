@@ -427,9 +427,9 @@ int main(int argc, char *argv[])
   TGraphErrors* gHIN25002_RawYield;
   
   if (MinDzeroPT == 2 && MaxDzeroPT == 5) {
-    fHIN25002_RawYield_Dpt2_5_gammaN = TFile::Open("../20250404_DzeroUPC_HIN-25-002-Preliminary_Frozen/plot/fullAnalysis/histograms_pt2-5_IsGammaN1.root", "READ");
+    fHIN25002_RawYield_Dpt2_5_gammaN = TFile::Open("/home/data/public/yuchenc/RST_redo0326_MCReweighting_cf_PR101_nomp3_ANv4GL/plot/histograms_pt2-5_IsGammaN1.root", "READ");
     
-    fHIN25002_RawYield_Dpt2_5_Ngamma = TFile::Open("../20250404_DzeroUPC_HIN-25-002-Preliminary_Frozen/plot/fullAnalysis/histograms_pt2-5_IsGammaN0.root", "READ");
+    fHIN25002_RawYield_Dpt2_5_Ngamma = TFile::Open("/home/data/public/yuchenc/RST_redo0326_MCReweighting_cf_PR101_nomp3_ANv4GL/plot/histograms_pt2-5_IsGammaN0.root", "READ");
     
     if (IsGammaN) gHIN25002_RawYield = (TGraphErrors*) fHIN25002_RawYield_Dpt2_5_gammaN->Get("RawYield");
     else gHIN25002_RawYield = (TGraphErrors*) fHIN25002_RawYield_Dpt2_5_Ngamma->Get("RawYield");
