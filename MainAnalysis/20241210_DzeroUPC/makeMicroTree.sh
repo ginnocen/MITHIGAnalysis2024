@@ -15,6 +15,7 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 	MaxDzeroY=$(echo $MicroTree | jq -r '.MaxDzeroY')
 	IsGammaN=$(echo $MicroTree | jq -r '.IsGammaN')
 	TriggerChoice=$(echo $MicroTree | jq -r '.TriggerChoice')
+	BkgFilterChoice=$(echo $MicroTree | jq -r '.BkgFilterChoice')
 	IsData=$(echo $MicroTree | jq -r '.IsData')
 	DoSystRapGap=$(echo $MicroTree | jq -r '.DoSystRapGap')
 	DoSystD=$(echo $MicroTree | jq -r '.DoSystD')
@@ -22,6 +23,8 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 	GptGyWeightFileName=$(echo $MicroTree | jq -r '.GptGyWeightFileName')
 	DoMultReweighting=$(echo $MicroTree | jq -r '.DoMultReweighting')
 	MultWeightFileName=$(echo $MicroTree | jq -r '.MultWeightFileName')
+	DoTrkPtErrFilter=$(echo $MicroTree | jq -r '.DoTrkPtErrFilter')
+	DoTrkHitFilter=$(echo $MicroTree | jq -r '.DoTrkHitFilter')
 	mkdir -p $MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/
 	Output=$MicroTreeDir/pt${MinDzeroPT}-${MaxDzeroPT}_y${MinDzeroY}-${MaxDzeroY}_IsGammaN${IsGammaN}/${MicroTreeBaseName}
 
@@ -39,6 +42,9 @@ jq -c '.MicroTrees[]' $SampleSettingCard | while read MicroTree; do
 			[ $GptGyWeightFileName != null ] && cmd="$cmd --GptGyWeightFileName $GptGyWeightFileName"
 			[ $DoMultReweighting != null ] && cmd="$cmd --DoMultReweighting $DoMultReweighting"
 			[ $MultWeightFileName != null ] && cmd="$cmd --MultWeightFileName $MultWeightFileName"
+			[ $BkgFilterChoice != null ] && cmd="$cmd --BkgFilterChoice $BkgFilterChoice"
+			[ $DoTrkPtErrFilter != null ] && cmd="$cmd --DoTrkPtErrFilter $DoTrkPtErrFilter"
+			[ $DoTrkHitFilter != null ] && cmd="$cmd --DoTrkHitFilter $DoTrkHitFilter"
 
 	echo "Executing >>>>>>"
 	echo $cmd

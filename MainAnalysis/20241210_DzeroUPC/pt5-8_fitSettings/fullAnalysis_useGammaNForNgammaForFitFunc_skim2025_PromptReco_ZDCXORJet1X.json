@@ -1,6 +1,7 @@
 {
   "FitDir": "MassFit",
   "luminosity": 0.0150910275,
+  "PDFraction": 0.5,
   "MicroTrees": [
     {
       "dataInput": "fullAnalysis/pt5-8_y-2--1_IsGammaN1/Data.root",
@@ -23,16 +24,6 @@
       "effmcInput": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC.root"
     },
     {
-      "dataInput": "fullAnalysis/pt5-8_y-2-2_IsGammaN1/Data.root",
-      "fitmcInputs": "fullAnalysis/pt5-8_y-2-2_IsGammaN1/MC_inclusive.root",
-      "effmcInput": "fullAnalysis/pt5-8_y-2-2_IsGammaN1/MC.root"
-    },
-    {
-      "dataInput": "fullAnalysis/pt5-8_y-1-1_IsGammaN1/Data.root",
-      "fitmcInputs": "fullAnalysis/pt5-8_y-1-1_IsGammaN1/MC_inclusive.root",
-      "effmcInput": "fullAnalysis/pt5-8_y-1-1_IsGammaN1/MC.root"
-    },
-    {
       "dataInput": "fullAnalysis/pt5-8_y-2--1_IsGammaN0/Data.root",
       "fitmcInputs": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
       "effmcInput": "fullAnalysis/pt5-8_y-2--1_IsGammaN0/MC.root"
@@ -51,16 +42,6 @@
       "dataInput": "fullAnalysis/pt5-8_y1-2_IsGammaN0/Data.root",
       "fitmcInputs": "fullAnalysis/pt5-8_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis/pt5-8_y-2--1_IsGammaN1/MC_inclusive.root",
       "effmcInput": "fullAnalysis/pt5-8_y1-2_IsGammaN0/MC.root"
-    },
-    {
-      "dataInput": "fullAnalysis/pt5-8_y-2-2_IsGammaN0/Data.root",
-      "fitmcInputs": "fullAnalysis/pt5-8_y-2-2_IsGammaN1/MC_inclusive.root",
-      "effmcInput": "fullAnalysis/pt5-8_y-2-2_IsGammaN0/MC.root"
-    },
-    {
-      "dataInput": "fullAnalysis/pt5-8_y-1-1_IsGammaN0/Data.root",
-      "fitmcInputs": "fullAnalysis/pt5-8_y-1-1_IsGammaN1/MC_inclusive.root",
-      "effmcInput": "fullAnalysis/pt5-8_y-1-1_IsGammaN0/MC.root"
     }
   ]
 }

@@ -22,9 +22,21 @@ using namespace std;
 #include "WeightHandler1D.h"
 
 #define DMASS 1.86484
-#define DMASSMIN 1.66
-#define DMASSMAX 2.26
-#define DMASSNBINS 48
+
+// Mass ranges and bins for Dmass monitoring histograms,
+// intended for cross-checking datapoints from the massfit.C routine.
+// Current analysis binning:
+#define DMASS_HISTMIN 1.66
+#define DMASS_HISTMAX 2.26
+#define DMASS_HISTNBINS 48
+// Bins matched to HIN-24-003 Dmass fit bins:
+#define DMASS_HISTMIN_24003 1.68
+#define DMASS_HISTMAX_24003 2.05
+#define DMASS_HISTNBINS_24003 74
+// Bins matched to HIN-25-002 Dmass fit bins:
+#define DMASS_HISTMIN_25002 1.66
+#define DMASS_HISTMAX_25002 2.16
+#define DMASS_HISTNBINS_25002 48
 
 //============================================================//
 // Function to check for configuration errors
@@ -34,52 +46,71 @@ bool checkError(const Parameters &par) { return false; }
 //======= trackSelection =====================================//
 // Check if the track pass selection criteria
 //============================================================//
-bool dzeroSelection(DzeroUPCMicroTreeMessenger *b, Parameters par, int j) { return true; }
+bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) { return true; }
 
 //======= eventSelection =====================================//
 // Check if the event pass eventSelection criteria
 //============================================================//
-bool eventSelection(DzeroUPCMicroTreeMessenger *b, const Parameters &par) {
+bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
   if (par.IsData)
   {
     if (par.TriggerChoice == 1 && b->isL1ZDCOr == false)
       return false;
     if (par.TriggerChoice == 2 && b->isL1ZDCXORJet8 == false)
       return false;
+    if (par.TriggerChoice == 3 && b->isL1ZDCXORJet12 == false)
+      return false;
+    if (par.TriggerChoice == 4 && b->isL1ZDCXORJet16 == false)
+      return false;
   }
+  
+  if (par.BkgFilterChoice == 1 &&
+      (b->selectedBkgFilter == false || b->selectedVtxFilter == false)
+    ) return false;
+  if (par.BkgFilterChoice == 2 &&
+      (b->cscTightHalo2015Filter == false || b->selectedVtxFilter == false)
+    ) return false;
 
-  if (b->selectedBkgFilter == false || b->selectedVtxFilter == false)
-    return false;
-
+  // Set HF rapidity definition
+  float HFEMaxPlus;
+  float HFEMaxMinus;
+  if (par.HFMaxRapDefn == 5) {
+    HFEMaxPlus = b->HFEMaxPlus_eta5;
+    HFEMaxMinus = b->HFEMaxMinus_eta5;
+  } else {
+    HFEMaxPlus = b->HFEMaxPlus;
+    HFEMaxMinus = b->HFEMaxMinus;
+  }
   if (par.DoSystRapGap==-1)
   {
     // alternative (loose) rapidity gap selection
-    if (par.IsGammaN && b->gammaN_EThreshSyst15() == false)
+    if (par.IsGammaN && (b->ZDCgammaN && HFEMaxPlus < 15) == false)
       return false;
-    if (!par.IsGammaN && b->Ngamma_EThreshSyst15() == false)
+    if (!par.IsGammaN && (b->ZDCNgamma && HFEMaxMinus < 15) == false)
       return false;
   }
   else if (par.DoSystRapGap==1)
   {
     // alternative (tight) rapidity gap selection
-    if (par.IsGammaN && b->gammaN_EThreshSyst5p5() == false)
+    if (par.IsGammaN && (b->ZDCgammaN && HFEMaxPlus < 5.5) == false)
       return false;
-    if (!par.IsGammaN && b->Ngamma_EThreshSyst5p5() == false)
+    if (!par.IsGammaN && (b->ZDCNgamma && HFEMaxMinus < 5.5) == false)
       return false;
   } 
-  else if (par.DoSystRapGap > 9) {
+  else if (par.DoSystRapGap > 9)
+  {
     // Custom rapidity gap threshold decision
-    if (par.IsGammaN && b->gammaN_EThreshCustom(((float)par.DoSystRapGap)/10.) == false)
+    if (par.IsGammaN && (b->ZDCgammaN && HFEMaxPlus < (((float)par.DoSystRapGap)/10.)) == false)
       return false;
-    if (!par.IsGammaN && b->Ngamma_EThreshCustom(((float)par.DoSystRapGap)/10.) == false)
+    if (!par.IsGammaN && (b->ZDCNgamma && HFEMaxMinus < (((float)par.DoSystRapGap)/10.)) == false)
       return false;
   } 
   else
   {
     // nominal rapidity gap selection
-    if (par.IsGammaN && (b->ZDCgammaN && b->gapgammaN) == false)
+    if (par.IsGammaN && (b->ZDCgammaN && HFEMaxPlus < 9.2) == false)
       return false;
-    if (!par.IsGammaN && (b->ZDCNgamma && b->gapNgamma) == false)
+    if (!par.IsGammaN && (b->ZDCNgamma && HFEMaxMinus < 8.6) == false)
       return false;
   }
 
@@ -91,7 +122,9 @@ class DataAnalyzer {
 public:
   TFile *inf, *outf;
   TH1D *hDmass;
-  DzeroUPCMicroTreeMessenger *MDzeroUPC;
+  TH1D *hDmass24003Bins;
+  TH1D *hDmass25002Bins;
+  DzeroUPCTreeMessenger *MDzeroUPC;
   TNtuple *nt;
   string title;
   TH2D *hHFEmaxPlus_vs_EvtMult;
@@ -104,7 +137,7 @@ public:
   TH1D *hRatioDEff;
 
   DataAnalyzer(const char *filename, const char *outFilename, const char *mytitle = "")
-      : inf(new TFile(filename)), MDzeroUPC(new DzeroUPCMicroTreeMessenger(*inf, string("Tree"))), title(mytitle),
+      : inf(new TFile(filename)), MDzeroUPC(new DzeroUPCTreeMessenger(*inf, string("Tree"))), title(mytitle),
         outf(new TFile(outFilename, "recreate")) {
     outf->cd();
     nt = new TNtuple("nt", "D0 mass tree", "Dmass:Dgen");
@@ -120,7 +153,9 @@ public:
 
   void analyze(Parameters &par) {
     outf->cd();
-    hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", DMASSNBINS, DMASSMIN, DMASSMAX);
+    hDmass = new TH1D(Form("hDmass%s", title.c_str()), "", DMASS_HISTNBINS, DMASS_HISTMIN, DMASS_HISTMAX);
+    hDmass24003Bins = new TH1D(Form("hDmass%s_24003Bins", title.c_str()), "", DMASS_HISTNBINS_24003, DMASS_HISTMIN_24003, DMASS_HISTMAX_24003);
+    hDmass25002Bins = new TH1D(Form("hDmass%s_25002Bins", title.c_str()), "", DMASS_HISTNBINS_25002, DMASS_HISTMIN_25002, DMASS_HISTMAX_25002);
     hDenEvtEff = new TH1D(Form("hDenEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hNumEvtEff = new TH1D(Form("hNumEvtEff%s", title.c_str()), "", 1, 0.5, 1.5);
     hRatioEvtEff = (TH1D*) hNumEvtEff->Clone("hRatioEvtEff");
@@ -140,6 +175,8 @@ public:
     }
 
     hDmass->Sumw2();
+    hDmass24003Bins->Sumw2();
+    hDmass25002Bins->Sumw2();
     hDenEvtEff->Sumw2();
     hNumEvtEff->Sumw2();
     hDenDEff->Sumw2();
@@ -208,13 +245,16 @@ public:
       // Check if the event passes the selection criteria
       if (eventSelection(MDzeroUPC, par)) {
         if (!par.IsData && isSigMCEvt) hNumEvtEff->Fill(1, GptGyWeight*MultWeight);
-        bool doTrkFilter = false;
-        if (MDzeroUPC->Dtrk1PtErr != nullptr &&
-            MDzeroUPC->Dtrk2PtErr != nullptr &&
+        bool doTrkPtErrFilter = false;
+        bool doTrkHitFilter = false;
+        if (par.DoTrkPtErrFilter &&
+            MDzeroUPC->Dtrk1PtErr != nullptr &&
+            MDzeroUPC->Dtrk2PtErr != nullptr) doTrkPtErrFilter = true;
+        if (par.DoTrkHitFilter &&
             MDzeroUPC->Dtrk1PixelHit != nullptr &&
             MDzeroUPC->Dtrk1StripHit != nullptr &&
             MDzeroUPC->Dtrk2PixelHit != nullptr &&
-            MDzeroUPC->Dtrk2StripHit != nullptr) doTrkFilter = true;
+            MDzeroUPC->Dtrk2StripHit != nullptr) doTrkHitFilter = true;
         for (unsigned long j = 0; j < MDzeroUPC->Dsize; j++) {
           if (MDzeroUPC->Dpt->at(j) < par.MinDzeroPT)
             continue;
@@ -225,7 +265,6 @@ public:
           if (MDzeroUPC->Dy->at(j) > par.MaxDzeroY)
             continue;
           if (par.DoSystD==0 && MDzeroUPC->DpassCut23PAS->at(j) == false) continue;
-          // if (par.DoSystD==0 && MDzeroUPC->DpassCut23LowPt->at(j) == false) continue;
           if (par.DoSystD==1 && MDzeroUPC->DpassCut23PASSystDsvpvSig->at(j) == false) continue;
           if (par.DoSystD==2 && MDzeroUPC->DpassCut23PASSystDtrkPt->at(j) == false) continue;
           if (par.DoSystD==3 && MDzeroUPC->DpassCut23PASSystDalpha->at(j) == false) continue;
@@ -235,18 +274,18 @@ public:
 //          if (par.DoSystD==2 && MDzeroUPC->DpassCutSystDtrkPt->at(j) == false) continue;
 //          if (par.DoSystD==3 && MDzeroUPC->DpassCutSystDalpha->at(j) == false) continue;
 //          if (par.DoSystD==4 && MDzeroUPC->DpassCutSystDchi2cl->at(j) == false) continue;
-          if (doTrkFilter) {
-            if (
+          if (doTrkPtErrFilter && (
               (MDzeroUPC->Dtrk1PtErr->at(j) / MDzeroUPC->Dtrk1Pt->at(j)) > 0.1 ||
               (MDzeroUPC->Dtrk2PtErr->at(j) / MDzeroUPC->Dtrk2Pt->at(j)) > 0.1
-            ) continue;
-           if (
-             (MDzeroUPC->Dtrk1PixelHit->at(j) + MDzeroUPC->Dtrk1StripHit->at(j)) < 11 ||
-             (MDzeroUPC->Dtrk2PixelHit->at(j) + MDzeroUPC->Dtrk2StripHit->at(j)) < 11
-           ) continue;
-          }
+            )) continue;
+          if (doTrkHitFilter && (
+              (MDzeroUPC->Dtrk1PixelHit->at(j) + MDzeroUPC->Dtrk1StripHit->at(j)) < 11 ||
+              (MDzeroUPC->Dtrk2PixelHit->at(j) + MDzeroUPC->Dtrk2StripHit->at(j)) < 11
+            )) continue;
 
           hDmass->Fill((*MDzeroUPC->Dmass)[j]);
+          hDmass24003Bins->Fill((*MDzeroUPC->Dmass)[j]);
+          hDmass25002Bins->Fill((*MDzeroUPC->Dmass)[j]);
           if (!par.IsData) {
             nt->Fill((*MDzeroUPC->Dmass)[j], (*MDzeroUPC->Dgen)[j]);
             if (MDzeroUPC->Dgen->at(j) == 23333) {
@@ -289,6 +328,8 @@ public:
   void writeHistograms(TFile *outf) {
     outf->cd();
     smartWrite(hDmass);
+    smartWrite(hDmass24003Bins);
+    smartWrite(hDmass25002Bins);
     hRatioEvtEff->Divide(hNumEvtEff, hDenEvtEff, 1, 1, "B");
     hRatioDEff->Divide(hNumDEff, hDenDEff, 1, 1, "B");
     hDenEvtEff->Write();
@@ -305,6 +346,8 @@ public:
 private:
   void deleteHistograms() {
     delete hDmass;
+    delete hDmass24003Bins;
+    delete hDmass25002Bins;
     delete hDenEvtEff;
     delete hNumEvtEff;
     delete hRatioEvtEff;
@@ -327,12 +370,14 @@ int main(int argc, char *argv[]) {
   if (printHelpMessage(argc, argv))
     return 0;
   CommandLine CL(argc, argv);
+  int Year = CL.GetDouble("Year", 0); // Data year that sample is associated with (optional for now)
   float MinDzeroPT = CL.GetDouble("MinDzeroPT", 2);  // Minimum Dzero transverse momentum threshold for Dzero selection.
   float MaxDzeroPT = CL.GetDouble("MaxDzeroPT", 5);  // Maximum Dzero transverse momentum threshold for Dzero selection.
   float MinDzeroY = CL.GetDouble("MinDzeroY", -2);   // Minimum Dzero rapidity threshold for Dzero selection.
   float MaxDzeroY = CL.GetDouble("MaxDzeroY", +2);   // Maximum Dzero rapidity threshold for Dzero selection.
   bool IsGammaN = CL.GetBool("IsGammaN", true);      // GammaN analysis (or NGamma)
-  int TriggerChoice = CL.GetInt("TriggerChoice", 2); // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
+  int TriggerChoice = CL.GetInt("TriggerChoice", 2); // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8, 3 = isL1ZDCXORJet12, 4 = isL1ZDCXORJet16,
+  int BkgFilterChoice = CL.GetInt("BkgFilterChoice", 1); // 1 = CCF + halo; 2 = halo only
   float scaleFactor = CL.GetDouble("scaleFactor", 1); // Scale factor for the number of events to be processed.
   int DoSystRapGap = CL.GetInt("DoSystRapGap", 0);   // Systematic study: apply the alternative event selections
                                                      // 0 = nominal, 1 = tight, -1: loose
@@ -344,12 +389,17 @@ int main(int argc, char *argv[]) {
   string GptGyWeightFileName= CL.Get      ("GptGyWeightFileName", "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root");
   bool DoMultReweighting   = CL.GetBool  ("DoMultReweighting", false);
   string MultWeightFileName= CL.Get      ("MultWeightFileName", "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights/testWeight.root");
+  float HFMaxRapDefn = CL.GetDouble("HFMaxRapDefn", -1);  // HF max rapidity definition: 5 for HFEmaxPlus(Minus)_eta5, 5.2 for HFEmaxPlus(Minus), -1 for samples with only HFEmaxPlus(Minus) branch
+  bool DoTrkPtErrFilter = CL.GetBool("DoTrkPtErrFilter", true);
+  bool DoTrkHitFilter = CL.GetBool("DoTrkHitFilter", true);
 
   bool IsData = CL.GetBool("IsData", 0);              // Data or MC
-  Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN, TriggerChoice, IsData, scaleFactor,
+  Parameters par(MinDzeroPT, MaxDzeroPT, MinDzeroY, MaxDzeroY, IsGammaN,
+                 TriggerChoice, BkgFilterChoice, IsData, Year, scaleFactor,
                  DoSystRapGap, DoSystD,
                  DoGptGyReweighting, GptGyWeightFileName,
-                 DoMultReweighting, MultWeightFileName);
+                 DoMultReweighting, MultWeightFileName,
+                 HFMaxRapDefn, DoTrkPtErrFilter, DoTrkHitFilter);
   par.input = CL.Get("Input", "mergedSample.root"); // Input file
   par.output = CL.Get("Output", "output.root");     // Output file
   par.nThread = CL.GetInt("nThread", 1);            // The number of threads to be used for parallel processing.
