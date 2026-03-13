@@ -12,8 +12,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -27,8 +27,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -46,8 +46,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     },
     {
@@ -61,8 +61,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -76,8 +76,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -95,8 +95,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     },
     {
@@ -110,8 +110,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -125,8 +125,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -144,8 +144,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     },
     {
@@ -159,8 +159,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -174,8 +174,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -193,8 +193,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     },
     {
@@ -208,8 +208,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -223,8 +223,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -242,8 +242,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     },
     {
@@ -257,8 +257,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -272,8 +272,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -291,8 +291,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     },
     {
@@ -306,8 +306,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -321,8 +321,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -340,8 +340,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     },
     {
@@ -355,8 +355,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": true
     },
     {
@@ -370,8 +370,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false,
       "DoGptGyReweighting": true,
       "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
@@ -389,8 +389,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": false,
-      "DoTrkHitFilter": false,
+      "DoTrkPtErrFilter": true,
+      "DoTrkHitFilter": true,
       "IsData": false
     }
   ]
