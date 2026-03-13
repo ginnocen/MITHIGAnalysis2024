@@ -107,15 +107,10 @@ bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
   } 
   else
   {
-//    // nominal rapidity gap selection
-//    if (par.IsGammaN && (b->ZDCgammaN && HFEMaxPlus < 9.2) == false)
-//      return false;
-//    if (!par.IsGammaN && (b->ZDCNgamma && HFEMaxMinus < 8.6) == false)
-//      return false;
     // nominal rapidity gap selection
-    if (par.IsGammaN && (b->ZDCgammaN && b->gapgammaN) == false)
+    if (par.IsGammaN && (b->ZDCgammaN && HFEMaxPlus < 9.2) == false)
       return false;
-    if (!par.IsGammaN && (b->ZDCNgamma && b->gapNgamma) == false)
+    if (!par.IsGammaN && (b->ZDCNgamma && HFEMaxMinus < 8.6) == false)
       return false;
   }
 
