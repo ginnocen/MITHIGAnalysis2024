@@ -12,8 +12,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -27,11 +27,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y-2--1_IsGammaN1.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -44,11 +46,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -61,8 +61,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -76,11 +76,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y-1-0_IsGammaN1.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -93,11 +95,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -110,8 +110,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -125,11 +125,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y0-1_IsGammaN1.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -142,11 +144,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -159,8 +159,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -174,11 +174,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y1-2_IsGammaN1.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -191,11 +193,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -208,8 +208,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -223,11 +223,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y-2--1_IsGammaN0.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -240,11 +242,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -257,8 +257,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -272,11 +272,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y-1-0_IsGammaN0.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -289,11 +291,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -306,8 +306,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -321,11 +321,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y0-1_IsGammaN0.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -338,11 +340,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     },
     {
       "MicroTreeBaseName": "Data.root",
@@ -355,8 +355,8 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": 5,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": true
     },
     {
@@ -370,11 +370,13 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
       "IsData": false,
       "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "GptGyWeightFileName": "../../WeightHandler/20250305_DzeroUPC_GptGyWeight/Weights/testWeight.root",
+      "DoMultReweighting": true,
+      "MultWeightFileName": "../../WeightHandler/20250312_DzeroUPC_multiplicityWeight/Weights_redo_0326/pt2-5_y1-2_IsGammaN0.root"
     },
     {
       "MicroTreeBaseName": "MC_inclusive.root",
@@ -387,11 +389,9 @@
       "TriggerChoice": 1,
       "BkgFilterChoice": 1,
       "HFMaxRapDefn": -1,
-      "DoTrkPtErrFilter": true,
-      "DoTrkHitFilter": true,
-      "IsData": false,
-      "DoGptGyReweighting": true,
-      "DoMultReweighting": true
+      "DoTrkPtErrFilter": false,
+      "DoTrkHitFilter": false,
+      "IsData": false
     }
   ]
 }
