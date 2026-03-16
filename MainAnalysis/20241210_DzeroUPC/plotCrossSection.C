@@ -406,7 +406,7 @@ int main(int argc, char *argv[])
   delete hFrame;
 
   /////////////////////////////////
-  // 2.5 Plot Raw Yield (iff Dpt 5-8)
+  // 2.5 Plot Raw Yield with comparison
   /////////////////////////////////
   
   TGraphErrors* gRawYield = new TGraphErrors(4, yValues.data(), rawYieldValues.data(), yErrors.data(), rawYieldErrors.data());
@@ -442,10 +442,10 @@ int main(int argc, char *argv[])
     if (RawYieldYMax < HIN25002_RawYieldYMax) RawYieldYMax = HIN25002_RawYieldYMax;
   }
   if (MinDzeroPT == 5 && MaxDzeroPT == 8) {
-    fHIN24003_RawYield_Dpt5_8_Dym2_m1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-2.0--1.0.root", "READ");
-    fHIN24003_RawYield_Dpt5_8_Dym1_0 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y-1.0-0.0.root", "READ");
-    fHIN24003_RawYield_Dpt5_8_Dy0_1 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y0.0-1.0.root", "READ");
-    fHIN24003_RawYield_Dpt5_8_Dy1_2 = TFile::Open("fitrootfiles_nominal/fit_hlt8_pt5-8_y1.0-2.0.root", "READ");
+    fHIN24003_RawYield_Dpt5_8_Dym2_m1 = TFile::Open("/home/data/public/jdlang/fitrootfiles_nominal/fit_hlt8_pt5-8_y-2.0--1.0.root", "READ");
+    fHIN24003_RawYield_Dpt5_8_Dym1_0 = TFile::Open("/home/data/public/jdlang/fitrootfiles_nominal/fit_hlt8_pt5-8_y-1.0-0.0.root", "READ");
+    fHIN24003_RawYield_Dpt5_8_Dy0_1 = TFile::Open("/home/data/public/jdlang/fitrootfiles_nominal/fit_hlt8_pt5-8_y0.0-1.0.root", "READ");
+    fHIN24003_RawYield_Dpt5_8_Dy1_2 = TFile::Open("/home/data/public/jdlang/fitrootfiles_nominal/fit_hlt8_pt5-8_y1.0-2.0.root", "READ");
     
     std::vector<double> HIN24003_rawYieldValues;
     std::vector<double> HIN24003_rawYieldErrors = {0., 0., 0., 0.};

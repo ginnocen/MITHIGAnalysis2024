@@ -46,12 +46,12 @@ bool checkError(const Parameters &par) { return false; }
 //======= trackSelection =====================================//
 // Check if the track pass selection criteria
 //============================================================//
-bool dzeroSelection(DzeroUPCTreeMessenger *b, Parameters par, int j) { return true; }
+bool dzeroSelection(DzeroUPCMicroTreeMessenger *b, Parameters par, int j) { return true; }
 
 //======= eventSelection =====================================//
 // Check if the event pass eventSelection criteria
 //============================================================//
-bool eventSelection(DzeroUPCTreeMessenger *b, const Parameters &par) {
+bool eventSelection(DzeroUPCMicroTreeMessenger *b, const Parameters &par) {
   if (par.IsData)
   {
     if (par.TriggerChoice == 1 && b->isL1ZDCOr == false)
@@ -124,7 +124,7 @@ public:
   TH1D *hDmass;
   TH1D *hDmass24003Bins;
   TH1D *hDmass25002Bins;
-  DzeroUPCTreeMessenger *MDzeroUPC;
+  DzeroUPCMicroTreeMessenger *MDzeroUPC;
   TNtuple *nt;
   string title;
   TH2D *hHFEmaxPlus_vs_EvtMult;
@@ -137,7 +137,7 @@ public:
   TH1D *hRatioDEff;
 
   DataAnalyzer(const char *filename, const char *outFilename, const char *mytitle = "")
-      : inf(new TFile(filename)), MDzeroUPC(new DzeroUPCTreeMessenger(*inf, string("Tree"))), title(mytitle),
+      : inf(new TFile(filename)), MDzeroUPC(new DzeroUPCMicroTreeMessenger(*inf, string("Tree"))), title(mytitle),
         outf(new TFile(outFilename, "recreate")) {
     outf->cd();
     nt = new TNtuple("nt", "D0 mass tree", "Dmass:Dgen");
