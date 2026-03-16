@@ -6,12 +6,15 @@ namespace fs = std::filesystem;
 //============================================================//
 class Parameters {
 public:
-    Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN, int TriggerChoice, bool IsData, float scaleFactor = 1.0,
+    Parameters( float MinDzeroPT, float MaxDzeroPT, float MinDzeroY, float MaxDzeroY, bool IsGammaN,
+                int TriggerChoice, int BkgFilterChoice, bool IsData, int Year = 0, float scaleFactor = 1.0,
                 int in_DoSystRapGap = 0, int in_DoSystD = 0,
                 bool in_DoGptGyReweighting = false, string in_GptGyWeightFileName = "",
-                bool in_DoMultReweighting = false, string in_MultWeightFileName = "" )
-	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), IsData(IsData), scaleFactor(scaleFactor)
+                bool in_DoMultReweighting = false, string in_MultWeightFileName = "" ,
+                float in_HFMaxRapDefn = -1, bool in_DoTrkPtErrFilter = true, bool in_DoTrkHitFilter = true)
+	: MinDzeroPT(MinDzeroPT), MaxDzeroPT(MaxDzeroPT), MinDzeroY(MinDzeroY), MaxDzeroY(MaxDzeroY), IsGammaN(IsGammaN), TriggerChoice(TriggerChoice), BkgFilterChoice(BkgFilterChoice),  IsData(IsData), Year(Year), scaleFactor(scaleFactor)
     {
+        // Check DoSystRapGap
         if (in_DoSystRapGap > 9) {
             // Custom HF energy threshold will be set to in_DoSystRapGap/10.
             printf("[INFO] Using custom rapidity gap energy threshold! (option DoSystRapGap > 9)");
@@ -24,6 +27,7 @@ public:
         }
         else { DoSystRapGap = in_DoSystRapGap; }
 
+        // Check DoSystD
         if (in_DoSystD!=0 && in_DoSystD != 1 && in_DoSystD != 2 \
                           && in_DoSystD != 3 && in_DoSystD != 4)
         {
@@ -31,6 +35,7 @@ public:
             exit(1);
         } else { DoSystD = in_DoSystD; }
 
+        // Check DoGptGyReweighting
         if (in_DoGptGyReweighting && fs::exists(in_GptGyWeightFileName))
         {
             DoGptGyReweighting  = true;
@@ -40,6 +45,7 @@ public:
             GptGyWeightFileName = "";
         }
 
+        // Check DoMultReweighting
         if (in_DoMultReweighting && fs::exists(in_MultWeightFileName))
         {
             DoMultReweighting  = true;
@@ -48,16 +54,33 @@ public:
             DoMultReweighting  = false;
             MultWeightFileName = "";
         }
+        
+        // Check HFMaxRapDefn:
+        if (in_HFMaxRapDefn == 5 || in_HFMaxRapDefn == 5.2)
+        {
+            HFMaxRapDefn = in_HFMaxRapDefn;
+        } else if (in_HFMaxRapDefn == -1) {
+            cout << "[Warning] Using unspecified definition for HFEMax. Max rapidity of HF was likely determined by forest settings." << endl;
+            HFMaxRapDefn = in_HFMaxRapDefn;
+        } else {
+            printf("[Error] Couldn't recognize the option HFMaxRapDefn=%d (should be equal to 5 or 5.2). Exiting...\n", in_HFMaxRapDefn);
+            exit(1);
+        }
+        
+        DoTrkPtErrFilter = in_DoTrkPtErrFilter;
+        DoTrkHitFilter = in_DoTrkHitFilter;
     }
     Parameters() {}
    string input;          // Input file name
    string output;         // Output file name
+   int Year;              // Year of sample data
    float MinDzeroPT;      // Lower limit of Dzero pt
    float MaxDzeroPT;      // Upper limit of Dzero pt
    float MinDzeroY;       // Lower limit of Dzero rapidity
    float MaxDzeroY;       // Upper limit of Dzero rapidity
    bool IsGammaN;         // GammaN analysis (or NGamma)
-   int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8
+   int TriggerChoice;     // 0 = no trigger sel, 1 = isL1ZDCOr, 2 = isL1ZDCXORJet8, 3 = isL1ZDCXORJet12, 4 = isL1ZDCXORJet16
+   int BkgFilterChoice;   // 1 = CCF + halo, 2 = halo only
    bool IsData;           // Data or MC
    float scaleFactor;     // Scale factor
    int DoSystRapGap;      // Systematic study: apply the alternative event selections
@@ -69,21 +92,31 @@ public:
    bool DoGptGyReweighting;      // MC reweighting:: Gpt, Gy
    string GptGyWeightFileName;   // MC reweighting:: Gpt, Gy correction factor
    bool DoMultReweighting;       // MC reweighting:: Mult
-   string MultWeightFileName;    // MC reweighting:: Mult correction factor 
-
-
+   string MultWeightFileName;    // MC reweighting:: Mult correction factor
+   float HFMaxRapDefn;    // Maximum rapidity used for HF definition: 5 or 5.2
+   bool DoTrkPtErrFilter; // Filter on DtrkPtErr / DtrkPt
+   bool DoTrkHitFilter;   // Filter on track pixel and strip hits
 
    int nThread;           // Number of Threads
    int nChunk;            // Process the Nth chunk
    void printParameters() const {
        cout << "Input file: " << input << endl;
        cout << "Output file: " << output << endl;
+       cout << "Year: " << Year << endl;
        cout << "MinDzeroPT: " << MinDzeroPT << endl;
        cout << "MaxDzeroPT: " << MaxDzeroPT << endl;
        cout << "MinDzeroY: " << MinDzeroY << endl;
        cout << "MaxDzeroY: " << MaxDzeroY << endl;
        cout << "IsGammaN: " << IsGammaN << endl; 
-       cout << "TriggerChoice: " << TriggerChoice << endl;
+       cout << "TriggerChoice: " << ((TriggerChoice==0)? "None" :
+                                     (TriggerChoice==1)? "isL1ZDCOr" :
+                                     (TriggerChoice==2)? "isL1ZDCXORJet8" :
+                                     (TriggerChoice==3)? "isL1ZDCXORJet12" :
+                                     (TriggerChoice==4)? "isL1ZDCXORJet16" : "")
+                                 << endl;
+       cout << "BkgFilterChoice: " << ((TriggerChoice==1)? "ClusterCompatibilityFilter + cscTightHalo2015Filter" :
+                                       (TriggerChoice==2)? "cscTightHalo2015Filter only" : "")
+                                   << endl;
        cout << "IsData: " << IsData << endl;
        cout << "Scale factor: " << scaleFactor << endl;
        cout << "DoSystRapGap: " << ((DoSystRapGap==0)? "No" :
@@ -99,6 +132,9 @@ public:
        cout << "GptGyWeightFileName: " << GptGyWeightFileName << endl;
        cout << "DoMultReweighting: " << DoMultReweighting << endl;
        cout << "MultWeightFileName: " << MultWeightFileName << endl;
+       cout << "HFMaxRapDefn: " << HFMaxRapDefn << endl;
+       cout << "DoTrkPtErrFilter: " << DoTrkPtErrFilter << endl;
+       cout << "DoTrkHitFilter: " << DoTrkHitFilter << endl;
        cout << "Number of Threads: " << nThread << endl;
        cout << "Process the Nth chunk: " << nChunk << endl;
 
@@ -111,7 +147,9 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     outf->cd("par"); // Change to the "par" directory
 
     // Create and fill histograms for each parameter
-    TH1D* hMinDzeroPT = new TH1D("parMinDzeroPT", "parMinDzeroPT", 1, 0, 1);  
+    TH1D* hYear = new TH1D("parYear", "parYear", 1, 0, 1);
+    hYear->SetBinContent(1, par.Year);
+    TH1D* hMinDzeroPT = new TH1D("parMinDzeroPT", "parMinDzeroPT", 1, 0, 1);
     hMinDzeroPT->SetBinContent(1, par.MinDzeroPT);
     TH1D* hMaxDzeroPT = new TH1D("parMaxDzeroPT", "parMaxDzeroPT", 1, 0, 1);
     hMaxDzeroPT->SetBinContent(1, par.MaxDzeroPT);
@@ -123,6 +161,8 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hIsGammaN->SetBinContent(1, par.IsGammaN);
     TH1D* hTriggerChoice = new TH1D("parTriggerChoice", "parTriggerChoice", 1, 0, 1);
     hTriggerChoice->SetBinContent(1, par.TriggerChoice);
+    TH1D* hBkgFilterChoice = new TH1D("parBkgFilterChoice", "parBkgFilterChoice", 1, 0, 1);
+    hBkgFilterChoice->SetBinContent(1, par.BkgFilterChoice);
     TH1D* hIsData = new TH1D("parIsData", "parIsData", 1, 0, 1);
     hIsData->SetBinContent(1, par.IsData);
     TH1D* hScaleFactor = new TH1D("parScaleFactor", "parScaleFactor", 1, 0, 1);
@@ -135,32 +175,48 @@ void saveParametersToHistograms(const Parameters& par, TFile* outf) {
     hDoGptGyReweighting->SetBinContent(1, par.DoGptGyReweighting);
     TH1D* hDoMultReweighting = new TH1D("parDoMultReweighting", "parDoMultReweighting", 1, 0, 1);
     hDoMultReweighting->SetBinContent(1, par.DoMultReweighting);
+    TH1D* hHFMaxRapDefn = new TH1D("parHFMaxRapDefn", "parHFMaxRapDefn", 1, 0, 1);
+    hHFMaxRapDefn->SetBinContent(1, par.HFMaxRapDefn);
+    TH1D* hDoTrkPtErrFilter = new TH1D("parDoTrkPtErrFilter", "parDoTrkPtErrFilter", 1, 0, 1);
+    hDoTrkPtErrFilter->SetBinContent(1, par.DoTrkPtErrFilter);
+    TH1D* hDoTrkHitFilter = new TH1D("parDoTrkHitFilter", "parDoTrkHitFilter", 1, 0, 1);
+    hDoTrkHitFilter->SetBinContent(1, par.DoTrkHitFilter);
 
     // Write histograms to the output file
+    hYear->Write();
     hMinDzeroPT->Write();
     hMaxDzeroPT->Write();
     hMinDzeroY->Write();
     hMaxDzeroY->Write();
     hIsGammaN->Write();
     hTriggerChoice->Write();
+    hBkgFilterChoice->Write();
     hIsData->Write();
     hScaleFactor->Write();
     hDoSystRapGap->Write();
     hDoSystD->Write();
     hDoGptGyReweighting->Write();
     hDoMultReweighting->Write();
+    hHFMaxRapDefn->Write();
+    hDoTrkPtErrFilter->Write();
+    hDoTrkHitFilter->Write();
 
     // Clean up
+    delete hYear;
     delete hMinDzeroPT;
     delete hMaxDzeroPT;
     delete hMinDzeroY;
     delete hMaxDzeroY;
     delete hIsGammaN;
     delete hTriggerChoice;
+    delete hBkgFilterChoice;
     delete hIsData;
     delete hScaleFactor;
     delete hDoSystRapGap;
     delete hDoSystD;
     delete hDoGptGyReweighting;
     delete hDoMultReweighting;
+    delete hHFMaxRapDefn;
+    delete hDoTrkPtErrFilter;
+    delete hDoTrkHitFilter;
 }

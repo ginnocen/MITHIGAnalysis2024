@@ -198,10 +198,14 @@ int main(int argc, char *argv[]) {
   string effInput         = CL.Get      ("effInput",      "output.root"); // Input eff file from ExecuteDzeroUPC
   string outputMD         = CL.Get      ("Output", "correctedYields.md");     // Output file
   float luminosity        = CL.GetDouble("luminosity", -999.);  // Luminosity for the corrected yield
+  float PDFraction        = CL.GetDouble("PDFraction", 1.);  // Luminosity for the corrected yield
 
   if (luminosity<0) {
     printf("[Error] 'luminosity' is a required (positive) input. Exiting... ");
     return 1;
+  }
+  if (PDFraction > 0. && PDFraction < 1.) {
+    luminosity = luminosity * PDFraction;
   }
 
   int retVal = getCorrectedYields(rawYieldInput, effInput, outputMD, luminosity );
