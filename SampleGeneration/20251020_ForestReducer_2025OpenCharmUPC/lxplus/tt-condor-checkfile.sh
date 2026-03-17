@@ -2,8 +2,8 @@
 
 # https://batchdocs.web.cern.ch/local/submit.html
 
-if [[ $# -ne 12 ]]; then
-    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection]"
+if [[ $# -ne 13 ]]; then
+    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection] [WeightMVA]"
     exit 1
 fi
 
@@ -19,9 +19,10 @@ Year=$9
 ApplyTriggerRejection=${10}
 DptThreshold=${11}
 ApplyZDCGapRejection=${12}
+WeightMVA=${13}
 
 SCRVERSION=${SCRAM_ARCH%%_*}
-runtimelimit="microcentury" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
+runtimelimit="espresso" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
 
 PROXYFILE=$HOME/$(ls $HOME -lt | grep $USER | grep -m 1 x509 | awk '{print $NF}')
 
@@ -57,7 +58,7 @@ Universe     = vanilla
 Initialdir   = $PWD/
 Notification = Error
 Executable   = $PWD/tt-${tag}-checkfile.sh
-Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection
+Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection $WeightMVA
 Output       = $LOGDIR/log-${infn}.out
 Error        = $LOGDIR/log-${infn}.err
 Log          = $LOGDIR/log-${infn}.log
@@ -68,7 +69,7 @@ MY.WantOS = "$SCRVERSION"
 should_transfer_files = YES
 use_x509userproxy = True
 x509userproxy = $PROXYFILE
-transfer_input_files = ${EXEFILE},DzeroUPC_dedxMap.root
+transfer_input_files = ${EXEFILE},DzeroUPC_dedxMap.root,weights.tar.gz
 Queue 
 EOF
 
