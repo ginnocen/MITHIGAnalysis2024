@@ -2,8 +2,8 @@
 
 # https://batchdocs.web.cern.ch/local/submit.html
 
-if [[ $# -ne 13 ]]; then
-    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection] [WeightMVA]"
+if [[ $# -ne 14 ]]; then
+    echo "usage: ./tt-condor-checkfile.sh [executable file] [input dir] [output dir] [max jobs] [log dir] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection] [WeightMVA] [YbinsMVA]"
     exit 1
 fi
 
@@ -20,6 +20,7 @@ ApplyTriggerRejection=${10}
 DptThreshold=${11}
 ApplyZDCGapRejection=${12}
 WeightMVA=${13}
+YbinsMVA="${14}"
 
 SCRVERSION=${SCRAM_ARCH%%_*}
 runtimelimit="espresso" # espresso = 20 min, microcentury = 1 hour, longlunch = 2 hours
@@ -58,7 +59,7 @@ Universe     = vanilla
 Initialdir   = $PWD/
 Notification = Error
 Executable   = $PWD/tt-${tag}-checkfile.sh
-Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection $WeightMVA
+Arguments    = $EXEFILE $inputname $DEST_CONDOR ${outputfile} $CMSSW_VERSION $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection $WeightMVA $YbinsMVA
 Output       = $LOGDIR/log-${infn}.out
 Error        = $LOGDIR/log-${infn}.err
 Log          = $LOGDIR/log-${infn}.log

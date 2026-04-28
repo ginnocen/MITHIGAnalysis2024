@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [[ $# -ne 13 ]]; then
-    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection] [WeightMVA]"
+if [[ $# -ne 14 ]]; then
+    echo "usage: ./tt-skim-checkfile.sh [executable file] [input file] [output dir] [output filename] [release] [IsData] [ApplyDRejection] [IsGammaNMCtype] [Year] [ApplyTriggerRejection] [DptThreshold] [ApplyZDCGapRejection] [WeightMVA] [YbinsMVA]"
     exit 1
 fi
 
@@ -18,6 +18,7 @@ ApplyTriggerRejection=${10}
 DptThreshold=${11}
 ApplyZDCGapRejection=${12}
 WeightMVA=${13}
+YbinsMVA="${14}"
 
 echo "SCRAM_ARCH:          "$SCRAM_ARCH
 echo "PWD:                 "$PWD
@@ -52,6 +53,7 @@ INFILE_NAME=$PWD/${INFILE##*/}
                --Output $OUTFILE \
                --RootPID DzeroUPC_dedxMap.root \
                --WeightMVA $WeightMVA \
+               --YbinsMVA $YbinsMVA \
                --ApplyTriggerRejection $ApplyTriggerRejection \
                --ApplyEventRejection false \
                --ApplyZDCGapRejection $ApplyZDCGapRejection \

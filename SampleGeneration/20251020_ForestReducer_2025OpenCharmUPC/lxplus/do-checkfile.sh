@@ -6,15 +6,15 @@ if [[ $0 != *.sh ]] ; then
 fi
 
 # Max number of files to submit for each input
-MAXFILENO=5
+MAXFILENO=100000
 
 # Exe parameters
-# Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=3 ; # Data 2025
+Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=3 ; # Data 2025
 # Year=2023 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # Data 2023
-Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # MC 2024
+# Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # MC 2024
 IsGammaNMCtype=true
 #
-PRIMARY="Dzero_260310-ydiffmva"
+PRIMARY="Dzero_260426-yrefmva"
 LABELTAG="" # e.g. versions or selections
 #
 [[ $ApplyDRejection != "no" ]] && LABELTAG+="_Drej-"$ApplyDRejection 
@@ -25,7 +25,7 @@ LABELTAG="" # e.g. versions or selections
 # 
 EXEFILE=Execute_Dzero
 COPYfiles='../../../CommonCode/root/DzeroUPC_dedxMap.root' # wrt ./
-MVAfiles='../data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA_0-1-2-3-4-5-6*'
+MVAfiles='../data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA_0-1-2-3-4-5-6*' ; YbinsMVA='-2,-1,0,1,2' ;
 
 ###############################################################################
 ## IMPORTANT:
@@ -35,11 +35,13 @@ MVAfiles='../data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA
 ###############################################################################
 INPUTS=(
     # ------ gammaN -> IsGammaNMCtype=true
-    root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260218_200449/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260218_200449/0000
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_nonprompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260219_200038/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/GNucleus-QCD-PhotonBeamA_Bin-Pthat0_UPC_5p36TeV_pythia8/crab_HiForest_260218_GNucleus-QCD-PhotonBeamA_Bin-Pthat0/260311_032100/000[0-4]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleus-QCD-PhotonBeamA_Bin-Pthat0_UPC_5p36TeV_pythia8/crab_HiForest_260218_prompt_GNucleus-QCD-PhotonBeamA_Bin-Pthat0/260311_032315/000[0-3]
     # ------ Ngamma -> IsGammaNMCtype=false
-    # # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_233803/0000
-    # # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_nonprompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_Dpt1_PF0p1/260121_000604/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_t2/260319_181748/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_nonprompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi/260218_170957/0000 # not full stats
 
     # ------ Data -> 2025
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0/251227_162520/000[0-6]
@@ -174,14 +176,14 @@ do
     ##
 
     [[ ($INPUTDIR == *BeamA* && $IsGammaNMCtype == false) || ($INPUTDIR == *BeamB* && $IsGammaNMCtype == true) ]] && { echo -e "\e[31merror:\e[0m mismatching between IsGammaNMCtype ("$IsGammaNMCtype") and Beam for MC." ; continue ; }
-    [[ ($INPUTDIR == *ythia* && $IsData == true) || ($INPUTDIR == *HIForward* && $IsData == false) ]] && { echo -e "\e[31merror:\[0m mismatching between IsData ("$IsData") and INPUTDIR "$INPUTDIR ; continue ; }
+    [[ ($INPUTDIR == *ythia* && $IsData == true) || ($INPUTDIR == *HIForward* && $IsData == false) ]] && { echo -e "\e[31merror:\e[0m mismatching between IsData ("$IsData") and INPUTDIR "$INPUTDIR ; continue ; }
 
     WeightMVA=${MVAfiles##*/}
     WeightMVA='weights/'${WeightMVA%'*'}
 
     if [ "$submit_jobs" -eq 1 ] ; then
         set -x
-        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection $WeightMVA
+        ./tt-condor-checkfile.sh $EXEFILE "$INPUTFILELIST" $OUTPUTDIR $MAXFILENO $LOGDIR $IsData $ApplyDRejection $IsGammaNMCtype $Year $ApplyTriggerRejection $DptThreshold $ApplyZDCGapRejection $WeightMVA "$YbinsMVA"
         set +x
     fi
 
@@ -192,7 +194,7 @@ if [[ "$prep_jobs" -gt 0 ]] ; then
     cp -v ../$EXEFILE .
     cp -v $COPYfiles .
 
-    rm -r weights.tar.gz weights
+    rm -rf weights.tar.gz weights
     mkdir -p weights
     for dir in $MVAfiles ; do
         cp -r $dir weights/
