@@ -25,8 +25,8 @@ using namespace DzeroSelection;
 #include "include/PIDScoring.h"
 
 #include "include/clusComp.h"
+#include "include/mvaprod.h"
 
-int main(int argc, char *argv[]);
 double GetMaxEnergyHF(PFTreeMessenger *M, double etaMin, double etaMax, double ptMin = 0.);
 
 int main(int argc, char *argv[]) {
@@ -41,7 +41,9 @@ int main(int argc, char *argv[]) {
   bool IsGammaNMCtype = CL.GetBool("IsGammaNMCtype", true); // This is only meaningful when IsData==false. gammaN: BeamA, Ngamma: BeamB
   int Year = CL.GetInt("Year", 2023);
   bool DoPID = CL.GetBool("DoPID", true);
-  auto RootPID = CL.Get("RootPID", "../../CommonCode/root/DzeroUPC_dedxMap.root");
+  const auto RootPID = CL.Get("RootPID", "../../CommonCode/root/DzeroUPC_dedxMap.root");
+  const auto WeightMVA = CL.Get("WeightMVA", ""); // ""
+  auto ybinsMVA = xjjc::vec_cast<double, float>(CL.GetDoubleVector("YbinsMVA", std::vector<double>{}));
 
   double Fraction = CL.GetDouble("Fraction", 1.00);
   float ZDCMinus1nThreshold = CL.GetDouble("ZDCMinus1nThreshold", 1000.);
@@ -49,7 +51,6 @@ int main(int argc, char *argv[]) {
   int ApplyTriggerRejection = CL.GetInteger("ApplyTriggerRejection", 0);
   bool ApplyEventRejection = CL.GetBool("ApplyEventRejection", false);
   int ApplyZDCGapRejection = CL.GetInteger("ApplyZDCGapRejection", 0);
-
   // options for how to reject non-selected D candidates (case-insensitive)
   // "NO":              keep all D's
   // "OR":              keep D's that pass the OR logic of all D selections
@@ -110,6 +111,9 @@ int main(int argc, char *argv[]) {
     fdedxProtSigmaLo = dedxFunctions[7];
     fdedxProtSigmaHi = dedxFunctions[8];
   }
+
+  auto mvas = mytmva::dir_to_weights(WeightMVA, ybinsMVA);
+  bool do_mva = !mvas.empty() && !ybinsMVA.empty();
     
   for (const auto& InputFileName : InputFileNames) {
     auto* InputFile = TFile::Open(InputFileName.c_str());
@@ -124,6 +128,8 @@ int main(int argc, char *argv[]) {
     DfinderGenTreeMessenger MDzeroGen(InputFile); // Dfinder/ntGen
     ZDCTreeMessenger MZDC(InputFile, ZDCTreeName); // zdcanalyzer/zdcrechit
     METFilterTreeMessenger MMETFilter(InputFile); // l1MetFilterRecoTree/MetFilterRecoTree
+
+    auto* value = new mytmva::varval(new hfupc::dtree(&MDzero)); // for mva
     
     int EntryCount = MEvent.GetEntries() * Fraction;
     ProgressBar Bar(cout, EntryCount);
@@ -470,7 +476,26 @@ int main(int argc, char *argv[]) {
           MDzeroUPC.DisSignalCalcPrompt->push_back(isSignalGenMatched && isPromptGenMatched);
           MDzeroUPC.DisSignalCalcFeeddown->push_back(isSignalGenMatched && isFeeddownGenMatched);
         }
+
+        if (do_mva && (MDzeroUPC.ZDCgammaN || MDzeroUPC.ZDCNgamma)) { // ZDCgammaN and Ngamma works for both data and MC
+          auto idxpt = mytmva::whichbin(MDzero.Dpt[iD], mytmva::ptbins);
+          auto mvay = MDzeroUPC.ZDCgammaN ? MDzero.Dy[iD] : (0-MDzero.Dy[iD]); // 
+          auto idxy = mytmva::whichbin(mvay, ybinsMVA);
+          auto& mva = mvas.at(idxpt).at(idxy);
+          for (auto& [m, br] : MDzeroUPC.Dmva) {
+            float mvaval = -999.;
+            if (mva.find(m) != mva.end() && mva.at(m))
+              mvaval = mva.at(m)->evalmva(value, iD);
+            br->push_back(mvaval);
+          }
+        } else {
+          for (auto& [_, br] : MDzeroUPC.Dmva) {
+            br->push_back(-999.);
+          }
+        }
+        
       }
+
       MDzeroUPC.Dsize = countSelDzero;
       MDzeroUPC.FillEntry();
     }
