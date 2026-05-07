@@ -1,0 +1,133 @@
+{
+  "MicroTreeDir": "fullAnalysis_Dextra14",
+  "sideBand": "SB",
+  "sideBandEdge": 6.0,
+  "vars": [
+    {
+      "var": "Dpt",
+      "xTitle": "D_{p_{T}} (GeV/c)",
+      "nbins": 10,
+      "xmin": 1.5,
+      "xmax": 5.5,
+      "filesuffix": "Dpt"
+    },
+    {
+      "var": "Dchi2cl",
+      "xTitle": "Dchi2cl",
+      "nbins": 7,
+      "xmin": 0.05,
+      "xmax": 1,
+      "filesuffix": "Dchi2cl"
+    },
+    {
+      "var": "Dmva_BDT",
+      "xTitle": "Dmva_BDT",
+      "nbins": 12,
+      "xmin": -1,
+      "xmax": 1,
+      "filesuffix": "Dmva_BDT"
+    }
+  ],
+  "tasks": [
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y-2--1_IsGammaN1/Data.root",
+        "massFitResult": "pt2-5_y-2--1_IsGammaN1/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y-2--1_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y-2--1_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y-2--1_IsGammaN0/Data.root",
+        "massFitResult": "pt2-5_y-2--1_IsGammaN0/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y-2--1_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y-2--1_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y-1-0_IsGammaN1/Data.root",
+        "massFitResult": "pt2-5_y-1-0_IsGammaN1/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y-1-0_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y-1-0_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y-1-0_IsGammaN0/Data.root",
+        "massFitResult": "pt2-5_y-1-0_IsGammaN0/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y-1-0_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y-1-0_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y0-1_IsGammaN1/Data.root",
+        "massFitResult": "pt2-5_y0-1_IsGammaN1/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y0-1_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y0-1_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y0-1_IsGammaN0/Data.root",
+        "massFitResult": "pt2-5_y0-1_IsGammaN0/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y0-1_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y0-1_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y1-2_IsGammaN1/Data.root",
+        "massFitResult": "pt2-5_y1-2_IsGammaN1/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y1-2_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y1-2_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y1-2_IsGammaN0/Data.root",
+        "massFitResult": "pt2-5_y1-2_IsGammaN0/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y1-2_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y1-2_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y-2-2_IsGammaN1/Data.root",
+        "massFitResult": "pt2-5_y-2-2_IsGammaN1/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y-2-2_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y-2-2_IsGammaN1/MassFit_MC/fit.root"
+      }
+    },
+    {
+      "Data": {
+        "sampleInput": "pt2-5_y-2-2_IsGammaN0/Data.root",
+        "massFitResult": "pt2-5_y-2-2_IsGammaN0/MassFit/fit.root"
+      },
+      "MC": {
+        "sampleInput": "pt2-5_y-2-2_IsGammaN1/MC.root",
+        "massFitResult": "pt2-5_y-2-2_IsGammaN1/MassFit_MC/fit.root"
+      }
+    }
+  ]
+}
