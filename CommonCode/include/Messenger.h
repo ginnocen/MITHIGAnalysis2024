@@ -1170,6 +1170,8 @@ public:
    std::vector<float> *Dip3derr;
    std::vector<float> *Dalpha;
    std::vector<float> *Ddtheta;
+   std::vector<float> *Dmva_BDT;
+   std::vector<float> *Dmva_BDTG;
    std::vector<bool>  *DpassCut23PAS;
    std::vector<bool>  *DpassCut23LowPt;
    std::vector<bool>  *DpassCut23PASSystDsvpvSig;
