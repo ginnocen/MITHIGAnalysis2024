@@ -500,6 +500,10 @@ public:
     // Candidate gen info
     int   Dgen[DFINDERCOUNTMAX];
     float Dgenpt[DFINDERCOUNTMAX];
+    int   DgenpdgId[DFINDERCOUNTMAX];
+    int   DgennDa[DFINDERCOUNTMAX];
+    int   Dgentk1pdgId[DFINDERCOUNTMAX];  
+    int   Dgentk2pdgId[DFINDERCOUNTMAX];  
     int   DgenBAncestorpdgId[DFINDERCOUNTMAX];
 
     // Candidate daughter track 1
@@ -616,6 +620,10 @@ public:
     TTree *Tree;
     int Gsize;
     float Gpt[DFINDERGENCOUNTMAX];
+    float Gtk1pt[DFINDERGENCOUNTMAX];
+    float Gtk2pt[DFINDERGENCOUNTMAX];
+    float Gtk1eta[DFINDERGENCOUNTMAX];
+    float Gtk2eta[DFINDERGENCOUNTMAX];
     float Gy[DFINDERGENCOUNTMAX];
     float Gphi[DFINDERGENCOUNTMAX];
     int GpdgId[DFINDERGENCOUNTMAX];
@@ -1188,11 +1196,17 @@ public:
   std::map<std::string, std::vector<float>*> Dmva;
    std::vector<int>   *Dgen;
    std::vector<bool>  *DisSignalCalc;
+   std::vector<bool>  *DisSignalKK;
+   std::vector<bool>  *DisSignalpipi;
    std::vector<bool>  *DisSignalCalcPrompt;
    std::vector<bool>  *DisSignalCalcFeeddown;
    //MC only quantities
    int Gsize;
    std::vector<float> *Gpt;
+   std::vector<float> *Gtk1pt;
+   std::vector<float> *Gtk2pt;
+   std::vector<float> *Gtk1eta;
+   std::vector<float> *Gtk2eta;
    std::vector<float> *Gy;
    std::vector<bool>  *GisSignalCalc;
    std::vector<bool>  *GisSignalCalcPrompt;

@@ -6,15 +6,15 @@ if [[ $0 != *.sh ]] ; then
 fi
 
 # Max number of files to submit for each input
-MAXFILENO=100000
+MAXFILENO=1000000
 
 # Exe parameters
-Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=3 ; # Data 2025
-# Year=2023 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # Data 2023
-# Year=2024 ; IsData=false ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # MC 2024
-IsGammaNMCtype=true
+# Year=2025 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # Data 2025
+# Year=2023 ; IsData=true ; ApplyDRejection=no ; ApplyTriggerRejection=2 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # Data 2023
+Year=2024 ; IsData=false ; ApplyDRejection=genmatched ; ApplyTriggerRejection=0 ; DptThreshold=2 ; ApplyZDCGapRejection=0 ; # MC 2024
+IsGammaNMCtype=false
 #
-PRIMARY="Dzero_260426-yrefmva"
+PRIMARY="Dzero_260714-gen"
 LABELTAG="" # e.g. versions or selections
 #
 [[ $ApplyDRejection != "no" ]] && LABELTAG+="_Drej-"$ApplyDRejection 
@@ -35,13 +35,14 @@ MVAfiles='../data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA
 ###############################################################################
 INPUTS=(
     # ------ gammaN -> IsGammaNMCtype=true
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260218_200449/0000
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_nonprompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260219_200038/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260328_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_trkpt0p1/260430_005302/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260328_nonprompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_trkpt0p1/260714_012049/0000
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleus-QCD-PhotonBeamA_Bin-Pthat0_UPC_5p36TeV_pythia8/crab_HiForest_260328_prompt_GNucleus-QCD-PhotonBeamA_Bin-Pthat0/260714_012341/000[0-3]
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/GNucleus-QCD-PhotonBeamA_Bin-Pthat0_UPC_5p36TeV_pythia8/crab_HiForest_260218_GNucleus-QCD-PhotonBeamA_Bin-Pthat0/260311_032100/000[0-4]
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleus-QCD-PhotonBeamA_Bin-Pthat0_UPC_5p36TeV_pythia8/crab_HiForest_260218_prompt_GNucleus-QCD-PhotonBeamA_Bin-Pthat0/260311_032315/000[0-3]
     # ------ Ngamma -> IsGammaNMCtype=false
-    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_t2/260319_181748/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260328_prompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi_trkpt0p1/260629_165743/000[0-1]
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/nonprompt-GNucleusToD0-PhotonBeamB_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_nonprompt_GNucleusToD0-PhotonBeamB_Bin-Pthat0_Kpi/260218_170957/0000 # not full stats
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleus-QCD-PhotonBeamB_Bin-Pthat0_UPC_5p36TeV_pythia8/crab_HiForest_260328_prompt_GNucleus-QCD-PhotonBeamB_Bin-Pthat0/260714_013413/000[0-1] # not full stats
 
     # ------ Data -> 2025
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward0/crab_PbPbUPC_HIForward0/251227_162520/000[0-6]
@@ -57,6 +58,19 @@ INPUTS=(
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward20/crab_PbPbUPC_HIForward20/251228_175537/000[0-6]
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward22/crab_PbPbUPC_HIForward22/251228_175617/000[0-6]
 
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward1/crab_PbPbUPC_HIForward1/260106_105443/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward3/crab_PbPbUPC_HIForward3/260106_153404/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward5/crab_PbPbUPC_HIForward5/260106_153448/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward7/crab_PbPbUPC_HIForward7/260106_153529/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward9/crab_PbPbUPC_HIForward9/260106_155453/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward11/crab_PbPbUPC_HIForward11/260106_155609/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward13/crab_PbPbUPC_HIForward13/260106_182341/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward15/crab_PbPbUPC_HIForward15/260106_182652/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward17/crab_PbPbUPC_HIForward17/260107_082251/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward19/crab_PbPbUPC_HIForward19/260107_082803/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward21/crab_PbPbUPC_HIForward21/260107_083102/000[0-6]
+    # root://xrootd-se31-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2025_PromptReco/HIForward23/crab_PbPbUPC_HIForward23/260107_083355/000[0-6]
+    
     # ------ Data -> 2023
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Jan2024ReReco_2025Reforest/HIForward0/crab_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForward0/260212_170406/000[0-1]
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Jan2024ReReco_2025Reforest/HIForward1/crab_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForward1/260212_222917/000[0-1]
@@ -79,12 +93,34 @@ INPUTS=(
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Jan2024ReReco_2025Reforest/HIForward18/crab_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForward18/260213_222303/000[0-1]
     # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Jan2024ReReco_2025Reforest/HIForward19/crab_2023PbPbUPC_Jan2024ReReco_20260212Forest_HIForward19/260213_222333/000[0-1]
     
+    # ------ Data -> 2023 (Feb2025 rereco)
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward0/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward0/260521_203705/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward1/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward1/260521_204105/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward2/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward2/260521_204622/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward3/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward3/260605_143050/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward4/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward4/260605_150709/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward5/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward5/260608_131609/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward6/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward6/260605_151605/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward7/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward7/260605_165938/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward8/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward8/260608_131711/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward9/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward9/260608_132126/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward10/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward10/260608_132331/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward11/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward11/260608_132705/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward12/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward12/260608_165115/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward13/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward13/260608_165159/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward14/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward14/260608_165240/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward15/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward15/260608_165315/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward16/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward16/260609_181242/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward17/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward17/260609_195201/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward18/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward18/260609_195311/000[0-1]
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/jdlang/Run3_PbPbUPC/Forest_2023_Feb2025ReReco_2025Reforest/HIForward19/crab_2023PbPbUPC_Feb2025ReReco_20260521Forest_HIForward19/260609_195346/000[0-1]
+
     # ------ Data -> clusComp
-    # 2025 EmptyBX
+    # # 2025 EmptyBX
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIEmptyBX_HIRun2025A_PromptReco_v1/260219_194030/0000
-    # 2023 EmptyBX
+    # # 2023 EmptyBX
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIEmptyBX_HIRun2023A_PromptReco_v2/260219_210631/0000
-    # 2025 high rate ZB
+    # # 2025 high rate ZB
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime0_HIRun2025A_highrZB_399766/260219_195114/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime1_HIRun2025A_highrZB_399766/260219_201619/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime2_HIRun2025A_highrZB_399766/260219_203507/0000
@@ -96,14 +132,16 @@ INPUTS=(
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime8_HIRun2025A_highrZB_399766/260219_230030/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime9_HIRun2025A_highrZB_399766/260219_230144/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime10_HIRun2025A_highrZB_399766/260219_230232/0000
-    # 2023 high rate ZB
+    # # 2023 high rate ZB
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime0_HIRun2023A_ZB_374970/260219_211205/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime1_HIRun2023A_ZB_374970/260219_211240/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime2_HIRun2023A_ZB_374970/260219_211409/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime3_HIRun2023A_ZB_374970/260219_211435/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime4_HIRun2023A_ZB_374970/260219_211507/0000
     # /eos/cms/store/group/phys_heavyions/wangj/Forest2023PbPb/forest/crab_HiForest_260218_HIPhysicsRawPrime5_HIRun2023A_ZB_374970/260219_211609/0000
-
+    # # 2023 UPC with clusComp
+    # root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/HIForward0/crab_HiForest_260206_HIForward0_HIRun2023A_16Jan2024_wCC/260627_234413/0000
+    
 )
 
 OUTPUTPRIDIR="/eos/cms/store/group/phys_heavyions/"$USER"/Forest"${Year}"PbPb"
