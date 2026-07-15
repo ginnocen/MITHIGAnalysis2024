@@ -94,32 +94,33 @@ set -x
 
 ### 2024 MC ###
 # inputname=HiForest_2024-MC_126.root
-# [[ -f $inputname ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260120_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_Dpt1_PF0p1/260120_232519/0000/HiForestMiniAOD_126.root $inputname
+# [[ -f $inputname ]] || xrdcp root://xrootd-vanderbilt.sites.opensciencegrid.org//store/user/wangj/prompt-GNucleusToD0-PhotonBeamA_Bin-Pthat0_Fil-Kpi_UPC_5p36TeV_pythia8-evtgen/crab_HiForest_260218_prompt_GNucleusToD0-PhotonBeamA_Bin-Pthat0_Kpi_t2/260218_200449/0000/HiForestMiniAOD_126.root $inputname
 # ./Execute_Dzero --Input $inputname \
-    #                 --Output ${inputname/HiForest_/skim_} --Year 2025 --IsData false \
-    #                 --ApplyTriggerRejection 0 \
-    #                 --ApplyEventRejection false \
-    #                 --ApplyZDCGapRejection 0 \
-    #                 --ApplyDRejection no \
-    #                 --DptThreshold 2 \
-    #                 --WeightMVA data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA_0-1-2-3-4-5-6 \
-    #                 --Fraction 1.0 \
-    #                 --HideProgressBar false
+#                     --Output ${inputname/HiForest_/skim_} --Year 2024 --IsData false \
+#                     --ApplyTriggerRejection 0 \
+#                     --ApplyEventRejection false \
+#                     --ApplyZDCGapRejection 0 \
+#                     --ApplyDRejection no \
+#                     --DptThreshold 2 \
+#                     --WeightMVA data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA_0-1-2-3-4-5-6 \
+#                     --YbinsMVA -2,-1,0,1,2 \
+#                     --Fraction 1.0 \
+#                     --HideProgressBar false
 
 ### 2025 MC ###
-inputname=HiForest_260218_RelValNuGun_151X_mcRun3_2025_realistic_v4_STD_RegeneratedGS_2025_noPU-v2.root
-[[ -f $inputname ]] || cp /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/HiForest_260218_RelValNuGun_151X_mcRun3_2025_realistic_v4_STD_RegeneratedGS_2025_noPU-v2.root $inputname
-./Execute_Dzero --Input $inputname \
-                --Output ${inputname/HiForest_/skim_} --Year 2025 --IsData false \
-                --ApplyTriggerRejection 0 \
-                --ApplyEventRejection false \
-                --ApplyZDCGapRejection 0 \
-                --ApplyDRejection no \
-                --DptThreshold 2 \
-                --WeightMVA data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA_0-1-2-3-4-5-6 \
-                --YbinsMVA -2,-1,0,1,2 \
-                --Fraction 1.0 \
-                --HideProgressBar false
+# inputname=HiForest_260218_RelValNuGun_151X_mcRun3_2025_realistic_v4_STD_RegeneratedGS_2025_noPU-v2.root
+# [[ -f $inputname ]] || cp /eos/cms/store/group/phys_heavyions/wangj/Forest2025PbPb/forest/HiForest_260218_RelValNuGun_151X_mcRun3_2025_realistic_v4_STD_RegeneratedGS_2025_noPU-v2.root $inputname
+# ./Execute_Dzero --Input $inputname \
+#                 --Output ${inputname/HiForest_/skim_} --Year 2025 --IsData false \
+#                 --ApplyTriggerRejection 0 \
+#                 --ApplyEventRejection false \
+#                 --ApplyZDCGapRejection 0 \
+#                 --ApplyDRejection no \
+#                 --DptThreshold 2 \
+#                 --WeightMVA data/weights/TMVA_trainD0_260309-gammaN_sideband_BDT-BDTG-LD-CutsGA_0-1-2-3-4-5-6 \
+#                 --YbinsMVA -2,-1,0,1,2 \
+#                 --Fraction 1.0 \
+#                 --HideProgressBar false
 
 set +x 
 
