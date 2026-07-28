@@ -3622,6 +3622,8 @@ DzeroUPCTreeMessenger::~DzeroUPCTreeMessenger()
       delete Dip3derr;
       delete Dalpha;
       delete Ddtheta;
+      delete Dmva_BDT;
+      delete Dmva_BDTG;
       delete Dgen;
       delete DisSignalCalc;
       delete DisSignalKK;
@@ -3704,6 +3706,8 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    Dip3derr = nullptr;
    Dalpha = nullptr;
    Ddtheta = nullptr;
+   Dmva_BDT = nullptr;
+   Dmva_BDTG = nullptr;
    Dgen = nullptr;
    DisSignalCalc = nullptr;
    DisSignalKK = nullptr;
@@ -3804,6 +3808,8 @@ bool DzeroUPCTreeMessenger::Initialize(bool Debug)
    CheckAndSetBranch(Tree, Dip3derr);
    CheckAndSetBranch(Tree, Dalpha);
    CheckAndSetBranch(Tree, Ddtheta);
+   CheckAndSetBranch(Tree, Dmva_BDT);
+   CheckAndSetBranch(Tree, Dmva_BDTG);
    CheckAndSetBranch(Tree, DpassCut23PAS);
    CheckAndSetBranch(Tree, DpassCut23LowPt);
    CheckAndSetBranch(Tree, DpassCut23PASSystDsvpvSig);
@@ -3919,6 +3925,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Dip3derr = new std::vector<float>();
    Dalpha = new std::vector<float>();
    Ddtheta = new std::vector<float>();
+   Dmva_BDT = new std::vector<float>();
+   Dmva_BDTG = new std::vector<float>();
    Dgen = new std::vector<int>();
    DisSignalCalc = new std::vector<bool>();
    DisSignalKK = new std::vector<bool>();
@@ -4022,6 +4030,8 @@ bool DzeroUPCTreeMessenger::SetBranch(TTree *T)
    Tree->Branch("Dip3derr",              &Dip3derr);
    Tree->Branch("Dalpha",                &Dalpha);
    Tree->Branch("Ddtheta",               &Ddtheta);
+   Tree->Branch("Dmva_BDT",              &Dmva_BDT);
+   Tree->Branch("Dmva_BDTG",             &Dmva_BDTG);
    Tree->Branch("DpassCut23PAS",         &DpassCut23PAS);
    Tree->Branch("DpassCut23LowPt",       &DpassCut23LowPt);
    Tree->Branch("DpassCut23PASSystDsvpvSig",&DpassCut23PASSystDsvpvSig);
@@ -4146,6 +4156,8 @@ void DzeroUPCTreeMessenger::Clear()
    Dip3derr->clear();
    Dalpha->clear();
    Ddtheta->clear();
+   Dmva_BDT->clear();
+   Dmva_BDTG->clear();
    DpassCut23PAS->clear();
    DpassCut23LowPt->clear();
    DpassCut23PASSystDsvpvSig->clear();
@@ -4264,6 +4276,8 @@ void DzeroUPCTreeMessenger::CopyNonTrack(DzeroUPCTreeMessenger &M)
    if(Dip3derr != nullptr && M.Dip3derr != nullptr)   *Dip3derr = *(M.Dip3derr);
    if(Dalpha != nullptr && M.Dalpha != nullptr)   *Dalpha = *(M.Dalpha);
    if(Ddtheta != nullptr && M.Ddtheta != nullptr)   *Ddtheta = *(M.Ddtheta);
+   if(Dmva_BDT != nullptr && M.Dmva_BDT != nullptr)   *Dmva_BDT = *(M.Dmva_BDT);
+   if(Dmva_BDTG != nullptr && M.Dmva_BDTG != nullptr)   *Dmva_BDTG = *(M.Dmva_BDTG);
    if(DpassCut23PAS != nullptr && M.DpassCut23PAS != nullptr)   *DpassCut23PAS = *(M.DpassCut23PAS);
    if(DpassCut23LowPt != nullptr && M.DpassCut23LowPt != nullptr)   *DpassCut23LowPt = *(M.DpassCut23LowPt);
    if(DpassCut23PASSystDsvpvSig != nullptr && M.DpassCut23PASSystDsvpvSig != nullptr)   *DpassCut23PASSystDsvpvSig = *(M.DpassCut23PASSystDsvpvSig);
@@ -4411,6 +4425,8 @@ bool DzeroUPCMicroTreeMessenger::Initialize(bool Debug)
    Dip3derr = nullptr;
    Dalpha = nullptr;
    Ddtheta = nullptr;
+   Dmva_BDT = nullptr;
+   Dmva_BDTG = nullptr;
    Dgen = nullptr;
    DisSignalCalc = nullptr;
    DisSignalCalcPrompt = nullptr;
@@ -4502,6 +4518,8 @@ bool DzeroUPCMicroTreeMessenger::Initialize(bool Debug)
 //   CheckAndSetBranch(Tree, Dip3derr);
    CheckAndSetBranch(Tree, Dalpha);
    CheckAndSetBranch(Tree, Ddtheta);
+   CheckAndSetBranch(Tree, Dmva_BDT);
+   CheckAndSetBranch(Tree, Dmva_BDTG);
    CheckAndSetBranch(Tree, DpassCut23PAS);
    CheckAndSetBranch(Tree, DpassCut23LowPt);
    CheckAndSetBranch(Tree, DpassCut23PASSystDsvpvSig);

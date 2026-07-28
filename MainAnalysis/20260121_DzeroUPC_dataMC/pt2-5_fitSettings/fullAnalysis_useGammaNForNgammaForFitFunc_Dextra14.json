@@ -1,0 +1,57 @@
+{
+  "FitDir": "MassFit",
+  "luminosity": 0.0150910275,
+  "PDFraction": 1,
+  "MicroTrees": [
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-1-0_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y0-1_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN1/MC_inclusive.root,fullAnalysis_Dextra14/pt2-5_y-2--1_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y1-2_IsGammaN0/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y-2-2_IsGammaN1/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y-2-2_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y-2-2_IsGammaN1/MC.root"
+    },
+    {
+      "dataInput": "fullAnalysis_Dextra14/pt2-5_y-2-2_IsGammaN0/Data.root",
+      "fitmcInputs": "fullAnalysis_Dextra14/pt2-5_y-2-2_IsGammaN1/MC_inclusive.root",
+      "effmcInput": "fullAnalysis_Dextra14/pt2-5_y-2-2_IsGammaN0/MC.root"
+    }
+  ]
+}
