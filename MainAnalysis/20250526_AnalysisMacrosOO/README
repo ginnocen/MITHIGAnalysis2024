@@ -1,0 +1,4 @@
+To run: 
+
+./analyze.sh: Writes Efficiency Information to a root file
+./analyzeExecute2DPlot.sh: Simple code that uses Execute2DPlot.cpp to draw 2D. Separate from other analysis
