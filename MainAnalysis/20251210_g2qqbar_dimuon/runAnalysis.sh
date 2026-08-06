@@ -2,7 +2,7 @@
 
 source clean.sh
 
-INPUT="/data00/g2ccbar/mc2018/skim_011226_0/mergedfile.root"
+INPUT="/data00/g2ccbar/mc2018/pythia_0210_softmvaID.root"
 #"/data00/g2ccbar/mc2018/skim_010526_soft_0/mergedfile.root"
 #INPUT="/data00/g2ccbar/mc2018/skim_120925_1/mergedfile.root"
 
